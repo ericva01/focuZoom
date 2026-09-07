@@ -1,0 +1,976 @@
+"use client";
+
+import { useEffect, useRef, useState, useCallback } from "react";
+import * as THREE from "three";
+import { ClickEvent, CanvasConfig, FramePreset } from "@/types/editor";
+import { applyEasing, sineEaseInOut, clamp } from "@/utils/easing";
+
+interface ThreeCameraState {
+  scale: number;
+  camX: number;
+  camY: number;
+  isZoomed: boolean;
+  activeEvent: ClickEvent | null;
+  dollyDistance: number;
+}
+
+export function useThreeAnimationEngine(
+  videoRef: React.RefObject<HTMLVideoElement>,
+  canvasRef: React.RefObject<HTMLCanvasElement>,
+  events: ClickEvent[],
+  config: CanvasConfig,
+  mousePosRef: React.RefObject<{ x: number; y: number }>
+) {
+  const [cameraState, setCameraState] = useState<ThreeCameraState>({
+    scale: 1.0,
+    camX: 0.5,
+    camY: 0.5,
+    isZoomed: false,
+    activeEvent: null,
+    dollyDistance: 1.95,
+  });
+
+  const smoothStateRef = useRef({
+    camX: 0,
+    camY: 0,
+    camZ: 1.95,
+    lookAtX: 0,
+    lookAtY: 0,
+    lookAtZ: 0,
+    rotX: 0,
+    rotY: 0,
+    rotZ: 0,
+    haloScale: 0,
+    haloOpacity: 0,
+    cursorX: 0,
+    cursorY: 0,
+  });
+
+  // Precise sub-frame timing and throttled React update refs
+  const smoothedTimeRef = useRef<number>(0);
+  const lastPerfTimeRef = useRef<number>(0);
+  const lastStateUpdateRef = useRef<number>(0);
+  const lastZoomedRef = useRef<boolean>(false);
+  const lastScaleRef = useRef<number>(1.0);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const screenMeshRef = useRef<THREE.Mesh | null>(null);
+  const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
+
+  // Helper to create rounded rectangle shape in Three.js
+  const createRoundedRectShape = (width: number, height: number, radius: number) => {
+    const shape = new THREE.Shape();
+    const x = -width / 2;
+    const y = -height / 2;
+    const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+
+    if (r <= 0.0001) {
+      shape.moveTo(x, y);
+      shape.lineTo(x + width, y);
+      shape.lineTo(x + width, y + height);
+      shape.lineTo(x, y + height);
+      shape.closePath();
+      return shape;
+    }
+
+    shape.moveTo(x + r, y);
+    shape.lineTo(x + width - r, y);
+    shape.quadraticCurveTo(x + width, y, x + width, y + r);
+    shape.lineTo(x + width, y + height - r);
+    shape.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    shape.lineTo(x + r, y + height);
+    shape.quadraticCurveTo(x, y + height, x, y + height - r);
+    shape.lineTo(x, y + r);
+    shape.quadraticCurveTo(x, y, x + r, y);
+    return shape;
+  };
+
+  // Helper to generate a background gradient canvas texture
+  const createGradientTexture = (preset: FramePreset, customFrom?: string, customTo?: string) => {
+    const c = document.createElement("canvas");
+    c.width = 1024;
+    c.height = 1024;
+    const ctx = c.getContext("2d");
+    if (!ctx) return new THREE.CanvasTexture(c);
+
+    switch (preset) {
+      case "mesh-purple": {
+        const grad = ctx.createRadialGradient(512, 300, 50, 512, 512, 700);
+        grad.addColorStop(0, "#2e1065");
+        grad.addColorStop(0.4, "#1e1b4b");
+        grad.addColorStop(0.8, "#0f172a");
+        grad.addColorStop(1, "#08090d");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        const glow = ctx.createRadialGradient(800, 800, 20, 800, 800, 450);
+        glow.addColorStop(0, "rgba(168, 85, 247, 0.28)");
+        glow.addColorStop(1, "transparent");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "cosmic-blue": {
+        const grad = ctx.createRadialGradient(400, 300, 40, 512, 512, 750);
+        grad.addColorStop(0, "#0369a1");
+        grad.addColorStop(0.4, "#1e3a8a");
+        grad.addColorStop(0.8, "#090d1f");
+        grad.addColorStop(1, "#06070a");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "obsidian-dark": {
+        const grad = ctx.createRadialGradient(512, 350, 30, 512, 512, 800);
+        grad.addColorStop(0, "#1e2438");
+        grad.addColorStop(0.5, "#101322");
+        grad.addColorStop(1, "#06070a");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "emerald-matrix": {
+        const grad = ctx.createRadialGradient(512, 400, 30, 512, 512, 700);
+        grad.addColorStop(0, "#064e3b");
+        grad.addColorStop(0.5, "#022c22");
+        grad.addColorStop(1, "#040807");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "midnight-titanium": {
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, "#334155");
+        grad.addColorStop(0.3, "#1e293b");
+        grad.addColorStop(0.7, "#0f172a");
+        grad.addColorStop(1, "#020617");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "aurora-glow": {
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, "#042f2e");
+        grad.addColorStop(0.3, "#064e3b");
+        grad.addColorStop(0.7, "#0f172a");
+        grad.addColorStop(1, "#06080e");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        const accent = ctx.createRadialGradient(600, 300, 20, 600, 300, 400);
+        accent.addColorStop(0, "rgba(20, 184, 166, 0.3)");
+        accent.addColorStop(1, "transparent");
+        ctx.fillStyle = accent;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "sunset": {
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, "#4c0519");
+        grad.addColorStop(0.4, "#451a03");
+        grad.addColorStop(0.8, "#18181b");
+        grad.addColorStop(1, "#09090b");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "hyper-neon": {
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, "#083344");
+        grad.addColorStop(0.3, "#164e63");
+        grad.addColorStop(0.7, "#701a75");
+        grad.addColorStop(1, "#4a044e");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        const cyan = ctx.createRadialGradient(250, 250, 10, 250, 250, 450);
+        cyan.addColorStop(0, "rgba(6, 182, 212, 0.4)");
+        cyan.addColorStop(1, "transparent");
+        ctx.fillStyle = cyan;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "solar-flare": {
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, "#7c2d12");
+        grad.addColorStop(0.4, "#991b1b");
+        grad.addColorStop(0.7, "#450a0a");
+        grad.addColorStop(1, "#0f0505");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      case "pastel-dream": {
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, "#312e81");
+        grad.addColorStop(0.4, "#4c1d95");
+        grad.addColorStop(0.7, "#831843");
+        grad.addColorStop(1, "#0f172a");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+      default: {
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, customFrom || "#1e1b4b");
+        grad.addColorStop(1, customTo || "#06b6d4");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+        break;
+      }
+    }
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  };
+
+  // Helper to create a soft, feathered drop shadow texture with matching rounded corners
+  const createSoftShadowTexture = (cornerRadiusNorm: number, shadowType: string) => {
+    const c = document.createElement("canvas");
+    c.width = 512;
+    c.height = 512;
+    const ctx = c.getContext("2d");
+    if (!ctx) return new THREE.CanvasTexture(c);
+
+    ctx.clearRect(0, 0, 512, 512);
+
+    const isNeon = shadowType === "neon";
+    const shadowColor = isNeon ? "rgba(6, 182, 212, 0.7)" : "rgba(0, 0, 0, 0.75)";
+    const blurAmount = isNeon ? 36 : shadowType === "cinematic" ? 48 : 28;
+
+    ctx.shadowColor = shadowColor;
+    ctx.shadowBlur = blurAmount;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 12;
+
+    const pad = 64;
+    const w = 512 - pad * 2;
+    const h = 512 - pad * 2;
+    const r = Math.max(0, Math.min(w / 2, h / 2, cornerRadiusNorm * 380));
+
+    ctx.fillStyle = shadowColor;
+    ctx.beginPath();
+    ctx.roundRect(pad, pad, w, h, r);
+    ctx.fill();
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  };
+
+  // Helper to create a sleek 3D pointer cursor sprite with precise hotspot anchor
+  const createCursorTexture = (
+    style: string,
+    color: string
+  ): { texture: THREE.CanvasTexture; anchorU: number; anchorV: number } => {
+    const c = document.createElement("canvas");
+    c.width = 128;
+    c.height = 128;
+    const ctx = c.getContext("2d");
+    if (!ctx) {
+      return {
+        texture: new THREE.CanvasTexture(c),
+        anchorU: 0.5,
+        anchorV: 0.5,
+      };
+    }
+
+    ctx.clearRect(0, 0, 128, 128);
+    let anchorU = 0.5;
+    let anchorV = 0.5;
+
+    if (style === "neon-dot") {
+      ctx.shadowColor = color || "#06b6d4";
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = color || "#06b6d4";
+      ctx.beginPath();
+      ctx.arc(64, 64, 24, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(64, 64, 10, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (style === "cyber-ring") {
+      ctx.strokeStyle = color || "#8b5cf6";
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(64, 64, 30, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(64, 64, 8, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (style === "crosshair") {
+      ctx.strokeStyle = color || "#10b981";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(64, 64, 26, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(64, 20);
+      ctx.lineTo(64, 108);
+      ctx.moveTo(20, 64);
+      ctx.lineTo(108, 64);
+      ctx.stroke();
+    } else {
+      // macOS sleek pointer arrow - hotspot tip at exactly (24, 20)
+      anchorU = 24 / 128; // 0.1875
+      anchorV = 1 - 20 / 128; // 0.84375
+
+      ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 4;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#090a10";
+      ctx.lineWidth = 5;
+      ctx.lineJoin = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(24, 20);
+      ctx.lineTo(84, 80);
+      ctx.lineTo(54, 85);
+      ctx.lineTo(69, 115);
+      ctx.lineTo(54, 122);
+      ctx.lineTo(39, 92);
+      ctx.lineTo(24, 105);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return { texture: tex, anchorU, anchorV };
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (!canvas || !video) return;
+
+    let animId: number;
+
+    // 1. WebGL Renderer
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+      preserveDrawingBuffer: true,
+      powerPreference: "high-performance",
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(canvas.width, canvas.height, false);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+
+    // 2. Scene & Perspective Camera
+    const scene = new THREE.Scene();
+    const aspect = canvas.width / canvas.height;
+    const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
+
+    // Calculate initial camera distance so video occupies ~80-84% by default (or up to 96% at 0px padding)
+    const initialPad = Math.max(0, Math.min(120, config.padding ?? 36));
+    const initialFill = 0.96 - (initialPad / 120) * 0.41;
+    const initVFovRad = (45 * Math.PI) / 180;
+    const initTanHalfFov = Math.tan(initVFovRad / 2);
+    const initialBaseZ = Math.max(
+      2.4 / (2 * initTanHalfFov * aspect * initialFill),
+      1.35 / (2 * initTanHalfFov * initialFill)
+    );
+
+    camera.position.set(0, 0, initialBaseZ);
+    cameraRef.current = camera;
+    smoothStateRef.current.camZ = initialBaseZ;
+
+    // 3. Studio Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    scene.add(ambientLight);
+
+    // Key Light (Main soft specular caster)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    keyLight.position.set(3, 4, 4);
+    scene.add(keyLight);
+
+    // Rim / Back Lights (Electric Cyan and Purple for high-end studio gloss)
+    const cyanRim = new THREE.PointLight(0x06b6d4, 1.8, 15);
+    cyanRim.position.set(-3.5, 2.5, 2.5);
+    scene.add(cyanRim);
+
+    const purpleRim = new THREE.PointLight(0xa855f7, 1.4, 15);
+    purpleRim.position.set(3.5, -2, 2);
+    scene.add(purpleRim);
+
+    // 4. 3D Backdrop / Background Plate (Gradient, Solid, Custom Image, or Transparent)
+    let backdropMesh: THREE.Mesh | null = null;
+    let customImageTex: THREE.Texture | null = null;
+
+    if (config.backgroundType !== "transparent") {
+      let bgTexture: THREE.Texture | null = null;
+      if (config.backgroundType === "gradient") {
+        bgTexture = createGradientTexture(config.backgroundPreset, config.customGradientFrom, config.customGradientTo);
+      } else if (config.backgroundType === "image" && config.customBackgroundImage) {
+        customImageTex = new THREE.TextureLoader().load(config.customBackgroundImage);
+        customImageTex.colorSpace = THREE.SRGBColorSpace;
+        bgTexture = customImageTex;
+      }
+
+      const bgGeo = new THREE.PlaneGeometry(60, 60);
+      const bgMat = new THREE.MeshBasicMaterial({
+        map: bgTexture,
+        color: config.backgroundType === "solid" ? new THREE.Color(config.solidBackgroundColor || "#06402B") : 0xffffff,
+        depthWrite: false,
+      });
+      backdropMesh = new THREE.Mesh(bgGeo, bgMat);
+      backdropMesh.position.set(0, 0, -2.5);
+      scene.add(backdropMesh);
+    }
+
+    // 5. 3D Screen Group (Video Plane + Bezel Slab + Drop Shadow + Cursor)
+    const screenGroup = new THREE.Group();
+    scene.add(screenGroup);
+
+    // Physical dimensions of the floating 3D screen
+    const screenW = 2.4;
+    const screenH = 1.35; // 16:9 base
+    const cornerRadiusPx = typeof config.cornerRadius === "number" ? config.cornerRadius : 20;
+    // Map 0px -> 0.0 (sharp square), 64px -> 0.22 (smooth pill radius)
+    const radiusNorm = (cornerRadiusPx / 64) * 0.22;
+
+    // Create front video screen mesh with rounded corners
+    const screenShape = createRoundedRectShape(screenW, screenH, radiusNorm);
+    const screenGeo = new THREE.ShapeGeometry(screenShape, 32);
+
+    // Compute proper UV mapping for the video texture
+    const posAttr = screenGeo.attributes.position;
+    const uvs = [];
+    for (let i = 0; i < posAttr.count; i++) {
+      const px = posAttr.getX(i);
+      const py = posAttr.getY(i);
+      const u = (px + screenW / 2) / screenW;
+      const v = (py + screenH / 2) / screenH;
+      uvs.push(u, v);
+    }
+    screenGeo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+
+    // Video Texture
+    const videoTexture = new THREE.VideoTexture(video);
+    videoTexture.colorSpace = THREE.SRGBColorSpace;
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+    videoTexture.generateMipmaps = false;
+
+    // Luxury Screen Material (Clearcoat Glass Sheen + Specular Reflections)
+    const reflectionStrength = config.glassReflectionIntensity ?? 0.85;
+    const screenMat = new THREE.MeshPhysicalMaterial({
+      map: videoTexture,
+      roughness: 0.18,
+      metalness: 0.05,
+      clearcoat: 0.9 * reflectionStrength,
+      clearcoatRoughness: 0.08,
+      reflectivity: 0.7 * reflectionStrength,
+      transparent: true,
+    });
+
+    const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+    screenMesh.visible = false; // Hidden until video is verified readyState >= 2
+    screenMeshRef.current = screenMesh;
+    screenGroup.add(screenMesh);
+
+    // Beveled Backing / Metal Chassis Slab (strictly flush with screenShape, no hard black bulge)
+    const bezelExtrudeSettings = {
+      depth: 0.03,
+      bevelEnabled: false, // Flush geometry ensures zero dark borders poke out of rounded corners
+      steps: 1,
+    };
+    const bezelGeo = new THREE.ExtrudeGeometry(screenShape, bezelExtrudeSettings);
+    const bezelMat = new THREE.MeshStandardMaterial({
+      color: 0x181c2e,
+      metalness: 0.85,
+      roughness: 0.25,
+      transparent: true,
+      opacity: 0.7,
+    });
+    const bezelMesh = new THREE.Mesh(bezelGeo, bezelMat);
+    bezelMesh.position.z = -0.045;
+    bezelMesh.visible = false;
+    screenGroup.add(bezelMesh);
+
+    // Ambient 3D Drop Shadow with Soft Feathered Edges (NO hard black rectangle)
+    let shadowMesh: THREE.Mesh | null = null;
+    let shadowTex: THREE.CanvasTexture | null = null;
+    if (config.shadowIntensity !== "none") {
+      const shadowGeo = new THREE.PlaneGeometry(screenW * 1.35, screenH * 1.35);
+      shadowTex = createSoftShadowTexture(radiusNorm, config.shadowIntensity);
+      const shadowOpacity =
+        config.shadowIntensity === "cinematic"
+          ? 0.7
+          : config.shadowIntensity === "neon"
+          ? 0.8
+          : 0.4;
+
+      const shadowMat = new THREE.MeshBasicMaterial({
+        map: shadowTex,
+        transparent: true,
+        opacity: shadowOpacity,
+        depthWrite: false,
+      });
+      shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+      shadowMesh.position.set(0, -0.04, -0.08);
+      shadowMesh.visible = false;
+      screenGroup.add(shadowMesh);
+    }
+
+    // 6. 3D Animated Halo Ring on Click Events
+    const haloGeo = new THREE.RingGeometry(0.01, 0.08, 48);
+    const haloColor = new THREE.Color(config.rippleColor || "#06b6d4");
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: haloColor,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+    haloMesh.position.z = 0.012;
+    screenGroup.add(haloMesh);
+
+    // 7. 3D Cursor Sprite with accurate hotspot anchor
+    const cursorInfo = createCursorTexture(config.cursorStyle, config.cursorColor);
+    const cursorMat = new THREE.SpriteMaterial({
+      map: cursorInfo.texture,
+      transparent: true,
+      depthWrite: false,
+    });
+    const cursorSprite = new THREE.Sprite(cursorMat);
+    cursorSprite.center.set(cursorInfo.anchorU, cursorInfo.anchorV);
+    const cursorScale = (config.cursorSize || 22) / 220;
+    cursorSprite.scale.set(cursorScale, cursorScale, 1);
+    cursorSprite.position.z = 0.018;
+    screenGroup.add(cursorSprite);
+
+    // Initial angle preset base (defaults to flat studio-front: 0, 0, 0)
+    let basePitch = 0;
+    let baseYaw = 0;
+    let baseRoll = 0;
+
+    switch (config.screenAnglePreset) {
+      case "studio-front":
+        basePitch = 0;
+        baseYaw = 0;
+        baseRoll = 0;
+        break;
+      case "isometric":
+        basePitch = 0.18;
+        baseYaw = -0.25;
+        baseRoll = 0.06;
+        break;
+      case "cinematic-slant":
+        basePitch = 0.1;
+        baseYaw = 0.15;
+        baseRoll = -0.03;
+        break;
+      case "floating-dynamic":
+        basePitch = 0.04;
+        baseYaw = -0.06;
+        baseRoll = 0.01;
+        break;
+      default:
+        basePitch = 0;
+        baseYaw = 0;
+        baseRoll = 0;
+        break;
+    }
+
+    // Main 60 FPS Render Loop
+    const clock = new THREE.Clock();
+
+    const render = () => {
+      const now = performance.now();
+      if (!lastPerfTimeRef.current) lastPerfTimeRef.current = now;
+      const dt = Math.min((now - lastPerfTimeRef.current) / 1000, 0.05);
+      lastPerfTimeRef.current = now;
+
+      clock.getDelta();
+      const t = clock.getElapsedTime();
+
+      // Continuous smoothed playhead time (extrapolates between video frames to eliminate decoder stair-stepping)
+      if (!video.paused && !video.seeking) {
+        smoothedTimeRef.current += dt * (video.playbackRate || 1.0);
+        const diff = video.currentTime - smoothedTimeRef.current;
+        if (Math.abs(diff) > 0.15) {
+          smoothedTimeRef.current = video.currentTime;
+        } else {
+          smoothedTimeRef.current += diff * 0.15;
+        }
+      } else {
+        smoothedTimeRef.current = video.currentTime;
+      }
+      const effectiveTime = smoothedTimeRef.current;
+
+      // Dynamically sync WebGL buffer size, camera frustum, and aspect ratio on every frame
+      const currentCanvasAspect = canvas.width / canvas.height;
+      if (
+        Math.abs(camera.aspect - currentCanvasAspect) > 0.001 ||
+        renderer.domElement.width !== canvas.width ||
+        renderer.domElement.height !== canvas.height
+      ) {
+        camera.aspect = currentCanvasAspect;
+        camera.updateProjectionMatrix();
+        renderer.setSize(canvas.width, canvas.height, false);
+      }
+
+      // Update Video Texture strictly when video is actively ready (readyState >= 2)
+      const isVideoReady =
+        video.readyState >= 2 &&
+        video.videoWidth > 0 &&
+        video.videoHeight > 0;
+
+      let screenW = 2.4;
+      let screenH = 1.35;
+
+      if (isVideoReady) {
+        videoTexture.needsUpdate = true;
+        screenMesh.visible = true;
+        if (bezelMesh) bezelMesh.visible = true;
+        if (shadowMesh) shadowMesh.visible = true;
+
+        // Dynamic aspect ratio scaling to match recorded laptop video frame
+        const videoRatio = video.videoWidth / video.videoHeight;
+        if (videoRatio >= 1.0) {
+          screenW = 2.4;
+          screenH = 2.4 / videoRatio;
+        } else {
+          screenH = 1.8;
+          screenW = 1.8 * videoRatio;
+        }
+
+        const scaleX = screenW / 2.4;
+        const scaleY = screenH / 1.35;
+        screenMesh.scale.set(scaleX, scaleY, 1);
+        if (bezelMesh) bezelMesh.scale.set(scaleX, scaleY, 1);
+        if (shadowMesh) shadowMesh.scale.set(scaleX, scaleY, 1);
+      } else {
+        // When video is not ready, keep screen hidden so the background gradient renders cleanly without any black rectangle
+        screenMesh.visible = false;
+        if (bezelMesh) bezelMesh.visible = false;
+        if (shadowMesh) shadowMesh.visible = false;
+      }
+
+      // 1. Identify Active Zoom / Keyframe Event with Smooth Transition Window
+      let targetDollyScale = 1.0;
+      let targetFocalX = 0.5;
+      let targetFocalY = 0.5;
+      let zoomProgress = 0.0;
+      let activeEvent: ClickEvent | null = null;
+
+      const enabledEvents = events.filter((e) => e.enabled);
+
+      for (const event of enabledEvents) {
+        const zoomInDuration = Math.max(0.25, config.zoomDuration || 0.45);
+        const holdDuration = Math.max(0.4, config.zoomHoldDuration || 1.2);
+        const zoomOutDuration = Math.max(0.25, config.zoomDuration || 0.45);
+        const startTime = event.timestamp; // Begins precisely when the keyframe timestamp is hit
+        const peakTime = startTime + zoomInDuration;
+        const holdEndTime = peakTime + holdDuration;
+        const endTime = holdEndTime + zoomOutDuration;
+
+        if (effectiveTime >= startTime && effectiveTime <= endTime) {
+          activeEvent = event;
+          const peakScale = event.zoom || config.defaultZoomScale || 2.2;
+
+          if (effectiveTime < peakTime) {
+            // Smooth S-curve acceleration into zoom target
+            const prog = (effectiveTime - startTime) / zoomInDuration;
+            zoomProgress = applyEasing(prog, config.zoomEasing);
+          } else if (effectiveTime <= holdEndTime) {
+            // Steady hold at target coordinates
+            zoomProgress = 1.0;
+          } else {
+            // Smooth S-curve deceleration easing back to wide view
+            const prog = (effectiveTime - holdEndTime) / zoomOutDuration;
+            zoomProgress = 1.0 - sineEaseInOut(prog);
+          }
+
+          zoomProgress = clamp(zoomProgress, 0, 1);
+          targetDollyScale = 1.0 + (peakScale - 1.0) * zoomProgress;
+          targetFocalX = 0.5 + (event.x - 0.5) * zoomProgress;
+          targetFocalY = 0.5 + (event.y - 0.5) * zoomProgress;
+          break;
+        }
+      }
+
+      // Convert focal point to 3D screen plane coordinates with sub-pixel precision
+      const focus3DX = (targetFocalX - 0.5) * screenW;
+      const focus3DY = -(targetFocalY - 0.5) * screenH;
+
+      // 2. Physical 3D Camera Dolly Zoom & Dynamic Viewport Sizing
+      const clampedPad = Math.max(0, Math.min(120, config.padding ?? 36));
+      // Dynamic fill factor: 0.96 at 0px padding down to 0.55 at 120px padding
+      // At default padding (36px), targetFill is ~0.837 (occupies a healthy 75% to 85% of viewport width)
+      // When padding is set to lower values (like 0px to 24px), the video frame scales up dynamically (0.88 to 0.96)
+      // to fill the available canvas space without leaving excessive dead canvas margins.
+      const targetFill = 0.96 - (clampedPad / 120) * 0.41;
+
+      const vFovRad = (camera.fov * Math.PI) / 180;
+      const tanHalfFov = Math.tan(vFovRad / 2);
+      const curAspect = currentCanvasAspect;
+
+      const zForWidth = screenW / (2 * tanHalfFov * curAspect * targetFill);
+      const zForHeight = screenH / (2 * tanHalfFov * targetFill);
+      const baseZ = Math.max(zForWidth, zForHeight);
+
+      const targetZ = baseZ / targetDollyScale;
+
+      // Intelligent Focal Point Centering & Viewport Edge Clamping during Dolly Zoom
+      let targetCamX = focus3DX;
+      let targetCamY = focus3DY;
+
+      const halfVisW = targetZ * tanHalfFov * curAspect;
+      const halfVisH = targetZ * tanHalfFov;
+
+      const maxCamX = screenW / 2 - halfVisW;
+      if (maxCamX > 0) {
+        targetCamX = clamp(targetCamX, -maxCamX, maxCamX);
+      } else {
+        targetCamX = 0;
+      }
+
+      const maxCamY = screenH / 2 - halfVisH;
+      if (maxCamY > 0) {
+        targetCamY = clamp(targetCamY, -maxCamY, maxCamY);
+      } else {
+        targetCamY = 0;
+      }
+
+      const targetLookX = targetCamX;
+      const targetLookY = targetCamY;
+
+      // High-precision frame-rate independent exponential lerp
+      const lerpRate = 18.0;
+      const lerpFactor = 1.0 - Math.exp(-lerpRate * dt);
+
+      smoothStateRef.current.camX += (targetCamX - smoothStateRef.current.camX) * lerpFactor;
+      smoothStateRef.current.camY += (targetCamY - smoothStateRef.current.camY) * lerpFactor;
+      smoothStateRef.current.camZ += (targetZ - smoothStateRef.current.camZ) * lerpFactor;
+
+      smoothStateRef.current.lookAtX += (targetLookX - smoothStateRef.current.lookAtX) * lerpFactor;
+      smoothStateRef.current.lookAtY += (targetLookY - smoothStateRef.current.lookAtY) * lerpFactor;
+
+      camera.position.set(
+        smoothStateRef.current.camX,
+        smoothStateRef.current.camY,
+        smoothStateRef.current.camZ
+      );
+      camera.lookAt(
+        smoothStateRef.current.lookAtX,
+        smoothStateRef.current.lookAtY,
+        0
+      );
+
+      // 3. Organic 3D Floating / Breathing Hover Animation (optional)
+      let floatY = 0;
+      let floatRotX = 0;
+      let floatRotY = 0;
+
+      if (config.enableFloatingMotion) {
+        floatY = Math.sin(t * 1.5) * 0.032;
+        floatRotX = Math.sin(t * 1.1) * 0.016;
+        floatRotY = Math.cos(t * 0.8) * 0.022;
+      }
+
+      // 4. Interactive Mouse Parallax (optional)
+      let parallaxRotX = 0;
+      let parallaxRotY = 0;
+
+      if (config.enableMouseParallax && mousePosRef.current) {
+        const pIntensity = config.mouseParallaxIntensity ?? 0.65;
+        parallaxRotY = mousePosRef.current.x * 0.18 * pIntensity;
+        parallaxRotX = -mousePosRef.current.y * 0.12 * pIntensity;
+      }
+
+      // 3D cinematic tilt and floating motion activate dynamically ON KEYFRAME
+      // In wide overview (zoomProgress === 0), stage displays as a clean, flat, zero-tilt presentation
+      const finalRotX = (basePitch + floatRotX + parallaxRotX) * zoomProgress;
+      const finalRotY = (baseYaw + floatRotY + parallaxRotY) * zoomProgress;
+      const finalRotZ = baseRoll * zoomProgress;
+      const currentFloatY = floatY * zoomProgress;
+
+      // Fast snap to pristine flat overview when at 00:00 or when completely dormant
+      if (effectiveTime <= 0.05 && zoomProgress === 0.0) {
+        smoothStateRef.current.camX = 0;
+        smoothStateRef.current.camY = 0;
+        smoothStateRef.current.camZ = baseZ;
+        smoothStateRef.current.lookAtX = 0;
+        smoothStateRef.current.lookAtY = 0;
+        smoothStateRef.current.rotX = 0;
+        smoothStateRef.current.rotY = 0;
+        smoothStateRef.current.rotZ = 0;
+      } else {
+        smoothStateRef.current.rotX += (finalRotX - smoothStateRef.current.rotX) * 0.1;
+        smoothStateRef.current.rotY += (finalRotY - smoothStateRef.current.rotY) * 0.1;
+        smoothStateRef.current.rotZ += (finalRotZ - smoothStateRef.current.rotZ) * 0.1;
+      }
+
+      screenGroup.rotation.set(
+        smoothStateRef.current.rotX,
+        smoothStateRef.current.rotY,
+        smoothStateRef.current.rotZ
+      );
+      screenGroup.position.y = currentFloatY;
+
+      // 5. 3D Cursor & Animated Luminous Halo Rings (Rock-solid transformed alignment)
+      if (activeEvent && zoomProgress > 0.02) {
+        const evX = (activeEvent.x - 0.5) * screenW;
+        const evY = -(activeEvent.y - 0.5) * screenH;
+
+        cursorSprite.visible = true;
+        cursorSprite.position.set(evX, evY, 0.022);
+
+        // Maintain sharp, natural cursor scale during camera dolly zoom
+        const baseCursorScale = (config.cursorSize || 22) / 220;
+        const distFactor = Math.pow(smoothStateRef.current.camZ / baseZ, 0.65);
+        const dynamicScale = baseCursorScale * distFactor;
+        cursorSprite.scale.set(dynamicScale, dynamicScale, 1);
+
+        // Click Ripple Wave calculation
+        const clickDelta = effectiveTime - activeEvent.timestamp;
+        const haloDuration = 0.85;
+
+        if (clickDelta >= 0 && clickDelta < haloDuration && config.showRipple) {
+          const prog = clickDelta / haloDuration;
+          const fade = 1.0 - prog;
+
+          haloMesh.visible = true;
+          haloMesh.position.set(evX, evY, 0.015);
+          haloMesh.scale.set(1 + prog * 4.5, 1 + prog * 4.5, 1);
+          haloMat.opacity = fade * 0.85;
+        } else {
+          haloMesh.visible = false;
+        }
+      } else {
+        cursorSprite.visible = false;
+        haloMesh.visible = false;
+      }
+
+      // 6. Render the 3D Scene
+      if (config.backgroundType === "transparent") {
+        renderer.setClearColor(0x000000, 0);
+        if (backdropMesh) backdropMesh.visible = false;
+      } else if (config.backgroundType === "solid") {
+        renderer.setClearColor(new THREE.Color(config.solidBackgroundColor || "#06402B"), 1);
+        if (backdropMesh) backdropMesh.visible = true;
+      } else {
+        renderer.setClearColor(0x06402B, 1);
+        if (backdropMesh) backdropMesh.visible = true;
+      }
+
+      renderer.render(scene, camera);
+
+      // Throttled UI state updates (only update React state on meaningful change to avoid GC pauses)
+      const nowMs = performance.now();
+      if (nowMs - lastStateUpdateRef.current > 180) {
+        lastStateUpdateRef.current = nowMs;
+        const isCurrentlyZoomed = targetDollyScale > 1.02;
+        if (
+          isCurrentlyZoomed !== lastZoomedRef.current ||
+          Math.abs(lastScaleRef.current - targetDollyScale) > 0.03
+        ) {
+          lastZoomedRef.current = isCurrentlyZoomed;
+          lastScaleRef.current = targetDollyScale;
+          setCameraState({
+            scale: targetDollyScale,
+            camX: targetFocalX,
+            camY: targetFocalY,
+            isZoomed: isCurrentlyZoomed,
+            activeEvent,
+            dollyDistance: smoothStateRef.current.camZ,
+          });
+        }
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      renderer.dispose();
+      screenGeo.dispose();
+      screenMat.dispose();
+      bezelGeo.dispose();
+      bezelMat.dispose();
+      haloGeo.dispose();
+      haloMat.dispose();
+      videoTexture.dispose();
+      cursorMat.dispose();
+      if (customImageTex) {
+        customImageTex.dispose();
+      }
+      if (backdropMesh) {
+        backdropMesh.geometry.dispose();
+        if (Array.isArray(backdropMesh.material)) {
+          backdropMesh.material.forEach((m) => m.dispose());
+        } else {
+          backdropMesh.material.dispose();
+        }
+      }
+      if (shadowMesh) {
+        shadowMesh.geometry.dispose();
+        (shadowMesh.material as THREE.Material).dispose();
+      }
+      if (shadowTex) {
+        shadowTex.dispose();
+      }
+    };
+  }, [videoRef, canvasRef, events, config, mousePosRef]);
+
+  const captureSnapshot = useCallback((): string | null => {
+    if (!canvasRef.current) return null;
+    return canvasRef.current.toDataURL("image/png");
+  }, [canvasRef]);
+
+  // Raycasts from 2D canvas mouse coords to the exact 3D video frame UV texture space
+  const getVideoCoordinatesAtCanvasPos = useCallback(
+    (clientX: number, clientY: number): { x: number; y: number } | null => {
+      const canvas = canvasRef.current;
+      const camera = cameraRef.current;
+      const screenMesh = screenMeshRef.current;
+      if (!canvas || !camera || !screenMesh) return null;
+
+      const rect = canvas.getBoundingClientRect();
+      const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
+      const ndcY = -(((clientY - rect.top) / rect.height) * 2 - 1);
+
+      raycasterRef.current.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+      const intersects = raycasterRef.current.intersectObject(screenMesh, false);
+
+      if (intersects.length > 0 && intersects[0].uv) {
+        const uv = intersects[0].uv;
+        return {
+          x: Math.max(0.02, Math.min(0.98, Math.round(uv.x * 1000) / 1000)),
+          y: Math.max(0.02, Math.min(0.98, Math.round((1.0 - uv.y) * 1000) / 1000)),
+        };
+      }
+
+      const rawX = (clientX - rect.left) / rect.width;
+      const rawY = (clientY - rect.top) / rect.height;
+      return {
+        x: Math.max(0.05, Math.min(0.95, Math.round(rawX * 1000) / 1000)),
+        y: Math.max(0.05, Math.min(0.95, Math.round(rawY * 1000) / 1000)),
+      };
+    },
+    [canvasRef]
+  );
+
+  return {
+    cameraState,
+    captureSnapshot,
+    getVideoCoordinatesAtCanvasPos,
+  };
+}

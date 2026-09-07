@@ -1,0 +1,112 @@
+export type AspectRatio = "16:9" | "9:16" | "4:3" | "1:1";
+
+export type EasingType = "cubic-out" | "spring" | "smooth-step" | "linear";
+
+export type BackgroundType = "gradient" | "solid" | "image" | "transparent";
+
+export type RenderMode = "3d-cinematic" | "2d-flat";
+
+export type ScreenAnglePreset =
+  | "floating-dynamic"
+  | "studio-front"
+  | "isometric"
+  | "cinematic-slant";
+
+export type FramingStyle = "auto-follow" | "focus-click" | "static";
+
+export type CursorHaloStyle = "expanding-ring" | "glowing-halo" | "pulse-ripple";
+
+export type FramePreset =
+  | "mesh-purple"
+  | "cosmic-blue"
+  | "obsidian-dark"
+  | "emerald-matrix"
+  | "midnight-titanium"
+  | "aurora-glow"
+  | "sunset"
+  | "hyper-neon"
+  | "solar-flare"
+  | "pastel-dream";
+
+export type CursorStyle = "macos-arrow" | "neon-dot" | "cyber-ring" | "crosshair";
+
+export interface ClickEvent {
+  id: string;
+  timestamp: number; // in seconds
+  x: number; // normalized 0.0 to 1.0 (relative to video width)
+  y: number; // normalized 0.0 to 1.0 (relative to video height)
+  zoom: number; // e.g. 2.0x (3D dolly magnification)
+  duration?: number; // total duration of zoom in seconds
+  label?: string;
+  enabled: boolean;
+  framingStyle?: FramingStyle;
+  dollyDepth?: number;
+}
+
+export interface CanvasConfig {
+  // 3D Engine Configurations
+  renderMode: RenderMode;
+  screenAnglePreset: ScreenAnglePreset;
+  enableFloatingMotion: boolean;
+  enableMouseParallax: boolean;
+  mouseParallaxIntensity: number; // 0.0 to 1.0
+  glassReflectionIntensity: number; // 0.0 to 1.0
+  depthOfField: boolean;
+  framingStyle: FramingStyle;
+  cursorHaloStyle: CursorHaloStyle;
+
+  // Background & Frame Geometry
+  backgroundType: BackgroundType;
+  backgroundPreset: FramePreset;
+  solidBackgroundColor: string;
+  customBackgroundImage?: string | null;
+  customGradientFrom: string;
+  customGradientTo: string;
+  cornerRadius: number; // 0 to 64px
+  padding: number; // 0 to 120px
+  shadowIntensity: "none" | "subtle" | "cinematic" | "neon";
+  showWindowBar: boolean;
+
+  // Camera Zoom & Motion
+  defaultZoomScale: number; // e.g. 2.0
+  zoomEasing: EasingType;
+  zoomDuration: number;
+  zoomHoldDuration: number;
+
+  // Cursor & Halos
+  cursorStyle: CursorStyle;
+  cursorColor: string;
+  cursorSize: number;
+  showRipple: boolean;
+  rippleColor: string;
+
+  // General Playback & Canvas
+  aspectRatio: AspectRatio;
+  playbackSpeed: number;
+}
+
+export interface VideoMetadata {
+  name: string;
+  duration: number;
+  width: number;
+  height: number;
+  fileSize?: string;
+  url: string;
+}
+
+export interface TimelineClip {
+  id: string;
+  name: string;
+  sourceStart: number; // in seconds within source video
+  sourceEnd: number;   // in seconds within source video
+  duration: number;    // sourceEnd - sourceStart
+  startTimeline: number; // in seconds on the multi-track timeline
+  endTimeline: number;   // startTimeline + duration
+  color: string;
+  speed: number;
+  volume?: number;     // 0.0 to 1.0
+  muted?: boolean;
+}
+
+export type TimelineTrackType = "keyframe" | "video" | "audio";
+
