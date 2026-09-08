@@ -10,12 +10,18 @@ import {
   X,
   ShieldCheck,
   Zap,
+  ExternalLink,
 } from "lucide-react";
 
 interface DownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const GITHUB_RELEASE_DOWNLOAD =
+  process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
+  "https://github.com/ericva01/focuZoom/releases/download/v0.1.0/FocuFlow-Studio-Setup-0.1.0.exe";
+const GITHUB_RELEASES_PAGE = "https://github.com/ericva01/focuZoom/releases";
 
 export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
   const [userOS, setUserOS] = useState<"win" | "mac" | "linux">("win");
@@ -34,18 +40,26 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
   const handleDownload = (os: "win" | "mac" | "linux") => {
     if (os === "win") {
-      // Trigger actual download of the compiled Windows installer
+      // In local dev use local file if present, in production/Vercel use GitHub Release binary
+      const isLocal =
+        typeof window !== "undefined" &&
+        (window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1");
+
+      const downloadUrl = isLocal
+        ? "/downloads/FocuFlow-Studio-Setup.exe"
+        : GITHUB_RELEASE_DOWNLOAD;
+
       const link = document.createElement("a");
-      link.href = "/downloads/FocuFlow-Studio-Setup.exe";
+      link.href = downloadUrl;
       link.download = "FocuFlow-Studio-Setup.exe";
+      link.target = "_blank";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       setDownloadStarted(true);
     } else {
-      alert(
-        `macOS & Linux builds can be packaged via 'npm run electron:dist:mac' or 'npm run electron:dist:linux'. The Windows installer is currently available for direct download!`
-      );
+      window.open(GITHUB_RELEASES_PAGE, "_blank");
     }
   };
 
@@ -82,16 +96,27 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
         {/* Download Trigger Confirmation Badge */}
         {downloadStarted && (
-          <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 flex items-center gap-3 text-left animate-in slide-in-from-top-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-            <div>
-              <p className="text-xs font-semibold text-emerald-200">
-                Your download has started!
-              </p>
-              <p className="text-[11px] text-slate-400">
-                Run <code className="text-white font-mono">FocuFlow-Studio-Setup.exe</code> once completed to install on your PC.
-              </p>
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 flex items-center justify-between gap-3 text-left animate-in slide-in-from-top-2">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-emerald-200">
+                  Your download has started!
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Run <code className="text-white font-mono">FocuFlow-Studio-Setup.exe</code> once completed to install on your PC.
+                </p>
+              </div>
             </div>
+            <a
+              href={GITHUB_RELEASES_PAGE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] text-sky-400 hover:text-sky-300 underline font-mono flex items-center gap-1 flex-shrink-0"
+            >
+              <span>Releases</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         )}
 
@@ -180,6 +205,19 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               <span className="text-[10px] font-mono text-slate-400">.AppImage</span>
             </button>
           </div>
+        </div>
+
+        {/* GitHub Releases & Source Link */}
+        <div className="mt-4 pt-3 border-t border-white/[0.06] text-center">
+          <a
+            href={GITHUB_RELEASES_PAGE}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-sky-300 transition-colors group"
+          >
+            <span>View release assets, checksums & changelog on GitHub</span>
+            <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-sky-300 transition-colors" />
+          </a>
         </div>
 
         {/* Feature badges */}
