@@ -37,6 +37,9 @@ export interface ClickEvent {
   y: number; // normalized 0.0 to 1.0 (relative to video height)
   zoom: number; // e.g. 2.0x (3D dolly magnification)
   duration?: number; // total duration of zoom in seconds
+  zoomInDuration?: number; // Dolly-in transition duration in seconds (0.15s - 3.0s)
+  holdDuration?: number; // Hold focus duration in seconds (0.2s - 10.0s)
+  zoomOutDuration?: number; // Zoom-out transition duration in seconds (0.15s - 3.0s)
   label?: string;
   enabled: boolean;
   framingStyle?: FramingStyle;
@@ -70,10 +73,12 @@ export interface CanvasConfig {
   // Camera Zoom & Motion
   defaultZoomScale: number; // e.g. 2.0
   zoomEasing: EasingType;
-  zoomDuration: number;
-  zoomHoldDuration: number;
+  zoomDuration: number; // Dolly-in transition duration
+  zoomHoldDuration: number; // Hold focus duration
+  zoomOutDuration: number; // Zoom-out transition duration
 
   // Cursor & Halos
+  showCursor: boolean; // Master toggle to show/hide custom cursor overlay
   cursorStyle: CursorStyle;
   cursorColor: string;
   cursorSize: number;

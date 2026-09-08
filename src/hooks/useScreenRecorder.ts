@@ -201,34 +201,62 @@ export function useScreenRecorder({
     setClickCount(0);
     setRecordingDuration(0);
 
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.mediaDevices ||
-      !navigator.mediaDevices.getDisplayMedia
-    ) {
-      setError("Screen recording API (getDisplayMedia) is not supported in this browser.");
-      return false;
-    }
-
     try {
-      let stream: MediaStream;
-      try {
-        // Attempt capturing display with system audio
-        stream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            displaySurface: "browser",
-            frameRate: { ideal: 60, max: 60 },
-          },
-          audio: true,
-        });
-      } catch {
-        // Fallback to video-only if audio is denied or not supported
-        stream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            frameRate: { ideal: 60, max: 60 },
-          },
-          audio: false,
-        });
+      let stream: MediaStream | null = null;
+
+      // 1. Electron Native Desktop Stream Strategy (hardware-accelerated, zero-dialog)
+      if (typeof window !== "undefined" && window.electronAPI?.getDesktopSources) {
+        try {
+          const sources = await window.electronAPI.getDesktopSources({ types: ["screen", "window"] });
+          if (sources && sources.length > 0) {
+            const primary = sources.find((s) => s.id.startsWith("screen")) || sources[0];
+            const mediaDevicesAny = navigator.mediaDevices as unknown as {
+              getUserMedia: (constraints: unknown) => Promise<MediaStream>;
+            };
+            stream = await mediaDevicesAny.getUserMedia({
+              audio: false,
+              video: {
+                mandatory: {
+                  chromeMediaSource: "desktop",
+                  chromeMediaSourceId: primary.id,
+                  minWidth: 1280,
+                  maxWidth: 3840,
+                  minHeight: 720,
+                  maxHeight: 2160,
+                  maxFrameRate: 60,
+                },
+              },
+            });
+          }
+        } catch (electronErr) {
+          console.warn("[FocuFlow] Native Electron desktop stream fallback to getDisplayMedia:", electronErr);
+        }
+      }
+
+      // 2. Browser standard getDisplayMedia (also enabled in Electron via setDisplayMediaRequestHandler)
+      if (!stream) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+          setError("Screen recording API (getDisplayMedia) is not supported in this environment.");
+          setTimeout(() => setError(null), 5000);
+          return false;
+        }
+
+        try {
+          stream = await navigator.mediaDevices.getDisplayMedia({
+            video: {
+              displaySurface: "browser",
+              frameRate: { ideal: 60, max: 60 },
+            },
+            audio: true,
+          });
+        } catch {
+          stream = await navigator.mediaDevices.getDisplayMedia({
+            video: {
+              frameRate: { ideal: 60, max: 60 },
+            },
+            audio: false,
+          });
+        }
       }
 
       streamRef.current = stream;
@@ -316,10 +344,15 @@ export function useScreenRecorder({
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== "NotAllowedError") {
         setError(err.message || "Failed to start screen recording.");
+        setTimeout(() => setError(null), 5000);
       }
       return false;
     }
   }, [defaultZoomScale, stopRecording]);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   // Clean up on unmount
   useEffect(() => {
@@ -342,6 +375,7 @@ export function useScreenRecorder({
     recordingDuration,
     clickCount,
     error,
+    clearError,
     startRecording,
     stopRecording,
   };

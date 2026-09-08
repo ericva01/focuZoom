@@ -88,6 +88,7 @@ export function MultiTrackTimeline({
   onToggleLoop,
   events,
   onSelectEvent,
+  onUpdateEvent,
   onAddKeyframeAtCurrentTime,
   clips,
   selectedClipId,
@@ -113,6 +114,10 @@ export function MultiTrackTimeline({
 
   // Interactive Dragging States
   const [isScrubbing, setIsScrubbing] = useState<boolean>(false);
+  const [localScrubTime, setLocalScrubTime] = useState<number | null>(null);
+  const scrubRafRef = useRef<number | null>(null);
+  const keyframeRafRef = useRef<number | null>(null);
+
   const [trimmingState, setTrimmingState] = useState<{
     clipId: string;
     handle: "start" | "end";
@@ -127,6 +132,11 @@ export function MultiTrackTimeline({
     duration: number;
     startX: number;
   } | null>(null);
+  const [draggingKeyframeState, setDraggingKeyframeState] = useState<{
+    eventId: string;
+    startX: number;
+    initialTimestamp: number;
+  } | null>(null);
 
   const safeDuration = Math.max(1, duration || 12);
   // Total virtual timeline duration can span several minutes (e.g. at least max clip end or 2 minutes)
@@ -140,8 +150,9 @@ export function MultiTrackTimeline({
   const basePixelsPerSecond = 50 * zoomScale;
   const timelineContentWidth = Math.max(900, totalTimelineDuration * basePixelsPerSecond);
 
-  // Compute playhead position in pixels
-  const playheadX = (currentTime / totalTimelineDuration) * timelineContentWidth;
+  // Compute playhead position in pixels (using localScrubTime when dragging for zero-latency 60fps tracking)
+  const activeDisplayTime = isScrubbing && localScrubTime !== null ? localScrubTime : currentTime;
+  const playheadX = (activeDisplayTime / totalTimelineDuration) * timelineContentWidth;
 
   // Active clip under playhead
   const activeClipUnderPlayhead = clips.find(
@@ -202,17 +213,25 @@ export function MultiTrackTimeline({
   const handleStartScrubbing = (e: React.MouseEvent) => {
     if (e.button !== 0) return;
     const seekTime = calculateTimeFromClientX(e.clientX);
+    setLocalScrubTime(seekTime);
     onSeek(seekTime);
     setIsScrubbing(true);
   };
 
   useEffect(() => {
-    if (!isScrubbing && !trimmingState && !draggingClipState) return;
+    if (!isScrubbing && !trimmingState && !draggingClipState && !draggingKeyframeState) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (isScrubbing) {
-        const seekTime = calculateTimeFromClientX(e.clientX);
-        onSeek(seekTime);
+        const clientX = e.clientX;
+        if (scrubRafRef.current === null) {
+          scrubRafRef.current = requestAnimationFrame(() => {
+            scrubRafRef.current = null;
+            const seekTime = calculateTimeFromClientX(clientX);
+            setLocalScrubTime(seekTime);
+            onSeek(seekTime);
+          });
+        }
       } else if (trimmingState) {
         const deltaPixels = e.clientX - trimmingState.startX;
         const deltaTime = deltaPixels / basePixelsPerSecond;
@@ -240,13 +259,41 @@ export function MultiTrackTimeline({
         const candidateStart = Math.max(0, draggingClipState.initialStartTimeline + deltaTime);
         const snappedStart = applySnapping(candidateStart);
         onMoveClip(draggingClipState.clipId, snappedStart);
+      } else if (draggingKeyframeState && onUpdateEvent) {
+        const clientX = e.clientX;
+        if (keyframeRafRef.current === null) {
+          keyframeRafRef.current = requestAnimationFrame(() => {
+            keyframeRafRef.current = null;
+            const deltaPixels = clientX - draggingKeyframeState.startX;
+            const deltaTime = deltaPixels / basePixelsPerSecond;
+            const candidateTime = Math.max(
+              0,
+              Math.min(totalTimelineDuration, draggingKeyframeState.initialTimestamp + deltaTime)
+            );
+            const snappedTime = applySnapping(candidateTime);
+            const roundedTime = Math.round(snappedTime * 100) / 100;
+            onUpdateEvent(draggingKeyframeState.eventId, { timestamp: roundedTime });
+            setLocalScrubTime(roundedTime);
+            onSeek(roundedTime);
+          });
+        }
       }
     };
 
     const handleMouseUp = () => {
+      if (scrubRafRef.current !== null) {
+        cancelAnimationFrame(scrubRafRef.current);
+        scrubRafRef.current = null;
+      }
+      if (keyframeRafRef.current !== null) {
+        cancelAnimationFrame(keyframeRafRef.current);
+        keyframeRafRef.current = null;
+      }
       setIsScrubbing(false);
+      setLocalScrubTime(null);
       setTrimmingState(null);
       setDraggingClipState(null);
+      setDraggingKeyframeState(null);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -260,6 +307,7 @@ export function MultiTrackTimeline({
     isScrubbing,
     trimmingState,
     draggingClipState,
+    draggingKeyframeState,
     calculateTimeFromClientX,
     basePixelsPerSecond,
     totalTimelineDuration,
@@ -267,6 +315,7 @@ export function MultiTrackTimeline({
     onSeek,
     onTrimClip,
     onMoveClip,
+    onUpdateEvent,
   ]);
 
   // Split Action
@@ -586,6 +635,7 @@ export function MultiTrackTimeline({
               {events.map((ev) => {
                 const leftPx = timeToPixel(ev.timestamp);
                 const isNearCurrent = Math.abs(currentTime - ev.timestamp) < 0.3;
+                const isDraggingThis = draggingKeyframeState?.eventId === ev.id;
 
                 return (
                   <div
@@ -594,28 +644,41 @@ export function MultiTrackTimeline({
                       e.stopPropagation();
                       onSelectEvent(ev);
                       onSeek(ev.timestamp);
+                      if (!isKeyframeTrackLocked && onUpdateEvent) {
+                        setDraggingKeyframeState({
+                          eventId: ev.id,
+                          startX: e.clientX,
+                          initialTimestamp: ev.timestamp,
+                        });
+                      }
                     }}
                     style={{ left: `${leftPx}px` }}
-                    title={`Zoom Target: ${ev.label || "Keyframe"} (${ev.zoom}x) at ${formatSMPTETimecode(ev.timestamp)}`}
-                    className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 cursor-pointer z-10 transition-transform hover:scale-125 group/pin ${
-                      isNearCurrent ? "scale-125" : ""
+                    title={`Drag horizontally to shift timecode. Zoom Target: ${ev.label || "Keyframe"} (${ev.zoom}x) at ${formatSMPTETimecode(ev.timestamp)}`}
+                    className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 cursor-ew-resize active:cursor-grabbing z-10 transition-transform hover:scale-125 group/pin select-none ${
+                      isDraggingThis ? "scale-135 z-30" : isNearCurrent ? "scale-125" : ""
                     }`}
                   >
                     {/* Diamond Marker */}
                     <div
                       className={`w-4 h-4 rotate-45 rounded-sm flex items-center justify-center border transition-all ${
-                        ev.enabled
+                        isDraggingThis
+                          ? "bg-amber-400 border-white shadow-[0_0_16px_rgba(251,191,36,1)] scale-110"
+                          : ev.enabled
                           ? isNearCurrent
                             ? "bg-sky-400 border-white shadow-[0_0_12px_rgba(56,189,248,1)]"
                             : "bg-sky-500/80 border-sky-300 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
                           : "bg-slate-600/70 border-slate-500"
                       }`}
                     >
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#090D16]" />
+                      <div className={`w-1.5 h-1.5 rounded-full ${isDraggingThis ? "bg-amber-950" : "bg-[#090D16]"}`} />
                     </div>
 
-                    {/* Tooltip on hover */}
-                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/90 border border-white/20 text-[10px] font-mono text-white whitespace-nowrap opacity-0 group-hover/pin:opacity-100 transition-opacity pointer-events-none shadow-glass-sm z-30">
+                    {/* Tooltip on hover / drag */}
+                    <div
+                      className={`absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/90 border border-white/20 text-[10px] font-mono text-white whitespace-nowrap pointer-events-none shadow-glass-sm z-30 transition-opacity ${
+                        isDraggingThis ? "opacity-100 border-amber-400/60 text-amber-200" : "opacity-0 group-hover/pin:opacity-100"
+                      }`}
+                    >
                       {ev.zoom}x · {formatSMPTETimecode(ev.timestamp).substring(3, 8)}
                     </div>
                   </div>

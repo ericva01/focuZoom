@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -47,23 +47,56 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
     }
   }, [isPlaying, play, pause]);
 
+  // Pending seek tracking for buttery 60fps real-time scrubbing without decoder stall
+  const pendingSeekRef = useRef<number | null>(null);
+  const rafSeekIdRef = useRef<number | null>(null);
+
+  const applySeekToVideo = useCallback((video: HTMLVideoElement, targetTime: number) => {
+    const fastSeekVideo = video as HTMLVideoElement & { fastSeek?: (time: number) => void };
+    if (typeof fastSeekVideo.fastSeek === "function") {
+      try {
+        fastSeekVideo.fastSeek(targetTime);
+        return;
+      } catch {
+        // Fallback to setting currentTime
+      }
+    }
+    try {
+      video.currentTime = targetTime;
+    } catch {
+      // Ignore if decoder is busy
+    }
+  }, []);
+
   const seek = useCallback(
     (targetTime: number) => {
       const video = videoRef.current;
       if (video) {
         const maxTime = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : targetTime;
         const clamped = Math.max(0, Math.min(maxTime, targetTime));
-        try {
-          video.currentTime = clamped;
-        } catch {
-          // Ignore if video element cannot seek yet
-        }
+
+        // Immediately update React time state for zero-latency UI response
         setCurrentTime(clamped);
+
+        // Throttle hardware video decoder calls to 60fps using requestAnimationFrame
+        pendingSeekRef.current = clamped;
+        if (rafSeekIdRef.current === null) {
+          rafSeekIdRef.current = requestAnimationFrame(() => {
+            rafSeekIdRef.current = null;
+            if (videoRef.current && pendingSeekRef.current !== null) {
+              const destTime = pendingSeekRef.current;
+              if (!videoRef.current.seeking) {
+                applySeekToVideo(videoRef.current, destTime);
+                pendingSeekRef.current = null;
+              }
+            }
+          });
+        }
       } else {
         setCurrentTime(Math.max(0, targetTime));
       }
     },
-    [videoRef]
+    [videoRef, applySeekToVideo]
   );
 
   const stepFrames = useCallback(
@@ -89,6 +122,15 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
       setCurrentTime(video.currentTime);
     };
 
+    const handleSeeked = () => {
+      // Pick up latest requested seek if user scrubbed rapidly while decoder was busy
+      if (video && pendingSeekRef.current !== null) {
+        const nextTime = pendingSeekRef.current;
+        pendingSeekRef.current = null;
+        applySeekToVideo(video, nextTime);
+      }
+    };
+
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
     const handleEnded = () => {
@@ -97,6 +139,7 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
 
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("seeked", handleSeeked);
     video.addEventListener("play", handlePlay);
     video.addEventListener("pause", handlePause);
     video.addEventListener("ended", handleEnded);
@@ -109,11 +152,15 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
     return () => {
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("seeked", handleSeeked);
       video.removeEventListener("play", handlePlay);
       video.removeEventListener("pause", handlePause);
       video.removeEventListener("ended", handleEnded);
+      if (rafSeekIdRef.current !== null) {
+        cancelAnimationFrame(rafSeekIdRef.current);
+      }
     };
-  }, [videoRef, isLooping]);
+  }, [videoRef, isLooping, applySeekToVideo]);
 
   // 60 FPS continuous real-time playhead sync during playback
   useEffect(() => {

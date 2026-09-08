@@ -3,8 +3,6 @@
 import { Upload, Focus, Download, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/Button";
-
 export function HowItWorks() {
   const steps = [
     {
@@ -12,14 +10,14 @@ export function HowItWorks() {
       icon: Upload,
       title: "Drop or Record Video",
       description:
-        "Import any MP4 or WebM screen capture. Or immediately test out the editor with our built-in 1-click synthetic demo recording.",
+        "Import any MP4 or WebM screen capture. Or immediately test the editor with our built-in 1-click synthetic demo recording.",
     },
     {
       step: "02",
       icon: Focus,
       title: "Mark or Auto-Zoom Clicks",
       description:
-        "Click directly on the canvas to add instant zoom targets at that timestamp. Adjust zoom factor, easing curve, and frame padding in real time.",
+        "Click directly on the canvas to add instant zoom targets at that timestamp. Adjust Dolly-In speed, hold duration, and frame padding in real time.",
     },
     {
       step: "03",
@@ -31,20 +29,28 @@ export function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 lg:py-24 relative border-t border-white/[0.08]">
-      {/* Subtle atmospheric ambient light */}
-      <div className="absolute top-1/3 left-1/4 w-[500px] h-[400px] bg-indigo-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
+    <section id="how-it-works" className="py-24 lg:py-32 relative bg-[#060913] text-white border-t border-white/[0.08] overflow-hidden select-none">
+      {/* Subtle atmospheric ambient glow */}
+      <div className="absolute top-1/3 left-1/4 w-[600px] h-[400px] bg-sky-500/[0.04] rounded-full blur-[160px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-          <span className="glass-badge text-sky-300 border-sky-400/20 bg-sky-500/10">
-            Pipeline Architecture
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-            From raw screen recording to export in under 60 seconds.
+        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md text-xs font-medium text-sky-200">
+            <svg className="w-3.5 h-3.5 text-sky-400 fill-current" viewBox="0 0 24 24">
+              <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+            </svg>
+            <span>Pipeline Architecture</span>
+          </div>
+
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
+            From raw screen recording to export <br className="hidden sm:inline" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-blue-200 to-indigo-100">
+              in under 60 seconds.
+            </span>
           </h2>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Eliminate hours of manual keyframing in heavy video editing suites.
+
+          <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
+            Eliminate hours of manual keyframing in heavy video editing suites with a simple, three-step client-side pipeline.
           </p>
         </div>
 
@@ -54,26 +60,26 @@ export function HowItWorks() {
             return (
               <div
                 key={item.step}
-                className="relative rounded-2xl p-7 glass-panel-interactive flex flex-col justify-between group overflow-hidden"
+                className="relative rounded-2xl sm:rounded-3xl p-7 bg-[#080D1A]/70 border border-white/10 hover:border-sky-400/40 backdrop-blur-xl transition-all duration-300 hover:shadow-[0_0_35px_rgba(56,189,248,0.12)] flex flex-col justify-between group overflow-hidden"
               >
                 {/* Subtle top specular accent */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:via-sky-400/60 transition-colors pointer-events-none" />
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-2xl font-bold text-sky-400">
+                    <span className="font-mono text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-300">
                       {item.step}
                     </span>
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.12] shadow-glass-sm flex items-center justify-center text-sky-300 group-hover:scale-105 group-hover:border-sky-400/40 transition-all duration-200">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-sky-400 group-hover:scale-105 group-hover:border-sky-400/40 group-hover:bg-sky-500/20 transition-all duration-300">
                       <Icon className="w-4 h-4" />
                     </div>
                   </div>
 
-                  <h3 className="text-base font-semibold text-white group-hover:text-sky-200 transition-colors">
+                  <h3 className="text-lg font-semibold text-white group-hover:text-sky-200 transition-colors">
                     {item.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
@@ -82,16 +88,16 @@ export function HowItWorks() {
           })}
         </div>
 
-        {/* Bottom CTA bar */}
-        <div className="mt-14 text-center">
+        {/* Bottom CTA bar with white pill button */}
+        <div className="mt-16 text-center">
           <Link href="/editor">
-            <Button
-              variant="primary"
-              size="lg"
-              rightIcon={<ArrowRight className="w-4 h-4" />}
+            <button
+              type="button"
+              className="rounded-full bg-white text-black text-sm font-semibold px-8 py-3.5 shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:bg-slate-100 hover:shadow-[0_0_45px_rgba(255,255,255,0.45)] transition-all duration-300 cursor-pointer inline-flex items-center gap-2 active:scale-95"
             >
-              Launch Web Studio Now
-            </Button>
+              <span>Launch Web Studio Now</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </Link>
         </div>
       </div>

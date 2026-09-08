@@ -4,7 +4,7 @@ import { Logo } from "@/components/common/Logo";
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.08] bg-[#090D16]/80 backdrop-blur-xl text-slate-300 text-sm relative z-10">
+    <footer className="border-t border-white/[0.08] bg-[#060913] text-slate-300 text-sm relative z-10 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Col 1: Brand */}
@@ -54,6 +54,12 @@ export function Footer() {
           <div>
             <h4 className="text-white font-mono font-medium text-xs tracking-wider uppercase mb-3">Resources</h4>
             <ul className="space-y-2 text-xs">
+              <li>
+                <Link href="/about" className="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>About the Creator</span>
+                  <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-sky-500/20 text-sky-300">Eric</span>
+                </Link>
+              </li>
               <li>
                 <Link href="/contact" className="text-slate-400 hover:text-white transition-colors">
                   Contact Support

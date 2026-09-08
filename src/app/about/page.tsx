@@ -1,25 +1,24 @@
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
-import { ContactInfo } from "@/components/contact/ContactInfo";
-import { ContactForm } from "@/components/contact/ContactForm";
+import { AboutView } from "@/components/about/AboutView";
 
 export const metadata = {
-  title: "Contact & Community — FocuFlow Studio",
-  description: "Get in touch with the FocuFlow team for product feedback, feature requests, and inquiries.",
+  title: "About — Eric Va & FocuFlow Studio",
+  description: "Message from creator Eric Va (Eric Lvis) and the story behind FocuFlow Studio.",
 };
 
-export default function ContactPage() {
+export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 relative select-none">
       {/* ========================================================================= */}
-      {/* CELESTIAL HORIZON AURA FOR CONTACT PAGE                                    */}
+      {/* CELESTIAL HORIZON AURA FOR ABOUT PAGE                                     */}
       {/* ========================================================================= */}
       <div className="absolute top-0 inset-x-0 h-[450px] pointer-events-none overflow-hidden flex items-start justify-center">
         <div className="absolute -top-12 w-[800px] h-[300px] bg-gradient-to-b from-sky-400/[0.14] via-sky-500/[0.04] to-transparent blur-3xl" />
         <div className="w-[1100px] h-[450px] mt-4 flex-shrink-0 opacity-70">
           <svg viewBox="0 0 1600 500" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <defs>
-              <linearGradient id="contactCrest" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id="aboutCrest" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#38bdf8" stopOpacity="0" />
                 <stop offset="35%" stopColor="#7dd3fc" stopOpacity="0.8" />
                 <stop offset="50%" stopColor="#ffffff" stopOpacity="1" />
@@ -27,7 +26,7 @@ export default function ContactPage() {
                 <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
               </linearGradient>
             </defs>
-            <path d="M 150 480 C 400 80, 1200 80, 1450 480" stroke="url(#contactCrest)" strokeWidth="2.5" fill="none" />
+            <path d="M 150 480 C 400 80, 1200 80, 1450 480" stroke="url(#aboutCrest)" strokeWidth="2.5" fill="none" />
           </svg>
         </div>
       </div>
@@ -36,17 +35,7 @@ export default function ContactPage() {
 
       <main className="flex-1 py-12 lg:py-20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-            {/* Left Col: Info */}
-            <div className="lg:col-span-5">
-              <ContactInfo />
-            </div>
-
-            {/* Right Col: Interactive Form */}
-            <div className="lg:col-span-7">
-              <ContactForm />
-            </div>
-          </div>
+          <AboutView />
         </div>
       </main>
 

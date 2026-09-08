@@ -13,6 +13,9 @@ import {
   Combine,
   Plus,
   Film,
+  Clock,
+  Timer,
+  EyeOff,
 } from "lucide-react";
 import {
   CanvasConfig,
@@ -37,6 +40,7 @@ interface EditorInspectorProps {
   onDeleteClip: (clipId: string) => void;
   onRippleDeleteClip: (clipId: string) => void;
   currentTime: number;
+  onSeek?: (time: number) => void;
   events: ClickEvent[];
   onSelectEvent: (event: ClickEvent) => void;
   onUpdateEvent: (id: string, updates: Partial<ClickEvent>) => void;
@@ -66,6 +70,7 @@ export function EditorInspector({
   onDeleteClip,
   onRippleDeleteClip,
   currentTime,
+  onSeek,
   events,
   onSelectEvent,
   onUpdateEvent,
@@ -547,12 +552,18 @@ export function EditorInspector({
         )}
 
         {/* ============================================================ */}
-        {/* TAB 3: ZOOM KEYFRAME INSPECTOR */}
+        {/* TAB 3: ZOOM KEYFRAME INSPECTOR & TIMING CONTROLS */}
         {/* ============================================================ */}
         {activeTab === "keyframes" && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-white">Click Keyframes</span>
+              <div className="flex items-center gap-1.5">
+                <Focus className="w-4 h-4 text-sky-400" />
+                <span className="text-xs font-semibold text-white">Zoom Keyframes</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                  {events.length}
+                </span>
+              </div>
               <Button
                 variant="primary"
                 size="sm"
@@ -563,8 +574,107 @@ export function EditorInspector({
               </Button>
             </div>
 
+            {/* Global Default Zoom Timing Card */}
+            <div className="glass-panel p-3.5 rounded-xl space-y-3 border-white/10 bg-white/[0.02]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+                  <Clock className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Default Camera Timing</span>
+                </div>
+                <span className="text-[10px] text-slate-400">Global defaults</span>
+              </div>
+
+              {/* Timing Quick Presets */}
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { name: "Snappy", in: 0.3, hold: 0.8, out: 0.3 },
+                  { name: "Balanced", in: 0.6, hold: 1.4, out: 0.6 },
+                  { name: "Cinematic", in: 1.0, hold: 2.4, out: 1.0 },
+                ].map((preset) => {
+                  const isActive =
+                    config.zoomDuration === preset.in &&
+                    config.zoomHoldDuration === preset.hold &&
+                    config.zoomOutDuration === preset.out;
+
+                  return (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() =>
+                        onChangeConfig({
+                          zoomDuration: preset.in,
+                          zoomHoldDuration: preset.hold,
+                          zoomOutDuration: preset.out,
+                        })
+                      }
+                      className={`py-1 px-2 rounded-lg text-[10px] font-medium border transition-all ${
+                        isActive
+                          ? "bg-sky-500/20 text-sky-200 border-sky-400/40 font-semibold"
+                          : "bg-white/[0.03] text-slate-400 border-white/10 hover:text-white hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      {preset.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-1 border-t border-white/[0.06]">
+                {/* Default Dolly In */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400">Dolly-In</span>
+                    <span className="font-mono text-sky-400 font-bold">{(config.zoomDuration ?? 0.6).toFixed(2)}s</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.15"
+                    max="2.0"
+                    step="0.05"
+                    value={config.zoomDuration ?? 0.6}
+                    onChange={(e) => onChangeConfig({ zoomDuration: parseFloat(e.target.value) })}
+                    className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                  />
+                </div>
+
+                {/* Default Hold */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400">Hold</span>
+                    <span className="font-mono text-emerald-400 font-bold">{(config.zoomHoldDuration ?? 1.4).toFixed(1)}s</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.2"
+                    max="5.0"
+                    step="0.1"
+                    value={config.zoomHoldDuration ?? 1.4}
+                    onChange={(e) => onChangeConfig({ zoomHoldDuration: parseFloat(e.target.value) })}
+                    className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/10 rounded"
+                  />
+                </div>
+
+                {/* Default Zoom-Out */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px]">
+                    <span className="text-slate-400">Zoom-Out</span>
+                    <span className="font-mono text-sky-400 font-bold">{(config.zoomOutDuration ?? 0.6).toFixed(2)}s</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.15"
+                    max="2.0"
+                    step="0.05"
+                    value={config.zoomOutDuration ?? 0.6}
+                    onChange={(e) => onChangeConfig({ zoomOutDuration: parseFloat(e.target.value) })}
+                    className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* List of keyframe events */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {events.length === 0 ? (
                 <div className="p-6 text-center text-slate-400 text-xs glass-panel rounded-xl">
                   No zoom keyframes logged. Click on the canvas or press &quot;Add at Playhead&quot;.
@@ -572,46 +682,121 @@ export function EditorInspector({
               ) : (
                 events.map((ev, index) => {
                   const isNearCurrent = Math.abs(currentTime - ev.timestamp) < 0.3;
+                  const inDur = ev.zoomInDuration ?? config.zoomDuration ?? 0.6;
+                  const holdDur = ev.holdDuration ?? config.zoomHoldDuration ?? 1.4;
+                  const outDur = ev.zoomOutDuration ?? config.zoomOutDuration ?? 0.6;
+                  const totalSpan = inDur + holdDur + outDur;
 
                   return (
                     <div
                       key={ev.id}
-                      onClick={() => onSelectEvent(ev)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer space-y-2.5 ${
+                      onClick={() => {
+                        onSelectEvent(ev);
+                        onSeek?.(ev.timestamp);
+                      }}
+                      className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-3 ${
                         isNearCurrent
-                          ? "bg-sky-500/15 border-sky-400/50 shadow-glass-sm"
-                          : "bg-black/30 border-white/10 hover:bg-white/[0.04]"
+                          ? "bg-sky-500/15 border-sky-400/50 shadow-glass-md"
+                          : "bg-black/40 border-white/10 hover:border-white/20 hover:bg-white/[0.03]"
                       }`}
                     >
+                      {/* Top Bar: Identifier, Timestamp, Delete */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-sky-500/20 border border-sky-400/30 text-sky-300 font-mono text-[10px] flex items-center justify-center">
+                          <span className="w-5 h-5 rounded-md bg-sky-500/20 border border-sky-400/30 text-sky-300 font-mono text-[10px] flex items-center justify-center font-bold">
                             #{index + 1}
                           </span>
-                          <span className="text-xs font-medium text-white">
+                          <span className="text-xs font-semibold text-white">
                             {ev.label || `Zoom Target ${index + 1}`}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[11px] font-mono text-sky-400 font-semibold">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectEvent(ev);
+                              onSeek?.(ev.timestamp);
+                            }}
+                            className="px-2 py-0.5 rounded-md bg-white/[0.06] hover:bg-sky-500/20 text-[11px] font-mono text-sky-300 border border-white/10 hover:border-sky-400/40 transition-colors cursor-pointer"
+                            title="Jump playhead to this keyframe"
+                          >
                             {formatSMPTETimecode(ev.timestamp).substring(3, 8)}
-                          </span>
+                          </button>
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               onDeleteEvent(ev.id);
                             }}
-                            className="text-slate-500 hover:text-rose-400 p-1"
+                            className="text-slate-500 hover:text-rose-400 p-1 transition-colors cursor-pointer"
+                            title="Delete Keyframe"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
 
-                      {/* Zoom factor adjustment */}
-                      <div className="flex items-center justify-between text-xs pt-1">
+                      {/* Timestamp Adjuster with Real-Time Video Seek */}
+                      <div className="space-y-2 bg-black/30 p-2.5 rounded-lg border border-white/[0.06]">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-400">Keyframe Time:</span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newTime = Math.max(0, Math.round((ev.timestamp - 0.1) * 100) / 100);
+                                onUpdateEvent(ev.id, { timestamp: newTime });
+                                onSeek?.(newTime);
+                              }}
+                              className="w-5 h-5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 text-xs flex items-center justify-center font-mono cursor-pointer"
+                              title="Step Back 0.1s"
+                            >
+                              -
+                            </button>
+                            <span className="font-mono text-xs text-sky-400 font-semibold w-12 text-center">
+                              {ev.timestamp.toFixed(2)}s
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newTime = Math.round((ev.timestamp + 0.1) * 100) / 100;
+                                onUpdateEvent(ev.id, { timestamp: newTime });
+                                onSeek?.(newTime);
+                              }}
+                              className="w-5 h-5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 text-xs flex items-center justify-center font-mono cursor-pointer"
+                              title="Step Forward 0.1s"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Real-time smooth scrub slider */}
+                        <div className="pt-0.5">
+                          <input
+                            type="range"
+                            min="0"
+                            max={Math.max(15, currentTime + 5, ev.timestamp + 5)}
+                            step="0.05"
+                            value={ev.timestamp}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              const val = Math.round(parseFloat(e.target.value) * 100) / 100;
+                              onUpdateEvent(ev.id, { timestamp: val });
+                              onSeek?.(val);
+                            }}
+                            className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                            title="Drag to smoothly scrub and move video time in real-time"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Magnification adjustment */}
+                      <div className="flex items-center justify-between text-xs">
                         <span className="text-slate-400 text-[11px]">Magnification:</span>
                         <div className="flex items-center gap-1">
                           {[1.8, 2.2, 2.8].map((scale) => (
@@ -624,13 +809,112 @@ export function EditorInspector({
                               }}
                               className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
                                 ev.zoom === scale
-                                  ? "bg-sky-500/25 text-sky-200 border border-sky-400/40"
-                                  : "bg-white/[0.04] text-slate-400 hover:text-white"
+                                  ? "bg-sky-500/25 text-sky-200 border border-sky-400/40 font-bold"
+                                  : "bg-white/[0.04] text-slate-400 hover:text-white border border-transparent"
                               }`}
                             >
                               {scale}x
                             </button>
                           ))}
+                        </div>
+                      </div>
+
+                      {/* Timing & Durations Control Panel */}
+                      <div className="pt-2 border-t border-white/[0.06] space-y-2.5">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="font-medium text-slate-300 flex items-center gap-1">
+                            <Timer className="w-3 h-3 text-sky-400" />
+                            Zoom & Hold Timing
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-400">
+                            Span: <span className="text-sky-300 font-semibold">{totalSpan.toFixed(2)}s</span>
+                          </span>
+                        </div>
+
+                        {/* 1. Dolly-In Speed / Duration */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px]">
+                            <span className="text-slate-400">Dolly-In Duration</span>
+                            <span className="font-mono text-sky-400 font-bold">{inDur.toFixed(2)}s</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.15"
+                            max="2.5"
+                            step="0.05"
+                            value={inDur}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              onUpdateEvent(ev.id, { zoomInDuration: parseFloat(e.target.value) });
+                            }}
+                            className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                          />
+                        </div>
+
+                        {/* 2. Hold Duration */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px]">
+                            <span className="text-slate-400">Hold Focus Duration</span>
+                            <span className="font-mono text-emerald-400 font-bold">{holdDur.toFixed(2)}s</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.2"
+                            max="6.0"
+                            step="0.1"
+                            value={holdDur}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              onUpdateEvent(ev.id, { holdDuration: parseFloat(e.target.value) });
+                            }}
+                            className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/10 rounded"
+                          />
+                        </div>
+
+                        {/* 3. Zoom-Out Duration */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px]">
+                            <span className="text-slate-400">Zoom-Out Duration</span>
+                            <span className="font-mono text-sky-400 font-bold">{outDur.toFixed(2)}s</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.15"
+                            max="2.5"
+                            step="0.05"
+                            value={outDur}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              onUpdateEvent(ev.id, { zoomOutDuration: parseFloat(e.target.value) });
+                            }}
+                            className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                          />
+                        </div>
+
+                        {/* Visual Timeline Span Bar */}
+                        <div className="pt-1">
+                          <div className="h-1.5 w-full rounded-full bg-black/40 overflow-hidden flex border border-white/[0.06]">
+                            <div
+                              style={{ width: `${(inDur / totalSpan) * 100}%` }}
+                              className="bg-sky-400 h-full"
+                              title={`Dolly-In: ${inDur.toFixed(2)}s`}
+                            />
+                            <div
+                              style={{ width: `${(holdDur / totalSpan) * 100}%` }}
+                              className="bg-emerald-400 h-full"
+                              title={`Hold: ${holdDur.toFixed(2)}s`}
+                            />
+                            <div
+                              style={{ width: `${(outDur / totalSpan) * 100}%` }}
+                              className="bg-sky-500 h-full"
+                              title={`Zoom-Out: ${outDur.toFixed(2)}s`}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[9px] text-slate-500 font-mono mt-1">
+                            <span>{ev.timestamp.toFixed(1)}s</span>
+                            <span>Hold ({(ev.timestamp + inDur).toFixed(1)}s)</span>
+                            <span>{(ev.timestamp + totalSpan).toFixed(1)}s</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -762,6 +1046,49 @@ export function EditorInspector({
         {/* ============================================================ */}
         {activeTab === "cursor" && (
           <div className="space-y-4">
+            {/* Master Cursor Overlay Switch */}
+            <div className="glass-panel p-4 rounded-xl space-y-3 border-sky-500/30 bg-gradient-to-r from-sky-950/20 to-transparent">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
+                      config.showCursor
+                        ? "bg-sky-500/20 border-sky-400/40 text-sky-300 shadow-glass-sm"
+                        : "bg-white/[0.04] border-white/10 text-slate-500"
+                    }`}
+                  >
+                    {config.showCursor ? (
+                      <MousePointer className="w-4 h-4" />
+                    ) : (
+                      <EyeOff className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-white block">Custom Cursor Overlay</span>
+                    <span className="text-[10px] text-slate-400">
+                      {config.showCursor ? "Visible across preview & export render" : "Hidden across preview & export render"}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onChangeConfig({ showCursor: !config.showCursor })}
+                  className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
+                    config.showCursor ? "bg-sky-500 shadow-[0_0_12px_rgba(56,189,248,0.5)]" : "bg-white/15"
+                  }`}
+                  title={config.showCursor ? "Hide cursor overlay" : "Show cursor overlay"}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white transition-transform shadow-md ${
+                      config.showCursor ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div className={`space-y-4 transition-opacity ${config.showCursor ? "opacity-100" : "opacity-60 pointer-events-none"}`}>
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <label className="text-xs font-semibold text-white block">Cursor Pointer Style</label>
               <div className="grid grid-cols-2 gap-2">
@@ -824,6 +1151,7 @@ export function EditorInspector({
               <p className="text-[11px] text-slate-400 leading-relaxed">
                 Renders expanding concentric wave rings on recorded mouse clicks mapped to the 3D screen.
               </p>
+            </div>
             </div>
           </div>
         )}

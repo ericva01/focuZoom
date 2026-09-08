@@ -671,9 +671,9 @@ export function useThreeAnimationEngine(
       const enabledEvents = events.filter((e) => e.enabled);
 
       for (const event of enabledEvents) {
-        const zoomInDuration = Math.max(0.25, config.zoomDuration || 0.45);
-        const holdDuration = Math.max(0.4, config.zoomHoldDuration || 1.2);
-        const zoomOutDuration = Math.max(0.25, config.zoomDuration || 0.45);
+        const zoomInDuration = Math.max(0.15, event.zoomInDuration ?? config.zoomDuration ?? 0.45);
+        const holdDuration = Math.max(0.2, event.holdDuration ?? config.zoomHoldDuration ?? 1.2);
+        const zoomOutDuration = Math.max(0.15, event.zoomOutDuration ?? config.zoomOutDuration ?? config.zoomDuration ?? 0.45);
         const startTime = event.timestamp; // Begins precisely when the keyframe timestamp is hit
         const peakTime = startTime + zoomInDuration;
         const holdEndTime = peakTime + holdDuration;
@@ -726,26 +726,12 @@ export function useThreeAnimationEngine(
 
       const targetZ = baseZ / targetDollyScale;
 
-      // Intelligent Focal Point Centering & Viewport Edge Clamping during Dolly Zoom
-      let targetCamX = focus3DX;
-      let targetCamY = focus3DY;
-
-      const halfVisW = targetZ * tanHalfFov * curAspect;
-      const halfVisH = targetZ * tanHalfFov;
-
-      const maxCamX = screenW / 2 - halfVisW;
-      if (maxCamX > 0) {
-        targetCamX = clamp(targetCamX, -maxCamX, maxCamX);
-      } else {
-        targetCamX = 0;
-      }
-
-      const maxCamY = screenH / 2 - halfVisH;
-      if (maxCamY > 0) {
-        targetCamY = clamp(targetCamY, -maxCamY, maxCamY);
-      } else {
-        targetCamY = 0;
-      }
+      // Dynamic Cursor Tracking: Camera moves directly to the user's cursor position
+      // Clamped to 48% of screen boundaries so it never drifts into empty space while fully reaching the edges
+      const maxReachX = screenW * 0.48;
+      const maxReachY = screenH * 0.48;
+      const targetCamX = clamp(focus3DX, -maxReachX, maxReachX);
+      const targetCamY = clamp(focus3DY, -maxReachY, maxReachY);
 
       const targetLookX = targetCamX;
       const targetLookY = targetCamY;
@@ -793,11 +779,18 @@ export function useThreeAnimationEngine(
         parallaxRotX = -mousePosRef.current.y * 0.12 * pIntensity;
       }
 
-      // 3D cinematic tilt and floating motion activate dynamically ON KEYFRAME
-      // In wide overview (zoomProgress === 0), stage displays as a clean, flat, zero-tilt presentation
-      const finalRotX = (basePitch + floatRotX + parallaxRotX) * zoomProgress;
-      const finalRotY = (baseYaw + floatRotY + parallaxRotY) * zoomProgress;
-      const finalRotZ = baseRoll * zoomProgress;
+      // 5. Dynamic 3D Cursor Tracking Tilt:
+      // When user clicks on the left side, the 3D plane tilts toward the left.
+      // When user clicks on the right, it tilts toward the right.
+      const cursorDeltaX = targetFocalX - 0.5;
+      const cursorDeltaY = targetFocalY - 0.5;
+      const cursorTrackingYaw = -cursorDeltaX * 0.38;
+      const cursorTrackingPitch = cursorDeltaY * 0.25;
+      const cursorTrackingRoll = -cursorDeltaX * 0.08;
+
+      const finalRotX = (basePitch + floatRotX + parallaxRotX + cursorTrackingPitch) * zoomProgress;
+      const finalRotY = (baseYaw + floatRotY + parallaxRotY + cursorTrackingYaw) * zoomProgress;
+      const finalRotZ = (baseRoll + cursorTrackingRoll) * zoomProgress;
       const currentFloatY = floatY * zoomProgress;
 
       // Fast snap to pristine flat overview when at 00:00 or when completely dormant
@@ -811,9 +804,9 @@ export function useThreeAnimationEngine(
         smoothStateRef.current.rotY = 0;
         smoothStateRef.current.rotZ = 0;
       } else {
-        smoothStateRef.current.rotX += (finalRotX - smoothStateRef.current.rotX) * 0.1;
-        smoothStateRef.current.rotY += (finalRotY - smoothStateRef.current.rotY) * 0.1;
-        smoothStateRef.current.rotZ += (finalRotZ - smoothStateRef.current.rotZ) * 0.1;
+        smoothStateRef.current.rotX += (finalRotX - smoothStateRef.current.rotX) * 0.12;
+        smoothStateRef.current.rotY += (finalRotY - smoothStateRef.current.rotY) * 0.12;
+        smoothStateRef.current.rotZ += (finalRotZ - smoothStateRef.current.rotZ) * 0.12;
       }
 
       screenGroup.rotation.set(
@@ -828,7 +821,7 @@ export function useThreeAnimationEngine(
         const evX = (activeEvent.x - 0.5) * screenW;
         const evY = -(activeEvent.y - 0.5) * screenH;
 
-        cursorSprite.visible = true;
+        cursorSprite.visible = config.showCursor !== false;
         cursorSprite.position.set(evX, evY, 0.022);
 
         // Maintain sharp, natural cursor scale during camera dolly zoom

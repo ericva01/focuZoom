@@ -11,11 +11,13 @@ import { useScreenRecorder } from "@/hooks/useScreenRecorder";
 import { generateSampleScreenRecording } from "@/utils/sampleVideoGenerator";
 import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import {
+  AspectRatio,
   CanvasConfig,
   ClickEvent,
   VideoMetadata,
   TimelineClip,
 } from "@/types/editor";
+import { getProjectById, saveProject, SavedProject } from "@/utils/projectStorage";
 
 export default function EditorPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -71,12 +73,14 @@ export default function EditorPage() {
     zoomEasing: "spring",
     zoomDuration: 0.6,
     zoomHoldDuration: 1.4,
+    zoomOutDuration: 0.6,
 
     // Cursor & FX
+    showCursor: true,
     cursorStyle: "macos-arrow",
     cursorColor: "#06b6d4",
     cursorSize: 22,
-    showRipple: true,
+    showRipple: false,
     rippleColor: "#06b6d4",
 
     aspectRatio: "16:9",
@@ -207,8 +211,17 @@ export default function EditorPage() {
     }
   }, []);
 
+  // Electron Integration State
+  const [isElectron, setIsElectron] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.electronAPI?.isElectron) {
+      setIsElectron(true);
+    }
+  }, []);
+
   // Handle user uploaded file
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = useCallback((file: File) => {
     const url = URL.createObjectURL(file);
     setVideoSrc(url);
 
@@ -254,11 +267,152 @@ export default function EditorPage() {
       setSelectedClipId(initialClip.id);
       playback.seek(0);
     };
-  };
+  }, [clips, config.defaultZoomScale, playback, pushHistory]);
 
-  // Auto-load demo on initial mount
+  // Handle native Electron video import
+  const handleNativeOpenVideo = useCallback(async () => {
+    if (typeof window !== "undefined" && window.electronAPI) {
+      try {
+        const result = await window.electronAPI.openVideoDialog();
+        if (!result.canceled && (result.dataUrl || result.filePath)) {
+          if (result.dataUrl) {
+            const res = await fetch(result.dataUrl);
+            const blob = await res.blob();
+            const file = new File([blob], result.fileName || "imported-video.mp4", {
+              type: blob.type || "video/mp4",
+            });
+            handleFileUpload(file);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to open native video:", err);
+      }
+    }
+  }, [handleFileUpload]);
+
+  // Project Storage & Save State
+  const projectIdRef = useRef<string | null>(null);
+  const createdAtRef = useRef<number>(Date.now());
+  const [isSavedFeedback, setIsSavedFeedback] = useState<boolean>(false);
+
+  // Load project by ?id=... or set aspect ratio from ?ratio=...
   useEffect(() => {
-    handleLoadDemo();
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+      const ratio = params.get("ratio") as AspectRatio | null;
+
+      if (id) {
+        const saved = getProjectById(id);
+        if (saved) {
+          projectIdRef.current = saved.id;
+          createdAtRef.current = saved.createdAt;
+          setProjectName(saved.name);
+          if (saved.config) {
+            setConfig((prev) => ({ ...prev, ...saved.config }));
+          }
+          if (saved.clips && saved.clips.length > 0) {
+            setClips(saved.clips);
+            setSelectedClipId(saved.clips[0].id);
+          }
+          if (saved.events && saved.events.length > 0) {
+            setEvents(saved.events);
+          }
+          return;
+        }
+      }
+
+      if (ratio) {
+        setConfig((prev) => ({ ...prev, aspectRatio: ratio }));
+      }
+    }
+  }, []);
+
+  // Save current project state
+  const handleSaveProject = useCallback(async () => {
+    let thumbnail: string | undefined = undefined;
+    if (canvasRef.current) {
+      try {
+        thumbnail = canvasRef.current.toDataURL("image/jpeg", 0.6);
+      } catch (err) {
+        console.warn("Could not capture thumbnail:", err);
+      }
+    }
+
+    const currentId = projectIdRef.current || `proj-${Date.now()}`;
+    projectIdRef.current = currentId;
+
+    const calcDuration = clips.reduce(
+      (max, c) => Math.max(max, c.endTimeline),
+      metadata?.duration || 10
+    );
+
+    const projectData: SavedProject = {
+      id: currentId,
+      name: projectName,
+      createdAt: createdAtRef.current,
+      updatedAt: Date.now(),
+      duration: Math.round(calcDuration * 10) / 10,
+      aspectRatio: config.aspectRatio,
+      clipCount: clips.length,
+      keyframeCount: events.length,
+      thumbnail,
+      videoFileName: metadata?.name || "recording.mp4",
+      config,
+      clips,
+      events,
+    };
+
+    saveProject(projectData);
+    setIsSavedFeedback(true);
+    setTimeout(() => setIsSavedFeedback(false), 2200);
+
+    if (typeof window !== "undefined" && window.electronAPI) {
+      console.log("[FocuFlow] Project successfully saved to workspace:", projectData.name);
+    }
+  }, [clips, config, events, metadata?.duration, metadata?.name, projectName]);
+
+  // Global Ctrl+S keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        handleSaveProject();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSaveProject]);
+
+  // Subscribe to native application menu shortcuts (Ctrl+O, Ctrl+S, Ctrl+E, Ctrl+N)
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.electronAPI?.onMenuAction) {
+      const cleanup = window.electronAPI.onMenuAction((action) => {
+        if (action === "file:open") {
+          handleNativeOpenVideo();
+        } else if (action === "file:save") {
+          handleSaveProject();
+        } else if (action === "file:export") {
+          setIsExportOpen(true);
+        } else if (action === "file:new") {
+          setClips([]);
+          setEvents([]);
+          setVideoSrc(null);
+          setMetadata(null);
+          projectIdRef.current = `proj-${Date.now()}`;
+          setProjectName("New Project");
+        }
+      });
+      return cleanup;
+    }
+  }, [handleNativeOpenVideo, handleSaveProject]);
+
+  // Auto-load demo on initial mount if not loading a saved project
+  useEffect(() => {
+    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    if (!params.get("id")) {
+      handleLoadDemo();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -550,12 +704,18 @@ export default function EditorPage() {
         onAspectRatioChange={(ratio) => handleUpdateConfig({ aspectRatio: ratio })}
         onTakeSnapshot={handleTakeSnapshot}
         onOpenExport={() => setIsExportOpen(true)}
+        onSaveProject={handleSaveProject}
+        isSavedFeedback={isSavedFeedback}
         isReady={Boolean(videoSrc && metadata)}
+        isElectron={isElectron}
+        onNativeOpenVideo={handleNativeOpenVideo}
         isRecording={screenRecorder.isRecording}
         recordingDuration={screenRecorder.recordingDuration}
         clickCount={screenRecorder.clickCount}
         onStartRecording={screenRecorder.startRecording}
         onStopRecording={screenRecorder.stopRecording}
+        showCursor={config.showCursor}
+        onToggleCursor={() => handleUpdateConfig({ showCursor: !config.showCursor })}
         isRightCollapsed={isInspectorCollapsed}
         onToggleRightCollapse={() => setIsInspectorCollapsed((prev) => !prev)}
       />
@@ -604,6 +764,14 @@ export default function EditorPage() {
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl glass-panel border-rose-500/50 text-rose-200 text-xs shadow-xl backdrop-blur-xl">
           <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
           <span>{screenRecorder.error}</span>
+          <button
+            type="button"
+            onClick={screenRecorder.clearError}
+            className="text-rose-400 hover:text-white ml-2 p-0.5 rounded transition-colors cursor-pointer"
+            title="Dismiss error"
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -674,6 +842,7 @@ export default function EditorPage() {
               onDeleteClip={handleDeleteClip}
               onRippleDeleteClip={handleRippleDeleteClip}
               currentTime={playback.currentTime}
+              onSeek={playback.seek}
               events={events}
               onSelectEvent={handleSelectEvent}
               onUpdateEvent={handleUpdateEvent}
@@ -707,6 +876,7 @@ export default function EditorPage() {
         onToggleLoop={() => playback.setIsLooping(!playback.isLooping)}
         events={events}
         onSelectEvent={handleSelectEvent}
+        onUpdateEvent={handleUpdateEvent}
         onAddKeyframeAtCurrentTime={handleAddCurrentTimeEvent}
         clips={clips}
         selectedClipId={selectedClipId}

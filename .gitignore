@@ -13,8 +13,13 @@
 /.next/
 /out/
 
-# production
+# production & electron builds
 /build
+/dist/
+/electron-dist/
+/public/downloads/
+*.exe
+*.blockmap
 
 # misc
 .DS_Store

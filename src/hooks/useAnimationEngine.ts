@@ -258,80 +258,86 @@ export function useAnimationEngine(
         }
       }
 
-      ctx.save();
-      ctx.translate(x, y);
-      if (currentScale > 1) {
-        const damp = 1 / Math.pow(currentScale, 0.45);
-        ctx.scale(damp, damp);
+      if (config.showCursor !== false) {
+        ctx.save();
+        ctx.translate(x, y);
+        if (currentScale > 1) {
+          const damp = 1 / Math.pow(currentScale, 0.45);
+          ctx.scale(damp, damp);
+        }
+        const size = config.cursorSize || 20;
+
+        switch (config.cursorStyle) {
+          case "neon-dot": {
+            ctx.shadowColor = config.cursorColor || "#06b6d4";
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = config.cursorColor || "#06b6d4";
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+          }
+          case "cyber-ring": {
+            ctx.shadowColor = config.cursorColor || "#06b6d4";
+            ctx.shadowBlur = 8;
+            ctx.strokeStyle = config.cursorColor || "#06b6d4";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(0, 0, 3, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+          }
+          case "crosshair": {
+            ctx.shadowColor = config.cursorColor || "#06b6d4";
+            ctx.shadowBlur = 6;
+            ctx.strokeStyle = config.cursorColor || "#06b6d4";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.45, 0, Math.PI * 2);
+            ctx.moveTo(-size * 0.6, 0);
+            ctx.lineTo(size * 0.6, 0);
+            ctx.moveTo(0, -size * 0.6);
+            ctx.lineTo(0, size * 0.6);
+            ctx.stroke();
+            break;
+          }
+          case "macos-arrow":
+          default: {
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetY = 2;
+
+            ctx.fillStyle = "#ffffff";
+            ctx.strokeStyle = "#090a10";
+            ctx.lineWidth = 1.8;
+            ctx.lineJoin = "round";
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(size * 0.6, size * 0.6);
+            ctx.lineTo(size * 0.3, size * 0.65);
+            ctx.lineTo(size * 0.45, size * 0.95);
+            ctx.lineTo(size * 0.3, size * 1.02);
+            ctx.lineTo(size * 0.15, size * 0.72);
+            ctx.lineTo(0, size * 0.85);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            break;
+          }
+        }
+        ctx.restore();
       }
-      const size = config.cursorSize || 20;
-
-      switch (config.cursorStyle) {
-        case "neon-dot": {
-          ctx.shadowColor = config.cursorColor || "#06b6d4";
-          ctx.shadowBlur = 12;
-          ctx.fillStyle = config.cursorColor || "#06b6d4";
-          ctx.beginPath();
-          ctx.arc(0, 0, size * 0.4, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.fillStyle = "#ffffff";
-          ctx.beginPath();
-          ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2);
-          ctx.fill();
-          break;
-        }
-        case "cyber-ring": {
-          ctx.strokeStyle = config.cursorColor || "#8b5cf6";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
-          ctx.stroke();
-
-          ctx.fillStyle = "#ffffff";
-          ctx.beginPath();
-          ctx.arc(0, 0, 3, 0, Math.PI * 2);
-          ctx.fill();
-          break;
-        }
-        case "crosshair": {
-          ctx.strokeStyle = config.cursorColor || "#10b981";
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(0, 0, size * 0.45, 0, Math.PI * 2);
-          ctx.moveTo(-size * 0.6, 0);
-          ctx.lineTo(size * 0.6, 0);
-          ctx.moveTo(0, -size * 0.6);
-          ctx.lineTo(0, size * 0.6);
-          ctx.stroke();
-          break;
-        }
-        case "macos-arrow":
-        default: {
-          ctx.shadowColor = "rgba(0,0,0,0.5)";
-          ctx.shadowBlur = 6;
-          ctx.shadowOffsetY = 2;
-
-          ctx.fillStyle = "#ffffff";
-          ctx.strokeStyle = "#090a10";
-          ctx.lineWidth = 1.8;
-          ctx.lineJoin = "round";
-
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(size * 0.6, size * 0.6);
-          ctx.lineTo(size * 0.3, size * 0.65);
-          ctx.lineTo(size * 0.45, size * 0.95);
-          ctx.lineTo(size * 0.3, size * 1.02);
-          ctx.lineTo(size * 0.15, size * 0.72);
-          ctx.lineTo(0, size * 0.85);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-          break;
-        }
-      }
-      ctx.restore();
     };
 
     const render = () => {
@@ -405,9 +411,9 @@ export function useAnimationEngine(
       const enabledEvents = events.filter((e) => e.enabled);
 
       for (const event of enabledEvents) {
-        const zoomInDuration = Math.max(0.25, config.zoomDuration || 0.45);
-        const holdDuration = Math.max(0.4, config.zoomHoldDuration || 1.2);
-        const zoomOutDuration = Math.max(0.25, config.zoomDuration || 0.45);
+        const zoomInDuration = Math.max(0.15, event.zoomInDuration ?? config.zoomDuration ?? 0.45);
+        const holdDuration = Math.max(0.2, event.holdDuration ?? config.zoomHoldDuration ?? 1.2);
+        const zoomOutDuration = Math.max(0.15, event.zoomOutDuration ?? config.zoomOutDuration ?? config.zoomDuration ?? 0.45);
         const startTime = event.timestamp; // Begins precisely when keyframe timestamp is hit
         const peakTime = startTime + zoomInDuration;
         const holdEndTime = peakTime + holdDuration;

@@ -14,6 +14,11 @@ import {
   PanelLeftOpen,
   PanelRightClose,
   PanelRightOpen,
+  MousePointer,
+  EyeOff,
+  FolderOpen,
+  Save,
+  Check,
 } from "lucide-react";
 import { AspectRatio } from "@/types/editor";
 
@@ -26,13 +31,21 @@ interface EditorHeaderProps {
   onAspectRatioChange: (ratio: AspectRatio) => void;
   onTakeSnapshot: () => void;
   onOpenExport: () => void;
+  onSaveProject?: () => void;
+  isSavedFeedback?: boolean;
   isReady: boolean;
+  // Electron Desktop props
+  isElectron?: boolean;
+  onNativeOpenVideo?: () => void;
   // Screen Recording Props
   isRecording?: boolean;
   recordingDuration?: number;
   clickCount?: number;
   onStartRecording?: () => void;
   onStopRecording?: () => void;
+  // Cursor Overlay Toggle
+  showCursor?: boolean;
+  onToggleCursor?: () => void;
   // Sidebar Toggles
   isLeftCollapsed?: boolean;
   onToggleLeftCollapse?: () => void;
@@ -47,12 +60,18 @@ export function EditorHeader({
   onAspectRatioChange,
   onTakeSnapshot,
   onOpenExport,
+  onSaveProject,
+  isSavedFeedback = false,
   isReady,
+  isElectron = false,
+  onNativeOpenVideo,
   isRecording = false,
   recordingDuration = 0,
   clickCount = 0,
   onStartRecording,
   onStopRecording,
+  showCursor = true,
+  onToggleCursor,
   isLeftCollapsed = false,
   onToggleLeftCollapse,
   isRightCollapsed = false,
@@ -92,11 +111,11 @@ export function EditorHeader({
           </Button>
         )}
 
-        <Link href="/">
+        <Link href={isElectron ? "/desktop" : "/"}>
           <Button
             variant="ghost"
             size="icon-sm"
-            title="Return to Landing Page"
+            title={isElectron ? "Return to Desktop Studio" : "Return to Landing Page"}
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
@@ -155,6 +174,27 @@ export function EditorHeader({
 
       {/* Right: Snapshot, Recording, Export Action & Right Sidebar Toggle */}
       <div className="flex items-center gap-2">
+        {/* Electron Native Desktop Badge */}
+        {isElectron && (
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/25 text-[10px] font-mono text-sky-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <span>Desktop App</span>
+          </div>
+        )}
+
+        {/* Native File Open Button */}
+        {isElectron && onNativeOpenVideo && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onNativeOpenVideo}
+            title="Import video file from computer (Ctrl/Cmd+O)"
+            leftIcon={<FolderOpen className="w-3.5 h-3.5 text-sky-300" />}
+          >
+            <span className="hidden sm:inline">Open File</span>
+          </Button>
+        )}
+
         {/* Screen Recording Button */}
         {isRecording ? (
           <Button
@@ -183,6 +223,39 @@ export function EditorHeader({
           </Button>
         )}
 
+        {/* Cursor Overlay Quick Toggle */}
+        {onToggleCursor && (
+          <Button
+            variant={showCursor ? "secondary" : "ghost"}
+            size="sm"
+            onClick={onToggleCursor}
+            title={showCursor ? "Hide Simulated Cursor Overlay" : "Show Simulated Cursor Overlay"}
+            className={
+              showCursor
+                ? "border-sky-400/40 text-sky-200 bg-sky-500/15 shadow-glass-sm"
+                : "border-white/10 text-slate-400 hover:text-white"
+            }
+            leftIcon={
+              showCursor ? (
+                <MousePointer className="w-3.5 h-3.5 text-sky-300" />
+              ) : (
+                <EyeOff className="w-3.5 h-3.5 text-slate-500" />
+              )
+            }
+          >
+            <span>Cursor</span>
+            <span
+              className={`text-[9px] font-mono px-1.5 py-0.5 rounded ml-1 font-bold ${
+                showCursor
+                  ? "bg-sky-400/20 text-sky-300 border border-sky-400/30"
+                  : "bg-white/[0.08] text-slate-400"
+              }`}
+            >
+              {showCursor ? "ON" : "OFF"}
+            </span>
+          </Button>
+        )}
+
         <Button
           variant="secondary"
           size="sm"
@@ -193,6 +266,25 @@ export function EditorHeader({
         >
           <span className="hidden sm:inline">Snapshot</span>
         </Button>
+
+        {onSaveProject && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onSaveProject}
+            disabled={!isReady}
+            title="Save project to workspace and local storage (Ctrl/Cmd+S)"
+            leftIcon={
+              isSavedFeedback ? (
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+              ) : (
+                <Save className="w-3.5 h-3.5 text-sky-400" />
+              )
+            }
+          >
+            <span>{isSavedFeedback ? "Saved!" : "Save"}</span>
+          </Button>
+        )}
 
         <Button
           variant="primary"

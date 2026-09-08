@@ -73,11 +73,12 @@ export function getClampedCameraCenter(
   if (scale <= 1.001) {
     return { camX: 0.5, camY: 0.5 };
   }
-  const halfSpan = 0.5 / scale;
-  const minX = halfSpan;
-  const maxX = 1 - halfSpan;
-  const minY = halfSpan;
-  const maxY = 1 - halfSpan;
+  // Allow full reach to left/right/top/bottom edges for true cursor tracking
+  const margin = Math.max(0.04, 0.35 / scale);
+  const minX = margin;
+  const maxX = 1 - margin;
+  const minY = margin;
+  const maxY = 1 - margin;
 
   return {
     camX: clamp(targetX, minX, maxX),
