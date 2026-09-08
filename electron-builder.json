@@ -37,22 +37,28 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "resources/icon.png",
+    "icon": "resources/icon.ico",
     "artifactName": "${productName}-Setup-${version}.${ext}"
   },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
-    "createDesktopShortcut": true,
+    "createDesktopShortcut": "always",
     "createStartMenuShortcut": true,
-    "shortcutName": "FocuFlow Studio"
+    "shortcutName": "FocuFlow Studio",
+    "installerIcon": "resources/icon.ico",
+    "uninstallerIcon": "resources/icon.ico",
+    "installerHeaderIcon": "resources/icon.ico"
   },
   "nsisWeb": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
-    "createDesktopShortcut": true,
+    "createDesktopShortcut": "always",
     "createStartMenuShortcut": true,
-    "shortcutName": "FocuFlow Studio"
+    "shortcutName": "FocuFlow Studio",
+    "installerIcon": "resources/icon.ico",
+    "uninstallerIcon": "resources/icon.ico",
+    "installerHeaderIcon": "resources/icon.ico"
   },
   "mac": {
     "target": [

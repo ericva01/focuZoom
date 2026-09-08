@@ -158,6 +158,11 @@ function createApplicationMenu(window: BrowserWindow) {
 }
 
 async function createWindow() {
+  const iconPath =
+    process.platform === "win32"
+      ? path.join(__dirname, "../resources/icon.ico")
+      : path.join(__dirname, "../resources/icon.png");
+
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 920,
@@ -165,6 +170,7 @@ async function createWindow() {
     minHeight: 700,
     backgroundColor: "#060913",
     title: "FocuFlow Studio",
+    icon: fs.existsSync(iconPath) ? iconPath : undefined,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -373,6 +379,10 @@ function registerIpcHandlers() {
 // -----------------------------------------------------------------------------
 // App Lifecycle
 // -----------------------------------------------------------------------------
+
+if (process.platform === "win32") {
+  app.setAppUserModelId("com.focuflow.studio");
+}
 
 app.whenReady().then(async () => {
   // Enable screen & window capture for navigator.mediaDevices.getDisplayMedia in Electron
