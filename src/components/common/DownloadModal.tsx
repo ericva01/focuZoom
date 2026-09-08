@@ -20,8 +20,8 @@ interface DownloadModalProps {
 
 const GITHUB_RELEASE_DOWNLOAD =
   process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
-  "https://github.com/ericva01/focuZoom/releases/download/v0.1.0/FocuFlow-Studio-Setup-0.1.0.exe";
-const GITHUB_RELEASES_PAGE = "https://github.com/ericva01/focuZoom/releases";
+  "https://github.com/ericva01/focuZoom/releases/download/v0.1.0/FocuFlow.Studio-Setup-0.1.0.exe";
+const GITHUB_RELEASES_PAGE = "https://github.com/ericva01/focuZoom/releases/tag/v0.1.0";
 
 export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
   const [userOS, setUserOS] = useState<"win" | "mac" | "linux">("win");
@@ -52,8 +52,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.download = "FocuFlow-Studio-Setup.exe";
-      link.target = "_blank";
+      link.setAttribute("download", "FocuFlow.Studio-Setup-0.1.0.exe");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -82,10 +81,16 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-xs font-mono text-sky-300 mb-3">
+          <a
+            href={GITHUB_RELEASES_PAGE}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-xs font-mono text-sky-300 mb-3 hover:bg-sky-500/20 hover:border-sky-400/40 transition-all cursor-pointer group"
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-            <span>ELECTRON DESKTOP EDITION</span>
-          </div>
+            <span>ELECTRON DESKTOP EDITION (v0.1.0)</span>
+            <ExternalLink className="w-3 h-3 text-sky-400 group-hover:translate-x-0.5 transition-transform" />
+          </a>
           <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Download FocuFlow Studio
           </h3>
@@ -104,7 +109,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
                   Your download has started!
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  Run <code className="text-white font-mono">FocuFlow-Studio-Setup.exe</code> once completed to install on your PC.
+                  Run <code className="text-white font-mono">FocuFlow.Studio-Setup-0.1.0.exe</code> once completed to install on your PC.
                 </p>
               </div>
             </div>
@@ -114,7 +119,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               rel="noopener noreferrer"
               className="text-[11px] text-sky-400 hover:text-sky-300 underline font-mono flex items-center gap-1 flex-shrink-0"
             >
-              <span>Releases</span>
+              <span>GitHub Release</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
@@ -155,6 +160,18 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               </div>
             </div>
           </button>
+
+          <div className="mt-2.5 text-center">
+            <a
+              href={GITHUB_RELEASES_PAGE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-sky-300 transition-colors"
+            >
+              <span>Or view release details & all assets on GitHub</span>
+              <ExternalLink className="w-3 h-3 text-slate-500" />
+            </a>
+          </div>
         </div>
 
         {/* Other Platform Options */}
