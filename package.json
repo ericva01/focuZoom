@@ -13,6 +13,7 @@
     "electron:pack": "npm run build:web && npm run build:electron && electron-builder --dir",
     "electron:dist": "npm run build:web && npm run build:electron && electron-builder",
     "electron:dist:win": "npm run build:web && npm run build:electron && electron-builder --win",
+    "electron:dist:win:web": "npm run build:web && npm run build:electron && electron-builder --win nsis-web",
     "electron:dist:mac": "npm run build:web && npm run build:electron && electron-builder --mac",
     "electron:dist:linux": "npm run build:web && npm run build:electron && electron-builder --linux",
     "start": "next start",

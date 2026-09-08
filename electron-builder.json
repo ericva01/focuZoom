@@ -3,6 +3,11 @@
   "appId": "com.focuflow.studio",
   "productName": "FocuFlow Studio",
   "copyright": "Copyright © 2026 Eric Va",
+  "publish": {
+    "provider": "github",
+    "owner": "ericva01",
+    "repo": "focuZoom"
+  },
   "directories": {
     "output": "dist",
     "buildResources": "resources"
@@ -20,6 +25,10 @@
   "win": {
     "target": [
       {
+        "target": "nsis-web",
+        "arch": ["x64"]
+      },
+      {
         "target": "nsis",
         "arch": ["x64"]
       },
@@ -32,6 +41,13 @@
     "artifactName": "${productName}-Setup-${version}.${ext}"
   },
   "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "FocuFlow Studio"
+  },
+  "nsisWeb": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
