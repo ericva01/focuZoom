@@ -20,8 +20,8 @@ interface DownloadModalProps {
 
 const GITHUB_RELEASE_DOWNLOAD =
   process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
-  "https://github.com/ericva01/focuZoom/releases/download/v0.1.0/Glideo.Studio-Setup-0.1.0.exe";
-const GITHUB_RELEASES_PAGE = "https://github.com/ericva01/focuZoom/releases/tag/v0.1.0";
+  "https://github.com/ericva01/focuZoom/releases/download/v0.1.1/Glideo_0.1.0_x64-setup.exe";
+const GITHUB_RELEASES_PAGE = "https://github.com/ericva01/focuZoom/releases/tag/v0.1.1";
 
 export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
   const [userOS, setUserOS] = useState<"win" | "mac" | "linux">("win");
@@ -47,12 +47,12 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
           window.location.hostname === "127.0.0.1");
 
       const downloadUrl = isLocal
-        ? "/downloads/Glideo-Studio-Setup.exe"
+        ? "/downloads/Glideo_0.1.0_x64-setup.exe"
         : GITHUB_RELEASE_DOWNLOAD;
 
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.setAttribute("download", "Glideo.Studio-Setup-0.1.0.exe");
+      link.setAttribute("download", "Glideo_0.1.0_x64-setup.exe");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
