@@ -17,101 +17,157 @@ interface ThreeCameraState {
 /**
  * Evaluates the cursor position (x, y) at a specific time:
  * 1. Using real recorded cursor trajectory if available (anchored to event.x, event.y).
- * 2. Or smoothly gliding between sequential click targets.
+/**
+ * Critically-damped spring follower (SmoothDamp)
+ * Gradually changes a value towards a desired goal over time, with zero initial jolt and smooth deceleration.
+ */
+function smoothDamp(
+  current: number,
+  target: number,
+  vel: { current: number },
+  smoothTime: number,
+  deltaTime: number,
+  maxSpeed = Infinity
+): number {
+  smoothTime = Math.max(0.0001, smoothTime);
+  const omega = 2 / smoothTime;
+  const x = omega * deltaTime;
+  const exp = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+  let change = current - target;
+  const originalTo = target;
+
+  const maxChange = maxSpeed * smoothTime;
+  change = clamp(change, -maxChange, maxChange);
+  const tempTarget = current - change;
+
+  const temp = (vel.current + omega * change) * deltaTime;
+  vel.current = (vel.current - omega * temp) * exp;
+  let output = tempTarget + (change + temp) * exp;
+
+  if ((originalTo - current > 0) === (output > originalTo)) {
+    output = originalTo;
+    vel.current = (output - originalTo) / Math.max(0.0001, deltaTime);
+  }
+  return output;
+}
+
+/**
+ * Samples a continuous cursor trajectory using Catmull-Rom cubic spline interpolation
+ * across adjacent neighbor points [pPrev, p0, p1, pNext] for smooth velocity curves.
+ */
+function sampleTrajectoryFromPoints(
+  effectiveTime: number,
+  trail: CursorPoint[]
+): { x: number; y: number } {
+  if (!trail || trail.length === 0) return { x: 0.5, y: 0.5 };
+  if (trail.length === 1) return { x: trail[0].x, y: trail[0].y };
+
+  if (effectiveTime <= trail[0].timestamp) {
+    return {
+      x: clamp(trail[0].x, 0.02, 0.98),
+      y: clamp(trail[0].y, 0.02, 0.98),
+    };
+  }
+  if (effectiveTime >= trail[trail.length - 1].timestamp) {
+    const last = trail[trail.length - 1];
+    return {
+      x: clamp(last.x, 0.02, 0.98),
+      y: clamp(last.y, 0.02, 0.98),
+    };
+  }
+
+  // Binary search to find segment
+  let low = 0;
+  let high = trail.length - 1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    if (trail[mid].timestamp < effectiveTime) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+
+  const idx1 = Math.max(1, Math.min(trail.length - 1, low));
+  const idx0 = idx1 - 1;
+  const p0 = trail[idx0];
+  const p1 = trail[idx1];
+  const span = p1.timestamp - p0.timestamp;
+  if (span <= 0.0001) {
+    return {
+      x: clamp(p0.x, 0.02, 0.98),
+      y: clamp(p0.y, 0.02, 0.98),
+    };
+  }
+
+  const tNorm = clamp((effectiveTime - p0.timestamp) / span, 0, 1);
+
+  // Smooth Catmull-Rom spline interpolation with 4 control points [pPrev, p0, p1, pNext]
+  const pPrev = idx0 > 0 ? trail[idx0 - 1] : p0;
+  const pNext = idx1 < trail.length - 1 ? trail[idx1 + 1] : p1;
+
+  const interpCatmullRom = (v0: number, v1: number, v2: number, v3: number, u: number) => {
+    const u2 = u * u;
+    const u3 = u2 * u;
+    return 0.5 * (
+      (2 * v1) +
+      (-v0 + v2) * u +
+      (2 * v0 - 5 * v1 + 4 * v2 - v3) * u2 +
+      (-v0 + 3 * v1 - 3 * v2 + v3) * u3
+    );
+  };
+
+  const smoothX = interpCatmullRom(pPrev.x, p0.x, p1.x, pNext.x, tNorm);
+  const smoothY = interpCatmullRom(pPrev.y, p0.y, p1.y, pNext.y, tNorm);
+
+  return {
+    x: clamp(smoothX, 0.02, 0.98),
+    y: clamp(smoothY, 0.02, 0.98),
+  };
+}
+
+/**
+ * Evaluates the cursor position (x, y) at a specific time:
+ * 1. Using real recorded cursor trajectory if available (event.cursorTrail or global cursorTrail).
+ * 2. Or smoothly gliding between sequential click targets (clustered clicks) in advance of each click.
  * 3. Or returning the exact target position (event.x, event.y).
  */
 function sampleCursorTrajectory(
   effectiveTime: number,
-  event: ClickEvent
+  event: ClickEvent,
+  globalTrail?: CursorPoint[]
 ): { x: number; y: number } {
   const baseTargetX = typeof event.x === "number" ? event.x : 0.5;
   const baseTargetY = typeof event.y === "number" ? event.y : 0.5;
 
-  // 1. If event has a recorded cursor trajectory attached to it
+  // 1. If event has its own recorded cursor trajectory attached
   if (event.cursorTrail && event.cursorTrail.length > 0) {
-    const trail = event.cursorTrail;
-    const originX = trail[0].x;
-    const originY = trail[0].y;
-    // Calculate user-edit offset so modifying event (x, y) properly shifts the whole path
-    const dx = baseTargetX - originX;
-    const dy = baseTargetY - originY;
-
-    if (effectiveTime <= trail[0].timestamp) {
-      return {
-        x: clamp(trail[0].x + dx, 0.02, 0.98),
-        y: clamp(trail[0].y + dy, 0.02, 0.98),
-      };
-    }
-    if (effectiveTime >= trail[trail.length - 1].timestamp) {
-      const last = trail[trail.length - 1];
-      return {
-        x: clamp(last.x + dx, 0.02, 0.98),
-        y: clamp(last.y + dy, 0.02, 0.98),
-      };
-    }
-
-    let low = 0;
-    let high = trail.length - 1;
-    while (low <= high) {
-      const mid = (low + high) >> 1;
-      if (trail[mid].timestamp < effectiveTime) {
-        low = mid + 1;
-      } else {
-        high = mid - 1;
-      }
-    }
-    const idx0 = Math.max(0, low - 1);
-    const idx1 = Math.min(trail.length - 1, low);
-    if (idx0 === idx1) {
-      return {
-        x: clamp(trail[idx0].x + dx, 0.02, 0.98),
-        y: clamp(trail[idx0].y + dy, 0.02, 0.98),
-      };
-    }
-
-    const p0 = trail[idx0];
-    const p1 = trail[idx1];
-    const span = p1.timestamp - p0.timestamp;
-    if (span <= 0.0001) {
-      return {
-        x: clamp(p0.x + dx, 0.02, 0.98),
-        y: clamp(p0.y + dy, 0.02, 0.98),
-      };
-    }
-
-    const p = (effectiveTime - p0.timestamp) / span;
-    const smoothP = clamp(p, 0, 1);
-    const interpX = p0.x + (p1.x - p0.x) * smoothP + dx;
-    const interpY = p0.y + (p1.y - p0.y) * smoothP + dy;
-    return {
-      x: clamp(interpX, 0.02, 0.98),
-      y: clamp(interpY, 0.02, 0.98),
-    };
+    return sampleTrajectoryFromPoints(effectiveTime, event.cursorTrail);
   }
 
-  // 2. Sequential click targets (clustered clicks)
+  // 2. If global recording cursor trajectory is provided
+  if (globalTrail && globalTrail.length > 0) {
+    return sampleTrajectoryFromPoints(effectiveTime, globalTrail);
+  }
+
+  // 3. Sequential click targets (clustered clicks)
   if (event.targets && event.targets.length > 0) {
     const seqTargets = event.targets;
-    const originX = seqTargets[0].x;
-    const originY = seqTargets[0].y;
-    const dx = baseTargetX - originX;
-    const dy = baseTargetY - originY;
-
     if (seqTargets.length === 1) {
-      return { x: baseTargetX, y: baseTargetY };
+      return { x: seqTargets[0].x, y: seqTargets[0].y };
     }
 
     if (effectiveTime <= seqTargets[0].timestamp) {
       return {
-        x: clamp(seqTargets[0].x + dx, 0.02, 0.98),
-        y: clamp(seqTargets[0].y + dy, 0.02, 0.98),
+        x: clamp(seqTargets[0].x, 0.02, 0.98),
+        y: clamp(seqTargets[0].y, 0.02, 0.98),
       };
     }
     if (effectiveTime >= seqTargets[seqTargets.length - 1].timestamp) {
       const last = seqTargets[seqTargets.length - 1];
       return {
-        x: clamp(last.x + dx, 0.02, 0.98),
-        y: clamp(last.y + dy, 0.02, 0.98),
+        x: clamp(last.x, 0.02, 0.98),
+        y: clamp(last.y, 0.02, 0.98),
       };
     }
 
@@ -122,14 +178,24 @@ function sampleCursorTrajectory(
         const segSpan = tB - tA;
         if (segSpan <= 0.001) {
           return {
-            x: clamp(seqTargets[i].x + dx, 0.02, 0.98),
-            y: clamp(seqTargets[i].y + dy, 0.02, 0.98),
+            x: clamp(seqTargets[i].x, 0.02, 0.98),
+            y: clamp(seqTargets[i].y, 0.02, 0.98),
           };
         }
-        const p = (effectiveTime - tA) / segSpan;
+        // Pan in advance towards target B so camera is already centered on the target at click timestamp tB
+        const panDuration = Math.min(0.8, segSpan * 0.75);
+        const panStartTime = tB - panDuration;
+        if (effectiveTime < panStartTime) {
+          // Hold at target A
+          return {
+            x: clamp(seqTargets[i].x, 0.02, 0.98),
+            y: clamp(seqTargets[i].y, 0.02, 0.98),
+          };
+        }
+        const p = (effectiveTime - panStartTime) / panDuration;
         const smoothP = cubicEaseInOut(clamp(p, 0, 1));
-        const interpX = seqTargets[i].x + (seqTargets[i + 1].x - seqTargets[i].x) * smoothP + dx;
-        const interpY = seqTargets[i].y + (seqTargets[i + 1].y - seqTargets[i].y) * smoothP + dy;
+        const interpX = seqTargets[i].x + (seqTargets[i + 1].x - seqTargets[i].x) * smoothP;
+        const interpY = seqTargets[i].y + (seqTargets[i + 1].y - seqTargets[i].y) * smoothP;
         return {
           x: clamp(interpX, 0.02, 0.98),
           y: clamp(interpY, 0.02, 0.98),
@@ -139,12 +205,12 @@ function sampleCursorTrajectory(
 
     const lastTarget = seqTargets[seqTargets.length - 1];
     return {
-      x: clamp(lastTarget.x + dx, 0.02, 0.98),
-      y: clamp(lastTarget.y + dy, 0.02, 0.98),
+      x: clamp(lastTarget.x, 0.02, 0.98),
+      y: clamp(lastTarget.y, 0.02, 0.98),
     };
   }
 
-  // 3. Single discrete keyframe target point
+  // 4. Single discrete keyframe target point
   return { x: baseTargetX, y: baseTargetY };
 }
 
@@ -169,9 +235,14 @@ export function useThreeAnimationEngine(
     camX: 0,
     camY: 0,
     camZ: 1.95,
+    velCamX: 0,
+    velCamY: 0,
+    velCamZ: 0,
     lookAtX: 0,
     lookAtY: 0,
     lookAtZ: 0,
+    velLookX: 0,
+    velLookY: 0,
     rotX: 0,
     rotY: 0,
     rotZ: 0,
@@ -182,6 +253,7 @@ export function useThreeAnimationEngine(
   });
 
   // Precise sub-frame timing and throttled React update refs
+  const lastEffectiveTimeRef = useRef<number>(0);
   const smoothedTimeRef = useRef<number>(0);
   const lastPerfTimeRef = useRef<number>(0);
   const lastStateUpdateRef = useRef<number>(0);
@@ -702,19 +774,10 @@ export function useThreeAnimationEngine(
       clock.getDelta();
       const t = clock.getElapsedTime();
 
-      // Continuous smoothed playhead time (extrapolates between video frames to eliminate decoder stair-stepping)
-      if (!video.paused && !video.seeking) {
-        smoothedTimeRef.current += dt * (video.playbackRate || 1.0);
-        const diff = video.currentTime - smoothedTimeRef.current;
-        if (Math.abs(diff) > 0.15) {
-          smoothedTimeRef.current = video.currentTime;
-        } else {
-          smoothedTimeRef.current += diff * 0.15;
-        }
-      } else {
-        smoothedTimeRef.current = video.currentTime;
-      }
-      const effectiveTime = smoothedTimeRef.current;
+      // Frame-accurate playhead time directly locked to the active video frame
+      // Eliminates the progressive 150-300ms drift and delay over long recordings
+      const effectiveTime = video.currentTime;
+      smoothedTimeRef.current = effectiveTime;
 
       // Dynamically sync WebGL buffer size, camera frustum, and aspect ratio on every frame
       const currentCanvasAspect = canvas.width / canvas.height;
@@ -790,23 +853,13 @@ export function useThreeAnimationEngine(
           activeEvent = event;
           const peakScale = event.zoom || config.defaultZoomScale || 2.2;
 
-          // Multi-target continuous cursor tracking list with user edit offset support
-          const originX = event.targets && event.targets.length > 0 ? event.targets[0].x : event.x;
-          const originY = event.targets && event.targets.length > 0 ? event.targets[0].y : event.y;
-          const dx = (event.x ?? 0.5) - originX;
-          const dy = (event.y ?? 0.5) - originY;
-          const rawTargets =
+          activeTargets =
             event.targets && event.targets.length > 0
               ? event.targets
               : [{ timestamp: event.timestamp, x: event.x, y: event.y, label: event.label }];
-          activeTargets = rawTargets.map((t) => ({
-            ...t,
-            x: clamp(t.x + dx, 0.02, 0.98),
-            y: clamp(t.y + dy, 0.02, 0.98),
-          }));
 
           // Dynamically track the cursor position at this exact video frame
-          const cursorPosition = sampleCursorTrajectory(effectiveTime, event);
+          const cursorPosition = sampleCursorTrajectory(effectiveTime, event, cursorTrail);
           activeTargetX = cursorPosition.x;
           activeTargetY = cursorPosition.y;
 
@@ -839,9 +892,6 @@ export function useThreeAnimationEngine(
       // 2. Physical 3D Camera Dolly Zoom & Dynamic Viewport Sizing
       const clampedPad = Math.max(0, Math.min(120, config.padding ?? 36));
       // Dynamic fill factor: 0.96 at 0px padding down to 0.55 at 120px padding
-      // At default padding (36px), targetFill is ~0.837 (occupies a healthy 75% to 85% of viewport width)
-      // When padding is set to lower values (like 0px to 24px), the video frame scales up dynamically (0.88 to 0.96)
-      // to fill the available canvas space without leaving excessive dead canvas margins.
       const targetFill = 0.96 - (clampedPad / 120) * 0.41;
 
       const vFovRad = (camera.fov * Math.PI) / 180;
@@ -864,16 +914,73 @@ export function useThreeAnimationEngine(
       const targetLookX = targetCamX;
       const targetLookY = targetCamY;
 
-      // High-precision frame-rate independent exponential lerp
-      const lerpRate = 18.0;
-      const lerpFactor = 1.0 - Math.exp(-lerpRate * dt);
+      // Frame seek or sudden jump detection to snap camera immediately without lag
+      const timeDelta = Math.abs(effectiveTime - lastEffectiveTimeRef.current);
+      const isSeek = timeDelta > 0.35;
+      lastEffectiveTimeRef.current = effectiveTime;
 
-      smoothStateRef.current.camX += (targetCamX - smoothStateRef.current.camX) * lerpFactor;
-      smoothStateRef.current.camY += (targetCamY - smoothStateRef.current.camY) * lerpFactor;
-      smoothStateRef.current.camZ += (targetZ - smoothStateRef.current.camZ) * lerpFactor;
+      if (isSeek || (effectiveTime <= 0.05 && zoomProgress === 0.0)) {
+        smoothStateRef.current.camX = targetCamX;
+        smoothStateRef.current.camY = targetCamY;
+        smoothStateRef.current.camZ = targetZ;
+        smoothStateRef.current.lookAtX = targetLookX;
+        smoothStateRef.current.lookAtY = targetLookY;
+        smoothStateRef.current.velCamX = 0;
+        smoothStateRef.current.velCamY = 0;
+        smoothStateRef.current.velCamZ = 0;
+        smoothStateRef.current.velLookX = 0;
+        smoothStateRef.current.velLookY = 0;
+      } else {
+        // Silky smooth critically damped spring follower
+        const camSmoothTime = zoomProgress > 0.05 ? 0.20 : 0.26;
+        const velXObj = { current: smoothStateRef.current.velCamX };
+        const velYObj = { current: smoothStateRef.current.velCamY };
+        const velZObj = { current: smoothStateRef.current.velCamZ };
+        const velLookXObj = { current: smoothStateRef.current.velLookX };
+        const velLookYObj = { current: smoothStateRef.current.velLookY };
 
-      smoothStateRef.current.lookAtX += (targetLookX - smoothStateRef.current.lookAtX) * lerpFactor;
-      smoothStateRef.current.lookAtY += (targetLookY - smoothStateRef.current.lookAtY) * lerpFactor;
+        smoothStateRef.current.camX = smoothDamp(
+          smoothStateRef.current.camX,
+          targetCamX,
+          velXObj,
+          camSmoothTime,
+          dt
+        );
+        smoothStateRef.current.camY = smoothDamp(
+          smoothStateRef.current.camY,
+          targetCamY,
+          velYObj,
+          camSmoothTime,
+          dt
+        );
+        smoothStateRef.current.camZ = smoothDamp(
+          smoothStateRef.current.camZ,
+          targetZ,
+          velZObj,
+          camSmoothTime,
+          dt
+        );
+        smoothStateRef.current.lookAtX = smoothDamp(
+          smoothStateRef.current.lookAtX,
+          targetLookX,
+          velLookXObj,
+          camSmoothTime,
+          dt
+        );
+        smoothStateRef.current.lookAtY = smoothDamp(
+          smoothStateRef.current.lookAtY,
+          targetLookY,
+          velLookYObj,
+          camSmoothTime,
+          dt
+        );
+
+        smoothStateRef.current.velCamX = velXObj.current;
+        smoothStateRef.current.velCamY = velYObj.current;
+        smoothStateRef.current.velCamZ = velZObj.current;
+        smoothStateRef.current.velLookX = velLookXObj.current;
+        smoothStateRef.current.velLookY = velLookYObj.current;
+      }
 
       camera.position.set(
         smoothStateRef.current.camX,
@@ -989,9 +1096,10 @@ export function useThreeAnimationEngine(
         smoothStateRef.current.rotY = 0;
         smoothStateRef.current.rotZ = 0;
       } else {
-        smoothStateRef.current.rotX += (finalRotX - smoothStateRef.current.rotX) * 0.12;
-        smoothStateRef.current.rotY += (finalRotY - smoothStateRef.current.rotY) * 0.12;
-        smoothStateRef.current.rotZ += (finalRotZ - smoothStateRef.current.rotZ) * 0.12;
+        const rotLerpFactor = 1.0 - Math.exp(-10.0 * dt);
+        smoothStateRef.current.rotX += (finalRotX - smoothStateRef.current.rotX) * rotLerpFactor;
+        smoothStateRef.current.rotY += (finalRotY - smoothStateRef.current.rotY) * rotLerpFactor;
+        smoothStateRef.current.rotZ += (finalRotZ - smoothStateRef.current.rotZ) * rotLerpFactor;
       }
 
       screenGroup.rotation.set(

@@ -1,4 +1,5 @@
-import { ClickEvent } from "@/types/editor";
+import { ClickEvent, CursorPoint } from "@/types/editor";
+import { clusterNearbyClicks } from "@/utils/clickClusterer";
 
 /**
  * Procedurally generates a realistic 12-second 1280x720 developer screen recording
@@ -8,6 +9,7 @@ export async function generateSampleScreenRecording(): Promise<{
   blobUrl: string;
   duration: number;
   defaultEvents: ClickEvent[];
+  cursorTrail: CursorPoint[];
 }> {
   return new Promise((resolve, reject) => {
     try {
@@ -47,6 +49,8 @@ export async function generateSampleScreenRecording(): Promise<{
       const totalFrames = durationSeconds * 30;
       let frame = 0;
 
+      const sampleCursorTrail: CursorPoint[] = [];
+
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: "video/webm" });
         const blobUrl = URL.createObjectURL(blob);
@@ -54,8 +58,8 @@ export async function generateSampleScreenRecording(): Promise<{
           {
             id: "demo-event-1",
             timestamp: 2.4,
-            x: 0.85,
-            y: 0.12,
+            x: 0.898,
+            y: 0.033,
             zoom: 2.2,
             label: "Run Cinematic Build",
             enabled: true,
@@ -63,8 +67,8 @@ export async function generateSampleScreenRecording(): Promise<{
           {
             id: "demo-event-2",
             timestamp: 5.8,
-            x: 0.32,
-            y: 0.72,
+            x: 0.344,
+            y: 0.749,
             zoom: 2.4,
             label: "Inspect Terminal Diagnostics",
             enabled: true,
@@ -72,18 +76,21 @@ export async function generateSampleScreenRecording(): Promise<{
           {
             id: "demo-event-3",
             timestamp: 9.2,
-            x: 0.75,
-            y: 0.45,
+            x: 0.828,
+            y: 0.497,
             zoom: 2.0,
             label: "Deploy Instant Release",
             enabled: true,
           },
         ];
 
+        const clustered = clusterNearbyClicks(defaultEvents, 1.8, 2.2, sampleCursorTrail);
+
         resolve({
           blobUrl,
           duration: durationSeconds,
-          defaultEvents,
+          defaultEvents: clustered,
+          cursorTrail: sampleCursorTrail,
         });
       };
 
@@ -322,6 +329,13 @@ export async function generateSampleScreenRecording(): Promise<{
           cursorX = width - 220 + Math.sin(t * 3) * 15;
           cursorY = 358 + Math.cos(t * 3) * 10;
         }
+
+        // Record continuous cursor trajectory for realistic camera tracking
+        sampleCursorTrail.push({
+          timestamp: Math.round(t * 100) / 100,
+          x: Math.round((cursorX / width) * 1000) / 1000,
+          y: Math.round((cursorY / height) * 1000) / 1000,
+        });
 
         // Draw small pointer cursor
         ctx.fillStyle = "#ffffff";

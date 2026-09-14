@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { DesktopProjectHub } from "@/components/landing/DesktopProjectHub";
 import { FeatureGrid } from "@/components/landing/FeatureGrid";
+import { ProcessSection } from "@/components/landing/ProcessSection";
+import { BannerMarquee } from "@/components/landing/BannerMarquee";
 import { ComparisonDemo } from "@/components/landing/ComparisonDemo";
-import { HowItWorks } from "@/components/landing/HowItWorks";
+import { DesktopProjectHub } from "@/components/landing/DesktopProjectHub";
 import { DesktopAppDashboard } from "@/components/desktop/DesktopAppDashboard";
 
 import { isDesktopApp } from "@/lib/desktopBridge";
@@ -23,21 +24,20 @@ export default function LandingPage() {
     }
   }, []);
 
-  // When running inside Electron desktop app, render the dedicated Desktop Workspace Dashboard
   if (isDesktopMode) {
     return <DesktopAppDashboard />;
   }
 
-  // When visiting via web browser, render marketing landing page
   return (
-    <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 selection:bg-rose-400 selection:text-black">
+    <div className="min-h-screen flex flex-col bg-[#030509] text-slate-100 selection:bg-rose-400 selection:text-black">
       <Navbar />
       <main className="flex-1">
         <HeroSection />
-        <DesktopProjectHub />
         <FeatureGrid />
+        <ProcessSection />
+        <BannerMarquee />
         <ComparisonDemo />
-        <HowItWorks />
+        <DesktopProjectHub />
       </main>
       <Footer />
     </div>

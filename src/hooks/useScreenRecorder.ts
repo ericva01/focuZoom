@@ -201,47 +201,78 @@ export function useScreenRecorder({
 
         tempVideo.onloadedmetadata = () => {
           const elapsedSec = (performance.now() - startTimeRef.current) / 1000;
-          const calculatedDuration =
-            tempVideo.duration && isFinite(tempVideo.duration)
-              ? tempVideo.duration
-              : Math.max(1, elapsedSec);
 
-          const fullTrail = [...recordedTrailRef.current].sort(
-            (a, b) => a.timestamp - b.timestamp
-          );
+          // Chromium WebM duration resolution: seeking to end resolves actual encoded media duration
+          const resolveDurationAndImport = (actualDuration: number) => {
+            const finalDuration = Math.max(0.5, actualDuration);
+            const timeScale = elapsedSec > 0.5 ? finalDuration / elapsedSec : 1.0;
 
-          const dateStamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-          const metadata: VideoMetadata = {
-            name: `screen-recording-${dateStamp}.webm`,
-            duration: Math.round(calculatedDuration * 10) / 10,
-            width: tempVideo.videoWidth || 1920,
-            height: tempVideo.videoHeight || 1080,
-            fileSize: `${(blob.size / (1024 * 1024)).toFixed(2)} MB`,
-            url: blobUrl,
-            webcamUrl: recordedWebcamBlobUrl || undefined,
-            cursorTrail: fullTrail,
+            // Align all recorded clicks and cursor points to the exact encoded video timeline
+            const fullTrail = recordedTrailRef.current
+              .map((p) => ({
+                ...p,
+                timestamp: Math.round(p.timestamp * timeScale * 100) / 100,
+              }))
+              .sort((a, b) => a.timestamp - b.timestamp);
+
+            const sortedClicks = recordedClicksRef.current
+              .map((c) => ({
+                ...c,
+                timestamp: Math.round(c.timestamp * timeScale * 100) / 100,
+              }))
+              .sort((a, b) => a.timestamp - b.timestamp);
+
+            const clusteredClicks = clusterNearbyClicks(
+              sortedClicks,
+              1.8,
+              defaultZoomScale,
+              fullTrail
+            );
+
+            const dateStamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+            const metadata: VideoMetadata = {
+              name: `screen-recording-${dateStamp}.webm`,
+              duration: Math.round(finalDuration * 10) / 10,
+              width: tempVideo.videoWidth || 1920,
+              height: tempVideo.videoHeight || 1080,
+              fileSize: `${(blob.size / (1024 * 1024)).toFixed(2)} MB`,
+              url: blobUrl,
+              webcamUrl: recordedWebcamBlobUrl || undefined,
+              cursorTrail: fullTrail,
+            };
+
+            setIsRecording(false);
+            setRecordingDuration(0);
+
+            onImportRecording({
+              blobUrl,
+              metadata,
+              events: clusteredClicks,
+              webcamBlobUrl: recordedWebcamBlobUrl,
+            });
           };
 
-          // Final sorted click events clustered into single continuous zoom sequences with cursor trail
-          const sortedClicks = [...recordedClicksRef.current].sort(
-            (a, b) => a.timestamp - b.timestamp
-          );
-          const clusteredClicks = clusterNearbyClicks(
-            sortedClicks,
-            2.0,
-            defaultZoomScale,
-            fullTrail
-          );
-
-          setIsRecording(false);
-          setRecordingDuration(0);
-
-          onImportRecording({
-            blobUrl,
-            metadata,
-            events: clusteredClicks,
-            webcamBlobUrl: recordedWebcamBlobUrl,
-          });
+          if (tempVideo.duration && isFinite(tempVideo.duration) && tempVideo.duration > 0) {
+            resolveDurationAndImport(tempVideo.duration);
+          } else {
+            // Seek to 1e101 to force Chromium to parse final cluster and resolve finite duration
+            tempVideo.currentTime = 1e101;
+            tempVideo.onseeked = () => {
+              tempVideo.onseeked = null;
+              const resolved =
+                isFinite(tempVideo.duration) && tempVideo.duration > 0
+                  ? tempVideo.duration
+                  : elapsedSec;
+              resolveDurationAndImport(resolved);
+            };
+            // Fallback safety timeout if seeked event is delayed
+            setTimeout(() => {
+              if (tempVideo.onseeked) {
+                tempVideo.onseeked = null;
+                resolveDurationAndImport(elapsedSec);
+              }
+            }, 600);
+          }
         };
 
         tempVideo.onerror = () => {
@@ -387,22 +418,15 @@ export function useScreenRecorder({
       // Listen for user clicking native "Stop sharing" browser bar
       const videoTrack = stream.getVideoTracks()[0];
       if (videoTrack) {
+        // Enforce motion content hint so Chromium does not drop frames during static screen periods
+        if ("contentHint" in videoTrack) {
+          (videoTrack as MediaStreamTrack & { contentHint?: string }).contentHint = "motion";
+        }
         trackSettingsRef.current = videoTrack.getSettings();
         videoTrack.onended = () => {
           stopRecording();
         };
       }
-
-      // Record start timestamp
-      const startTime = performance.now();
-      startTimeRef.current = startTime;
-      setIsRecording(true);
-
-      // Start elapsed timer
-      timerRef.current = setInterval(() => {
-        const sec = (performance.now() - startTime) / 1000;
-        setRecordingDuration(sec);
-      }, 200);
 
       // Attach global mouse movement listener for continuous trajectory tracking
       let lastMoveMs = 0;
@@ -414,7 +438,8 @@ export function useScreenRecorder({
           trackSettingsRef.current = videoTrack.getSettings();
         }
         const coords = getStreamRelativeCoordinates(e, trackSettingsRef.current);
-        const relTime = Math.max(0, Math.round(((now - startTime) / 1000) * 100) / 100);
+        const baseStart = startTimeRef.current || now;
+        const relTime = Math.max(0, Math.round(((now - baseStart) / 1000) * 100) / 100);
         recordedTrailRef.current.push({
           timestamp: relTime,
           x: coords.x,
@@ -427,7 +452,9 @@ export function useScreenRecorder({
       // Attach global click logging listener scaled to video stream
       const handleClick = (e: MouseEvent) => {
         const coords = getStreamRelativeCoordinates(e, trackSettingsRef.current);
-        const relTime = Math.max(0.1, Math.round(((performance.now() - startTime) / 1000) * 10) / 10);
+        const now = performance.now();
+        const baseStart = startTimeRef.current || now;
+        const relTime = Math.max(0.05, Math.round(((now - baseStart) / 1000) * 100) / 100);
 
         const newClick: ClickEvent = {
           id: `rec-click-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -446,12 +473,7 @@ export function useScreenRecorder({
       window.addEventListener("mousedown", handleClick, true);
       clickListenerRef.current = handleClick;
 
-      // Start native OS-level global mouse tracking (Tauri on Windows)
-      desktopBridge.startMouseTracking().catch((err) => {
-        console.warn("[ScreenRecorder] Could not start native mouse tracker:", err);
-      });
-
-      // Initialize secondary webcam recording if enabled
+      // Initialize secondary webcam recording if enabled BEFORE starting screen recorder
       if (enableWebcam && navigator.mediaDevices?.getUserMedia) {
         try {
           const camConstraints: MediaStreamConstraints = {
@@ -486,8 +508,32 @@ export function useScreenRecorder({
         }
       }
 
+      // Synchronize recording start timestamp strictly with video frame 0
+      const onRecordingStarted = () => {
+        const startTime = performance.now();
+        startTimeRef.current = startTime;
+        setIsRecording(true);
+
+        // Start native OS-level global mouse tracking in exact sync with video frame 0
+        desktopBridge.startMouseTracking().catch((err) => {
+          console.warn("[ScreenRecorder] Could not start native mouse tracker:", err);
+        });
+
+        // Start elapsed timer
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+          const sec = (performance.now() - startTime) / 1000;
+          setRecordingDuration(sec);
+        }, 200);
+      };
+
+      recorder.onstart = onRecordingStarted;
+
       // Begin recording in 500ms time slices
       recorder.start(500);
+      if (!startTimeRef.current) {
+        onRecordingStarted();
+      }
       return true;
     } catch (err: unknown) {
       if (err instanceof Error && err.name !== "NotAllowedError") {

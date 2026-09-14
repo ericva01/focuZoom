@@ -245,7 +245,7 @@ export default function EditorPage() {
       }
 
       if (recEvents && recEvents.length > 0) {
-        setEvents(clusterNearbyClicks(recEvents, 2.0, config.defaultZoomScale, recMeta.cursorTrail));
+        setEvents(clusterNearbyClicks(recEvents, 1.8, config.defaultZoomScale, recMeta.cursorTrail));
       } else {
         setEvents([
           {
@@ -288,6 +288,7 @@ export default function EditorPage() {
         width: 1280,
         height: 720,
         url: sample.blobUrl,
+        cursorTrail: sample.cursorTrail,
       });
 
       const initialClip: TimelineClip = {
@@ -697,7 +698,9 @@ export default function EditorPage() {
       enabled: true,
     };
 
-    setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
+    setEvents((prev) =>
+      clusterNearbyClicks([...prev, newEvent], 1.8, config.defaultZoomScale, metadata?.cursorTrail)
+    );
     setIsAddMode(false);
   };
 
@@ -713,8 +716,10 @@ export default function EditorPage() {
       label: `Target at ${playback.currentTime.toFixed(1)}s`,
       enabled: true,
     };
-    setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
-  }, [playback.currentTime, config.defaultZoomScale, recordHistory]);
+    setEvents((prev) =>
+      clusterNearbyClicks([...prev, newEvent], 1.8, config.defaultZoomScale, metadata?.cursorTrail)
+    );
+  }, [playback.currentTime, config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
 
   const handleUpdateEvent = (id: string, updates: Partial<ClickEvent>) => {
     recordHistory();
@@ -725,29 +730,25 @@ export default function EditorPage() {
         if (updates.x !== undefined || updates.y !== undefined) {
           const newX = updates.x !== undefined ? updates.x : e.x;
           const newY = updates.y !== undefined ? updates.y : e.y;
+          const dx = newX - e.x;
+          const dy = newY - e.y;
 
-          if (updated.targets && updated.targets.length > 0) {
-            const anchorX = updated.targets[0].x;
-            const anchorY = updated.targets[0].y;
-            const dx = newX - anchorX;
-            const dy = newY - anchorY;
-            updated.targets = updated.targets.map((tgt) => ({
-              ...tgt,
-              x: Math.max(0.02, Math.min(0.98, Math.round((tgt.x + dx) * 1000) / 1000)),
-              y: Math.max(0.02, Math.min(0.98, Math.round((tgt.y + dy) * 1000) / 1000)),
-            }));
-          }
+          if (dx !== 0 || dy !== 0) {
+            if (updated.targets && updated.targets.length > 0) {
+              updated.targets = updated.targets.map((tgt) => ({
+                ...tgt,
+                x: Math.max(0.02, Math.min(0.98, Math.round((tgt.x + dx) * 1000) / 1000)),
+                y: Math.max(0.02, Math.min(0.98, Math.round((tgt.y + dy) * 1000) / 1000)),
+              }));
+            }
 
-          if (updated.cursorTrail && updated.cursorTrail.length > 0) {
-            const anchorX = updated.cursorTrail[0].x;
-            const anchorY = updated.cursorTrail[0].y;
-            const dx = newX - anchorX;
-            const dy = newY - anchorY;
-            updated.cursorTrail = updated.cursorTrail.map((p) => ({
-              ...p,
-              x: Math.max(0.02, Math.min(0.98, Math.round((p.x + dx) * 1000) / 1000)),
-              y: Math.max(0.02, Math.min(0.98, Math.round((p.y + dy) * 1000) / 1000)),
-            }));
+            if (updated.cursorTrail && updated.cursorTrail.length > 0) {
+              updated.cursorTrail = updated.cursorTrail.map((p) => ({
+                ...p,
+                x: Math.max(0.02, Math.min(0.98, Math.round((p.x + dx) * 1000) / 1000)),
+                y: Math.max(0.02, Math.min(0.98, Math.round((p.y + dy) * 1000) / 1000)),
+              }));
+            }
           }
         }
         return updated;
@@ -763,7 +764,7 @@ export default function EditorPage() {
 
   const handleMergeNearbyClicks = useCallback(() => {
     recordHistory();
-    setEvents((prev) => clusterNearbyClicks(prev, 2.0, config.defaultZoomScale, metadata?.cursorTrail));
+    setEvents((prev) => clusterNearbyClicks(prev, 1.8, config.defaultZoomScale, metadata?.cursorTrail));
   }, [config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
 
   const handleSelectEvent = useCallback((event: ClickEvent) => {
