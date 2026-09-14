@@ -21,13 +21,13 @@ function getStaticDir(): string {
 
   for (const p of candidatePaths) {
     if (fs.existsSync(p) && fs.existsSync(path.join(p, "index.html"))) {
-      console.log("[FocuFlow] Found static export at:", p);
+      console.log("[Glideo] Found static export at:", p);
       return p;
     }
   }
 
   const fallback = path.join(__dirname, "../out");
-  console.log("[FocuFlow] Fallback static path:", fallback);
+  console.log("[Glideo] Fallback static path:", fallback);
   return fallback;
 }
 
@@ -126,7 +126,7 @@ function createApplicationMenu(window: BrowserWindow) {
       label: "Help",
       submenu: [
         {
-          label: "FocuFlow Documentation",
+          label: "Glideo Documentation",
           click: async () => {
             await shell.openExternal("https://github.com/ericva01/focuZoom");
           },
@@ -139,12 +139,12 @@ function createApplicationMenu(window: BrowserWindow) {
         },
         { type: "separator" as const },
         {
-          label: "About FocuFlow Studio",
+          label: "About Glideo",
           click: () => {
             dialog.showMessageBox(window, {
               type: "info",
-              title: "About FocuFlow Studio",
-              message: "FocuFlow Studio",
+              title: "About Glideo",
+              message: "Glideo",
               detail: `Version: ${app.getVersion()}\nElectron: ${process.versions.electron}\nNode: ${process.versions.node}\nChromium: ${process.versions.chrome}\nPlatform: ${process.platform} (${process.arch})\n\nAccelerated Canvas Video Editor with Dynamic 3D Camera Animations.`,
             });
           },
@@ -169,7 +169,7 @@ async function createWindow() {
     minWidth: 1080,
     minHeight: 700,
     backgroundColor: "#060913",
-    title: "FocuFlow Studio",
+    title: "Glideo",
     icon: fs.existsSync(iconPath) ? iconPath : undefined,
     show: false,
     webPreferences: {
@@ -202,17 +202,17 @@ async function createWindow() {
 
   if (isDev) {
     const devUrl = process.env.ELECTRON_START_URL || "http://localhost:3000/desktop";
-    console.log("[FocuFlow] Development mode, loading:", devUrl);
+    console.log("[Glideo] Development mode, loading:", devUrl);
     await mainWindow.loadURL(devUrl);
   } else {
     try {
       const staticDir = getStaticDir();
-      console.log("[FocuFlow] Production mode, starting local loopback server for:", staticDir);
+      console.log("[Glideo] Production mode, starting local loopback server for:", staticDir);
       staticServer = await startStaticServer(staticDir);
-      console.log("[FocuFlow] Server listening at:", staticServer.url);
+      console.log("[Glideo] Server listening at:", staticServer.url);
       await mainWindow.loadURL(`${staticServer.url}/desktop`);
     } catch (err) {
-      console.error("[FocuFlow] Failed to start internal offline server:", err);
+      console.error("[Glideo] Failed to start internal offline server:", err);
       // Fallback to load direct desktop.html or index.html if server fails
       const fallbackDesktop = path.join(getStaticDir(), "desktop.html");
       const fallbackPath = fs.existsSync(fallbackDesktop)
@@ -278,10 +278,10 @@ function registerIpcHandlers() {
     if (!mainWindow) return { canceled: true };
 
     const result = await dialog.showSaveDialog(mainWindow, {
-      title: "Save FocuFlow Project",
-      defaultPath: options.defaultPath || "project.focuflow",
+      title: "Save Glideo Project",
+      defaultPath: options.defaultPath || "project.glideo",
       filters: [
-        { name: "FocuFlow Project (*.focuflow)", extensions: ["focuflow"] },
+        { name: "Glideo Project (*.glideo)", extensions: ["glideo"] },
         { name: "JSON File (*.json)", extensions: ["json"] },
       ],
     });
@@ -381,7 +381,7 @@ function registerIpcHandlers() {
 // -----------------------------------------------------------------------------
 
 if (process.platform === "win32") {
-  app.setAppUserModelId("com.focuflow.studio");
+  app.setAppUserModelId("com.glideo.app");
 }
 
 app.whenReady().then(async () => {
@@ -395,13 +395,13 @@ app.whenReady().then(async () => {
       if (sources.length > 0) {
         // Prioritize full primary display screen, fallback to first source
         const primarySource = sources.find((s) => s.id.startsWith("screen")) || sources[0];
-        console.log("[FocuFlow] Granting display media request for:", primarySource.name, primarySource.id);
+        console.log("[Glideo] Granting display media request for:", primarySource.name, primarySource.id);
         callback({ video: primarySource });
       } else {
         callback({});
       }
     } catch (err) {
-      console.error("[FocuFlow] Failed to handle display media request:", err);
+      console.error("[Glideo] Failed to handle display media request:", err);
       callback({});
     }
   });

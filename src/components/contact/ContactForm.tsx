@@ -44,9 +44,9 @@ export function ContactForm() {
   };
 
   const getMailtoUri = () => {
-    const subject = encodeURIComponent(`[FocuFlow] ${formData.subject} - ${formData.name || "Inquiry"}`);
+    const subject = encodeURIComponent(`[Glideo] ${formData.subject} - ${formData.name || "Inquiry"}`);
     const body = encodeURIComponent(
-      `Hello Eric Va,\n\n${formData.message}\n\n---\nSender: ${formData.name}\nEmail: ${formData.email}\nTopic: ${formData.subject}\nSent via FocuFlow Studio Contact Form`
+      `Hello Eric Va,\n\n${formData.message}\n\n---\nSender: ${formData.name}\nEmail: ${formData.email}\nTopic: ${formData.subject}\nSent via Glideo Contact Form`
     );
     return `mailto:ericva014@gmail.com?subject=${subject}&body=${body}`;
   };
@@ -57,7 +57,7 @@ export function ContactForm() {
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ["#38bdf8", "#818cf8", "#c084fc", "#34d399"],
+        colors: ["#fb7185", "#818cf8", "#c084fc", "#34d399"],
       });
     } catch {
       // ignore
@@ -81,7 +81,7 @@ export function ContactForm() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          _subject: `[FocuFlow] ${formData.subject} from ${formData.name}`,
+          _subject: `[Glideo] ${formData.subject} from ${formData.name}`,
           topic: formData.subject,
           message: formData.message,
           _captcha: "false",
@@ -132,26 +132,26 @@ export function ContactForm() {
   };
 
   return (
-    <div className="relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 bg-[#080D1A]/85 border border-white/15 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_30px_rgba(56,189,248,0.08)] select-none">
+    <div className="relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 bg-[#080D1A]/85 border border-white/15 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_30px_rgba(251,113,133,0.08)] select-none">
       {/* Specular top border light */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
 
       {/* Success Confirmation View */}
       {isSuccess ? (
         <div className="py-10 text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
-          <div className="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-400/30 text-sky-300 mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(56,189,248,0.3)]">
+          <div className="w-14 h-14 rounded-2xl bg-rose-500/20 border border-rose-400/30 text-rose-300 mx-auto flex items-center justify-center shadow-[0_0_25px_rgba(251,113,133,0.3)]">
             <CheckCircle2 className="w-7 h-7" />
           </div>
 
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-[11px] font-mono text-sky-300">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-400/20 text-[11px] font-mono text-rose-300">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>{sentVia === "api" ? "Delivered via Mail Gateway" : "Dispatched via Mail Client"}</span>
             </div>
             <h3 className="text-2xl font-bold text-white tracking-tight">Message Sent</h3>
             <p className="text-slate-300 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
               Thank you, <strong className="text-white">{formData.name}</strong>. Your message regarding{" "}
-              <span className="text-sky-300">&ldquo;{formData.subject}&rdquo;</span> has been sent to{" "}
+              <span className="text-rose-300">&ldquo;{formData.subject}&rdquo;</span> has been sent to{" "}
               <span className="text-white font-mono underline">ericva014@gmail.com</span>. We typically respond within 2 hours to{" "}
               <span className="text-white font-mono">{formData.email}</span>.
             </p>
@@ -160,7 +160,7 @@ export function ContactForm() {
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href={getMailtoUri()}
-              className="rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-sky-300 hover:text-white border border-white/15 px-5 py-2.5 text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer"
+              className="rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-rose-300 hover:text-white border border-white/15 px-5 py-2.5 text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Mail className="w-3.5 h-3.5" />
               <span>Open in Mail App (Copy)</span>
@@ -192,8 +192,8 @@ export function ContactForm() {
                 Have an idea, bug report, or questions about in-browser video processing? Drop us a message.
               </p>
             </div>
-            <div className="hidden sm:flex items-center gap-1 text-[11px] font-mono text-sky-300 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-400/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <div className="hidden sm:flex items-center gap-1 text-[11px] font-mono text-rose-300 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-400/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
               <span>To: ericva014@gmail.com</span>
             </div>
           </div>
@@ -213,7 +213,7 @@ export function ContactForm() {
                   if (errors.name) setErrors({ ...errors, name: "" });
                 }}
                 placeholder="e.g. Alex Rivera"
-                className={`w-full bg-black/40 border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 transition-colors ${
+                className={`w-full bg-black/40 border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400/50 transition-colors ${
                   errors.name ? "border-rose-500/50" : "border-white/10"
                 }`}
               />
@@ -238,7 +238,7 @@ export function ContactForm() {
                   if (errors.email) setErrors({ ...errors, email: "" });
                 }}
                 placeholder="alex@domain.com"
-                className={`w-full bg-black/40 border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 transition-colors ${
+                className={`w-full bg-black/40 border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400/50 transition-colors ${
                   errors.email ? "border-rose-500/50" : "border-white/10"
                 }`}
               />
@@ -262,7 +262,7 @@ export function ContactForm() {
                   onClick={() => setFormData({ ...formData, subject: subj })}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                     formData.subject === subj
-                      ? "bg-sky-500/20 text-sky-200 border-sky-400/40 shadow-[0_0_15px_rgba(56,189,248,0.2)]"
+                      ? "bg-rose-500/20 text-rose-200 border-rose-400/40 shadow-[0_0_15px_rgba(251,113,133,0.2)]"
                       : "bg-white/[0.04] text-slate-400 hover:text-white border-white/10"
                   }`}
                 >
@@ -286,7 +286,7 @@ export function ContactForm() {
                 if (errors.message) setErrors({ ...errors, message: "" });
               }}
               placeholder="Tell us what feature you need, report an issue, or ask a question..."
-              className={`w-full bg-black/40 border rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/50 transition-colors ${
+              className={`w-full bg-black/40 border rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400/50 transition-colors ${
                 errors.message ? "border-rose-500/50" : "border-white/10"
               }`}
             />
@@ -303,7 +303,7 @@ export function ContactForm() {
             <button
               type="button"
               onClick={handleOpenEmailClientDirectly}
-              className="text-xs text-slate-400 hover:text-sky-300 transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="text-xs text-slate-400 hover:text-rose-300 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Mail className="w-3.5 h-3.5" />
               <span>Or open in Mail Client (Gmail / Outlook)</span>

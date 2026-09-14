@@ -19,6 +19,8 @@ interface ExportModalProps {
   videoRef: React.RefObject<HTMLVideoElement>;
   duration: number;
   projectName: string;
+  webcamConfig?: import("@/types/editor").WebcamConfig;
+  webcamUrl?: string | null;
 }
 
 export function ExportModal({
@@ -28,6 +30,8 @@ export function ExportModal({
   videoRef,
   duration,
   projectName,
+  webcamConfig,
+  webcamUrl,
 }: ExportModalProps) {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -54,8 +58,117 @@ export function ExportModal({
 
     await new Promise((r) => setTimeout(r, 200));
 
-    // Capture 60 FPS stream from canvas
-    const stream = canvas.captureStream(60);
+    // Setup export video stream: either direct canvas stream or composite canvas stream with webcam
+    let exportStream: MediaStream;
+    let exportCanvas: HTMLCanvasElement | null = null;
+    let exportCtx: CanvasRenderingContext2D | null = null;
+    let camVid: HTMLVideoElement | null = null;
+    let animFrameId: number | null = null;
+
+    const hasWebcamOverlay =
+      webcamConfig?.enabled !== false &&
+      (webcamUrl || webcamConfig?.url);
+
+    if (hasWebcamOverlay) {
+      exportCanvas = document.createElement("canvas");
+      exportCanvas.width = canvas.width;
+      exportCanvas.height = canvas.height;
+      exportCtx = exportCanvas.getContext("2d");
+
+      camVid = document.createElement("video");
+      camVid.src = webcamUrl || webcamConfig?.url || "";
+      camVid.muted = true;
+      camVid.playsInline = true;
+      await camVid.play().catch(() => {});
+
+      const wConfig = webcamConfig || {
+        enabled: true,
+        shape: "circle",
+        position: "bottom-right",
+        customX: 0.85,
+        customY: 0.82,
+        size: 180,
+        borderColor: "#fb7185",
+        borderWidth: 3,
+        shadow: true,
+        mirror: true,
+      };
+
+      const renderCompositeFrame = () => {
+        if (!exportCtx || !exportCanvas) return;
+        exportCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+        exportCtx.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
+
+        // Draw webcam PiP overlay
+        if (camVid && camVid.readyState >= 2) {
+          const cW = exportCanvas.width;
+          const cH = exportCanvas.height;
+          // Scale bubble size proportional to export canvas
+          const scaleFactor = cW / 1920;
+          const bubbleSize = (wConfig.size || 180) * scaleFactor;
+          const posX = (wConfig.customX ?? 0.85) * cW;
+          const posY = (wConfig.customY ?? 0.82) * cH;
+
+          exportCtx.save();
+          exportCtx.translate(posX, posY);
+
+          // Path clipping for shape
+          exportCtx.beginPath();
+          if (wConfig.shape === "circle") {
+            exportCtx.arc(0, 0, bubbleSize / 2, 0, Math.PI * 2);
+          } else if (wConfig.shape === "rounded-rect") {
+            const rad = 24 * scaleFactor;
+            exportCtx.roundRect(-bubbleSize / 2, -bubbleSize / 2, bubbleSize, bubbleSize, rad);
+          } else {
+            exportCtx.rect(-bubbleSize / 2, -bubbleSize / 2, bubbleSize, bubbleSize);
+          }
+          exportCtx.closePath();
+
+          // Drop shadow
+          if (wConfig.shadow) {
+            exportCtx.shadowColor = "rgba(0, 0, 0, 0.65)";
+            exportCtx.shadowBlur = 25 * scaleFactor;
+            exportCtx.shadowOffsetY = 10 * scaleFactor;
+          }
+
+          exportCtx.clip();
+
+          // Mirror if enabled
+          if (wConfig.mirror) {
+            exportCtx.scale(-1, 1);
+          }
+
+          exportCtx.drawImage(camVid, -bubbleSize / 2, -bubbleSize / 2, bubbleSize, bubbleSize);
+          exportCtx.restore();
+
+          // Draw border
+          if (wConfig.borderWidth > 0) {
+            exportCtx.save();
+            exportCtx.translate(posX, posY);
+            exportCtx.lineWidth = wConfig.borderWidth * scaleFactor;
+            exportCtx.strokeStyle = wConfig.borderColor || "#fb7185";
+            exportCtx.beginPath();
+            if (wConfig.shape === "circle") {
+              exportCtx.arc(0, 0, bubbleSize / 2, 0, Math.PI * 2);
+            } else if (wConfig.shape === "rounded-rect") {
+              const rad = 24 * scaleFactor;
+              exportCtx.roundRect(-bubbleSize / 2, -bubbleSize / 2, bubbleSize, bubbleSize, rad);
+            } else {
+              exportCtx.rect(-bubbleSize / 2, -bubbleSize / 2, bubbleSize, bubbleSize);
+            }
+            exportCtx.stroke();
+            exportCtx.restore();
+          }
+        }
+
+        animFrameId = requestAnimationFrame(renderCompositeFrame);
+      };
+
+      animFrameId = requestAnimationFrame(renderCompositeFrame);
+      exportStream = exportCanvas.captureStream(60);
+    } else {
+      exportStream = canvas.captureStream(60);
+    }
 
     let mimeType = "video/webm;codecs=vp9";
     if (!MediaRecorder.isTypeSupported(mimeType)) {
@@ -65,7 +178,7 @@ export function ExportModal({
       mimeType = "video/webm";
     }
 
-    const recorder = new MediaRecorder(stream, {
+    const recorder = new MediaRecorder(exportStream, {
       mimeType,
       videoBitsPerSecond: bitrate,
     });
@@ -77,6 +190,12 @@ export function ExportModal({
     };
 
     recorder.onstop = () => {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      if (camVid) {
+        camVid.pause();
+        camVid.src = "";
+      }
+
       const blob = new Blob(chunks, { type: "video/webm" });
       const url = URL.createObjectURL(blob);
       setExportedUrl(url);
@@ -92,7 +211,7 @@ export function ExportModal({
           particleCount: 100,
           spread: 80,
           origin: { y: 0.5 },
-          colors: ["#38bdf8", "#818cf8", "#c084fc"],
+          colors: ["#fb7185", "#818cf8", "#c084fc"],
         });
       } catch {
         // ignore
@@ -101,11 +220,19 @@ export function ExportModal({
 
     recorder.start();
     video.play();
+    if (camVid) {
+      camVid.currentTime = 0;
+      camVid.play().catch(() => {});
+    }
 
     const interval = setInterval(() => {
       if (!video || !isExporting) {
         clearInterval(interval);
+        if (animFrameId) cancelAnimationFrame(animFrameId);
         return;
+      }
+      if (camVid && Math.abs(camVid.currentTime - video.currentTime) > 0.2) {
+        camVid.currentTime = video.currentTime;
       }
       const safeDur = duration > 0 ? duration : 1;
       const currentProgress = Math.min(99, (video.currentTime / safeDur) * 100);
@@ -135,7 +262,7 @@ export function ExportModal({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300">
+            <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-center text-rose-300">
               <Film className="w-4 h-4" />
             </div>
             <div>
@@ -181,7 +308,7 @@ export function ExportModal({
                   onClick={() => setBitrate(8000000)}
                   className={`p-2.5 rounded-xl border text-xs text-left transition-all duration-200 ${
                     bitrate === 8000000
-                      ? "bg-sky-500/20 border-sky-400/30 text-white shadow-glass-sm"
+                      ? "bg-rose-500/20 border-rose-400/30 text-white shadow-glass-sm"
                       : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white"
                   }`}
                 >
@@ -194,7 +321,7 @@ export function ExportModal({
                   onClick={() => setBitrate(16000000)}
                   className={`p-2.5 rounded-xl border text-xs text-left transition-all duration-200 ${
                     bitrate === 16000000
-                      ? "bg-sky-500/20 border-sky-400/30 text-white shadow-glass-sm"
+                      ? "bg-rose-500/20 border-rose-400/30 text-white shadow-glass-sm"
                       : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white"
                   }`}
                 >
@@ -219,7 +346,7 @@ export function ExportModal({
         {/* State 2: Export in Progress */}
         {isExporting && (
           <div className="py-6 text-center space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin text-sky-400 mx-auto" />
+            <Loader2 className="w-8 h-8 animate-spin text-rose-400 mx-auto" />
             <div className="space-y-0.5">
               <div className="text-white font-medium text-xs">Rendering Frame by Frame...</div>
               <div className="text-[11px] text-slate-400">
@@ -231,11 +358,11 @@ export function ExportModal({
             <div className="space-y-1.5">
               <div className="w-full h-2.5 rounded-full bg-black/40 overflow-hidden border border-white/[0.08]">
                 <div
-                  className="h-full bg-gradient-to-r from-sky-500 to-sky-400 transition-all duration-100 shadow-[0_0_10px_rgba(56,189,248,0.5)]"
+                  className="h-full bg-gradient-to-r from-rose-500 to-rose-400 transition-all duration-100 shadow-[0_0_10px_rgba(251,113,133,0.5)]"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <div className="text-right text-[11px] font-mono text-sky-400 font-medium">
+              <div className="text-right text-[11px] font-mono text-rose-400 font-medium">
                 {Math.round(progress)}% Complete
               </div>
             </div>
@@ -245,8 +372,8 @@ export function ExportModal({
         {/* State 3: Export Complete */}
         {exportedUrl && (
           <div className="space-y-3.5 animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-3 rounded-xl glass-panel border-sky-400/30 text-sky-300 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-sky-400" />
+            <div className="p-3 rounded-xl glass-panel border-rose-400/30 text-rose-300 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-rose-400" />
               <span>Video rendered successfully ({fileSize})</span>
             </div>
 

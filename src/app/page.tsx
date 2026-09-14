@@ -10,14 +10,16 @@ import { ComparisonDemo } from "@/components/landing/ComparisonDemo";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { DesktopAppDashboard } from "@/components/desktop/DesktopAppDashboard";
 
+import { isDesktopApp } from "@/lib/desktopBridge";
+
 export default function LandingPage() {
   const [isDesktopMode, setIsDesktopMode] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const isElectron = Boolean(window.electronAPI?.isElectron);
+      const isDesktop = isDesktopApp();
       const isDesktopQuery = window.location.search.includes("desktop=true");
-      setIsDesktopMode(isElectron || isDesktopQuery);
+      setIsDesktopMode(isDesktop || isDesktopQuery);
     }
   }, []);
 
@@ -28,7 +30,7 @@ export default function LandingPage() {
 
   // When visiting via web browser, render marketing landing page
   return (
-    <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 selection:bg-sky-400 selection:text-black">
+    <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 selection:bg-rose-400 selection:text-black">
       <Navbar />
       <main className="flex-1">
         <HeroSection />

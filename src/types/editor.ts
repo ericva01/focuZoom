@@ -7,8 +7,9 @@ export type BackgroundType = "gradient" | "solid" | "image" | "transparent";
 export type RenderMode = "3d-cinematic" | "2d-flat";
 
 export type ScreenAnglePreset =
-  | "floating-dynamic"
+  | "simple-smooth"
   | "studio-front"
+  | "floating-dynamic"
   | "isometric"
   | "cinematic-slant";
 
@@ -30,6 +31,19 @@ export type FramePreset =
 
 export type CursorStyle = "macos-arrow" | "neon-dot" | "cyber-ring" | "crosshair";
 
+export interface ClickTarget {
+  timestamp: number; // in seconds
+  x: number; // normalized 0.0 to 1.0
+  y: number; // normalized 0.0 to 1.0
+  label?: string;
+}
+
+export interface CursorPoint {
+  timestamp: number; // in seconds relative to video start
+  x: number; // normalized 0.0 to 1.0 (relative to video width)
+  y: number; // normalized 0.0 to 1.0 (relative to video height)
+}
+
 export interface ClickEvent {
   id: string;
   timestamp: number; // in seconds
@@ -44,6 +58,9 @@ export interface ClickEvent {
   enabled: boolean;
   framingStyle?: FramingStyle;
   dollyDepth?: number;
+  screenAnglePreset?: ScreenAnglePreset;
+  targets?: ClickTarget[]; // Sequential click targets within a continuous zoom sequence
+  cursorTrail?: CursorPoint[]; // Continuous cursor trajectory during this zoom sequence
 }
 
 export interface CanvasConfig {
@@ -88,6 +105,27 @@ export interface CanvasConfig {
   // General Playback & Canvas
   aspectRatio: AspectRatio;
   playbackSpeed: number;
+
+  // Webcam Picture-in-Picture (PiP) Configuration
+  webcamConfig?: WebcamConfig;
+}
+
+export type WebcamShape = "circle" | "rounded-rect" | "square";
+export type WebcamPosition = "bottom-right" | "bottom-left" | "top-right" | "top-left" | "custom";
+
+export interface WebcamConfig {
+  enabled: boolean;
+  shape: WebcamShape; // "circle" (bubble), "rounded-rect", "square"
+  position: WebcamPosition; // preset corner or custom position
+  customX: number; // normalized 0.0 to 1.0 (relative to canvas width)
+  customY: number; // normalized 0.0 to 1.0 (relative to canvas height)
+  size: number; // diameter or width in pixels (100 to 360)
+  borderColor: string;
+  borderWidth: number; // 0 to 8
+  shadow: boolean;
+  mirror: boolean; // flip horizontally
+  url?: string | null; // recorded webcam blob URL or null
+  deviceId?: string | null; // chosen camera input device ID
 }
 
 export interface VideoMetadata {
@@ -97,6 +135,8 @@ export interface VideoMetadata {
   height: number;
   fileSize?: string;
   url: string;
+  webcamUrl?: string;
+  cursorTrail?: CursorPoint[];
 }
 
 export interface TimelineClip {

@@ -18,7 +18,7 @@ export interface SavedProject {
   localFilePath?: string;
 }
 
-const STORAGE_KEY = "focuflow_saved_projects";
+const STORAGE_KEY = "glideo_saved_projects";
 
 export function getSavedProjects(): SavedProject[] {
   if (typeof window === "undefined") return [];

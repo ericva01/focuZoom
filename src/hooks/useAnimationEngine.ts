@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ClickEvent, CanvasConfig } from "@/types/editor";
-import { applyEasing, getClampedCameraCenter, sineEaseInOut, clamp } from "@/utils/easing";
+import { ClickEvent, ClickTarget, CursorPoint, CanvasConfig } from "@/types/editor";
+import { applyEasing, getClampedCameraCenter, sineEaseInOut, cubicEaseInOut, clamp } from "@/utils/easing";
 
 interface CameraState {
   scale: number;
@@ -12,11 +12,144 @@ interface CameraState {
   activeEvent: ClickEvent | null;
 }
 
+/**
+ * Evaluates the cursor position (x, y) at a specific time:
+ * 1. Using real recorded cursor trajectory if available.
+ * 2. Or smoothly gliding between sequential click targets.
+ */
+function sampleCursorTrajectory(
+  effectiveTime: number,
+  event: ClickEvent
+): { x: number; y: number } {
+  const baseTargetX = typeof event.x === "number" ? event.x : 0.5;
+  const baseTargetY = typeof event.y === "number" ? event.y : 0.5;
+
+  // 1. If event has a recorded cursor trajectory attached to it
+  if (event.cursorTrail && event.cursorTrail.length > 0) {
+    const trail = event.cursorTrail;
+    const originX = trail[0].x;
+    const originY = trail[0].y;
+    const dx = baseTargetX - originX;
+    const dy = baseTargetY - originY;
+
+    if (effectiveTime <= trail[0].timestamp) {
+      return {
+        x: clamp(trail[0].x + dx, 0.02, 0.98),
+        y: clamp(trail[0].y + dy, 0.02, 0.98),
+      };
+    }
+    if (effectiveTime >= trail[trail.length - 1].timestamp) {
+      const last = trail[trail.length - 1];
+      return {
+        x: clamp(last.x + dx, 0.02, 0.98),
+        y: clamp(last.y + dy, 0.02, 0.98),
+      };
+    }
+
+    let low = 0;
+    let high = trail.length - 1;
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      if (trail[mid].timestamp < effectiveTime) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+    const idx0 = Math.max(0, low - 1);
+    const idx1 = Math.min(trail.length - 1, low);
+    if (idx0 === idx1) {
+      return {
+        x: clamp(trail[idx0].x + dx, 0.02, 0.98),
+        y: clamp(trail[idx0].y + dy, 0.02, 0.98),
+      };
+    }
+
+    const p0 = trail[idx0];
+    const p1 = trail[idx1];
+    const span = p1.timestamp - p0.timestamp;
+    if (span <= 0.0001) {
+      return {
+        x: clamp(p0.x + dx, 0.02, 0.98),
+        y: clamp(p0.y + dy, 0.02, 0.98),
+      };
+    }
+
+    const p = (effectiveTime - p0.timestamp) / span;
+    const smoothP = clamp(p, 0, 1);
+    const interpX = p0.x + (p1.x - p0.x) * smoothP + dx;
+    const interpY = p0.y + (p1.y - p0.y) * smoothP + dy;
+    return {
+      x: clamp(interpX, 0.02, 0.98),
+      y: clamp(interpY, 0.02, 0.98),
+    };
+  }
+
+  // 2. Sequential click targets (clustered clicks)
+  if (event.targets && event.targets.length > 0) {
+    const seqTargets = event.targets;
+    const originX = seqTargets[0].x;
+    const originY = seqTargets[0].y;
+    const dx = baseTargetX - originX;
+    const dy = baseTargetY - originY;
+
+    if (seqTargets.length === 1) {
+      return { x: baseTargetX, y: baseTargetY };
+    }
+
+    if (effectiveTime <= seqTargets[0].timestamp) {
+      return {
+        x: clamp(seqTargets[0].x + dx, 0.02, 0.98),
+        y: clamp(seqTargets[0].y + dy, 0.02, 0.98),
+      };
+    }
+    if (effectiveTime >= seqTargets[seqTargets.length - 1].timestamp) {
+      const last = seqTargets[seqTargets.length - 1];
+      return {
+        x: clamp(last.x + dx, 0.02, 0.98),
+        y: clamp(last.y + dy, 0.02, 0.98),
+      };
+    }
+
+    for (let i = 0; i < seqTargets.length - 1; i++) {
+      const tA = seqTargets[i].timestamp;
+      const tB = seqTargets[i + 1].timestamp;
+      if (effectiveTime >= tA && effectiveTime <= tB) {
+        const segSpan = tB - tA;
+        if (segSpan <= 0.001) {
+          return {
+            x: clamp(seqTargets[i].x + dx, 0.02, 0.98),
+            y: clamp(seqTargets[i].y + dy, 0.02, 0.98),
+          };
+        }
+        const p = (effectiveTime - tA) / segSpan;
+        const smoothP = cubicEaseInOut(clamp(p, 0, 1));
+        const interpX = seqTargets[i].x + (seqTargets[i + 1].x - seqTargets[i].x) * smoothP + dx;
+        const interpY = seqTargets[i].y + (seqTargets[i + 1].y - seqTargets[i].y) * smoothP + dy;
+        return {
+          x: clamp(interpX, 0.02, 0.98),
+          y: clamp(interpY, 0.02, 0.98),
+        };
+      }
+    }
+
+    const lastTarget = seqTargets[seqTargets.length - 1];
+    return {
+      x: clamp(lastTarget.x + dx, 0.02, 0.98),
+      y: clamp(lastTarget.y + dy, 0.02, 0.98),
+    };
+  }
+
+  // 3. Single discrete keyframe target point
+  return { x: baseTargetX, y: baseTargetY };
+}
+
 export function useAnimationEngine(
   videoRef: React.RefObject<HTMLVideoElement>,
   canvasRef: React.RefObject<HTMLCanvasElement>,
   events: ClickEvent[],
-  config: CanvasConfig
+  config: CanvasConfig,
+  cursorTrail?: CursorPoint[]
 ) {
   const cameraRef = useRef({
     scale: 1.0,
@@ -175,7 +308,7 @@ export function useAnimationEngine(
           ctx.fillRect(0, 0, width, height);
 
           const cyanGlow = ctx.createRadialGradient(width * 0.2, height * 0.2, 10, width * 0.2, height * 0.2, 450);
-          cyanGlow.addColorStop(0, "rgba(6, 182, 212, 0.35)");
+          cyanGlow.addColorStop(0, "rgba(251, 113, 133, 0.35)");
           cyanGlow.addColorStop(1, "transparent");
           ctx.fillStyle = cyanGlow;
           ctx.fillRect(0, 0, width, height);
@@ -221,40 +354,48 @@ export function useAnimationEngine(
       y: number,
       t: number,
       activeEvent: ClickEvent | null,
-      currentScale: number = 1
+      currentScale: number = 1,
+      targets: ClickTarget[] = [],
+      frameW: number = 0,
+      frameH: number = 0
     ) => {
       if (activeEvent && config.showRipple) {
-        const clickDelta = t - activeEvent.timestamp;
         const rippleDuration = 0.8;
-        if (clickDelta >= 0 && clickDelta < rippleDuration) {
-          const progress = clickDelta / rippleDuration;
-          const fade = 1 - progress;
+        const checkList = targets.length > 0 ? targets : [activeEvent];
+        for (const tgt of checkList) {
+          const clickDelta = t - tgt.timestamp;
+          if (clickDelta >= 0 && clickDelta < rippleDuration) {
+            const progress = clickDelta / rippleDuration;
+            const fade = 1 - progress;
+            const ripX = frameW > 0 ? (tgt.x - 0.5) * frameW : x;
+            const ripY = frameH > 0 ? (tgt.y - 0.5) * frameH : y;
 
-          ctx.save();
-          ctx.strokeStyle = config.rippleColor || "#06b6d4";
+            ctx.save();
+            ctx.strokeStyle = config.rippleColor || "#fb7185";
 
-          // Ring 1
-          ctx.lineWidth = 2.5 * fade;
-          ctx.globalAlpha = fade * 0.8;
-          ctx.beginPath();
-          ctx.arc(x, y, 10 + progress * 50, 0, Math.PI * 2);
-          ctx.stroke();
+            // Ring 1
+            ctx.lineWidth = 2.5 * fade;
+            ctx.globalAlpha = fade * 0.8;
+            ctx.beginPath();
+            ctx.arc(ripX, ripY, 10 + progress * 50, 0, Math.PI * 2);
+            ctx.stroke();
 
-          // Ring 2
-          ctx.lineWidth = 1.5 * fade;
-          ctx.globalAlpha = fade * 0.5;
-          ctx.beginPath();
-          ctx.arc(x, y, 5 + progress * 32, 0, Math.PI * 2);
-          ctx.stroke();
+            // Ring 2
+            ctx.lineWidth = 1.5 * fade;
+            ctx.globalAlpha = fade * 0.5;
+            ctx.beginPath();
+            ctx.arc(ripX, ripY, 5 + progress * 32, 0, Math.PI * 2);
+            ctx.stroke();
 
-          // Central Flash Dot
-          ctx.fillStyle = "#ffffff";
-          ctx.globalAlpha = fade * 0.9;
-          ctx.beginPath();
-          ctx.arc(x, y, 4 * fade, 0, Math.PI * 2);
-          ctx.fill();
+            // Central Flash Dot
+            ctx.fillStyle = "#ffffff";
+            ctx.globalAlpha = fade * 0.9;
+            ctx.beginPath();
+            ctx.arc(ripX, ripY, 4 * fade, 0, Math.PI * 2);
+            ctx.fill();
 
-          ctx.restore();
+            ctx.restore();
+          }
         }
       }
 
@@ -269,9 +410,9 @@ export function useAnimationEngine(
 
         switch (config.cursorStyle) {
           case "neon-dot": {
-            ctx.shadowColor = config.cursorColor || "#06b6d4";
+            ctx.shadowColor = config.cursorColor || "#fb7185";
             ctx.shadowBlur = 12;
-            ctx.fillStyle = config.cursorColor || "#06b6d4";
+            ctx.fillStyle = config.cursorColor || "#fb7185";
             ctx.beginPath();
             ctx.arc(0, 0, size * 0.4, 0, Math.PI * 2);
             ctx.fill();
@@ -283,9 +424,9 @@ export function useAnimationEngine(
             break;
           }
           case "cyber-ring": {
-            ctx.shadowColor = config.cursorColor || "#06b6d4";
+            ctx.shadowColor = config.cursorColor || "#fb7185";
             ctx.shadowBlur = 8;
-            ctx.strokeStyle = config.cursorColor || "#06b6d4";
+            ctx.strokeStyle = config.cursorColor || "#fb7185";
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
@@ -298,9 +439,9 @@ export function useAnimationEngine(
             break;
           }
           case "crosshair": {
-            ctx.shadowColor = config.cursorColor || "#06b6d4";
+            ctx.shadowColor = config.cursorColor || "#fb7185";
             ctx.shadowBlur = 6;
-            ctx.strokeStyle = config.cursorColor || "#06b6d4";
+            ctx.strokeStyle = config.cursorColor || "#fb7185";
             ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.arc(0, 0, size * 0.45, 0, Math.PI * 2);
@@ -407,6 +548,9 @@ export function useAnimationEngine(
       let targetCamY = 0.5;
       let zoomProgress = 0.0;
       let activeEvent: ClickEvent | null = null;
+      let activeTargetX = 0.5;
+      let activeTargetY = 0.5;
+      let activeTargets: ClickTarget[] = [];
 
       const enabledEvents = events.filter((e) => e.enabled);
 
@@ -423,6 +567,26 @@ export function useAnimationEngine(
           activeEvent = event;
           const peakScale = event.zoom || config.defaultZoomScale || 2.2;
 
+          // Multi-target continuous cursor tracking list with user edit offset support
+          const originX = event.targets && event.targets.length > 0 ? event.targets[0].x : event.x;
+          const originY = event.targets && event.targets.length > 0 ? event.targets[0].y : event.y;
+          const dx = (event.x ?? 0.5) - originX;
+          const dy = (event.y ?? 0.5) - originY;
+          const rawTargets =
+            event.targets && event.targets.length > 0
+              ? event.targets
+              : [{ timestamp: event.timestamp, x: event.x, y: event.y, label: event.label }];
+          activeTargets = rawTargets.map((tgt) => ({
+            ...tgt,
+            x: clamp(tgt.x + dx, 0.02, 0.98),
+            y: clamp(tgt.y + dy, 0.02, 0.98),
+          }));
+
+          // Dynamically track the cursor position at this exact video frame
+          const cursorPosition = sampleCursorTrajectory(t, event);
+          activeTargetX = cursorPosition.x;
+          activeTargetY = cursorPosition.y;
+
           if (t < peakTime) {
             const progress = (t - startTime) / zoomInDuration;
             zoomProgress = applyEasing(progress, config.zoomEasing);
@@ -435,8 +599,8 @@ export function useAnimationEngine(
 
           zoomProgress = clamp(zoomProgress, 0, 1);
           targetScale = 1.0 + (peakScale - 1.0) * zoomProgress;
-          targetCamX = 0.5 + (event.x - 0.5) * zoomProgress;
-          targetCamY = 0.5 + (event.y - 0.5) * zoomProgress;
+          targetCamX = 0.5 + (activeTargetX - 0.5) * zoomProgress;
+          targetCamY = 0.5 + (activeTargetY - 0.5) * zoomProgress;
           break;
         }
       }
@@ -507,7 +671,7 @@ export function useAnimationEngine(
       ctx.save();
       if (config.shadowIntensity !== "none") {
         if (config.shadowIntensity === "neon") {
-          ctx.shadowColor = "rgba(6, 182, 212, 0.45)";
+          ctx.shadowColor = "rgba(251, 113, 133, 0.45)";
           ctx.shadowBlur = 45;
         } else if (config.shadowIntensity === "cinematic") {
           ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
@@ -552,9 +716,19 @@ export function useAnimationEngine(
 
       // 7. Draw Custom Cursor & Ripples relative to true center origin
       if (activeEvent) {
-        const cursorTargetX = (activeEvent.x - 0.5) * frameW;
-        const cursorTargetY = (activeEvent.y - 0.5) * frameH;
-        drawCursorAndRipples(ctx, cursorTargetX, cursorTargetY, t, activeEvent, currentScale);
+        const cursorTargetX = (activeTargetX - 0.5) * frameW;
+        const cursorTargetY = (activeTargetY - 0.5) * frameH;
+        drawCursorAndRipples(
+          ctx,
+          cursorTargetX,
+          cursorTargetY,
+          t,
+          activeEvent,
+          currentScale,
+          activeTargets,
+          frameW,
+          frameH
+        );
       }
 
       ctx.restore();
@@ -602,7 +776,7 @@ export function useAnimationEngine(
 
     animationFrameId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [videoRef, canvasRef, events, config]);
+  }, [videoRef, canvasRef, events, config, cursorTrail]);
 
   const captureSnapshot = useCallback((): string | null => {
     if (!canvasRef.current) return null;

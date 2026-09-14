@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import * as THREE from "three";
-import { ClickEvent, CanvasConfig, FramePreset } from "@/types/editor";
-import { applyEasing, sineEaseInOut, clamp } from "@/utils/easing";
+import { ClickEvent, ClickTarget, CursorPoint, CanvasConfig, FramePreset } from "@/types/editor";
+import { applyEasing, sineEaseInOut, cubicEaseInOut, clamp } from "@/utils/easing";
 
 interface ThreeCameraState {
   scale: number;
@@ -14,12 +14,147 @@ interface ThreeCameraState {
   dollyDistance: number;
 }
 
+/**
+ * Evaluates the cursor position (x, y) at a specific time:
+ * 1. Using real recorded cursor trajectory if available (anchored to event.x, event.y).
+ * 2. Or smoothly gliding between sequential click targets.
+ * 3. Or returning the exact target position (event.x, event.y).
+ */
+function sampleCursorTrajectory(
+  effectiveTime: number,
+  event: ClickEvent
+): { x: number; y: number } {
+  const baseTargetX = typeof event.x === "number" ? event.x : 0.5;
+  const baseTargetY = typeof event.y === "number" ? event.y : 0.5;
+
+  // 1. If event has a recorded cursor trajectory attached to it
+  if (event.cursorTrail && event.cursorTrail.length > 0) {
+    const trail = event.cursorTrail;
+    const originX = trail[0].x;
+    const originY = trail[0].y;
+    // Calculate user-edit offset so modifying event (x, y) properly shifts the whole path
+    const dx = baseTargetX - originX;
+    const dy = baseTargetY - originY;
+
+    if (effectiveTime <= trail[0].timestamp) {
+      return {
+        x: clamp(trail[0].x + dx, 0.02, 0.98),
+        y: clamp(trail[0].y + dy, 0.02, 0.98),
+      };
+    }
+    if (effectiveTime >= trail[trail.length - 1].timestamp) {
+      const last = trail[trail.length - 1];
+      return {
+        x: clamp(last.x + dx, 0.02, 0.98),
+        y: clamp(last.y + dy, 0.02, 0.98),
+      };
+    }
+
+    let low = 0;
+    let high = trail.length - 1;
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      if (trail[mid].timestamp < effectiveTime) {
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
+    }
+    const idx0 = Math.max(0, low - 1);
+    const idx1 = Math.min(trail.length - 1, low);
+    if (idx0 === idx1) {
+      return {
+        x: clamp(trail[idx0].x + dx, 0.02, 0.98),
+        y: clamp(trail[idx0].y + dy, 0.02, 0.98),
+      };
+    }
+
+    const p0 = trail[idx0];
+    const p1 = trail[idx1];
+    const span = p1.timestamp - p0.timestamp;
+    if (span <= 0.0001) {
+      return {
+        x: clamp(p0.x + dx, 0.02, 0.98),
+        y: clamp(p0.y + dy, 0.02, 0.98),
+      };
+    }
+
+    const p = (effectiveTime - p0.timestamp) / span;
+    const smoothP = clamp(p, 0, 1);
+    const interpX = p0.x + (p1.x - p0.x) * smoothP + dx;
+    const interpY = p0.y + (p1.y - p0.y) * smoothP + dy;
+    return {
+      x: clamp(interpX, 0.02, 0.98),
+      y: clamp(interpY, 0.02, 0.98),
+    };
+  }
+
+  // 2. Sequential click targets (clustered clicks)
+  if (event.targets && event.targets.length > 0) {
+    const seqTargets = event.targets;
+    const originX = seqTargets[0].x;
+    const originY = seqTargets[0].y;
+    const dx = baseTargetX - originX;
+    const dy = baseTargetY - originY;
+
+    if (seqTargets.length === 1) {
+      return { x: baseTargetX, y: baseTargetY };
+    }
+
+    if (effectiveTime <= seqTargets[0].timestamp) {
+      return {
+        x: clamp(seqTargets[0].x + dx, 0.02, 0.98),
+        y: clamp(seqTargets[0].y + dy, 0.02, 0.98),
+      };
+    }
+    if (effectiveTime >= seqTargets[seqTargets.length - 1].timestamp) {
+      const last = seqTargets[seqTargets.length - 1];
+      return {
+        x: clamp(last.x + dx, 0.02, 0.98),
+        y: clamp(last.y + dy, 0.02, 0.98),
+      };
+    }
+
+    for (let i = 0; i < seqTargets.length - 1; i++) {
+      const tA = seqTargets[i].timestamp;
+      const tB = seqTargets[i + 1].timestamp;
+      if (effectiveTime >= tA && effectiveTime <= tB) {
+        const segSpan = tB - tA;
+        if (segSpan <= 0.001) {
+          return {
+            x: clamp(seqTargets[i].x + dx, 0.02, 0.98),
+            y: clamp(seqTargets[i].y + dy, 0.02, 0.98),
+          };
+        }
+        const p = (effectiveTime - tA) / segSpan;
+        const smoothP = cubicEaseInOut(clamp(p, 0, 1));
+        const interpX = seqTargets[i].x + (seqTargets[i + 1].x - seqTargets[i].x) * smoothP + dx;
+        const interpY = seqTargets[i].y + (seqTargets[i + 1].y - seqTargets[i].y) * smoothP + dy;
+        return {
+          x: clamp(interpX, 0.02, 0.98),
+          y: clamp(interpY, 0.02, 0.98),
+        };
+      }
+    }
+
+    const lastTarget = seqTargets[seqTargets.length - 1];
+    return {
+      x: clamp(lastTarget.x + dx, 0.02, 0.98),
+      y: clamp(lastTarget.y + dy, 0.02, 0.98),
+    };
+  }
+
+  // 3. Single discrete keyframe target point
+  return { x: baseTargetX, y: baseTargetY };
+}
+
 export function useThreeAnimationEngine(
   videoRef: React.RefObject<HTMLVideoElement>,
   canvasRef: React.RefObject<HTMLCanvasElement>,
   events: ClickEvent[],
   config: CanvasConfig,
-  mousePosRef: React.RefObject<{ x: number; y: number }>
+  mousePosRef: React.RefObject<{ x: number; y: number }>,
+  cursorTrail?: CursorPoint[]
 ) {
   const [cameraState, setCameraState] = useState<ThreeCameraState>({
     scale: 1.0,
@@ -183,7 +318,7 @@ export function useThreeAnimationEngine(
         ctx.fillRect(0, 0, 1024, 1024);
 
         const cyan = ctx.createRadialGradient(250, 250, 10, 250, 250, 450);
-        cyan.addColorStop(0, "rgba(6, 182, 212, 0.4)");
+        cyan.addColorStop(0, "rgba(251, 113, 133, 0.4)");
         cyan.addColorStop(1, "transparent");
         ctx.fillStyle = cyan;
         ctx.fillRect(0, 0, 1024, 1024);
@@ -212,7 +347,7 @@ export function useThreeAnimationEngine(
       default: {
         const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
         grad.addColorStop(0, customFrom || "#1e1b4b");
-        grad.addColorStop(1, customTo || "#06b6d4");
+        grad.addColorStop(1, customTo || "#fb7185");
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 1024, 1024);
         break;
@@ -235,7 +370,7 @@ export function useThreeAnimationEngine(
     ctx.clearRect(0, 0, 512, 512);
 
     const isNeon = shadowType === "neon";
-    const shadowColor = isNeon ? "rgba(6, 182, 212, 0.7)" : "rgba(0, 0, 0, 0.75)";
+    const shadowColor = isNeon ? "rgba(251, 113, 133, 0.7)" : "rgba(0, 0, 0, 0.75)";
     const blurAmount = isNeon ? 36 : shadowType === "cinematic" ? 48 : 28;
 
     ctx.shadowColor = shadowColor;
@@ -280,9 +415,9 @@ export function useThreeAnimationEngine(
     let anchorV = 0.5;
 
     if (style === "neon-dot") {
-      ctx.shadowColor = color || "#06b6d4";
+      ctx.shadowColor = color || "#fb7185";
       ctx.shadowBlur = 18;
-      ctx.fillStyle = color || "#06b6d4";
+      ctx.fillStyle = color || "#fb7185";
       ctx.beginPath();
       ctx.arc(64, 64, 24, 0, Math.PI * 2);
       ctx.fill();
@@ -526,7 +661,7 @@ export function useThreeAnimationEngine(
 
     // 6. 3D Animated Halo Ring on Click Events
     const haloGeo = new THREE.RingGeometry(0.01, 0.08, 48);
-    const haloColor = new THREE.Color(config.rippleColor || "#06b6d4");
+    const haloColor = new THREE.Color(config.rippleColor || "#fb7185");
     const haloMat = new THREE.MeshBasicMaterial({
       color: haloColor,
       transparent: true,
@@ -553,38 +688,7 @@ export function useThreeAnimationEngine(
     cursorSprite.position.z = 0.018;
     screenGroup.add(cursorSprite);
 
-    // Initial angle preset base (defaults to flat studio-front: 0, 0, 0)
-    let basePitch = 0;
-    let baseYaw = 0;
-    let baseRoll = 0;
 
-    switch (config.screenAnglePreset) {
-      case "studio-front":
-        basePitch = 0;
-        baseYaw = 0;
-        baseRoll = 0;
-        break;
-      case "isometric":
-        basePitch = 0.18;
-        baseYaw = -0.25;
-        baseRoll = 0.06;
-        break;
-      case "cinematic-slant":
-        basePitch = 0.1;
-        baseYaw = 0.15;
-        baseRoll = -0.03;
-        break;
-      case "floating-dynamic":
-        basePitch = 0.04;
-        baseYaw = -0.06;
-        baseRoll = 0.01;
-        break;
-      default:
-        basePitch = 0;
-        baseYaw = 0;
-        baseRoll = 0;
-        break;
-    }
 
     // Main 60 FPS Render Loop
     const clock = new THREE.Clock();
@@ -667,6 +771,9 @@ export function useThreeAnimationEngine(
       let targetFocalY = 0.5;
       let zoomProgress = 0.0;
       let activeEvent: ClickEvent | null = null;
+      let activeTargetX = 0.5;
+      let activeTargetY = 0.5;
+      let activeTargets: ClickTarget[] = [];
 
       const enabledEvents = events.filter((e) => e.enabled);
 
@@ -683,23 +790,44 @@ export function useThreeAnimationEngine(
           activeEvent = event;
           const peakScale = event.zoom || config.defaultZoomScale || 2.2;
 
+          // Multi-target continuous cursor tracking list with user edit offset support
+          const originX = event.targets && event.targets.length > 0 ? event.targets[0].x : event.x;
+          const originY = event.targets && event.targets.length > 0 ? event.targets[0].y : event.y;
+          const dx = (event.x ?? 0.5) - originX;
+          const dy = (event.y ?? 0.5) - originY;
+          const rawTargets =
+            event.targets && event.targets.length > 0
+              ? event.targets
+              : [{ timestamp: event.timestamp, x: event.x, y: event.y, label: event.label }];
+          activeTargets = rawTargets.map((t) => ({
+            ...t,
+            x: clamp(t.x + dx, 0.02, 0.98),
+            y: clamp(t.y + dy, 0.02, 0.98),
+          }));
+
+          // Dynamically track the cursor position at this exact video frame
+          const cursorPosition = sampleCursorTrajectory(effectiveTime, event);
+          activeTargetX = cursorPosition.x;
+          activeTargetY = cursorPosition.y;
+
           if (effectiveTime < peakTime) {
-            // Smooth S-curve acceleration into zoom target
+            // Smooth acceleration into initial zoom target
             const prog = (effectiveTime - startTime) / zoomInDuration;
             zoomProgress = applyEasing(prog, config.zoomEasing);
           } else if (effectiveTime <= holdEndTime) {
-            // Steady hold at target coordinates
+            // Steady hold at peak zoom magnification - DO NOT ZOOM OUT BETWEEN CLICKS!
+            // Camera smoothly glides and follows the cursor wherever it moves
             zoomProgress = 1.0;
           } else {
-            // Smooth S-curve deceleration easing back to wide view
+            // Smooth deceleration easing back to wide view after the entire sequence ends
             const prog = (effectiveTime - holdEndTime) / zoomOutDuration;
             zoomProgress = 1.0 - sineEaseInOut(prog);
           }
 
           zoomProgress = clamp(zoomProgress, 0, 1);
           targetDollyScale = 1.0 + (peakScale - 1.0) * zoomProgress;
-          targetFocalX = 0.5 + (event.x - 0.5) * zoomProgress;
-          targetFocalY = 0.5 + (event.y - 0.5) * zoomProgress;
+          targetFocalX = 0.5 + (activeTargetX - 0.5) * zoomProgress;
+          targetFocalY = 0.5 + (activeTargetY - 0.5) * zoomProgress;
           break;
         }
       }
@@ -784,14 +912,71 @@ export function useThreeAnimationEngine(
       // When user clicks on the right, it tilts toward the right.
       const cursorDeltaX = targetFocalX - 0.5;
       const cursorDeltaY = targetFocalY - 0.5;
-      const cursorTrackingYaw = -cursorDeltaX * 0.38;
-      const cursorTrackingPitch = cursorDeltaY * 0.25;
-      const cursorTrackingRoll = -cursorDeltaX * 0.08;
+      // Corrected 3D tilt: clicking left tilts the left side forward; clicking right tilts the right side forward
+      const cursorTrackingYaw = cursorDeltaX * 0.35;
+      const cursorTrackingPitch = -cursorDeltaY * 0.22;
+      const cursorTrackingRoll = cursorDeltaX * 0.05;
 
-      const finalRotX = (basePitch + floatRotX + parallaxRotX + cursorTrackingPitch) * zoomProgress;
-      const finalRotY = (baseYaw + floatRotY + parallaxRotY + cursorTrackingYaw) * zoomProgress;
-      const finalRotZ = (baseRoll + cursorTrackingRoll) * zoomProgress;
-      const currentFloatY = floatY * zoomProgress;
+      // Evaluate 3D angle preset specifically for the active zoom event so editing one effect doesn't distort all
+      const effectiveAnglePreset =
+        (activeEvent && activeEvent.screenAnglePreset) ||
+        config.screenAnglePreset ||
+        "studio-front";
+
+      let eventPitch = 0;
+      let eventYaw = 0;
+      let eventRoll = 0;
+      let allow3DTilt = true;
+
+      switch (effectiveAnglePreset) {
+        case "simple-smooth":
+          // Pure, smooth flat zoom in and zoom out without any 3D angle tilt or skew
+          eventPitch = 0;
+          eventYaw = 0;
+          eventRoll = 0;
+          allow3DTilt = false;
+          break;
+        case "studio-front":
+          eventPitch = 0;
+          eventYaw = 0;
+          eventRoll = 0;
+          allow3DTilt = true;
+          break;
+        case "isometric":
+          eventPitch = 0.18;
+          eventYaw = -0.25;
+          eventRoll = 0.06;
+          allow3DTilt = true;
+          break;
+        case "cinematic-slant":
+          eventPitch = 0.1;
+          eventYaw = 0.15;
+          eventRoll = -0.03;
+          allow3DTilt = true;
+          break;
+        case "floating-dynamic":
+          eventPitch = 0.04;
+          eventYaw = -0.06;
+          eventRoll = 0.01;
+          allow3DTilt = true;
+          break;
+        default:
+          eventPitch = 0;
+          eventYaw = 0;
+          eventRoll = 0;
+          allow3DTilt = true;
+      }
+
+      const activePitch = allow3DTilt ? cursorTrackingPitch : 0;
+      const activeYaw = allow3DTilt ? cursorTrackingYaw : 0;
+      const activeRoll = allow3DTilt ? cursorTrackingRoll : 0;
+      const activeFloatX = allow3DTilt ? floatRotX : 0;
+      const activeFloatY = allow3DTilt ? floatRotY : 0;
+
+      const finalRotX = (eventPitch + activeFloatX + parallaxRotX + activePitch) * zoomProgress;
+      const finalRotY = (eventYaw + activeFloatY + parallaxRotY + activeYaw) * zoomProgress;
+      const finalRotZ = (eventRoll + activeRoll) * zoomProgress;
+      const currentFloatY = (allow3DTilt ? floatY : 0) * zoomProgress;
 
       // Fast snap to pristine flat overview when at 00:00 or when completely dormant
       if (effectiveTime <= 0.05 && zoomProgress === 0.0) {
@@ -818,8 +1003,8 @@ export function useThreeAnimationEngine(
 
       // 5. 3D Cursor & Animated Luminous Halo Rings (Rock-solid transformed alignment)
       if (activeEvent && zoomProgress > 0.02) {
-        const evX = (activeEvent.x - 0.5) * screenW;
-        const evY = -(activeEvent.y - 0.5) * screenH;
+        const evX = (activeTargetX - 0.5) * screenW;
+        const evY = -(activeTargetY - 0.5) * screenH;
 
         cursorSprite.visible = config.showCursor !== false;
         cursorSprite.position.set(evX, evY, 0.022);
@@ -830,16 +1015,28 @@ export function useThreeAnimationEngine(
         const dynamicScale = baseCursorScale * distFactor;
         cursorSprite.scale.set(dynamicScale, dynamicScale, 1);
 
-        // Click Ripple Wave calculation
-        const clickDelta = effectiveTime - activeEvent.timestamp;
+        // Click Ripple Wave calculation across all sequential click targets
         const haloDuration = 0.85;
+        let activeHaloTarget: ClickTarget | null = null;
+        let activeDelta = 999;
 
-        if (clickDelta >= 0 && clickDelta < haloDuration && config.showRipple) {
-          const prog = clickDelta / haloDuration;
+        const checkTargets = activeTargets.length > 0 ? activeTargets : [activeEvent];
+        for (const tgt of checkTargets) {
+          const delta = effectiveTime - tgt.timestamp;
+          if (delta >= 0 && delta < haloDuration && delta < activeDelta) {
+            activeDelta = delta;
+            activeHaloTarget = tgt;
+          }
+        }
+
+        if (activeHaloTarget && config.showRipple) {
+          const prog = activeDelta / haloDuration;
           const fade = 1.0 - prog;
+          const hX = (activeHaloTarget.x - 0.5) * screenW;
+          const hY = -(activeHaloTarget.y - 0.5) * screenH;
 
           haloMesh.visible = true;
-          haloMesh.position.set(evX, evY, 0.015);
+          haloMesh.position.set(hX, hY, 0.015);
           haloMesh.scale.set(1 + prog * 4.5, 1 + prog * 4.5, 1);
           haloMat.opacity = fade * 0.85;
         } else {
@@ -921,7 +1118,7 @@ export function useThreeAnimationEngine(
         shadowTex.dispose();
       }
     };
-  }, [videoRef, canvasRef, events, config, mousePosRef]);
+  }, [videoRef, canvasRef, events, config, mousePosRef, cursorTrail]);
 
   const captureSnapshot = useCallback((): string | null => {
     if (!canvasRef.current) return null;

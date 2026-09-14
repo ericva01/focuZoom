@@ -44,14 +44,14 @@ export function ClickInspector({
       <div className="p-4 border-b border-white/[0.08] bg-white/[0.02] space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-sky-500/20 border border-sky-400/30 flex items-center justify-center">
-              <Focus className="w-3.5 h-3.5 text-sky-300" />
+            <div className="w-6 h-6 rounded-lg bg-rose-500/20 border border-rose-400/30 flex items-center justify-center">
+              <Focus className="w-3.5 h-3.5 text-rose-300" />
             </div>
             <h3 className="font-semibold text-white text-xs uppercase tracking-wider">
               Zoom Keyframes
             </h3>
           </div>
-          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-400/30">
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-400/30">
             {events.length} Points
           </span>
         </div>
@@ -89,7 +89,7 @@ export function ClickInspector({
             <p className="text-xs text-slate-400">No zoom keyframes added yet.</p>
             <button
               onClick={onResetDemoEvents}
-              className="text-xs text-sky-400 hover:text-sky-300 flex items-center justify-center gap-1.5 mx-auto font-medium transition-colors"
+              className="text-xs text-rose-400 hover:text-rose-300 flex items-center justify-center gap-1.5 mx-auto font-medium transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Load standard demo points</span>
@@ -104,7 +104,7 @@ export function ClickInspector({
                 key={ev.id}
                 className={`rounded-xl border transition-all duration-200 ${
                   isNearCurrentTime
-                    ? "glass-panel-elevated border-sky-400/50 shadow-[0_0_20px_rgba(56,189,248,0.15)] bg-sky-950/20"
+                    ? "glass-panel-elevated border-rose-400/50 shadow-[0_0_20px_rgba(251,113,133,0.15)] bg-rose-950/20"
                     : "glass-panel hover:border-white/20"
                 } p-3.5 space-y-2.5`}
               >
@@ -113,7 +113,7 @@ export function ClickInspector({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onSelectEvent(ev)}
-                      className="px-2 py-0.5 rounded-lg bg-sky-500/20 border border-sky-400/30 text-[11px] font-mono text-sky-300 hover:bg-sky-500/30 transition-colors flex items-center gap-1 shadow-glass-sm"
+                      className="px-2 py-0.5 rounded-lg bg-rose-500/20 border border-rose-400/30 text-[11px] font-mono text-rose-300 hover:bg-rose-500/30 transition-colors flex items-center gap-1 shadow-glass-sm"
                       title="Jump playhead to this event"
                     >
                       <Play className="w-2.5 h-2.5 fill-current" />
@@ -129,7 +129,7 @@ export function ClickInspector({
                     <button
                       onClick={() => onUpdateEvent(ev.id, { enabled: !ev.enabled })}
                       className={`p-1.5 rounded-lg hover:bg-white/[0.08] transition-colors ${
-                        ev.enabled ? "text-sky-400" : "text-slate-500"
+                        ev.enabled ? "text-rose-400" : "text-slate-500"
                       }`}
                       title={ev.enabled ? "Zoom point active" : "Zoom point disabled"}
                     >
@@ -155,7 +155,7 @@ export function ClickInspector({
                     </span>
                   </div>
                   <div className="text-right">
-                    3D Dolly: <span className="text-sky-300 font-mono font-bold">{ev.zoom}x</span>
+                    3D Dolly: <span className="text-rose-300 font-mono font-bold">{ev.zoom}x</span>
                   </div>
                 </div>
 
@@ -169,7 +169,7 @@ export function ClickInspector({
                         onClick={() => onUpdateEvent(ev.id, { zoom: zm })}
                         className={`px-2 py-0.5 rounded-lg text-[10px] font-mono transition-all duration-200 ${
                           ev.zoom === zm
-                            ? "bg-sky-500/20 text-sky-200 font-bold border border-sky-400/30 shadow-glass-sm"
+                            ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
                             : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                         }`}
                       >
@@ -191,7 +191,7 @@ export function ClickInspector({
           size="sm"
           onClick={onResetDemoEvents}
           className="w-full"
-          leftIcon={<RotateCcw className="w-3.5 h-3.5 text-sky-300" />}
+          leftIcon={<RotateCcw className="w-3.5 h-3.5 text-rose-300" />}
         >
           Reset Sample Keyframes
         </Button>

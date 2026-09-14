@@ -30,7 +30,7 @@ const config: Config = {
             subtle: "rgba(255, 255, 255, 0.07)",
             medium: "rgba(255, 255, 255, 0.13)",
             strong: "rgba(255, 255, 255, 0.22)",
-            accent: "rgba(56, 189, 248, 0.35)",
+            accent: "rgba(251, 113, 133, 0.35)",
           },
         },
         dark: {
@@ -42,8 +42,9 @@ const config: Config = {
           700: "#242c48",
           600: "#333d61",
         },
-        focu: {
-          cyan: "#06b6d4",
+        glideo: {
+          coral: "#fb7185",
+          salmon: "#fda4af",
           blue: "#3b82f6",
           indigo: "#6366f1",
           purple: "#8b5cf6",
@@ -57,8 +58,8 @@ const config: Config = {
         "glass-md": "0 8px 32px 0 rgba(0, 0, 0, 0.36)",
         "glass-lg": "0 16px 48px 0 rgba(0, 0, 0, 0.45)",
         "glass-inner": "inset 0 1px 1px 0 rgba(255, 255, 255, 0.14)",
-        "glass-glow-accent": "0 0 35px -5px rgba(56, 189, 248, 0.25)",
-        "glow-cyan": "0 0 35px -5px rgba(6, 182, 212, 0.35)",
+        "glass-glow-accent": "0 0 35px -5px rgba(251, 113, 133, 0.25)",
+        "glow-cyan": "0 0 35px -5px rgba(251, 113, 133, 0.35)",
         "glow-card": "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
         "inner-glass": "inset 0 1px 1px 0 rgba(255, 255, 255, 0.12)",
       },

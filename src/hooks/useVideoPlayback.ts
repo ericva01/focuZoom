@@ -2,13 +2,24 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 
-export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
+export function useVideoPlayback(
+  videoRef: React.RefObject<HTMLVideoElement>,
+  maxDuration?: number
+) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [isLooping, setIsLooping] = useState<boolean>(true);
   const [isReady, setIsReady] = useState<boolean>(false);
+
+  const maxDurationRef = useRef<number | undefined>(maxDuration);
+  useEffect(() => {
+    maxDurationRef.current = maxDuration;
+    if (typeof maxDuration === "number" && maxDuration > 0) {
+      setDuration(maxDuration);
+    }
+  }, [maxDuration]);
 
   // Sync playback speed
   useEffect(() => {
@@ -72,7 +83,12 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
     (targetTime: number) => {
       const video = videoRef.current;
       if (video) {
-        const maxTime = video.duration && !isNaN(video.duration) && video.duration > 0 ? video.duration : targetTime;
+        const maxTime =
+          maxDurationRef.current && maxDurationRef.current > 0
+            ? maxDurationRef.current
+            : (video.duration && !isNaN(video.duration) && video.duration > 0
+            ? video.duration
+            : targetTime);
         const clamped = Math.max(0, Math.min(maxTime, targetTime));
 
         // Immediately update React time state for zero-latency UI response
@@ -114,11 +130,26 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
     if (!video) return;
 
     const handleLoadedMetadata = () => {
-      setDuration(video.duration || 0);
+      const limit = maxDurationRef.current;
+      setDuration(limit && limit > 0 ? limit : (video.duration || 0));
       setIsReady(true);
     };
 
     const handleTimeUpdate = () => {
+      const limit = maxDurationRef.current;
+      if (limit && limit > 0 && video.currentTime >= limit) {
+        if (isLooping) {
+          applySeekToVideo(video, 0);
+          setCurrentTime(0);
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+          applySeekToVideo(video, limit);
+          setCurrentTime(limit);
+          setIsPlaying(false);
+        }
+        return;
+      }
       setCurrentTime(video.currentTime);
     };
 
@@ -145,7 +176,8 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
     video.addEventListener("ended", handleEnded);
 
     if (video.readyState >= 1) {
-      setDuration(video.duration);
+      const limit = maxDurationRef.current;
+      setDuration(limit && limit > 0 ? limit : video.duration);
       setIsReady(true);
     }
 
@@ -170,7 +202,21 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
     let animId: number;
     const syncLoop = () => {
       if (video && !video.paused && !video.ended) {
-        setCurrentTime(video.currentTime);
+        const limit = maxDurationRef.current;
+        if (limit && limit > 0 && video.currentTime >= limit) {
+          if (isLooping) {
+            applySeekToVideo(video, 0);
+            setCurrentTime(0);
+          } else {
+            video.pause();
+            applySeekToVideo(video, limit);
+            setCurrentTime(limit);
+            setIsPlaying(false);
+            return;
+          }
+        } else {
+          setCurrentTime(video.currentTime);
+        }
         animId = requestAnimationFrame(syncLoop);
       }
     };
@@ -179,7 +225,7 @@ export function useVideoPlayback(videoRef: React.RefObject<HTMLVideoElement>) {
     return () => {
       cancelAnimationFrame(animId);
     };
-  }, [isPlaying, videoRef]);
+  }, [isPlaying, isLooping, videoRef, applySeekToVideo]);
 
   return {
     isPlaying,

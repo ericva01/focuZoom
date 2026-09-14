@@ -20,7 +20,7 @@ interface DownloadModalProps {
 
 const GITHUB_RELEASE_DOWNLOAD =
   process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
-  "https://github.com/ericva01/focuZoom/releases/download/v0.1.0/FocuFlow.Studio-Setup-0.1.0.exe";
+  "https://github.com/ericva01/focuZoom/releases/download/v0.1.0/Glideo.Studio-Setup-0.1.0.exe";
 const GITHUB_RELEASES_PAGE = "https://github.com/ericva01/focuZoom/releases/tag/v0.1.0";
 
 export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
@@ -47,12 +47,12 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
           window.location.hostname === "127.0.0.1");
 
       const downloadUrl = isLocal
-        ? "/downloads/FocuFlow-Studio-Setup.exe"
+        ? "/downloads/Glideo-Studio-Setup.exe"
         : GITHUB_RELEASE_DOWNLOAD;
 
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.setAttribute("download", "FocuFlow.Studio-Setup-0.1.0.exe");
+      link.setAttribute("download", "Glideo.Studio-Setup-0.1.0.exe");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -69,7 +69,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Ambient celestial top aura */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-36 bg-gradient-to-b from-sky-400/20 via-indigo-500/10 to-transparent blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-36 bg-gradient-to-b from-rose-400/20 via-indigo-500/10 to-transparent blur-3xl pointer-events-none" />
 
         {/* Close Button */}
         <button
@@ -85,14 +85,14 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             href={GITHUB_RELEASES_PAGE}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-xs font-mono text-sky-300 mb-3 hover:bg-sky-500/20 hover:border-sky-400/40 transition-all cursor-pointer group"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-rose-500/10 border border-rose-400/20 text-xs font-mono text-rose-300 mb-3 hover:bg-rose-500/20 hover:border-rose-400/40 transition-all cursor-pointer group"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
             <span>ELECTRON DESKTOP EDITION (v0.1.0)</span>
-            <ExternalLink className="w-3 h-3 text-sky-400 group-hover:translate-x-0.5 transition-transform" />
+            <ExternalLink className="w-3 h-3 text-rose-400 group-hover:translate-x-0.5 transition-transform" />
           </a>
           <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            Download FocuFlow Studio
+            Download Glideo
           </h3>
           <p className="text-slate-400 text-xs sm:text-sm mt-1.5 max-w-md mx-auto">
             Experience 100% offline video editing, local GPU acceleration, and automated 3D cinematic camera zooms on your desktop.
@@ -109,7 +109,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
                   Your download has started!
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  Run <code className="text-white font-mono">FocuFlow.Studio-Setup-0.1.0.exe</code> once completed to install on your PC.
+                  Run <code className="text-white font-mono">Glideo.Studio-Setup-0.1.0.exe</code> once completed to install on your PC.
                 </p>
               </div>
             </div>
@@ -117,7 +117,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               href={GITHUB_RELEASES_PAGE}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[11px] text-sky-400 hover:text-sky-300 underline font-mono flex items-center gap-1 flex-shrink-0"
+              className="text-[11px] text-rose-400 hover:text-rose-300 underline font-mono flex items-center gap-1 flex-shrink-0"
             >
               <span>GitHub Release</span>
               <ExternalLink className="w-3 h-3" />
@@ -133,7 +133,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
           >
             <div className="flex items-center gap-3.5 text-left">
               <div className="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center">
-                {userOS === "win" && <Monitor className="w-5 h-5 text-sky-400" />}
+                {userOS === "win" && <Monitor className="w-5 h-5 text-rose-400" />}
                 {userOS === "mac" && <Apple className="w-5 h-5 text-white" />}
                 {userOS === "linux" && <Terminal className="w-5 h-5 text-emerald-400" />}
               </div>
@@ -166,7 +166,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               href={GITHUB_RELEASES_PAGE}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-sky-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-rose-300 transition-colors"
             >
               <span>Or view release details & all assets on GitHub</span>
               <ExternalLink className="w-3 h-3 text-slate-500" />
@@ -185,11 +185,11 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               onClick={() => handleDownload("win")}
               className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                 userOS === "win"
-                  ? "bg-sky-500/10 border-sky-400/40 text-white"
+                  ? "bg-rose-500/10 border-rose-400/40 text-white"
                   : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
-              <Monitor className="w-4 h-4 text-sky-400" />
+              <Monitor className="w-4 h-4 text-rose-400" />
               <span className="text-xs font-semibold">Windows</span>
               <span className="text-[10px] font-mono text-slate-400">.exe (64-bit)</span>
             </button>
@@ -199,7 +199,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               onClick={() => handleDownload("mac")}
               className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                 userOS === "mac"
-                  ? "bg-sky-500/10 border-sky-400/40 text-white"
+                  ? "bg-rose-500/10 border-rose-400/40 text-white"
                   : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
@@ -213,7 +213,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               onClick={() => handleDownload("linux")}
               className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                 userOS === "linux"
-                  ? "bg-sky-500/10 border-sky-400/40 text-white"
+                  ? "bg-rose-500/10 border-rose-400/40 text-white"
                   : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
@@ -230,10 +230,10 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             href={GITHUB_RELEASES_PAGE}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-sky-300 transition-colors group"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-rose-300 transition-colors group"
           >
             <span>View release assets, checksums & changelog on GitHub</span>
-            <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-sky-300 transition-colors" />
+            <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-rose-300 transition-colors" />
           </a>
         </div>
 
@@ -248,7 +248,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             <span>GPU Accelerated</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <Monitor className="w-3.5 h-3.5 text-sky-400" />
+            <Monitor className="w-3.5 h-3.5 text-rose-400" />
             <span>Cross-Platform</span>
           </span>
         </div>

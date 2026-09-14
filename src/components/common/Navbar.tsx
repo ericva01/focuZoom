@@ -80,7 +80,7 @@ export function Navbar() {
           {/* 1. Left: Twin-star Brand Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 rounded-lg group"
+            className="flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 rounded-lg group"
           >
             <Logo size="md" />
           </Link>
@@ -115,7 +115,7 @@ export function Navbar() {
                 <DropdownMenuLabel className="text-xs text-slate-400 uppercase font-mono">Aspect Ratios</DropdownMenuLabel>
                 <Link href="/editor">
                   <DropdownMenuItem className="cursor-pointer">
-                    <Ratio className="w-3.5 h-3.5 mr-2 text-sky-400" />
+                    <Ratio className="w-3.5 h-3.5 mr-2 text-rose-400" />
                     <span>16:9 Landscape Screen</span>
                   </DropdownMenuItem>
                 </Link>
@@ -158,7 +158,7 @@ export function Navbar() {
                 </Link>
                 <Link href="/editor">
                   <DropdownMenuItem className="cursor-pointer">
-                    <FileCode className="w-3.5 h-3.5 mr-2 text-sky-400" />
+                    <FileCode className="w-3.5 h-3.5 mr-2 text-rose-400" />
                     <span>Keyframe Timing API</span>
                   </DropdownMenuItem>
                 </Link>
@@ -200,7 +200,7 @@ export function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 bg-[#080D1A]/95 border-white/10 backdrop-blur-2xl">
                 <div className="flex items-center gap-3 p-2.5">
-                  <Avatar className="h-9 w-9 ring-1 ring-sky-400/40">
+                  <Avatar className="h-9 w-9 ring-1 ring-rose-400/40">
                     <AvatarImage src="/avatar.jpg" alt="Eric Va" />
                     <AvatarFallback>EV</AvatarFallback>
                   </Avatar>
@@ -210,9 +210,9 @@ export function Navbar() {
                   </div>
                 </div>
 
-                <div className="px-2.5 py-1.5 mx-1 mb-1 rounded-lg bg-sky-500/10 border border-sky-400/20 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-                  <span className="text-[10px] font-mono text-sky-200">
+                <div className="px-2.5 py-1.5 mx-1 mb-1 rounded-lg bg-rose-500/10 border border-rose-400/20 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                  <span className="text-[10px] font-mono text-rose-200">
                     Creator Community · 12,000+ creators
                   </span>
                 </div>
@@ -221,13 +221,13 @@ export function Navbar() {
 
                 <Link href="/editor">
                   <DropdownMenuItem className="cursor-pointer">
-                    <Sliders className="w-3.5 h-3.5 mr-2 text-sky-400" />
+                    <Sliders className="w-3.5 h-3.5 mr-2 text-rose-400" />
                     <span>Launch Studio</span>
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/about">
                   <DropdownMenuItem className="cursor-pointer">
-                    <User className="w-3.5 h-3.5 mr-2 text-sky-400" />
+                    <User className="w-3.5 h-3.5 mr-2 text-rose-400" />
                     <span>About the Creator</span>
                   </DropdownMenuItem>
                 </Link>
@@ -244,9 +244,9 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setDownloadModalOpen(true)}
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-sky-400/35 text-slate-200 hover:text-white transition-all cursor-pointer active:scale-95"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-rose-400/35 text-slate-200 hover:text-white transition-all cursor-pointer active:scale-95"
             >
-              <Download className="w-3.5 h-3.5 text-sky-400" />
+              <Download className="w-3.5 h-3.5 text-rose-400" />
               <span>Download App</span>
             </button>
 
@@ -348,7 +348,7 @@ export function Navbar() {
                     }}
                     className="w-full flex items-center justify-center gap-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white text-xs font-semibold py-2.5 transition-all"
                   >
-                    <Download className="w-3.5 h-3.5 text-sky-400" />
+                    <Download className="w-3.5 h-3.5 text-rose-400" />
                     <span>Download Desktop App</span>
                   </button>
                   <p className="text-center text-[11px] font-mono text-slate-400">

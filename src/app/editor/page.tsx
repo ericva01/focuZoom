@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { EditorHeader } from "@/components/editor/EditorHeader";
 import { PreviewMonitor } from "@/components/editor/PreviewMonitor";
 import { EditorInspector } from "@/components/editor/EditorInspector";
@@ -9,6 +9,7 @@ import { ExportModal } from "@/components/editor/ExportModal";
 import { useVideoPlayback } from "@/hooks/useVideoPlayback";
 import { useScreenRecorder } from "@/hooks/useScreenRecorder";
 import { generateSampleScreenRecording } from "@/utils/sampleVideoGenerator";
+import { clusterNearbyClicks } from "@/utils/clickClusterer";
 import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   AspectRatio,
@@ -18,6 +19,7 @@ import {
   TimelineClip,
 } from "@/types/editor";
 import { getProjectById, saveProject, SavedProject } from "@/utils/projectStorage";
+import { desktopBridge } from "@/lib/desktopBridge";
 
 export default function EditorPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -36,13 +38,12 @@ export default function EditorPage() {
   const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
 
-  // Multi-track video clips state
+  // Multi-track video clips & multi-selection state
   const [clips, setClips] = useState<TimelineClip[]>([]);
   const [selectedClipId, setSelectedClipId] = useState<string | null>(null);
-
-  // Undo / Redo history for clip edits
-  const [history, setHistory] = useState<TimelineClip[][]>([]);
-  const [future, setFuture] = useState<TimelineClip[][]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [selectedClipIds, setSelectedClipIds] = useState<string[]>([]);
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
 
   // Editor styling and motion configurations
   const [config, setConfig] = useState<CanvasConfig>({
@@ -62,7 +63,7 @@ export default function EditorPage() {
     backgroundPreset: "mesh-purple",
     solidBackgroundColor: "#06402B",
     customGradientFrom: "#1e1b4b",
-    customGradientTo: "#06b6d4",
+    customGradientTo: "#fb7185",
     cornerRadius: 20,
     padding: 36,
     shadowIntensity: "cinematic",
@@ -78,46 +79,129 @@ export default function EditorPage() {
     // Cursor & FX
     showCursor: true,
     cursorStyle: "macos-arrow",
-    cursorColor: "#06b6d4",
+    cursorColor: "#fb7185",
     cursorSize: 22,
     showRipple: false,
-    rippleColor: "#06b6d4",
+    rippleColor: "#fb7185",
 
     aspectRatio: "16:9",
     playbackSpeed: 1.0,
+
+    // Webcam Picture-in-Picture (PiP) Configuration
+    webcamConfig: {
+      enabled: false,
+      shape: "circle",
+      position: "bottom-right",
+      customX: 0.85,
+      customY: 0.82,
+      size: 180,
+      borderColor: "#fb7185",
+      borderWidth: 3,
+      shadow: true,
+      mirror: true,
+      url: null,
+      deviceId: null,
+    },
   });
 
   // Registered zoom events
   const [events, setEvents] = useState<ClickEvent[]>([]);
 
-  // Video playback controller hook
-  const playback = useVideoPlayback(videoRef);
+  // Effective project timeline duration computed from clips (stops playback at clip trim end like CapCut)
+  const effectiveDuration = useMemo(() => {
+    if (clips.length === 0) return metadata?.duration || 10;
+    const maxEnd = clips.reduce((max, c) => Math.max(max, c.endTimeline), 0);
+    return maxEnd > 0 ? maxEnd : (metadata?.duration || 10);
+  }, [clips, metadata?.duration]);
 
-  // Helper to record history before mutating clips
-  const pushHistory = useCallback((prevClips: TimelineClip[]) => {
-    setHistory((h) => [...h.slice(-20), prevClips]);
+  // Video playback controller hook bounded by effective timeline duration
+  const playback = useVideoPlayback(videoRef, effectiveDuration);
+
+  // Comprehensive Undo / Redo history snapshot (capturing clips, events, and selections)
+  type HistorySnapshot = {
+    clips: TimelineClip[];
+    events: ClickEvent[];
+    selectedClipId: string | null;
+    selectedEventId: string | null;
+    selectedClipIds: string[];
+    selectedEventIds: string[];
+  };
+
+  const [history, setHistory] = useState<HistorySnapshot[]>([]);
+  const [future, setFuture] = useState<HistorySnapshot[]>([]);
+
+  // Snapshot recording helper
+  const recordHistory = useCallback(() => {
+    setHistory((prev) => [
+      ...prev.slice(-30),
+      {
+        clips,
+        events,
+        selectedClipId,
+        selectedEventId,
+        selectedClipIds,
+        selectedEventIds,
+      },
+    ]);
     setFuture([]);
-  }, []);
+  }, [clips, events, selectedClipId, selectedEventId, selectedClipIds, selectedEventIds]);
 
   const handleUndo = useCallback(() => {
     if (history.length === 0) return;
     const previous = history[history.length - 1];
     setHistory((h) => h.slice(0, -1));
-    setFuture((f) => [clips, ...f]);
-    setClips(previous);
-  }, [history, clips]);
+    setFuture((f) => [
+      {
+        clips,
+        events,
+        selectedClipId,
+        selectedEventId,
+        selectedClipIds,
+        selectedEventIds,
+      },
+      ...f,
+    ]);
+    setClips(previous.clips);
+    setEvents(previous.events);
+    setSelectedClipId(previous.selectedClipId);
+    setSelectedEventId(previous.selectedEventId);
+    setSelectedClipIds(previous.selectedClipIds);
+    setSelectedEventIds(previous.selectedEventIds);
+  }, [history, clips, events, selectedClipId, selectedEventId, selectedClipIds, selectedEventIds]);
 
   const handleRedo = useCallback(() => {
     if (future.length === 0) return;
     const next = future[0];
     setFuture((f) => f.slice(1));
-    setHistory((h) => [...h, clips]);
-    setClips(next);
-  }, [future, clips]);
+    setHistory((h) => [
+      ...h,
+      {
+        clips,
+        events,
+        selectedClipId,
+        selectedEventId,
+        selectedClipIds,
+        selectedEventIds,
+      },
+    ]);
+    setClips(next.clips);
+    setEvents(next.events);
+    setSelectedClipId(next.selectedClipId);
+    setSelectedEventId(next.selectedEventId);
+    setSelectedClipIds(next.selectedClipIds);
+    setSelectedEventIds(next.selectedEventIds);
+  }, [future, clips, events, selectedClipId, selectedEventId, selectedClipIds, selectedEventIds]);
+
+  // Webcam state
+  const [enableWebcam, setEnableWebcam] = useState<boolean>(false);
+  const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
+  const [isWebcamHidden, setIsWebcamHidden] = useState<boolean>(false);
 
   // Screen recording hook with automatic canvas import and click keyframe mapping
   const screenRecorder = useScreenRecorder({
-    onImportRecording: ({ blobUrl, metadata: recMeta, events: recEvents }) => {
+    enableWebcam,
+    webcamDeviceId: selectedCameraId,
+    onImportRecording: ({ blobUrl, metadata: recMeta, events: recEvents, webcamBlobUrl }) => {
       setVideoSrc(blobUrl);
       setMetadata(recMeta);
       setProjectName(recMeta.name.replace(/\.[^/.]+$/, ""));
@@ -131,15 +215,37 @@ export default function EditorPage() {
         duration: recDuration,
         startTimeline: 0,
         endTimeline: recDuration,
-        color: "#0284c7",
+        color: "#e11d48",
         speed: 1.0,
       };
-      pushHistory(clips);
+      recordHistory();
       setClips([initialClip]);
       setSelectedClipId(initialClip.id);
 
+      // If webcam was recorded, set up webcam config with recorded URL
+      if (webcamBlobUrl) {
+        setConfig((prev) => ({
+          ...prev,
+          webcamConfig: {
+            ...(prev.webcamConfig || {
+              shape: "circle",
+              position: "bottom-right",
+              customX: 0.85,
+              customY: 0.82,
+              size: 180,
+              borderColor: "#fb7185",
+              borderWidth: 3,
+              shadow: true,
+              mirror: true,
+            }),
+            enabled: true,
+            url: webcamBlobUrl,
+          },
+        }));
+      }
+
       if (recEvents && recEvents.length > 0) {
-        setEvents(recEvents);
+        setEvents(clusterNearbyClicks(recEvents, 2.0, config.defaultZoomScale, recMeta.cursorTrail));
       } else {
         setEvents([
           {
@@ -177,7 +283,7 @@ export default function EditorPage() {
       setVideoSrc(sample.blobUrl);
       setEvents(sample.defaultEvents);
       setMetadata({
-        name: "focuflow-demo-recording.webm",
+        name: "glideo-demo-recording.webm",
         duration: sample.duration,
         width: 1280,
         height: 720,
@@ -192,7 +298,7 @@ export default function EditorPage() {
         duration: sample.duration,
         startTimeline: 0,
         endTimeline: sample.duration,
-        color: "#0284c7",
+        color: "#e11d48",
         speed: 1.0,
       };
       setClips([initialClip]);
@@ -259,21 +365,20 @@ export default function EditorPage() {
         duration: vidDur,
         startTimeline: 0,
         endTimeline: vidDur,
-        color: "#0284c7",
+        color: "#e11d48",
         speed: 1.0,
       };
-      pushHistory(clips);
       setClips([initialClip]);
       setSelectedClipId(initialClip.id);
       playback.seek(0);
     };
-  }, [clips, config.defaultZoomScale, playback, pushHistory]);
+  }, [config.defaultZoomScale, playback]);
 
-  // Handle native Electron video import
+  // Handle native desktop video import
   const handleNativeOpenVideo = useCallback(async () => {
-    if (typeof window !== "undefined" && window.electronAPI) {
+    if (desktopBridge.isDesktop) {
       try {
-        const result = await window.electronAPI.openVideoDialog();
+        const result = await desktopBridge.openVideoDialog();
         if (!result.canceled && (result.dataUrl || result.filePath)) {
           if (result.dataUrl) {
             const res = await fetch(result.dataUrl);
@@ -368,7 +473,7 @@ export default function EditorPage() {
     setTimeout(() => setIsSavedFeedback(false), 2200);
 
     if (typeof window !== "undefined" && window.electronAPI) {
-      console.log("[FocuFlow] Project successfully saved to workspace:", projectData.name);
+      console.log("[Glideo] Project successfully saved to workspace:", projectData.name);
     }
   }, [clips, config, events, metadata?.duration, metadata?.name, projectName]);
 
@@ -416,9 +521,41 @@ export default function EditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Multi-selection handler passed to MultiTrackTimeline
+  const handleSelectMultiple = useCallback((clipIds: string[], eventIds: string[]) => {
+    setSelectedClipIds(clipIds);
+    setSelectedEventIds(eventIds);
+    if (clipIds.length === 1 && eventIds.length === 0) {
+      setSelectedClipId(clipIds[0]);
+      setSelectedEventId(null);
+    } else if (eventIds.length === 1 && clipIds.length === 0) {
+      setSelectedEventId(eventIds[0]);
+      setSelectedClipId(null);
+    } else {
+      setSelectedClipId(null);
+      setSelectedEventId(null);
+    }
+  }, []);
+
+  // Delete multiple items selected via marquee
+  const handleDeleteMultiple = useCallback((clipIds: string[], eventIds: string[]) => {
+    recordHistory();
+    if (clipIds.length > 0) {
+      setClips((prev) => prev.filter((c) => !clipIds.includes(c.id)));
+    }
+    if (eventIds.length > 0) {
+      setEvents((prev) => prev.filter((e) => !eventIds.includes(e.id)));
+    }
+    setSelectedClipIds([]);
+    setSelectedEventIds([]);
+    setSelectedClipId(null);
+    setSelectedEventId(null);
+  }, [recordHistory]);
+
   // Split / Cut Clip Action
   const handleSplitClip = useCallback(
     (clipId: string, splitTime: number) => {
+      recordHistory();
       setClips((prev) => {
         const clipIdx = prev.findIndex((c) => c.id === clipId);
         if (clipIdx === -1) return prev;
@@ -426,8 +563,6 @@ export default function EditorPage() {
         if (splitTime <= targetClip.startTimeline + 0.25 || splitTime >= targetClip.endTimeline - 0.25) {
           return prev;
         }
-
-        pushHistory(prev);
 
         const offset = splitTime - targetClip.startTimeline;
         const splitSourceTime = targetClip.sourceStart + offset * targetClip.speed;
@@ -456,12 +591,13 @@ export default function EditorPage() {
         return updated;
       });
     },
-    [pushHistory]
+    [recordHistory]
   );
 
   // Trim Clip Action
   const handleTrimClip = useCallback(
     (clipId: string, newStart: number, newEnd: number) => {
+      recordHistory();
       setClips((prev) => {
         const target = prev.find((c) => c.id === clipId);
         if (!target) return prev;
@@ -481,13 +617,17 @@ export default function EditorPage() {
           };
         });
       });
+      if (playback.currentTime > newEnd) {
+        playback.seek(newEnd);
+      }
     },
-    []
+    [playback, recordHistory]
   );
 
   // Move / Reposition Clip on Timeline
   const handleMoveClip = useCallback(
     (clipId: string, newStart: number) => {
+      recordHistory();
       setClips((prev) => {
         const target = prev.find((c) => c.id === clipId);
         if (!target) return prev;
@@ -505,28 +645,26 @@ export default function EditorPage() {
         });
       });
     },
-    []
+    [recordHistory]
   );
 
   // Delete Clip Action
   const handleDeleteClip = useCallback(
     (clipId: string) => {
-      setClips((prev) => {
-        pushHistory(prev);
-        return prev.filter((c) => c.id !== clipId);
-      });
+      recordHistory();
+      setClips((prev) => prev.filter((c) => c.id !== clipId));
       if (selectedClipId === clipId) setSelectedClipId(null);
     },
-    [pushHistory, selectedClipId]
+    [recordHistory, selectedClipId]
   );
 
   // Ripple Delete Clip Action
   const handleRippleDeleteClip = useCallback(
     (clipId: string) => {
+      recordHistory();
       setClips((prev) => {
         const target = prev.find((c) => c.id === clipId);
         if (!target) return prev;
-        pushHistory(prev);
 
         const gap = target.duration;
         const remaining = prev.filter((c) => c.id !== clipId);
@@ -543,11 +681,12 @@ export default function EditorPage() {
       });
       if (selectedClipId === clipId) setSelectedClipId(null);
     },
-    [pushHistory, selectedClipId]
+    [recordHistory, selectedClipId]
   );
 
   // Add click event from canvas click
   const handleAddClickAtCoords = (x: number, y: number) => {
+    recordHistory();
     const newEvent: ClickEvent = {
       id: "click-" + Date.now(),
       timestamp: Math.round(playback.currentTime * 10) / 10,
@@ -564,6 +703,7 @@ export default function EditorPage() {
 
   // Add event at current playhead time
   const handleAddCurrentTimeEvent = useCallback(() => {
+    recordHistory();
     const newEvent: ClickEvent = {
       id: "click-" + Date.now(),
       timestamp: Math.round(playback.currentTime * 10) / 10,
@@ -574,21 +714,70 @@ export default function EditorPage() {
       enabled: true,
     };
     setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
-  }, [playback.currentTime, config.defaultZoomScale]);
+  }, [playback.currentTime, config.defaultZoomScale, recordHistory]);
 
   const handleUpdateEvent = (id: string, updates: Partial<ClickEvent>) => {
+    recordHistory();
     setEvents((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+      prev.map((e) => {
+        if (e.id !== id) return e;
+        const updated = { ...e, ...updates };
+        if (updates.x !== undefined || updates.y !== undefined) {
+          const newX = updates.x !== undefined ? updates.x : e.x;
+          const newY = updates.y !== undefined ? updates.y : e.y;
+
+          if (updated.targets && updated.targets.length > 0) {
+            const anchorX = updated.targets[0].x;
+            const anchorY = updated.targets[0].y;
+            const dx = newX - anchorX;
+            const dy = newY - anchorY;
+            updated.targets = updated.targets.map((tgt) => ({
+              ...tgt,
+              x: Math.max(0.02, Math.min(0.98, Math.round((tgt.x + dx) * 1000) / 1000)),
+              y: Math.max(0.02, Math.min(0.98, Math.round((tgt.y + dy) * 1000) / 1000)),
+            }));
+          }
+
+          if (updated.cursorTrail && updated.cursorTrail.length > 0) {
+            const anchorX = updated.cursorTrail[0].x;
+            const anchorY = updated.cursorTrail[0].y;
+            const dx = newX - anchorX;
+            const dy = newY - anchorY;
+            updated.cursorTrail = updated.cursorTrail.map((p) => ({
+              ...p,
+              x: Math.max(0.02, Math.min(0.98, Math.round((p.x + dx) * 1000) / 1000)),
+              y: Math.max(0.02, Math.min(0.98, Math.round((p.y + dy) * 1000) / 1000)),
+            }));
+          }
+        }
+        return updated;
+      })
     );
   };
 
-  const handleDeleteEvent = (id: string) => {
+  const handleDeleteEvent = useCallback((id: string) => {
+    recordHistory();
     setEvents((prev) => prev.filter((e) => e.id !== id));
-  };
+    setSelectedEventId((prev) => (prev === id ? null : prev));
+  }, [recordHistory]);
 
-  const handleSelectEvent = (event: ClickEvent) => {
-    playback.seek(Math.max(0, event.timestamp - 0.2));
-  };
+  const handleMergeNearbyClicks = useCallback(() => {
+    recordHistory();
+    setEvents((prev) => clusterNearbyClicks(prev, 2.0, config.defaultZoomScale, metadata?.cursorTrail));
+  }, [config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
+
+  const handleSelectEvent = useCallback((event: ClickEvent) => {
+    setSelectedEventId(event.id);
+    setSelectedClipId(null);
+    playback.seek(event.timestamp);
+  }, [playback]);
+
+  const handleSelectClip = useCallback((clipId: string | null) => {
+    setSelectedClipId(clipId);
+    if (clipId) {
+      setSelectedEventId(null);
+    }
+  }, []);
 
   // Take high-res snapshot PNG of current canvas
   const handleTakeSnapshot = () => {
@@ -631,7 +820,14 @@ export default function EditorPage() {
           handleSplitClip(activeClip.id, playback.currentTime);
         }
       } else if (e.key === "Delete" || e.key === "Backspace") {
-        if (selectedClipId) {
+        if (selectedClipIds.length > 0 || selectedEventIds.length > 0) {
+          e.preventDefault();
+          handleDeleteMultiple(selectedClipIds, selectedEventIds);
+        } else if (selectedEventId) {
+          e.preventDefault();
+          handleDeleteEvent(selectedEventId);
+        } else if (selectedClipId) {
+          e.preventDefault();
           if (e.shiftKey) {
             handleRippleDeleteClip(selectedClipId);
           } else {
@@ -640,13 +836,15 @@ export default function EditorPage() {
         }
       } else if (e.key === "k" || e.key === "K") {
         handleAddCurrentTimeEvent();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+      } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "z" || e.code === "KeyZ")) {
+        e.preventDefault();
         if (e.shiftKey) {
           handleRedo();
         } else {
           handleUndo();
         }
-      } else if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+      } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || e.code === "KeyY")) {
+        e.preventDefault();
         handleRedo();
       } else if (e.key === "Escape") {
         setIsAddMode(false);
@@ -655,7 +853,22 @@ export default function EditorPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [playback, clips, selectedClipId, handleSplitClip, handleDeleteClip, handleRippleDeleteClip, handleUndo, handleRedo, handleAddCurrentTimeEvent]);
+  }, [
+    playback,
+    clips,
+    selectedClipId,
+    selectedEventId,
+    selectedClipIds,
+    selectedEventIds,
+    handleSplitClip,
+    handleDeleteClip,
+    handleRippleDeleteClip,
+    handleDeleteEvent,
+    handleDeleteMultiple,
+    handleUndo,
+    handleRedo,
+    handleAddCurrentTimeEvent,
+  ]);
 
   // Global mousemove and mouseup listeners for resizable inspector divider
   useEffect(() => {
@@ -716,8 +929,33 @@ export default function EditorPage() {
         onStopRecording={screenRecorder.stopRecording}
         showCursor={config.showCursor}
         onToggleCursor={() => handleUpdateConfig({ showCursor: !config.showCursor })}
+        enableWebcam={enableWebcam}
+        onToggleWebcam={() => {
+          setEnableWebcam((prev) => !prev);
+          handleUpdateConfig({
+            webcamConfig: {
+              ...(config.webcamConfig || {
+                shape: "circle",
+                position: "bottom-right",
+                customX: 0.85,
+                customY: 0.82,
+                size: 180,
+                borderColor: "#fb7185",
+                borderWidth: 3,
+                shadow: true,
+                mirror: true,
+              }),
+              enabled: !enableWebcam,
+            },
+          });
+        }}
+        hasWebcamRecorded={Boolean(metadata?.webcamUrl || config.webcamConfig?.url)}
         isRightCollapsed={isInspectorCollapsed}
         onToggleRightCollapse={() => setIsInspectorCollapsed((prev) => !prev)}
+        canUndo={history.length > 0}
+        canRedo={future.length > 0}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
       />
 
       {/* Floating Active Recording HUD Overlay */}
@@ -740,7 +978,7 @@ export default function EditorPage() {
           <div className="h-4 w-px bg-white/20" />
 
           <div className="text-xs text-slate-300 flex items-center gap-1.5">
-            <span className="text-sky-300 font-bold font-mono bg-sky-500/20 border border-sky-400/30 px-2 py-0.5 rounded-md text-[11px]">
+            <span className="text-rose-300 font-bold font-mono bg-rose-500/20 border border-rose-400/30 px-2 py-0.5 rounded-md text-[11px]">
               {screenRecorder.clickCount}
             </span>
             <span className="text-[11px] text-slate-400">
@@ -784,6 +1022,8 @@ export default function EditorPage() {
             canvasRef={canvasRef}
             videoSrc={videoSrc}
             events={events}
+            selectedEventId={selectedEventId}
+            onUpdateEvent={handleUpdateEvent}
             config={config}
             onChangeConfig={handleUpdateConfig}
             isPlaying={playback.isPlaying}
@@ -797,13 +1037,16 @@ export default function EditorPage() {
             onStepFrames={playback.stepFrames}
             isLooping={playback.isLooping}
             onToggleLoop={() => playback.setIsLooping(!playback.isLooping)}
+            cursorTrail={metadata?.cursorTrail}
+            webcamStream={screenRecorder.liveWebcamStream}
+            webcamUrl={metadata?.webcamUrl || config.webcamConfig?.url}
           />
         </div>
 
         {/* Draggable Divider between Monitor and Inspector */}
         <div
           onMouseDown={handleStartDragDivider}
-          className="relative w-1.5 hover:w-2 bg-white/[0.06] hover:bg-sky-500/40 active:bg-sky-500/60 cursor-col-resize flex-shrink-0 transition-colors z-20 group flex items-center justify-center select-none"
+          className="relative w-1.5 hover:w-2 bg-white/[0.06] hover:bg-rose-500/40 active:bg-rose-500/60 cursor-col-resize flex-shrink-0 transition-colors z-20 group flex items-center justify-center select-none"
           title="Drag to resize Inspector panel"
         >
           {/* Collapse / Expand toggle button on divider */}
@@ -816,14 +1059,14 @@ export default function EditorPage() {
             title={isInspectorCollapsed ? "Expand Inspector" : "Collapse Inspector"}
           >
             {isInspectorCollapsed ? (
-              <ChevronLeft className="w-3 h-3 text-sky-400" />
+              <ChevronLeft className="w-3 h-3 text-rose-400" />
             ) : (
               <ChevronRight className="w-3 h-3 text-slate-400" />
             )}
           </button>
         </div>
 
-        {/* Top-Right: Consolidated Tabbed Inspector (Clip, 3D Canvas, Keyframes, Media, Cursor) */}
+        {/* Top-Right: Consolidated Tabbed Inspector (Clip, 3D Canvas, Keyframes, Webcam, Cursor, Media) */}
         <div
           style={{ width: isInspectorCollapsed ? 0 : inspectorWidth }}
           className={`relative flex-shrink-0 h-full overflow-hidden ${
@@ -836,7 +1079,7 @@ export default function EditorPage() {
               onChangeConfig={handleUpdateConfig}
               clips={clips}
               selectedClipId={selectedClipId}
-              onSelectClip={setSelectedClipId}
+              onSelectClip={handleSelectClip}
               onSplitClip={handleSplitClip}
               onTrimClip={handleTrimClip}
               onDeleteClip={handleDeleteClip}
@@ -844,6 +1087,7 @@ export default function EditorPage() {
               currentTime={playback.currentTime}
               onSeek={playback.seek}
               events={events}
+              selectedEventId={selectedEventId}
               onSelectEvent={handleSelectEvent}
               onUpdateEvent={handleUpdateEvent}
               onDeleteEvent={handleDeleteEvent}
@@ -857,6 +1101,29 @@ export default function EditorPage() {
               clickCount={screenRecorder.clickCount}
               onStartRecording={screenRecorder.startRecording}
               onStopRecording={screenRecorder.stopRecording}
+              availableCameras={screenRecorder.availableCameras}
+              enableWebcam={enableWebcam}
+              onToggleWebcam={() => {
+                setEnableWebcam((prev) => !prev);
+                handleUpdateConfig({
+                  webcamConfig: {
+                    ...(config.webcamConfig || {
+                      shape: "circle",
+                      position: "bottom-right",
+                      customX: 0.85,
+                      customY: 0.82,
+                      size: 180,
+                      borderColor: "#fb7185",
+                      borderWidth: 3,
+                      shadow: true,
+                      mirror: true,
+                    }),
+                    enabled: !enableWebcam,
+                  },
+                });
+              }}
+              selectedCameraId={selectedCameraId}
+              onSelectCameraId={setSelectedCameraId}
             />
           </div>
         </div>
@@ -865,7 +1132,7 @@ export default function EditorPage() {
       {/* 3. Bottom Full-Width Multi-Track Timeline Workspace */}
       <MultiTrackTimeline
         currentTime={playback.currentTime}
-        duration={playback.duration}
+        duration={effectiveDuration}
         isPlaying={playback.isPlaying}
         onTogglePlay={playback.togglePlay}
         onSeek={playback.seek}
@@ -875,12 +1142,19 @@ export default function EditorPage() {
         isLooping={playback.isLooping}
         onToggleLoop={() => playback.setIsLooping(!playback.isLooping)}
         events={events}
+        selectedEventId={selectedEventId}
+        selectedClipIds={selectedClipIds}
+        selectedEventIds={selectedEventIds}
         onSelectEvent={handleSelectEvent}
+        onSelectMultiple={handleSelectMultiple}
+        onDeleteMultiple={handleDeleteMultiple}
         onUpdateEvent={handleUpdateEvent}
+        onDeleteEvent={handleDeleteEvent}
         onAddKeyframeAtCurrentTime={handleAddCurrentTimeEvent}
+        onMergeNearbyClicks={handleMergeNearbyClicks}
         clips={clips}
         selectedClipId={selectedClipId}
-        onSelectClip={setSelectedClipId}
+        onSelectClip={handleSelectClip}
         onSplitClip={handleSplitClip}
         onTrimClip={handleTrimClip}
         onMoveClip={handleMoveClip}
@@ -890,6 +1164,41 @@ export default function EditorPage() {
         canRedo={future.length > 0}
         onUndo={handleUndo}
         onRedo={handleRedo}
+        webcamClip={
+          (metadata?.webcamUrl || config.webcamConfig?.url)
+            ? {
+                id: "clip-facecam-1",
+                name: "Facecam (PiP)",
+                sourceStart: 0,
+                sourceEnd: effectiveDuration,
+                duration: effectiveDuration,
+                startTimeline: 0,
+                endTimeline: effectiveDuration,
+                color: "#10b981",
+                speed: 1.0,
+              }
+            : null
+        }
+        isWebcamHidden={isWebcamHidden}
+        onToggleWebcamHidden={() => {
+          setIsWebcamHidden((prev) => !prev);
+          handleUpdateConfig({
+            webcamConfig: {
+              ...(config.webcamConfig || {
+                shape: "circle",
+                position: "bottom-right",
+                customX: 0.85,
+                customY: 0.82,
+                size: 180,
+                borderColor: "#fb7185",
+                borderWidth: 3,
+                shadow: true,
+                mirror: true,
+              }),
+              enabled: isWebcamHidden,
+            },
+          });
+        }}
       />
 
       {/* 4. Export Video Modal */}
@@ -898,8 +1207,10 @@ export default function EditorPage() {
         onClose={() => setIsExportOpen(false)}
         canvasRef={canvasRef}
         videoRef={videoRef}
-        duration={playback.duration}
+        duration={effectiveDuration}
         projectName={projectName}
+        webcamConfig={config.webcamConfig}
+        webcamUrl={metadata?.webcamUrl || config.webcamConfig?.url}
       />
     </div>
   );

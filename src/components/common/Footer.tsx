@@ -16,8 +16,8 @@ export function Footer() {
               Transform standard screen captures into high-impact cinematic videos with automatic zoom, camera easing, and studio frames. Built for creators and developers.
             </p>
             <div className="flex items-center gap-3 pt-1">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs bg-white/[0.04] text-sky-300 border border-white/10 shadow-glass-inner">
-                <Shield className="w-3.5 h-3.5 text-sky-400" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs bg-white/[0.04] text-rose-300 border border-white/10 shadow-glass-inner">
+                <Shield className="w-3.5 h-3.5 text-rose-400" />
                 Zero Cloud Uploads
               </span>
             </div>
@@ -57,7 +57,7 @@ export function Footer() {
               <li>
                 <Link href="/about" className="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
                   <span>About the Creator</span>
-                  <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-sky-500/20 text-sky-300">Eric</span>
+                  <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-rose-500/20 text-rose-300">Eric</span>
                 </Link>
               </li>
               <li>
@@ -116,7 +116,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} FocuFlow Studio. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Glideo. All rights reserved.</p>
           <div className="flex items-center gap-2 text-slate-400">
             <span>Crafted with modern classic glassmorphism</span>
           </div>

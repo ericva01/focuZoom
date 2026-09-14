@@ -39,7 +39,7 @@ const electronAPI = {
   },
 
   /**
-   * Native OS dialog to save .focuflow project configuration
+   * Native OS dialog to save .glideo project configuration
    */
   saveProjectDialog: (options: { defaultPath?: string; data: string }): Promise<SaveDialogResult> => {
     return ipcRenderer.invoke("dialog:saveProject", options);

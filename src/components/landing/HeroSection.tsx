@@ -49,7 +49,7 @@ export function HeroSection() {
 
       // Soft radial glow inside canvas
       const grad = ctx.createRadialGradient(width * 0.5, height * 0.4, 20, width * 0.5, height * 0.4, 400);
-      grad.addColorStop(0, "rgba(56, 189, 248, 0.15)");
+      grad.addColorStop(0, "rgba(251, 113, 133, 0.15)");
       grad.addColorStop(0.6, "rgba(99, 102, 241, 0.05)");
       grad.addColorStop(1, "transparent");
       ctx.fillStyle = grad;
@@ -86,14 +86,14 @@ export function HeroSection() {
       ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
       ctx.fillRect(0, 0, fW, 38);
 
-      ctx.fillStyle = "#38bdf8";
+      ctx.fillStyle = "#fb7185";
       ctx.beginPath();
       ctx.arc(20, 19, 5, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 11px -apple-system, sans-serif";
-      ctx.fillText("FocuFlow Studio Engine", 34, 23);
+      ctx.fillText("Glideo Engine", 34, 23);
 
       // Rows inside simulated window
       for (let i = 0; i < 6; i++) {
@@ -107,7 +107,7 @@ export function HeroSection() {
         ctx.font = "10px -apple-system, sans-serif";
         ctx.fillText(`Action Event #${i + 1} · Timestamp ${(i * 1.8).toFixed(1)}s`, 32, rowY + 21);
 
-        ctx.fillStyle = i === 2 ? "#38bdf8" : "#64748b";
+        ctx.fillStyle = i === 2 ? "#fb7185" : "#64748b";
         ctx.beginPath();
         ctx.roundRect(fW - 96, rowY + 9, 68, 16, 6);
         ctx.fill();
@@ -122,13 +122,13 @@ export function HeroSection() {
         const tx = zoomTarget.x * fW;
         const ty = zoomTarget.y * fH;
         ctx.save();
-        ctx.strokeStyle = "#38bdf8";
+        ctx.strokeStyle = "#fb7185";
         ctx.lineWidth = 1.8;
         ctx.beginPath();
         ctx.arc(tx, ty, 18, 0, Math.PI * 2);
         ctx.stroke();
 
-        ctx.fillStyle = "#38bdf8";
+        ctx.fillStyle = "#fb7185";
         ctx.beginPath();
         ctx.arc(tx, ty, 4, 0, Math.PI * 2);
         ctx.fill();
@@ -158,14 +158,14 @@ export function HeroSection() {
       {/* ========================================================================= */}
       <div className="absolute top-0 inset-x-0 h-[680px] pointer-events-none overflow-hidden flex items-start justify-center">
         {/* Soft vertical beam rays shooting upward into the cosmos */}
-        <div className="absolute -top-10 w-[780px] sm:w-[1080px] h-[380px] bg-gradient-to-b from-sky-400/[0.16] via-sky-500/[0.06] to-transparent blur-3xl" />
+        <div className="absolute -top-10 w-[780px] sm:w-[1080px] h-[380px] bg-gradient-to-b from-rose-400/[0.16] via-rose-500/[0.06] to-transparent blur-3xl" />
 
         {/* Scattered Stardust Twinkle Micro-Particles */}
         <div className="absolute top-28 left-[18%] w-1 h-1 rounded-full bg-white/70 animate-ping" />
-        <div className="absolute top-44 left-[32%] w-1.5 h-1.5 rounded-full bg-sky-200/60 blur-[0.5px]" />
+        <div className="absolute top-44 left-[32%] w-1.5 h-1.5 rounded-full bg-rose-200/60 blur-[0.5px]" />
         <div className="absolute top-36 right-[24%] w-1 h-1 rounded-full bg-white/80 animate-pulse" />
-        <div className="absolute top-52 right-[36%] w-1.5 h-1.5 rounded-full bg-cyan-200/50" />
-        <div className="absolute top-20 right-[15%] w-1 h-1 rounded-full bg-sky-300/40" />
+        <div className="absolute top-52 right-[36%] w-1.5 h-1.5 rounded-full bg-orange-200/50" />
+        <div className="absolute top-20 right-[15%] w-1 h-1 rounded-full bg-rose-300/40" />
         <div className="absolute top-64 left-[48%] w-1 h-1 rounded-full bg-white/50" />
 
         {/* The Massive Glowing Curved Horizon Dome Arch */}
@@ -187,9 +187,9 @@ export function HeroSection() {
                 fy="0%"
               >
                 <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
-                <stop offset="25%" stopColor="#7dd3fc" stopOpacity="0.9" />
-                <stop offset="55%" stopColor="#38bdf8" stopOpacity="0.4" />
-                <stop offset="85%" stopColor="#0284c7" stopOpacity="0.1" />
+                <stop offset="25%" stopColor="#fda4af" stopOpacity="0.9" />
+                <stop offset="55%" stopColor="#fb7185" stopOpacity="0.4" />
+                <stop offset="85%" stopColor="#e11d48" stopOpacity="0.1" />
                 <stop offset="100%" stopColor="#060913" stopOpacity="0" />
               </radialGradient>
 
@@ -202,20 +202,20 @@ export function HeroSection() {
                 fx="50%"
                 fy="10%"
               >
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.25" />
+                <stop offset="0%" stopColor="#fb7185" stopOpacity="0.25" />
                 <stop offset="45%" stopColor="#1e3a8a" stopOpacity="0.12" />
                 <stop offset="90%" stopColor="#060913" stopOpacity="0" />
               </radialGradient>
 
               {/* Laser sharp crest stroke gradient */}
               <linearGradient id="crestStroke" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0" />
-                <stop offset="20%" stopColor="#38bdf8" stopOpacity="0.3" />
-                <stop offset="40%" stopColor="#7dd3fc" stopOpacity="0.95" />
+                <stop offset="0%" stopColor="#fb7185" stopOpacity="0" />
+                <stop offset="20%" stopColor="#fb7185" stopOpacity="0.3" />
+                <stop offset="40%" stopColor="#fda4af" stopOpacity="0.95" />
                 <stop offset="50%" stopColor="#ffffff" stopOpacity="1" />
-                <stop offset="60%" stopColor="#7dd3fc" stopOpacity="0.95" />
-                <stop offset="80%" stopColor="#38bdf8" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+                <stop offset="60%" stopColor="#fda4af" stopOpacity="0.95" />
+                <stop offset="80%" stopColor="#fb7185" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#fb7185" stopOpacity="0" />
               </linearGradient>
 
               {/* Blur filter for soft atmosphere */}
@@ -262,9 +262,9 @@ export function HeroSection() {
       {/* ========================================================================= */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         {/* Early Access Beta Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-xl text-xs font-medium text-sky-200 shadow-[0_0_20px_rgba(56,189,248,0.15)] mb-7 hover:border-sky-400/40 transition-colors">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-xl text-xs font-medium text-rose-200 shadow-[0_0_20px_rgba(251,113,133,0.15)] mb-7 hover:border-rose-400/40 transition-colors">
           <div className="relative flex items-center justify-center">
-            <svg className="w-3.5 h-3.5 text-sky-400 fill-current" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-rose-400 fill-current" viewBox="0 0 24 24">
               <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
             </svg>
           </div>
@@ -273,7 +273,7 @@ export function HeroSection() {
 
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white max-w-4xl mx-auto leading-[1.1] mb-6">
-          Build faster with FocuFlow Studio
+          Build faster with Glideo
         </h1>
 
         {/* Subtitle */}
@@ -304,9 +304,9 @@ export function HeroSection() {
           <button
             type="button"
             onClick={() => setDownloadModalOpen(true)}
-            className="rounded-full bg-sky-500/10 hover:bg-sky-500/20 text-sky-200 border border-sky-400/30 hover:border-sky-400/60 text-sm font-semibold px-6 py-3 backdrop-blur-xl transition-all duration-300 cursor-pointer flex items-center gap-2 active:scale-95 shadow-[0_0_20px_rgba(56,189,248,0.15)]"
+            className="rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-200 border border-rose-400/30 hover:border-rose-400/60 text-sm font-semibold px-6 py-3 backdrop-blur-xl transition-all duration-300 cursor-pointer flex items-center gap-2 active:scale-95 shadow-[0_0_20px_rgba(251,113,133,0.15)]"
           >
-            <Download className="w-4 h-4 text-sky-400" />
+            <Download className="w-4 h-4 text-rose-400" />
             <span>Download Desktop App (.exe)</span>
           </button>
         </div>
@@ -316,17 +316,17 @@ export function HeroSection() {
         {/* ========================================================================= */}
         <div className="max-w-5xl mx-auto relative">
           {/* Cyan Horizon Aura Reflection beneath the top edge of the card */}
-          <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[70%] h-20 bg-sky-400/[0.22] blur-3xl rounded-full pointer-events-none" />
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[70%] h-20 bg-rose-400/[0.22] blur-3xl rounded-full pointer-events-none" />
 
           {/* Window Container */}
-          <div className="rounded-2xl sm:rounded-3xl bg-[#080D1A]/90 border border-white/15 shadow-[0_20px_70px_rgba(0,0,0,0.8),0_0_40px_rgba(56,189,248,0.12)] backdrop-blur-2xl overflow-hidden text-left relative">
+          <div className="rounded-2xl sm:rounded-3xl bg-[#080D1A]/90 border border-white/15 shadow-[0_20px_70px_rgba(0,0,0,0.8),0_0_40px_rgba(251,113,133,0.12)] backdrop-blur-2xl overflow-hidden text-left relative">
             {/* Window Top Navigation Bar */}
             <div className="px-4 sm:px-6 py-3.5 bg-black/40 border-b border-white/10 flex items-center justify-between gap-3 text-xs">
               {/* Left Brand Mark & Breadcrumbs */}
               <div className="flex items-center gap-3 sm:gap-6 min-w-0">
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <div className="relative flex items-center justify-center">
-                    <svg className="w-4 h-4 text-sky-400 fill-current" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-rose-400 fill-current" viewBox="0 0 24 24">
                       <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
                     </svg>
                     <svg className="w-2 h-2 text-white fill-current absolute -top-0.5 -right-0.5" viewBox="0 0 24 24">
@@ -334,7 +334,7 @@ export function HeroSection() {
                     </svg>
                   </div>
                   <span className="font-bold tracking-wider text-white text-xs uppercase hidden sm:inline">
-                    FOCUFLOW
+                    GLIDEO
                   </span>
                 </div>
 
@@ -342,7 +342,7 @@ export function HeroSection() {
                 <div className="flex items-center gap-2 text-slate-400 text-[11px] font-mono truncate">
                   <span>Dashboards</span>
                   <span className="text-slate-600">/</span>
-                  <span className="text-sky-300 font-medium truncate">Default Studio</span>
+                  <span className="text-rose-300 font-medium truncate">Default Studio</span>
                 </div>
               </div>
 
@@ -360,7 +360,7 @@ export function HeroSection() {
                   onClick={() => setActiveTab(activeTab === "dashboard" ? "simulator" : "dashboard")}
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
                     activeTab === "simulator"
-                      ? "bg-sky-500/20 text-sky-200 border-sky-400/40"
+                      ? "bg-rose-500/20 text-rose-200 border-rose-400/40"
                       : "bg-white/[0.04] text-slate-300 border-white/10 hover:text-white"
                   }`}
                 >
@@ -396,7 +396,7 @@ export function HeroSection() {
                   }}
                 />
                 <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-xs text-slate-200">
-                  <MousePointer2 className="w-3 h-3 text-sky-400" />
+                  <MousePointer2 className="w-3 h-3 text-rose-400" />
                   <span>Click anywhere on canvas to pan zoom focal target</span>
                 </div>
               </div>
@@ -409,8 +409,8 @@ export function HeroSection() {
                       Favorites
                     </span>
                     <div className="space-y-0.5 text-slate-300">
-                      <div className="px-2.5 py-1.5 rounded-lg bg-sky-500/15 text-sky-200 font-medium flex items-center gap-2 border border-sky-400/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                      <div className="px-2.5 py-1.5 rounded-lg bg-rose-500/15 text-rose-200 font-medium flex items-center gap-2 border border-rose-400/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
                         <span>Overview</span>
                       </div>
                       <div className="px-2.5 py-1.5 rounded-lg hover:bg-white/[0.04] text-slate-400 hover:text-slate-200 flex items-center gap-2 cursor-pointer">
@@ -452,7 +452,7 @@ export function HeroSection() {
                   {/* Mock Table Rows */}
                   <div className="space-y-2">
                     {[
-                      { id: "#CM9801", user: "Natali Craig", project: "Landing Page", date: "Just now", status: "In Progress", color: "text-sky-400 bg-sky-500/10 border-sky-400/20" },
+                      { id: "#CM9801", user: "Natali Craig", project: "Landing Page", date: "Just now", status: "In Progress", color: "text-rose-400 bg-rose-500/10 border-rose-400/20" },
                       { id: "#CM9802", user: "Kate Morrison", project: "CRM Admin", date: "A minute ago", status: "Complete", color: "text-emerald-400 bg-emerald-500/10 border-emerald-400/20" },
                       { id: "#CM9803", user: "Drew Cano", project: "Client Portal", date: "1 hour ago", status: "Pending", color: "text-amber-400 bg-amber-500/10 border-amber-400/20" },
                       { id: "#CM9804", user: "Orlando Diggs", project: "Video Keyframes", date: "Yesterday", status: "Complete", color: "text-emerald-400 bg-emerald-500/10 border-emerald-400/20" },
@@ -484,7 +484,7 @@ export function HeroSection() {
                   <div className="space-y-2 text-xs">
                     <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
                       <div className="text-white font-medium flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
                         <span>You fixed a bug</span>
                       </div>
                       <div className="text-[10px] text-slate-400 font-mono">Just now</div>

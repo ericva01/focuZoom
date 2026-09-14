@@ -10,7 +10,7 @@ import {
   Crosshair,
   Ratio,
 } from "lucide-react";
-import { ClickEvent, CanvasConfig, AspectRatio } from "@/types/editor";
+import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint } from "@/types/editor";
 import { VideoCanvas } from "@/components/editor/VideoCanvas";
 import { Button } from "@/components/ui/Button";
 import { formatSMPTETimecode } from "./MultiTrackTimeline";
@@ -33,6 +33,11 @@ interface PreviewMonitorProps {
   onStepFrames: (delta: number) => void;
   isLooping: boolean;
   onToggleLoop: () => void;
+  cursorTrail?: CursorPoint[];
+  selectedEventId?: string | null;
+  onUpdateEvent?: (id: string, updates: Partial<ClickEvent>) => void;
+  webcamStream?: MediaStream | null;
+  webcamUrl?: string | null;
 }
 
 export function PreviewMonitor({
@@ -53,6 +58,11 @@ export function PreviewMonitor({
   onStepFrames,
   isLooping,
   onToggleLoop,
+  cursorTrail,
+  selectedEventId,
+  onUpdateEvent,
+  webcamStream,
+  webcamUrl,
 }: PreviewMonitorProps) {
   const aspectRatios: { id: AspectRatio; label: string }[] = [
     { id: "16:9", label: "16:9 Landscape" },
@@ -67,7 +77,7 @@ export function PreviewMonitor({
       <div className="h-10 px-4 border-b border-white/[0.08] bg-white/[0.02] flex items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
         {/* Left: Aspect Ratio Selector */}
         <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10 shadow-glass-inner">
-          <Ratio className="w-3.5 h-3.5 text-sky-400 ml-1 mr-0.5" />
+          <Ratio className="w-3.5 h-3.5 text-rose-400 ml-1 mr-0.5" />
           {aspectRatios.map((ar) => (
             <button
               key={ar.id}
@@ -75,7 +85,7 @@ export function PreviewMonitor({
               onClick={() => onChangeConfig({ aspectRatio: ar.id })}
               className={`px-2 py-0.5 rounded-lg text-[11px] font-mono transition-all ${
                 config.aspectRatio === ar.id
-                  ? "bg-sky-500/25 text-sky-200 font-bold border border-sky-400/40 shadow-glass-sm"
+                  ? "bg-rose-500/25 text-rose-200 font-bold border border-rose-400/40 shadow-glass-sm"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -119,6 +129,12 @@ export function PreviewMonitor({
           isAddMode={isAddMode}
           onAddClickAtCoords={onAddClickAtCoords}
           aspectRatio={config.aspectRatio}
+          cursorTrail={cursorTrail}
+          selectedEventId={selectedEventId}
+          onUpdateEvent={onUpdateEvent}
+          webcamStream={webcamStream}
+          webcamUrl={webcamUrl}
+          onChangeConfig={onChangeConfig}
         />
       </div>
 
@@ -145,7 +161,7 @@ export function PreviewMonitor({
             type="button"
             onClick={onTogglePlay}
             title={isPlaying ? "Pause" : "Play"}
-            className="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 flex items-center justify-center border border-sky-400/30 shadow-glass-sm"
+            className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 flex items-center justify-center border border-rose-400/30 shadow-glass-sm"
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
           </button>
@@ -172,7 +188,7 @@ export function PreviewMonitor({
             title={isLooping ? "Looping On" : "Looping Off"}
             className={`p-1.5 rounded-lg border transition-all ${
               isLooping
-                ? "bg-sky-500/20 text-sky-300 border-sky-400/30"
+                ? "bg-rose-500/20 text-rose-300 border-rose-400/30"
                 : "text-slate-400 hover:text-white border-transparent"
             }`}
           >

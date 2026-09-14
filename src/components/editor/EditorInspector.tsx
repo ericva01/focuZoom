@@ -16,6 +16,7 @@ import {
   Clock,
   Timer,
   EyeOff,
+  Camera,
 } from "lucide-react";
 import {
   CanvasConfig,
@@ -25,6 +26,8 @@ import {
   FramePreset,
   CursorStyle,
   ScreenAnglePreset,
+  WebcamShape,
+  WebcamPosition,
 } from "@/types/editor";
 import { Button } from "@/components/ui/Button";
 import { formatSMPTETimecode } from "./MultiTrackTimeline";
@@ -42,6 +45,7 @@ interface EditorInspectorProps {
   currentTime: number;
   onSeek?: (time: number) => void;
   events: ClickEvent[];
+  selectedEventId?: string | null;
   onSelectEvent: (event: ClickEvent) => void;
   onUpdateEvent: (id: string, updates: Partial<ClickEvent>) => void;
   onDeleteEvent: (id: string) => void;
@@ -55,9 +59,14 @@ interface EditorInspectorProps {
   clickCount: number;
   onStartRecording?: () => void;
   onStopRecording?: () => void;
+  availableCameras?: { deviceId: string; label: string }[];
+  enableWebcam?: boolean;
+  onToggleWebcam?: () => void;
+  selectedCameraId?: string | null;
+  onSelectCameraId?: (id: string) => void;
 }
 
-type InspectorTab = "clip" | "canvas" | "keyframes" | "media" | "cursor";
+type InspectorTab = "clip" | "canvas" | "keyframes" | "media" | "cursor" | "webcam";
 
 export function EditorInspector({
   config,
@@ -72,6 +81,7 @@ export function EditorInspector({
   currentTime,
   onSeek,
   events,
+  selectedEventId,
   onSelectEvent,
   onUpdateEvent,
   onDeleteEvent,
@@ -85,17 +95,23 @@ export function EditorInspector({
   clickCount,
   onStartRecording,
   onStopRecording,
+  availableCameras = [],
+  enableWebcam = false,
+  onToggleWebcam,
+  selectedCameraId,
+  onSelectCameraId,
 }: EditorInspectorProps) {
   const [activeTab, setActiveTab] = useState<InspectorTab>("canvas");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const customBgInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Active selected clip (or clip currently under playhead)
   const activeClip =
     clips.find((c) => c.id === selectedClipId) ||
     clips.find((c) => currentTime >= c.startTimeline && currentTime <= c.endTimeline) ||
     clips[0] ||
     null;
+
+  const selectedEvent = events.find((e) => e.id === selectedEventId) || null;
 
   // Handle custom image upload
   const handleCustomBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,42 +153,42 @@ export function EditorInspector({
         <button
           type="button"
           onClick={() => setActiveTab("clip")}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "clip"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-semibold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
           <Scissors className="w-3.5 h-3.5" />
-          <span>Clip</span>
+          <span className="hidden sm:inline">Clip</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("canvas")}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "canvas"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-semibold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
           <Palette className="w-3.5 h-3.5" />
-          <span>3D Canvas</span>
+          <span className="hidden sm:inline">3D</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("keyframes")}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "keyframes"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-semibold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
           <Focus className="w-3.5 h-3.5" />
-          <span>Zoom</span>
+          <span className="hidden sm:inline">Zoom</span>
           {events.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-sky-400/20 text-sky-300 text-[10px] font-mono flex items-center justify-center">
+            <span className="w-4 h-4 rounded-full bg-rose-400/20 text-rose-300 text-[10px] font-mono flex items-center justify-center">
               {events.length}
             </span>
           )}
@@ -180,28 +196,45 @@ export function EditorInspector({
 
         <button
           type="button"
-          onClick={() => setActiveTab("media")}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
-            activeTab === "media"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-semibold"
+          onClick={() => setActiveTab("webcam")}
+          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
+            activeTab === "webcam"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
+          title="Webcam Facecam PiP settings"
         >
-          <Upload className="w-3.5 h-3.5" />
-          <span>Media</span>
+          <Camera className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Face</span>
+          {enableWebcam && (
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          )}
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("cursor")}
-          className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "cursor"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-semibold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
           <MousePointer className="w-3.5 h-3.5" />
-          <span>Cursor</span>
+          <span className="hidden sm:inline">Cursor</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("media")}
+          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
+            activeTab === "media"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
+              : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+          }`}
+        >
+          <Upload className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Media</span>
         </button>
       </div>
 
@@ -221,7 +254,7 @@ export function EditorInspector({
                     onClick={() => onSelectClip(clip.id)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all whitespace-nowrap ${
                       selectedClipId === clip.id
-                        ? "bg-sky-500/25 text-sky-200 border border-sky-400/40 font-semibold"
+                        ? "bg-rose-500/25 text-rose-200 border border-rose-400/40 font-semibold"
                         : "bg-white/[0.04] text-slate-400 hover:text-white border border-transparent"
                     }`}
                   >
@@ -237,7 +270,7 @@ export function EditorInspector({
                 <div className="glass-panel p-4 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-white">Active Clip Properties</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-400/30">
                       ID: {activeClip.id}
                     </span>
                   </div>
@@ -252,7 +285,7 @@ export function EditorInspector({
 
                     <div className="p-2.5 rounded-lg bg-black/30 border border-white/10">
                       <span className="text-[10px] text-slate-400 block">Duration</span>
-                      <span className="font-mono text-sky-300 font-semibold">
+                      <span className="font-mono text-rose-300 font-semibold">
                         {activeClip.duration.toFixed(2)}s
                       </span>
                     </div>
@@ -267,7 +300,7 @@ export function EditorInspector({
                       variant="secondary"
                       size="sm"
                       onClick={() => onSplitClip(activeClip.id, currentTime)}
-                      leftIcon={<Scissors className="w-3.5 h-3.5 text-sky-400" />}
+                      leftIcon={<Scissors className="w-3.5 h-3.5 text-rose-400" />}
                       className="w-full justify-start"
                     >
                       Split Here
@@ -317,7 +350,7 @@ export function EditorInspector({
                 <div className="glass-panel p-4 rounded-xl space-y-2.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-slate-200">Clip Playback Speed</label>
-                    <span className="text-xs font-mono text-sky-400 font-bold">{config.playbackSpeed}x</span>
+                    <span className="text-xs font-mono text-rose-400 font-bold">{config.playbackSpeed}x</span>
                   </div>
                   <div className="grid grid-cols-4 gap-1.5">
                     {[0.5, 1.0, 1.5, 2.0].map((spd) => (
@@ -327,7 +360,7 @@ export function EditorInspector({
                         onClick={() => onChangeConfig({ playbackSpeed: spd })}
                         className={`py-1.5 rounded-lg text-xs font-mono transition-all ${
                           config.playbackSpeed === spd
-                            ? "bg-sky-500/20 text-sky-200 font-bold border border-sky-400/30 shadow-glass-sm"
+                            ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
                             : "bg-white/[0.04] text-slate-300 hover:text-white border border-transparent"
                         }`}
                       >
@@ -355,18 +388,21 @@ export function EditorInspector({
               <label className="text-xs font-semibold text-white block">3D Stage Orientation</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
+                  { id: "simple-smooth" as ScreenAnglePreset, name: "Simple Smooth", desc: "Smooth Zoom In & Out (Zero Tilt)" },
                   { id: "studio-front" as ScreenAnglePreset, name: "Front Studio", desc: "Clean & Direct" },
                   { id: "floating-dynamic" as ScreenAnglePreset, name: "Breathing Tilt", desc: "Organic Depth" },
                   { id: "isometric" as ScreenAnglePreset, name: "Isometric 3D", desc: "Diagonal View" },
                   { id: "cinematic-slant" as ScreenAnglePreset, name: "Filmic Slant", desc: "High Specular" },
-                ].map((preset) => (
+                ].map((preset, pIdx) => (
                   <button
                     key={preset.id}
                     type="button"
                     onClick={() => onChangeConfig({ screenAnglePreset: preset.id })}
                     className={`p-2.5 rounded-xl text-left border transition-all ${
+                      pIdx === 0 ? "col-span-2" : ""
+                    } ${
                       config.screenAnglePreset === preset.id
-                        ? "bg-sky-500/20 text-sky-200 border-sky-400/40 shadow-glass-sm"
+                        ? "bg-rose-500/20 text-rose-200 border-rose-400/40 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                     }`}
                   >
@@ -381,7 +417,7 @@ export function EditorInspector({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-white">Stage Inset (Padding)</label>
-                <div className="flex items-center gap-1 font-mono text-xs text-sky-400 font-bold">
+                <div className="flex items-center gap-1 font-mono text-xs text-rose-400 font-bold">
                   <span>{config.padding}</span>
                   <span className="text-slate-400">px</span>
                 </div>
@@ -405,7 +441,7 @@ export function EditorInspector({
                     onClick={() => onChangeConfig({ padding: pad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.padding === pad
-                        ? "bg-sky-500/20 text-sky-200 font-bold border border-sky-400/30"
+                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30"
                         : "bg-white/[0.04] text-slate-400 hover:text-white"
                     }`}
                   >
@@ -419,7 +455,7 @@ export function EditorInspector({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-white">Corner Curvature</label>
-                <div className="flex items-center gap-1 font-mono text-xs text-sky-400 font-bold">
+                <div className="flex items-center gap-1 font-mono text-xs text-rose-400 font-bold">
                   <span>{config.cornerRadius}</span>
                   <span className="text-slate-400">px</span>
                 </div>
@@ -443,7 +479,7 @@ export function EditorInspector({
                     onClick={() => onChangeConfig({ cornerRadius: rad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.cornerRadius === rad
-                        ? "bg-sky-500/20 text-sky-200 font-bold border border-sky-400/30"
+                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30"
                         : "bg-white/[0.04] text-slate-400 hover:text-white"
                     }`}
                   >
@@ -469,7 +505,7 @@ export function EditorInspector({
                     onClick={() => onChangeConfig({ backgroundType: type.id })}
                     className={`py-1 rounded-lg text-xs font-medium transition-all ${
                       config.backgroundType === type.id
-                        ? "bg-sky-500/25 text-sky-200 border border-sky-400/40 shadow-glass-sm"
+                        ? "bg-rose-500/25 text-rose-200 border border-rose-400/40 shadow-glass-sm"
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
@@ -488,7 +524,7 @@ export function EditorInspector({
                       onClick={() => onChangeConfig({ backgroundPreset: g.id })}
                       className={`h-10 rounded-xl bg-gradient-to-r ${g.class} p-2 text-left flex items-end justify-between border transition-all ${
                         config.backgroundPreset === g.id
-                          ? "border-white ring-2 ring-sky-400/60 shadow-glass-md"
+                          ? "border-white ring-2 ring-rose-400/60 shadow-glass-md"
                           : "border-white/15 opacity-80 hover:opacity-100"
                       }`}
                     >
@@ -513,7 +549,7 @@ export function EditorInspector({
                       onClick={() => onChangeConfig({ solidBackgroundColor: c.hex })}
                       className={`h-10 rounded-xl p-2 text-left border flex items-end justify-between transition-all ${
                         config.solidBackgroundColor === c.hex
-                          ? "border-white ring-2 ring-sky-400/60"
+                          ? "border-white ring-2 ring-rose-400/60"
                           : "border-white/15 opacity-80 hover:opacity-100"
                       }`}
                       style={{ backgroundColor: c.hex }}
@@ -541,7 +577,7 @@ export function EditorInspector({
                     size="sm"
                     className="w-full"
                     onClick={() => customBgInputRef.current?.click()}
-                    leftIcon={<ImageIcon className="w-3.5 h-3.5 text-sky-400" />}
+                    leftIcon={<ImageIcon className="w-3.5 h-3.5 text-rose-400" />}
                   >
                     Select Background Image
                   </Button>
@@ -558,9 +594,9 @@ export function EditorInspector({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <Focus className="w-4 h-4 text-sky-400" />
+                <Focus className="w-4 h-4 text-rose-400" />
                 <span className="text-xs font-semibold text-white">Zoom Keyframes</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30">
                   {events.length}
                 </span>
               </div>
@@ -574,11 +610,181 @@ export function EditorInspector({
               </Button>
             </div>
 
+            {/* Dedicated Selected Zoom Effect Inspector */}
+            {selectedEvent && (
+              <div className="glass-panel p-4 rounded-xl border border-blue-400/40 bg-blue-950/30 space-y-3.5 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-400/40">
+                      Selected Zoom
+                    </span>
+                    <span className="text-xs font-bold text-white">
+                      Zoom {selectedEvent.zoom || 2}X
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteEvent(selectedEvent.id)}
+                    className="flex items-center gap-1 text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                    title="Delete this zoom effect (or press Delete key)"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    <span>Delete</span>
+                  </button>
+                </div>
+
+                {/* Zoom Magnification Scale Pills */}
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-medium text-slate-300 block">Zoom Scale (Only for this effect)</label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[1.5, 2.0, 2.5, 3.0].map((scale) => (
+                      <button
+                        key={scale}
+                        type="button"
+                        onClick={() => onUpdateEvent(selectedEvent.id, { zoom: scale })}
+                        className={`py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                          selectedEvent.zoom === scale
+                            ? "bg-blue-600 text-white border-blue-400 shadow-md ring-1 ring-blue-300"
+                            : "bg-white/[0.04] text-slate-300 border-white/10 hover:bg-white/[0.08]"
+                        }`}
+                      >
+                        {scale}X
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Independent 3D Stage Orientation for THIS Zoom Effect */}
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-medium text-slate-300 block">3D Stage Angle (Only for this effect)</label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[
+                      { id: "simple-smooth" as ScreenAnglePreset, name: "Simple Smooth", desc: "Smooth Zoom In & Out (Zero Tilt)" },
+                      { id: "studio-front" as ScreenAnglePreset, name: "Front Studio", desc: "Clean & Flat" },
+                      { id: "floating-dynamic" as ScreenAnglePreset, name: "Breathing Tilt", desc: "Organic Depth" },
+                      { id: "isometric" as ScreenAnglePreset, name: "Isometric 3D", desc: "Diagonal View" },
+                      { id: "cinematic-slant" as ScreenAnglePreset, name: "Filmic Slant", desc: "High Specular" },
+                    ].map((preset, pIdx) => {
+                      const isPresetActive = (selectedEvent.screenAnglePreset || config.screenAnglePreset) === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => onUpdateEvent(selectedEvent.id, { screenAnglePreset: preset.id })}
+                          className={`p-2 rounded-lg text-left border transition-all ${
+                            pIdx === 0 ? "col-span-2" : ""
+                          } ${
+                            isPresetActive
+                              ? "bg-blue-500/20 text-blue-200 border-blue-400/50 shadow-sm"
+                              : "bg-white/[0.03] text-slate-400 border-white/10 hover:bg-white/[0.06] hover:text-white"
+                          }`}
+                        >
+                          <div className="text-[11px] font-medium text-white">{preset.name}</div>
+                          <div className="text-[9px] text-slate-400">{preset.desc}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Focal Target Position on Screen */}
+                <div className="space-y-2 pt-2 border-t border-white/[0.08]">
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="font-medium text-slate-300">Focus Target Position</span>
+                    <span className="font-mono text-blue-300 text-[10px]">
+                      X: {Math.round(selectedEvent.x * 100)}% · Y: {Math.round(selectedEvent.y * 100)}%
+                    </span>
+                  </div>
+
+                  {/* Quick Position Buttons */}
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { name: "Left", x: 0.2, y: 0.5 },
+                      { name: "Center", x: 0.5, y: 0.5 },
+                      { name: "Right", x: 0.8, y: 0.5 },
+                    ].map((pos) => (
+                      <button
+                        key={pos.name}
+                        type="button"
+                        onClick={() => onUpdateEvent(selectedEvent.id, { x: pos.x, y: pos.y })}
+                        className={`py-1 rounded-lg text-[10px] font-medium border transition-all ${
+                          Math.abs(selectedEvent.x - pos.x) < 0.08 && Math.abs(selectedEvent.y - pos.y) < 0.08
+                            ? "bg-blue-600 text-white border-blue-400 font-bold shadow-sm"
+                            : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                        }`}
+                      >
+                        {pos.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Horizontal Position Slider */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px]">
+                      <span className="text-slate-400">Horizontal (Left ↔ Right)</span>
+                      <span className="font-mono text-blue-400 font-bold">{Math.round(selectedEvent.x * 100)}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.05"
+                      max="0.95"
+                      step="0.01"
+                      value={selectedEvent.x}
+                      onChange={(e) =>
+                        onUpdateEvent(selectedEvent.id, { x: parseFloat(e.target.value) })
+                      }
+                      className="w-full accent-blue-400 cursor-pointer h-1 bg-white/10 rounded"
+                    />
+                  </div>
+
+                  {/* Vertical Position Slider */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px]">
+                      <span className="text-slate-400">Vertical (Top ↔ Bottom)</span>
+                      <span className="font-mono text-blue-400 font-bold">{Math.round(selectedEvent.y * 100)}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.05"
+                      max="0.95"
+                      step="0.01"
+                      value={selectedEvent.y}
+                      onChange={(e) =>
+                        onUpdateEvent(selectedEvent.id, { y: parseFloat(e.target.value) })
+                      }
+                      className="w-full accent-blue-400 cursor-pointer h-1 bg-white/10 rounded"
+                    />
+                  </div>
+                </div>
+
+                {/* Timing controls for THIS Zoom Effect */}
+                <div className="space-y-2 pt-2 border-t border-white/[0.08]">
+                  <div className="flex justify-between items-center text-[10px]">
+                    <span className="text-slate-400">Hold Focus Duration</span>
+                    <span className="font-mono text-emerald-400 font-bold">
+                      {(selectedEvent.holdDuration ?? 1.4).toFixed(1)}s
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.2"
+                    max="6.0"
+                    step="0.1"
+                    value={selectedEvent.holdDuration ?? 1.4}
+                    onChange={(e) =>
+                      onUpdateEvent(selectedEvent.id, { holdDuration: parseFloat(e.target.value) })
+                    }
+                    className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/10 rounded"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Global Default Zoom Timing Card */}
             <div className="glass-panel p-3.5 rounded-xl space-y-3 border-white/10 bg-white/[0.02]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
-                  <Clock className="w-3.5 h-3.5 text-sky-400" />
+                  <Clock className="w-3.5 h-3.5 text-rose-400" />
                   <span>Default Camera Timing</span>
                 </div>
                 <span className="text-[10px] text-slate-400">Global defaults</span>
@@ -609,7 +815,7 @@ export function EditorInspector({
                       }
                       className={`py-1 px-2 rounded-lg text-[10px] font-medium border transition-all ${
                         isActive
-                          ? "bg-sky-500/20 text-sky-200 border-sky-400/40 font-semibold"
+                          ? "bg-rose-500/20 text-rose-200 border-rose-400/40 font-semibold"
                           : "bg-white/[0.03] text-slate-400 border-white/10 hover:text-white hover:bg-white/[0.06]"
                       }`}
                     >
@@ -624,7 +830,7 @@ export function EditorInspector({
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-slate-400">Dolly-In</span>
-                    <span className="font-mono text-sky-400 font-bold">{(config.zoomDuration ?? 0.6).toFixed(2)}s</span>
+                    <span className="font-mono text-rose-400 font-bold">{(config.zoomDuration ?? 0.6).toFixed(2)}s</span>
                   </div>
                   <input
                     type="range"
@@ -658,7 +864,7 @@ export function EditorInspector({
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-slate-400">Zoom-Out</span>
-                    <span className="font-mono text-sky-400 font-bold">{(config.zoomOutDuration ?? 0.6).toFixed(2)}s</span>
+                    <span className="font-mono text-rose-400 font-bold">{(config.zoomOutDuration ?? 0.6).toFixed(2)}s</span>
                   </div>
                   <input
                     type="range"
@@ -696,14 +902,14 @@ export function EditorInspector({
                       }}
                       className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-3 ${
                         isNearCurrent
-                          ? "bg-sky-500/15 border-sky-400/50 shadow-glass-md"
+                          ? "bg-rose-500/15 border-rose-400/50 shadow-glass-md"
                           : "bg-black/40 border-white/10 hover:border-white/20 hover:bg-white/[0.03]"
                       }`}
                     >
                       {/* Top Bar: Identifier, Timestamp, Delete */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-sky-500/20 border border-sky-400/30 text-sky-300 font-mono text-[10px] flex items-center justify-center font-bold">
+                          <span className="w-5 h-5 rounded-md bg-rose-500/20 border border-rose-400/30 text-rose-300 font-mono text-[10px] flex items-center justify-center font-bold">
                             #{index + 1}
                           </span>
                           <span className="text-xs font-semibold text-white">
@@ -719,7 +925,7 @@ export function EditorInspector({
                               onSelectEvent(ev);
                               onSeek?.(ev.timestamp);
                             }}
-                            className="px-2 py-0.5 rounded-md bg-white/[0.06] hover:bg-sky-500/20 text-[11px] font-mono text-sky-300 border border-white/10 hover:border-sky-400/40 transition-colors cursor-pointer"
+                            className="px-2 py-0.5 rounded-md bg-white/[0.06] hover:bg-rose-500/20 text-[11px] font-mono text-rose-300 border border-white/10 hover:border-rose-400/40 transition-colors cursor-pointer"
                             title="Jump playhead to this keyframe"
                           >
                             {formatSMPTETimecode(ev.timestamp).substring(3, 8)}
@@ -756,7 +962,7 @@ export function EditorInspector({
                             >
                               -
                             </button>
-                            <span className="font-mono text-xs text-sky-400 font-semibold w-12 text-center">
+                            <span className="font-mono text-xs text-rose-400 font-semibold w-12 text-center">
                               {ev.timestamp.toFixed(2)}s
                             </span>
                             <button
@@ -809,7 +1015,7 @@ export function EditorInspector({
                               }}
                               className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
                                 ev.zoom === scale
-                                  ? "bg-sky-500/25 text-sky-200 border border-sky-400/40 font-bold"
+                                  ? "bg-rose-500/25 text-rose-200 border border-rose-400/40 font-bold"
                                   : "bg-white/[0.04] text-slate-400 hover:text-white border border-transparent"
                               }`}
                             >
@@ -823,11 +1029,11 @@ export function EditorInspector({
                       <div className="pt-2 border-t border-white/[0.06] space-y-2.5">
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="font-medium text-slate-300 flex items-center gap-1">
-                            <Timer className="w-3 h-3 text-sky-400" />
+                            <Timer className="w-3 h-3 text-rose-400" />
                             Zoom & Hold Timing
                           </span>
                           <span className="text-[10px] font-mono text-slate-400">
-                            Span: <span className="text-sky-300 font-semibold">{totalSpan.toFixed(2)}s</span>
+                            Span: <span className="text-rose-300 font-semibold">{totalSpan.toFixed(2)}s</span>
                           </span>
                         </div>
 
@@ -835,7 +1041,7 @@ export function EditorInspector({
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px]">
                             <span className="text-slate-400">Dolly-In Duration</span>
-                            <span className="font-mono text-sky-400 font-bold">{inDur.toFixed(2)}s</span>
+                            <span className="font-mono text-rose-400 font-bold">{inDur.toFixed(2)}s</span>
                           </div>
                           <input
                             type="range"
@@ -875,7 +1081,7 @@ export function EditorInspector({
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px]">
                             <span className="text-slate-400">Zoom-Out Duration</span>
-                            <span className="font-mono text-sky-400 font-bold">{outDur.toFixed(2)}s</span>
+                            <span className="font-mono text-rose-400 font-bold">{outDur.toFixed(2)}s</span>
                           </div>
                           <input
                             type="range"
@@ -896,7 +1102,7 @@ export function EditorInspector({
                           <div className="h-1.5 w-full rounded-full bg-black/40 overflow-hidden flex border border-white/[0.06]">
                             <div
                               style={{ width: `${(inDur / totalSpan) * 100}%` }}
-                              className="bg-sky-400 h-full"
+                              className="bg-rose-400 h-full"
                               title={`Dolly-In: ${inDur.toFixed(2)}s`}
                             />
                             <div
@@ -906,7 +1112,7 @@ export function EditorInspector({
                             />
                             <div
                               style={{ width: `${(outDur / totalSpan) * 100}%` }}
-                              className="bg-sky-500 h-full"
+                              className="bg-rose-500 h-full"
                               title={`Zoom-Out: ${outDur.toFixed(2)}s`}
                             />
                           </div>
@@ -988,7 +1194,7 @@ export function EditorInspector({
                 className="w-full"
                 onClick={onLoadDemo}
                 isLoading={isGeneratingDemo}
-                leftIcon={<Film className="w-3.5 h-3.5 text-sky-400" />}
+                leftIcon={<Film className="w-3.5 h-3.5 text-rose-400" />}
               >
                 Load Sample Screen Recording
               </Button>
@@ -1047,13 +1253,13 @@ export function EditorInspector({
         {activeTab === "cursor" && (
           <div className="space-y-4">
             {/* Master Cursor Overlay Switch */}
-            <div className="glass-panel p-4 rounded-xl space-y-3 border-sky-500/30 bg-gradient-to-r from-sky-950/20 to-transparent">
+            <div className="glass-panel p-4 rounded-xl space-y-3 border-rose-500/30 bg-gradient-to-r from-rose-950/20 to-transparent">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div
                     className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
                       config.showCursor
-                        ? "bg-sky-500/20 border-sky-400/40 text-sky-300 shadow-glass-sm"
+                        ? "bg-rose-500/20 border-rose-400/40 text-rose-300 shadow-glass-sm"
                         : "bg-white/[0.04] border-white/10 text-slate-500"
                     }`}
                   >
@@ -1075,7 +1281,7 @@ export function EditorInspector({
                   type="button"
                   onClick={() => onChangeConfig({ showCursor: !config.showCursor })}
                   className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
-                    config.showCursor ? "bg-sky-500 shadow-[0_0_12px_rgba(56,189,248,0.5)]" : "bg-white/15"
+                    config.showCursor ? "bg-rose-500 shadow-[0_0_12px_rgba(251,113,133,0.5)]" : "bg-white/15"
                   }`}
                   title={config.showCursor ? "Hide cursor overlay" : "Show cursor overlay"}
                 >
@@ -1104,7 +1310,7 @@ export function EditorInspector({
                     onClick={() => onChangeConfig({ cursorStyle: cur.id })}
                     className={`p-2.5 rounded-xl text-left border transition-all ${
                       config.cursorStyle === cur.id
-                        ? "bg-sky-500/20 text-sky-200 border-sky-400/40 shadow-glass-sm"
+                        ? "bg-rose-500/20 text-rose-200 border-rose-400/40 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                     }`}
                   >
@@ -1118,7 +1324,7 @@ export function EditorInspector({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-white">Cursor Size</label>
-                <span className="font-mono text-sky-400 font-bold">{config.cursorSize}px</span>
+                <span className="font-mono text-rose-400 font-bold">{config.cursorSize}px</span>
               </div>
               <input
                 type="range"
@@ -1138,7 +1344,7 @@ export function EditorInspector({
                   type="button"
                   onClick={() => onChangeConfig({ showRipple: !config.showRipple })}
                   className={`w-10 h-5 rounded-full transition-colors relative ${
-                    config.showRipple ? "bg-sky-500" : "bg-white/10"
+                    config.showRipple ? "bg-rose-500" : "bg-white/10"
                   }`}
                 >
                   <div
@@ -1152,6 +1358,381 @@ export function EditorInspector({
                 Renders expanding concentric wave rings on recorded mouse clicks mapped to the 3D screen.
               </p>
             </div>
+            </div>
+          </div>
+        )}
+
+        {/* 6. Webcam Facecam PiP Panel */}
+        {activeTab === "webcam" && (
+          <div className="space-y-4">
+            {/* Webcam Master Enable Switch */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-semibold text-white">Record Webcam Face</h3>
+                  <p className="text-[11px] text-slate-400">
+                    Captures your webcam alongside the screen and overlays a floating bubble.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onToggleWebcam) {
+                      onToggleWebcam();
+                    } else {
+                      const cur = config.webcamConfig?.enabled ?? false;
+                      onChangeConfig({
+                        webcamConfig: {
+                          ...(config.webcamConfig || {
+                            enabled: !cur,
+                            shape: "circle",
+                            position: "bottom-right",
+                            customX: 0.85,
+                            customY: 0.82,
+                            size: 180,
+                            borderColor: "#fb7185",
+                            borderWidth: 3,
+                            shadow: true,
+                            mirror: true,
+                          }),
+                          enabled: !cur,
+                        },
+                      });
+                    }
+                  }}
+                  className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
+                    enableWebcam || config.webcamConfig?.enabled
+                      ? "bg-emerald-500 shadow-[0_0_12px_rgba(52,211,153,0.5)]"
+                      : "bg-white/15"
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white transition-transform shadow-md ${
+                      enableWebcam || config.webcamConfig?.enabled ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Camera Device Selector */}
+            {availableCameras.length > 0 && (
+              <div className="glass-panel p-4 rounded-xl space-y-2.5">
+                <label className="text-xs font-semibold text-white block">Camera Device</label>
+                <select
+                  value={selectedCameraId || config.webcamConfig?.deviceId || ""}
+                  onChange={(e) => {
+                    const devId = e.target.value;
+                    if (onSelectCameraId) onSelectCameraId(devId);
+                    onChangeConfig({
+                      webcamConfig: {
+                        ...(config.webcamConfig || {
+                          enabled: true,
+                          shape: "circle",
+                          position: "bottom-right",
+                          customX: 0.85,
+                          customY: 0.82,
+                          size: 180,
+                          borderColor: "#fb7185",
+                          borderWidth: 3,
+                          shadow: true,
+                          mirror: true,
+                        }),
+                        deviceId: devId,
+                      },
+                    });
+                  }}
+                  className="w-full bg-[#090D16] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-rose-400 transition-colors"
+                >
+                  {availableCameras.map((cam) => (
+                    <option key={cam.deviceId} value={cam.deviceId}>
+                      {cam.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Shape Selector */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <label className="text-xs font-semibold text-white block">PiP Shape</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: "circle" as WebcamShape, label: "Circle (Bubble)" },
+                  { id: "rounded-rect" as WebcamShape, label: "Rounded" },
+                  { id: "square" as WebcamShape, label: "Square" },
+                ].map((sh) => {
+                  const currentShape = config.webcamConfig?.shape || "circle";
+                  return (
+                    <button
+                      key={sh.id}
+                      type="button"
+                      onClick={() =>
+                        onChangeConfig({
+                          webcamConfig: {
+                            ...(config.webcamConfig || {
+                              enabled: true,
+                              shape: "circle",
+                              position: "bottom-right",
+                              customX: 0.85,
+                              customY: 0.82,
+                              size: 180,
+                              borderColor: "#fb7185",
+                              borderWidth: 3,
+                              shadow: true,
+                              mirror: true,
+                            }),
+                            shape: sh.id,
+                          },
+                        })
+                      }
+                      className={`p-2.5 rounded-xl text-center border transition-all ${
+                        currentShape === sh.id
+                          ? "bg-rose-500/20 text-rose-200 border-rose-400/40 shadow-glass-sm"
+                          : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      <span className="text-xs font-semibold">{sh.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Position Corner Presets */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <label className="text-xs font-semibold text-white block">Corner Preset</label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { id: "bottom-right" as WebcamPosition, label: "Bottom Right", x: 0.85, y: 0.82 },
+                  { id: "bottom-left" as WebcamPosition, label: "Bottom Left", x: 0.15, y: 0.82 },
+                  { id: "top-right" as WebcamPosition, label: "Top Right", x: 0.85, y: 0.18 },
+                  { id: "top-left" as WebcamPosition, label: "Top Left", x: 0.15, y: 0.18 },
+                ].map((pos) => {
+                  const currentPos = config.webcamConfig?.position || "bottom-right";
+                  return (
+                    <button
+                      key={pos.id}
+                      type="button"
+                      onClick={() =>
+                        onChangeConfig({
+                          webcamConfig: {
+                            ...(config.webcamConfig || {
+                              enabled: true,
+                              shape: "circle",
+                              position: "bottom-right",
+                              customX: 0.85,
+                              customY: 0.82,
+                              size: 180,
+                              borderColor: "#fb7185",
+                              borderWidth: 3,
+                              shadow: true,
+                              mirror: true,
+                            }),
+                            position: pos.id,
+                            customX: pos.x,
+                            customY: pos.y,
+                          },
+                        })
+                      }
+                      className={`p-2 rounded-xl text-center border transition-all text-xs font-medium ${
+                        currentPos === pos.id
+                          ? "bg-rose-500/20 text-rose-200 border-rose-400/40 font-semibold"
+                          : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      {pos.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-slate-500 italic">
+                * You can also drag the bubble anywhere on the preview canvas to position freely!
+              </p>
+            </div>
+
+            {/* Size Slider */}
+            <div className="glass-panel p-4 rounded-xl space-y-2.5">
+              <div className="flex justify-between items-center text-xs">
+                <label className="font-semibold text-white">Bubble Size</label>
+                <span className="font-mono text-rose-400 font-bold">
+                  {config.webcamConfig?.size || 180}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="100"
+                max="360"
+                value={config.webcamConfig?.size || 180}
+                onChange={(e) =>
+                  onChangeConfig({
+                    webcamConfig: {
+                      ...(config.webcamConfig || {
+                        enabled: true,
+                        shape: "circle",
+                        position: "bottom-right",
+                        customX: 0.85,
+                        customY: 0.82,
+                        size: 180,
+                        borderColor: "#fb7185",
+                        borderWidth: 3,
+                        shadow: true,
+                        mirror: true,
+                      }),
+                      size: parseInt(e.target.value),
+                    },
+                  })
+                }
+                className="w-full accent-rose-500 cursor-pointer h-1 bg-white/10 rounded"
+              />
+            </div>
+
+            {/* Mirror Toggle & Drop Shadow */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-white block">Mirror Video</span>
+                  <span className="text-[11px] text-slate-400">Flips video horizontally (natural mirror look)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChangeConfig({
+                      webcamConfig: {
+                        ...(config.webcamConfig || {
+                          enabled: true,
+                          shape: "circle",
+                          position: "bottom-right",
+                          customX: 0.85,
+                          customY: 0.82,
+                          size: 180,
+                          borderColor: "#fb7185",
+                          borderWidth: 3,
+                          shadow: true,
+                          mirror: true,
+                        }),
+                        mirror: !(config.webcamConfig?.mirror ?? true),
+                      },
+                    })
+                  }
+                  className={`w-10 h-5 rounded-full transition-colors relative ${
+                    config.webcamConfig?.mirror ?? true ? "bg-rose-500" : "bg-white/10"
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
+                      config.webcamConfig?.mirror ?? true ? "left-5.5" : "left-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+                <div>
+                  <span className="text-xs font-semibold text-white block">Cinematic Shadow</span>
+                  <span className="text-[11px] text-slate-400">Deep ambient shadow behind bubble</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChangeConfig({
+                      webcamConfig: {
+                        ...(config.webcamConfig || {
+                          enabled: true,
+                          shape: "circle",
+                          position: "bottom-right",
+                          customX: 0.85,
+                          customY: 0.82,
+                          size: 180,
+                          borderColor: "#fb7185",
+                          borderWidth: 3,
+                          shadow: true,
+                          mirror: true,
+                        }),
+                        shadow: !(config.webcamConfig?.shadow ?? true),
+                      },
+                    })
+                  }
+                  className={`w-10 h-5 rounded-full transition-colors relative ${
+                    config.webcamConfig?.shadow ?? true ? "bg-rose-500" : "bg-white/10"
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
+                      config.webcamConfig?.shadow ?? true ? "left-5.5" : "left-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Border Width & Color */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <div className="flex justify-between items-center text-xs">
+                <label className="font-semibold text-white">Border Width</label>
+                <span className="font-mono text-rose-400 font-bold">
+                  {config.webcamConfig?.borderWidth ?? 3}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="8"
+                value={config.webcamConfig?.borderWidth ?? 3}
+                onChange={(e) =>
+                  onChangeConfig({
+                    webcamConfig: {
+                      ...(config.webcamConfig || {
+                        enabled: true,
+                        shape: "circle",
+                        position: "bottom-right",
+                        customX: 0.85,
+                        customY: 0.82,
+                        size: 180,
+                        borderColor: "#fb7185",
+                        borderWidth: 3,
+                        shadow: true,
+                        mirror: true,
+                      }),
+                      borderWidth: parseInt(e.target.value),
+                    },
+                  })
+                }
+                className="w-full accent-rose-500 cursor-pointer h-1 bg-white/10 rounded"
+              />
+
+              <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between">
+                <label className="text-xs font-semibold text-white">Border Color</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={config.webcamConfig?.borderColor || "#fb7185"}
+                    onChange={(e) =>
+                      onChangeConfig({
+                        webcamConfig: {
+                          ...(config.webcamConfig || {
+                            enabled: true,
+                            shape: "circle",
+                            position: "bottom-right",
+                            customX: 0.85,
+                            customY: 0.82,
+                            size: 180,
+                            borderColor: "#fb7185",
+                            borderWidth: 3,
+                            shadow: true,
+                            mirror: true,
+                          }),
+                          borderColor: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-7 h-7 rounded-lg border border-white/20 bg-transparent cursor-pointer"
+                  />
+                  <span className="font-mono text-xs text-slate-300 uppercase">
+                    {config.webcamConfig?.borderColor || "#fb7185"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         )}

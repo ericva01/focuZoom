@@ -19,6 +19,8 @@ import {
   FolderOpen,
   Save,
   Check,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import { AspectRatio } from "@/types/editor";
 
@@ -46,6 +48,15 @@ interface EditorHeaderProps {
   // Cursor Overlay Toggle
   showCursor?: boolean;
   onToggleCursor?: () => void;
+  // Webcam Facecam Toggle
+  enableWebcam?: boolean;
+  onToggleWebcam?: () => void;
+  hasWebcamRecorded?: boolean;
+  // Undo & Redo Controls
+  canUndo?: boolean;
+  canRedo?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
   // Sidebar Toggles
   isLeftCollapsed?: boolean;
   onToggleLeftCollapse?: () => void;
@@ -72,6 +83,13 @@ export function EditorHeader({
   onStopRecording,
   showCursor = true,
   onToggleCursor,
+  enableWebcam = false,
+  onToggleWebcam,
+  hasWebcamRecorded = false,
+  canUndo = false,
+  canRedo = false,
+  onUndo,
+  onRedo,
   isLeftCollapsed = false,
   onToggleLeftCollapse,
   isRightCollapsed = false,
@@ -104,7 +122,7 @@ export function EditorHeader({
             title={isLeftCollapsed ? "Expand Left Settings Panel" : "Collapse Left Settings Panel"}
           >
             {isLeftCollapsed ? (
-              <PanelLeftOpen className="w-4 h-4 text-sky-400" />
+              <PanelLeftOpen className="w-4 h-4 text-rose-400" />
             ) : (
               <PanelLeftClose className="w-4 h-4 text-slate-400" />
             )}
@@ -122,8 +140,8 @@ export function EditorHeader({
         </Link>
 
         <div className="flex items-center gap-2.5 ml-1">
-          <div className="w-7 h-7 rounded-lg overflow-hidden border border-white/20 shadow-[0_0_12px_rgba(56,189,248,0.25)] flex-shrink-0">
-            <Image src="/logo.png" alt="FocuFlow" width={28} height={28} className="w-full h-full object-cover" priority />
+          <div className="w-7 h-7 rounded-lg overflow-hidden border border-white/20 shadow-[0_0_12px_rgba(251,113,133,0.25)] flex-shrink-0">
+            <Image src="/logo.png" alt="Glideo" width={28} height={28} className="w-full h-full object-cover" priority />
           </div>
 
           {/* Project Title inline editor */}
@@ -144,7 +162,7 @@ export function EditorHeader({
                 className="text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/[0.06] px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1.5 group border border-transparent hover:border-white/[0.08]"
               >
                 <span>{projectName}</span>
-                <span className="text-[10px] text-slate-500 group-hover:text-sky-300">✎</span>
+                <span className="text-[10px] text-slate-500 group-hover:text-rose-300">✎</span>
               </button>
             )}
           </div>
@@ -163,7 +181,7 @@ export function EditorHeader({
             onClick={() => onAspectRatioChange(ratio.value)}
             className={`px-3 py-1 rounded-lg font-medium transition-all duration-200 ${
               aspectRatio === ratio.value
-                ? "bg-sky-500/20 text-sky-200 font-semibold border border-sky-400/30 shadow-glass-sm"
+                ? "bg-rose-500/20 text-rose-200 font-semibold border border-rose-400/30 shadow-glass-sm"
                 : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]"
             }`}
           >
@@ -176,8 +194,8 @@ export function EditorHeader({
       <div className="flex items-center gap-2">
         {/* Electron Native Desktop Badge */}
         {isElectron && (
-          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/25 text-[10px] font-mono text-sky-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-400/25 text-[10px] font-mono text-rose-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
             <span>Desktop App</span>
           </div>
         )}
@@ -189,9 +207,42 @@ export function EditorHeader({
             size="sm"
             onClick={onNativeOpenVideo}
             title="Import video file from computer (Ctrl/Cmd+O)"
-            leftIcon={<FolderOpen className="w-3.5 h-3.5 text-sky-300" />}
+            leftIcon={<FolderOpen className="w-3.5 h-3.5 text-rose-300" />}
           >
             <span className="hidden sm:inline">Open File</span>
+          </Button>
+        )}
+
+        {/* Webcam Facecam Quick Toggle Button */}
+        {onToggleWebcam && (
+          <Button
+            variant={enableWebcam ? "secondary" : "ghost"}
+            size="sm"
+            onClick={onToggleWebcam}
+            title={
+              enableWebcam
+                ? "Webcam Face recording is ACTIVE (Click to turn off)"
+                : "Webcam Face recording is OFF (Click to enable)"
+            }
+            className={
+              enableWebcam
+                ? "border-emerald-400/40 text-emerald-200 bg-emerald-500/15 shadow-glass-sm"
+                : hasWebcamRecorded
+                ? "border-white/10 text-slate-300 hover:text-white"
+                : "border-white/10 text-slate-400 hover:text-white"
+            }
+            leftIcon={<Camera className={`w-3.5 h-3.5 ${enableWebcam ? "text-emerald-400" : "text-slate-400"}`} />}
+          >
+            <span className="hidden sm:inline">Webcam</span>
+            <span
+              className={`text-[9px] font-mono px-1.5 py-0.5 rounded ml-1 font-bold ${
+                enableWebcam
+                  ? "bg-emerald-400/20 text-emerald-300 border border-emerald-400/30"
+                  : "bg-white/[0.08] text-slate-400"
+              }`}
+            >
+              {enableWebcam ? "ON" : "OFF"}
+            </span>
           </Button>
         )}
 
@@ -217,7 +268,7 @@ export function EditorHeader({
             size="sm"
             onClick={onStartRecording}
             title="Record your screen, window, or tab with auto click logging"
-            leftIcon={<span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />}
+            leftIcon={<span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />}
           >
             Record Screen
           </Button>
@@ -232,12 +283,12 @@ export function EditorHeader({
             title={showCursor ? "Hide Simulated Cursor Overlay" : "Show Simulated Cursor Overlay"}
             className={
               showCursor
-                ? "border-sky-400/40 text-sky-200 bg-sky-500/15 shadow-glass-sm"
+                ? "border-rose-400/40 text-rose-200 bg-rose-500/15 shadow-glass-sm"
                 : "border-white/10 text-slate-400 hover:text-white"
             }
             leftIcon={
               showCursor ? (
-                <MousePointer className="w-3.5 h-3.5 text-sky-300" />
+                <MousePointer className="w-3.5 h-3.5 text-rose-300" />
               ) : (
                 <EyeOff className="w-3.5 h-3.5 text-slate-500" />
               )
@@ -247,7 +298,7 @@ export function EditorHeader({
             <span
               className={`text-[9px] font-mono px-1.5 py-0.5 rounded ml-1 font-bold ${
                 showCursor
-                  ? "bg-sky-400/20 text-sky-300 border border-sky-400/30"
+                  ? "bg-rose-400/20 text-rose-300 border border-rose-400/30"
                   : "bg-white/[0.08] text-slate-400"
               }`}
             >
@@ -262,10 +313,35 @@ export function EditorHeader({
           onClick={onTakeSnapshot}
           disabled={!isReady}
           title="Save current canvas frame as high-res PNG"
-          leftIcon={<Camera className="w-3.5 h-3.5 text-sky-300" />}
+          leftIcon={<Camera className="w-3.5 h-3.5 text-rose-300" />}
         >
           <span className="hidden sm:inline">Snapshot</span>
         </Button>
+
+        {onUndo && (
+          <div className="flex items-center gap-0.5 bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.08]">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onUndo}
+              disabled={!canUndo}
+              title="Undo (Ctrl+Z)"
+            >
+              <Undo2 className="w-3.5 h-3.5 text-slate-300" />
+            </Button>
+            {onRedo && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={onRedo}
+                disabled={!canRedo}
+                title="Redo (Ctrl+Y or Ctrl+Shift+Z)"
+              >
+                <Redo2 className="w-3.5 h-3.5 text-slate-300" />
+              </Button>
+            )}
+          </div>
+        )}
 
         {onSaveProject && (
           <Button
@@ -278,7 +354,7 @@ export function EditorHeader({
               isSavedFeedback ? (
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
               ) : (
-                <Save className="w-3.5 h-3.5 text-sky-400" />
+                <Save className="w-3.5 h-3.5 text-rose-400" />
               )
             }
           >
@@ -314,7 +390,7 @@ export function EditorHeader({
             title={isRightCollapsed ? "Expand Click Inspector" : "Collapse Click Inspector"}
           >
             {isRightCollapsed ? (
-              <PanelRightOpen className="w-4 h-4 text-sky-400" />
+              <PanelRightOpen className="w-4 h-4 text-rose-400" />
             ) : (
               <PanelRightClose className="w-4 h-4 text-slate-400" />
             )}

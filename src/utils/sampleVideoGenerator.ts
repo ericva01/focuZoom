@@ -120,7 +120,7 @@ export async function generateSampleScreenRecording(): Promise<{
         ctx.fillStyle = "#8b949e";
         ctx.font = "13px -apple-system, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("FocuFlow — StudioEngine.tsx — 1280x720", width / 2, 25);
+        ctx.fillText("Glideo — StudioEngine.tsx — 1280x720", width / 2, 25);
 
         // Top right Action Button: "Run Build" (Click target at x: 0.85, y: 0.12 => ~1088, 86)
         const isRunHovered = t > 1.8 && t < 3.2;
@@ -160,7 +160,7 @@ export async function generateSampleScreenRecording(): Promise<{
           if (f.includes("StudioEngine.tsx")) {
             ctx.fillStyle = "#1e293b";
             ctx.fillRect(10, 80 + idx * 24 - 15, 200, 22);
-            ctx.fillStyle = "#38bdf8";
+            ctx.fillStyle = "#fb7185";
           } else {
             ctx.fillStyle = "#94a3b8";
           }
@@ -174,7 +174,7 @@ export async function generateSampleScreenRecording(): Promise<{
 
         ctx.fillStyle = "#1a1f36";
         ctx.fillRect(220, 40, 180, 36);
-        ctx.fillStyle = "#38bdf8";
+        ctx.fillStyle = "#fb7185";
         ctx.font = "12px monospace";
         ctx.fillText("StudioEngine.tsx", 240, 63);
 
@@ -183,21 +183,21 @@ export async function generateSampleScreenRecording(): Promise<{
         ctx.fillRect(220, 76, width - 220, height - 260);
 
         const codeLines = [
-          { text: "import { CinematicCamera, Easing } from '@focuflow/core';", color: "#c084fc" },
+          { text: "import { CinematicCamera, Easing } from '@glideo/core';", color: "#c084fc" },
           { text: "import { interpolatePanZoom } from '@/utils/easing';", color: "#c084fc" },
           { text: "", color: "" },
           { text: "export async function renderCinematicFrame(timestamp: number) {", color: "#60a5fa" },
           { text: "  const camera = new CinematicCamera({", color: "#e2e8f0" },
           { text: "    smoothing: 'spring-damped',", color: "#34d399" },
           { text: "    zoomScale: 2.2,", color: "#f59e0b" },
-          { text: "    retinaHighDPI: true,", color: "#38bdf8" },
+          { text: "    retinaHighDPI: true,", color: "#fb7185" },
           { text: "  });", color: "#e2e8f0" },
           { text: "", color: "" },
           { text: "  // Automatically track focus points & apply cubic easing", color: "#64748b" },
           { text: "  const activeTarget = camera.detectFocalTarget(timestamp);", color: "#e2e8f0" },
           { text: "  if (activeTarget) {", color: "#c084fc" },
           { text: "    camera.panTo(activeTarget.x, activeTarget.y, { duration: 1.2 });", color: "#a78bfa" },
-          { text: "    camera.renderRipples({ color: '#06b6d4', ringCount: 3 });", color: "#38bdf8" },
+          { text: "    camera.renderRipples({ color: '#fb7185', ringCount: 3 });", color: "#fb7185" },
           { text: "  }", color: "#c084fc" },
           { text: "  return camera.renderFrame();", color: "#34d399" },
           { text: "}", color: "#60a5fa" },
@@ -220,7 +220,7 @@ export async function generateSampleScreenRecording(): Promise<{
 
         // Blinking cursor
         if (Math.floor(t * 3) % 2 === 0 && visibleLinesCount < codeLines.length) {
-          ctx.fillStyle = "#38bdf8";
+          ctx.fillStyle = "#fb7185";
           ctx.fillRect(270 + 200, 93 + (visibleLinesCount - 1) * 22, 8, 16);
         }
 
@@ -273,7 +273,7 @@ export async function generateSampleScreenRecording(): Promise<{
 
         // Status pill button (target for second zoom)
         const isStatusHovered = t > 5.0 && t < 6.8;
-        ctx.fillStyle = isStatusHovered ? "#0284c7" : "#0369a1";
+        ctx.fillStyle = isStatusHovered ? "#e11d48" : "#0369a1";
         ctx.beginPath();
         ctx.roundRect(380, height - 195, 120, 20, 4);
         ctx.fill();
@@ -284,7 +284,7 @@ export async function generateSampleScreenRecording(): Promise<{
 
         // Terminal text lines
         const termLines = [
-          "$ npm run build:focuflow",
+          "$ npm run build:glideo",
           "✓ Bundled in 142ms (client-side WebCodecs)",
           "✓ Auto-zoom keyframes detected: 3 points",
           t > 3 ? "✓ Camera pan interpolation: 60 FPS verified" : "  Compiling...",

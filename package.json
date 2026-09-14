@@ -16,6 +16,9 @@
     "electron:dist:win:web": "npm run build:web && npm run build:electron && electron-builder --win nsis-web",
     "electron:dist:mac": "npm run build:web && npm run build:electron && electron-builder --mac",
     "electron:dist:linux": "npm run build:web && npm run build:electron && electron-builder --linux",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "npm run build:web && tauri build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -24,6 +27,11 @@
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-dropdown-menu": "^2.1.24",
     "@radix-ui/react-tooltip": "^1.2.16",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-dialog": "^2.7.3",
+    "@tauri-apps/plugin-fs": "^2.5.2",
+    "@tauri-apps/plugin-opener": "^2.5.5",
+    "@tauri-apps/plugin-shell": "^2.3.6",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "framer-motion": "^13.2.0",
@@ -35,6 +43,7 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/react": "^18",

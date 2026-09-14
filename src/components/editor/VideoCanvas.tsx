@@ -8,7 +8,7 @@ import {
   Check,
   Cuboid,
 } from "lucide-react";
-import { ClickEvent, CanvasConfig, AspectRatio } from "@/types/editor";
+import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint } from "@/types/editor";
 import { useThreeAnimationEngine } from "@/hooks/useThreeAnimationEngine";
 import { clamp } from "@/utils/easing";
 
@@ -23,6 +23,12 @@ interface VideoCanvasProps {
   isAddMode: boolean;
   onAddClickAtCoords: (x: number, y: number) => void;
   aspectRatio: AspectRatio;
+  cursorTrail?: CursorPoint[];
+  selectedEventId?: string | null;
+  onUpdateEvent?: (id: string, updates: Partial<ClickEvent>) => void;
+  webcamStream?: MediaStream | null;
+  webcamUrl?: string | null;
+  onChangeConfig?: (updates: Partial<CanvasConfig>) => void;
 }
 
 export function VideoCanvas({
@@ -36,13 +42,75 @@ export function VideoCanvas({
   isAddMode,
   onAddClickAtCoords,
   aspectRatio,
+  cursorTrail,
+  selectedEventId,
+  onUpdateEvent,
+  webcamStream,
+  webcamUrl,
+  onChangeConfig,
 }: VideoCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hoverCoords, setHoverCoords] = useState<{ x: number; y: number } | null>(null);
   const [justAddedToast, setJustAddedToast] = useState<{ x: number; y: number } | null>(null);
+  const [isRightClickDragging, setIsRightClickDragging] = useState<boolean>(false);
+  const [rightDragEvent, setRightDragEvent] = useState<ClickEvent | null>(null);
 
   // Mouse normalized coordinates for 3D perspective parallax tracking (-1.0 to 1.0)
   const mousePosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Webcam PiP video element ref & drag state
+  const webcamVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [isDraggingWebcam, setIsDraggingWebcam] = useState<boolean>(false);
+  const webcamDragStartRef = useRef<{ startX: number; startY: number; initCustomX: number; initCustomY: number }>({
+    startX: 0,
+    startY: 0,
+    initCustomX: 0.85,
+    initCustomY: 0.82,
+  });
+
+  // Attach live stream or recorded URL to webcam video element
+  useEffect(() => {
+    const el = webcamVideoRef.current;
+    if (!el) return;
+    if (webcamStream) {
+      el.srcObject = webcamStream;
+      el.play().catch(() => {});
+    } else if (webcamUrl || config.webcamConfig?.url) {
+      el.srcObject = null;
+      el.src = webcamUrl || config.webcamConfig?.url || "";
+      el.play().catch(() => {});
+    }
+  }, [webcamStream, webcamUrl, config.webcamConfig?.url]);
+
+  // Synchronize webcam video playback with main video playback
+  useEffect(() => {
+    const mainVid = videoRef.current;
+    const camVid = webcamVideoRef.current;
+    if (!mainVid || !camVid || webcamStream) return;
+
+    const handleTimeUpdate = () => {
+      if (Math.abs(camVid.currentTime - mainVid.currentTime) > 0.15) {
+        camVid.currentTime = mainVid.currentTime;
+      }
+    };
+    const handlePlay = () => camVid.play().catch(() => {});
+    const handlePause = () => camVid.pause();
+    const handleSeeking = () => {
+      camVid.currentTime = mainVid.currentTime;
+    };
+
+    mainVid.addEventListener("timeupdate", handleTimeUpdate);
+    mainVid.addEventListener("play", handlePlay);
+    mainVid.addEventListener("pause", handlePause);
+    mainVid.addEventListener("seeking", handleSeeking);
+
+    return () => {
+      mainVid.removeEventListener("timeupdate", handleTimeUpdate);
+      mainVid.removeEventListener("play", handlePlay);
+      mainVid.removeEventListener("pause", handlePause);
+      mainVid.removeEventListener("seeking", handleSeeking);
+    };
+  }, [videoRef, webcamStream]);
 
   // Initialize Three.js 3D WebGL animation engine
   const { cameraState, getVideoCoordinatesAtCanvasPos } = useThreeAnimationEngine(
@@ -50,7 +118,8 @@ export function VideoCanvas({
     canvasRef,
     events,
     config,
-    mousePosRef
+    mousePosRef,
+    cursorTrail
   );
 
   // Set internal canvas resolution based on Aspect Ratio
@@ -110,6 +179,43 @@ export function VideoCanvas({
     setTimeout(() => setJustAddedToast(null), 1500);
   };
 
+  // Right-click drag to directly reposition zoom target focus
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (e.button === 2) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const targetEv =
+        (selectedEventId && events.find((ev) => ev.id === selectedEventId)) ||
+        cameraState?.activeEvent ||
+        events[0] ||
+        null;
+
+      const videoCoords = getVideoCoordinatesAtCanvasPos(e.clientX, e.clientY);
+      if (videoCoords) {
+        setIsRightClickDragging(true);
+        setRightDragEvent(targetEv);
+        setHoverCoords(videoCoords);
+        if (targetEv && onUpdateEvent) {
+          onUpdateEvent(targetEv.id, { x: videoCoords.x, y: videoCoords.y });
+        }
+      }
+    }
+  };
+
+  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (e.button === 2 && isRightClickDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsRightClickDragging(false);
+      setRightDragEvent(null);
+      if (hoverCoords) {
+        setJustAddedToast(hoverCoords);
+        setTimeout(() => setJustAddedToast(null), 1500);
+      }
+    }
+  };
+
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -121,7 +227,17 @@ export function VideoCanvas({
     const my = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
     mousePosRef.current = { x: clamp(mx, -1, 1), y: clamp(my, -1, 1) };
 
-    // 2. Add-mode coordinate crosshair HUD mapped to video stream coordinates
+    // 2. Right-click drag to live-reposition target point
+    if (isRightClickDragging && rightDragEvent && onUpdateEvent) {
+      const videoCoords = getVideoCoordinatesAtCanvasPos(e.clientX, e.clientY);
+      if (videoCoords) {
+        onUpdateEvent(rightDragEvent.id, { x: videoCoords.x, y: videoCoords.y });
+        setHoverCoords(videoCoords);
+      }
+      return;
+    }
+
+    // 3. Add-mode coordinate crosshair HUD mapped to video stream coordinates
     if (isAddMode) {
       const videoCoords = getVideoCoordinatesAtCanvasPos(e.clientX, e.clientY);
       setHoverCoords(
@@ -130,14 +246,16 @@ export function VideoCanvas({
           y: (e.clientY - rect.top) / rect.height,
         }
       );
-    } else if (hoverCoords) {
+    } else if (hoverCoords && !isRightClickDragging) {
       setHoverCoords(null);
     }
   };
 
   const handleMouseLeave = () => {
-    mousePosRef.current = { x: 0, y: 0 };
-    setHoverCoords(null);
+    if (!isRightClickDragging) {
+      mousePosRef.current = { x: 0, y: 0 };
+      setHoverCoords(null);
+    }
   };
 
   const aspectCss =
@@ -159,7 +277,7 @@ export function VideoCanvas({
       className="w-full h-full min-h-0 bg-transparent flex flex-col items-center justify-center p-2 sm:p-3 overflow-hidden relative select-none"
     >
       {/* Ambient background glow */}
-      <div className="absolute w-[600px] h-[450px] bg-sky-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute w-[600px] h-[450px] bg-rose-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
 
       {/* Hidden HTML5 Video element used as texture source */}
       {videoSrc && (
@@ -173,24 +291,33 @@ export function VideoCanvas({
         />
       )}
 
+      {/* Right-Click Moving Banner Overlay */}
+      {isRightClickDragging && (
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-rose-400/60 bg-rose-950/90 text-white font-bold text-xs shadow-glass-md animate-pulse">
+          <Crosshair className="w-4 h-4 text-rose-300 animate-spin" />
+          <span>Moving Focus Point: ({Math.round((hoverCoords?.x ?? 0.5) * 100)}%, {Math.round((hoverCoords?.y ?? 0.5) * 100)}%) · Release to save</span>
+        </div>
+      )}
+
       {/* Mode Banner Overlay */}
-      {isAddMode && (
-        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-sky-400/40 text-white font-bold text-xs shadow-glass-md animate-pulse">
-          <Crosshair className="w-4 h-4 text-sky-400" />
+      {isAddMode && !isRightClickDragging && (
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-rose-400/40 text-white font-bold text-xs shadow-glass-md animate-pulse">
+          <Crosshair className="w-4 h-4 text-rose-400" />
           <span>3D Focal Target Mode: Click on any element on the 3D screen to set a camera dolly target!</span>
         </div>
       )}
 
       {/* Just Added Confirmation Toast */}
       {justAddedToast && (
-        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl glass-panel-elevated border-sky-400/50 text-white font-semibold text-xs shadow-glass-md animate-in fade-in zoom-in duration-200">
-          <Check className="w-4 h-4 text-sky-400" />
-          <span>3D Target logged at ({Math.round(justAddedToast.x * 100)}%, {Math.round(justAddedToast.y * 100)}%)!</span>
+        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl glass-panel-elevated border-rose-400/50 text-white font-semibold text-xs shadow-glass-md animate-in fade-in zoom-in duration-200">
+          <Check className="w-4 h-4 text-rose-400" />
+          <span>3D Target set at ({Math.round(justAddedToast.x * 100)}%, {Math.round(justAddedToast.y * 100)}%)!</span>
         </div>
       )}
 
       {/* Canvas Wrapper - Centered Bounding Box */}
       <div
+        onContextMenu={(e) => e.preventDefault()}
         className={`relative flex items-center justify-center max-h-full max-w-full rounded-2xl overflow-hidden shadow-glass-lg border border-white/[0.12] group ${
           config.backgroundType === "transparent"
             ? "bg-[#090D16] [background-image:linear-gradient(45deg,rgba(255,255,255,0.03)_25%,transparent_25%),linear-gradient(-45deg,rgba(255,255,255,0.03)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgba(255,255,255,0.03)_75%),linear-gradient(-45deg,transparent_75%,rgba(255,255,255,0.03)_75%)] [background-size:20px_20px] [background-position:0_0,0_10px,10px_-10px,-10px_0px]"
@@ -205,10 +332,13 @@ export function VideoCanvas({
           width={defaultWidth}
           height={defaultHeight}
           onClick={handleCanvasClick}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseUp={handleCanvasMouseUp}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
+          onContextMenu={(e) => e.preventDefault()}
           className={`block max-h-full max-w-full object-contain ${
-            isAddMode ? "cursor-crosshair" : "cursor-pointer"
+            isRightClickDragging ? "cursor-move" : isAddMode ? "cursor-crosshair" : "cursor-pointer"
           }`}
           style={{
             aspectRatio: aspectCss,
@@ -230,7 +360,7 @@ export function VideoCanvas({
 
         {/* Live 3D Camera Zoom Indicator HUD Badge */}
         <div className="absolute bottom-4 left-4 z-20 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl glass-panel text-xs shadow-glass-md backdrop-blur-xl">
-          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-sky-400 animate-pulse" : "text-slate-400"}`} />
+          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-rose-400 animate-pulse" : "text-slate-400"}`} />
           <span className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider hidden sm:inline">
             3D Studio
           </span>
@@ -238,7 +368,7 @@ export function VideoCanvas({
             {cameraState.scale.toFixed(2)}x Dolly
           </span>
           {cameraState.isZoomed && (
-            <span className="text-[10px] text-sky-200 font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-sky-500/20 border border-sky-400/30 shadow-glass-sm">
+            <span className="text-[10px] text-rose-200 font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-500/20 border border-rose-400/30 shadow-glass-sm">
               Focus Active
             </span>
           )}
@@ -247,7 +377,7 @@ export function VideoCanvas({
         {/* Coordinate Crosshair Tracker during Add Mode */}
         {isAddMode && hoverCoords && (
           <div
-            className="absolute pointer-events-none z-20 px-2.5 py-1 rounded-lg glass-panel text-sky-300 font-mono text-[10px] border-sky-400/40 shadow-glass-sm -translate-x-1/2 -translate-y-8"
+            className="absolute pointer-events-none z-20 px-2.5 py-1 rounded-lg glass-panel text-rose-300 font-mono text-[10px] border-rose-400/40 shadow-glass-sm -translate-x-1/2 -translate-y-8"
             style={{
               left: `${hoverCoords.x * 100}%`,
               top: `${hoverCoords.y * 100}%`,
@@ -255,6 +385,119 @@ export function VideoCanvas({
           >
             {Math.round(hoverCoords.x * 100)}%, {Math.round(hoverCoords.y * 100)}%
           </div>
+        )}
+
+        {/* Floating Draggable Webcam PiP Overlay */}
+        {(webcamStream || webcamUrl || config.webcamConfig?.url) && config.webcamConfig?.enabled !== false && (
+          (() => {
+            const wConfig = config.webcamConfig || {
+              enabled: true,
+              shape: "circle",
+              position: "bottom-right",
+              customX: 0.85,
+              customY: 0.82,
+              size: 180,
+              borderColor: "#fb7185",
+              borderWidth: 3,
+              shadow: true,
+              mirror: true,
+            };
+
+            const shapeClasses =
+              wConfig.shape === "circle"
+                ? "rounded-full"
+                : wConfig.shape === "rounded-rect"
+                ? "rounded-2xl"
+                : "rounded-none";
+
+            const posX = wConfig.customX ?? 0.85;
+            const posY = wConfig.customY ?? 0.82;
+
+            const handleWebcamMouseDown = (e: React.MouseEvent) => {
+              if (e.button !== 0) return;
+              e.stopPropagation();
+              setIsDraggingWebcam(true);
+              webcamDragStartRef.current = {
+                startX: e.clientX,
+                startY: e.clientY,
+                initCustomX: posX,
+                initCustomY: posY,
+              };
+
+              const handleMouseMoveGlobal = (me: MouseEvent) => {
+                const canvasEl = canvasRef.current;
+                if (!canvasEl) return;
+                const rect = canvasEl.getBoundingClientRect();
+                const deltaX = (me.clientX - webcamDragStartRef.current.startX) / (rect.width || 1);
+                const deltaY = (me.clientY - webcamDragStartRef.current.startY) / (rect.height || 1);
+
+                const newX = Math.max(0.05, Math.min(0.95, webcamDragStartRef.current.initCustomX + deltaX));
+                const newY = Math.max(0.05, Math.min(0.95, webcamDragStartRef.current.initCustomY + deltaY));
+
+                if (onChangeConfig) {
+                  onChangeConfig({
+                    webcamConfig: {
+                      ...wConfig,
+                      position: "custom",
+                      customX: newX,
+                      customY: newY,
+                    },
+                  });
+                }
+              };
+
+              const handleMouseUpGlobal = () => {
+                setIsDraggingWebcam(false);
+                window.removeEventListener("mousemove", handleMouseMoveGlobal);
+                window.removeEventListener("mouseup", handleMouseUpGlobal);
+              };
+
+              window.addEventListener("mousemove", handleMouseMoveGlobal);
+              window.addEventListener("mouseup", handleMouseUpGlobal);
+            };
+
+            return (
+              <div
+                onMouseDown={handleWebcamMouseDown}
+                title="Drag to reposition webcam bubble"
+                className={`absolute z-30 cursor-move group/pip transition-shadow ${
+                  isDraggingWebcam ? "ring-2 ring-rose-400 scale-105" : "hover:scale-[1.02]"
+                }`}
+                style={{
+                  left: `${posX * 100}%`,
+                  top: `${posY * 100}%`,
+                  transform: "translate(-50%, -50%)",
+                  width: `${wConfig.size}px`,
+                  height: `${wConfig.size}px`,
+                }}
+              >
+                <div
+                  className={`w-full h-full overflow-hidden relative ${shapeClasses} ${
+                    wConfig.shadow ? "shadow-[0_10px_35px_rgba(0,0,0,0.6)]" : ""
+                  }`}
+                  style={{
+                    border: `${wConfig.borderWidth}px solid ${wConfig.borderColor || "#fb7185"}`,
+                  }}
+                >
+                  <video
+                    ref={webcamVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className={`w-full h-full object-cover pointer-events-none select-none ${
+                      wConfig.mirror ? "scale-x-[-1]" : ""
+                    }`}
+                  />
+                  {/* Subtle hover badge */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/pip:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <span className="text-[10px] font-semibold text-white bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                      Drag PiP
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()
         )}
       </div>
     </div>

@@ -24,6 +24,9 @@ import {
   Redo2,
   Video as VideoIcon,
   Mic,
+  Plus,
+  X,
+  Camera,
 } from "lucide-react";
 import { ClickEvent, TimelineClip } from "@/types/editor";
 
@@ -39,13 +42,19 @@ interface MultiTrackTimelineProps {
   isLooping: boolean;
   onToggleLoop: () => void;
   events: ClickEvent[];
+  selectedEventId?: string | null;
   onSelectEvent: (event: ClickEvent) => void;
   onUpdateEvent?: (id: string, updates: Partial<ClickEvent>) => void;
   onDeleteEvent?: (id: string) => void;
   onAddKeyframeAtCurrentTime: () => void;
+  onMergeNearbyClicks?: () => void;
   clips: TimelineClip[];
   selectedClipId: string | null;
+  selectedClipIds?: string[];
+  selectedEventIds?: string[];
   onSelectClip: (id: string | null) => void;
+  onSelectMultiple?: (clipIds: string[], eventIds: string[]) => void;
+  onDeleteMultiple?: (clipIds: string[], eventIds: string[]) => void;
   onSplitClip: (clipId: string, splitTime: number) => void;
   onTrimClip: (clipId: string, newStart: number, newEnd: number) => void;
   onMoveClip?: (clipId: string, newStart: number) => void;
@@ -55,6 +64,9 @@ interface MultiTrackTimelineProps {
   canRedo?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
+  webcamClip?: TimelineClip | null;
+  isWebcamHidden?: boolean;
+  onToggleWebcamHidden?: () => void;
 }
 
 /**
@@ -87,9 +99,16 @@ export function MultiTrackTimeline({
   isLooping,
   onToggleLoop,
   events,
+  selectedEventId,
+  selectedClipIds = [],
+  selectedEventIds = [],
   onSelectEvent,
+  onSelectMultiple,
+  onDeleteMultiple,
   onUpdateEvent,
+  onDeleteEvent,
   onAddKeyframeAtCurrentTime,
+  onMergeNearbyClicks,
   clips,
   selectedClipId,
   onSelectClip,
@@ -102,6 +121,9 @@ export function MultiTrackTimeline({
   canRedo = false,
   onUndo,
   onRedo,
+  webcamClip,
+  isWebcamHidden = false,
+  onToggleWebcamHidden,
 }: MultiTrackTimelineProps) {
   const tracksScrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -112,11 +134,22 @@ export function MultiTrackTimeline({
   const [isVideoHidden, setIsVideoHidden] = useState<boolean>(false);
   const [isKeyframeTrackLocked, setIsKeyframeTrackLocked] = useState<boolean>(false);
 
+  // Right-Click Marquee Box Selection State
+  const [marqueeSelection, setMarqueeSelection] = useState<{
+    startX: number;
+    startY: number;
+    currentX: number;
+    currentY: number;
+    relStartX: number;
+    relStartY: number;
+    relCurrentX: number;
+    relCurrentY: number;
+  } | null>(null);
+
   // Interactive Dragging States
   const [isScrubbing, setIsScrubbing] = useState<boolean>(false);
   const [localScrubTime, setLocalScrubTime] = useState<number | null>(null);
   const scrubRafRef = useRef<number | null>(null);
-  const keyframeRafRef = useRef<number | null>(null);
 
   const [trimmingState, setTrimmingState] = useState<{
     clipId: string;
@@ -134,16 +167,18 @@ export function MultiTrackTimeline({
   } | null>(null);
   const [draggingKeyframeState, setDraggingKeyframeState] = useState<{
     eventId: string;
+    mode: "move" | "trim-start" | "trim-end";
     startX: number;
     initialTimestamp: number;
+    initialHoldDuration: number;
+    currentDeltaSec: number;
+    currentDurationDeltaSec: number;
   } | null>(null);
 
-  const safeDuration = Math.max(1, duration || 12);
-  // Total virtual timeline duration can span several minutes (e.g. at least max clip end or 2 minutes)
+  const clipsMaxEnd = clips.reduce((max, c) => Math.max(max, c.endTimeline), 0);
   const totalTimelineDuration = Math.max(
-    safeDuration,
-    currentTime,
-    clips.reduce((max, c) => Math.max(max, c.endTimeline), 0)
+    1,
+    clipsMaxEnd > 0 ? clipsMaxEnd : (duration || 12)
   );
 
   // Pixel width calculation based on zoomScale
@@ -218,10 +253,59 @@ export function MultiTrackTimeline({
     setIsScrubbing(true);
   };
 
+  // Handle Right-Click Marquee Drag initiation on the Tracks Container
+  const handleTracksMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 2) {
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = e.currentTarget.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      const relY = e.clientY - rect.top;
+      setMarqueeSelection({
+        startX: e.clientX,
+        startY: e.clientY,
+        currentX: e.clientX,
+        currentY: e.clientY,
+        relStartX: relX,
+        relStartY: relY,
+        relCurrentX: relX,
+        relCurrentY: relY,
+      });
+    }
+  };
+
   useEffect(() => {
-    if (!isScrubbing && !trimmingState && !draggingClipState && !draggingKeyframeState) return;
+    if (
+      !isScrubbing &&
+      !trimmingState &&
+      !draggingClipState &&
+      !draggingKeyframeState &&
+      !marqueeSelection
+    ) {
+      return;
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (marqueeSelection) {
+        if (!tracksScrollRef.current) return;
+        const tracksEl = tracksScrollRef.current.querySelector<HTMLElement>(".tracks-canvas-layer");
+        const rect = tracksEl?.getBoundingClientRect() || tracksScrollRef.current.getBoundingClientRect();
+        const relX = e.clientX - rect.left;
+        const relY = e.clientY - rect.top;
+        setMarqueeSelection((prev) =>
+          prev
+            ? {
+                ...prev,
+                currentX: e.clientX,
+                currentY: e.clientY,
+                relCurrentX: relX,
+                relCurrentY: relY,
+              }
+            : null
+        );
+        return;
+      }
+
       if (isScrubbing) {
         const clientX = e.clientX;
         if (scrubRafRef.current === null) {
@@ -248,7 +332,7 @@ export function MultiTrackTimeline({
           const candidateEnd = trimmingState.initialTimelineEnd + deltaTime;
           const clampedEnd = Math.max(
             trimmingState.initialTimelineStart + 0.25,
-            Math.min(totalTimelineDuration, candidateEnd)
+            candidateEnd
           );
           const snappedEnd = applySnapping(clampedEnd);
           onTrimClip(trimmingState.clipId, trimmingState.initialTimelineStart, snappedEnd);
@@ -259,36 +343,90 @@ export function MultiTrackTimeline({
         const candidateStart = Math.max(0, draggingClipState.initialStartTimeline + deltaTime);
         const snappedStart = applySnapping(candidateStart);
         onMoveClip(draggingClipState.clipId, snappedStart);
-      } else if (draggingKeyframeState && onUpdateEvent) {
-        const clientX = e.clientX;
-        if (keyframeRafRef.current === null) {
-          keyframeRafRef.current = requestAnimationFrame(() => {
-            keyframeRafRef.current = null;
-            const deltaPixels = clientX - draggingKeyframeState.startX;
-            const deltaTime = deltaPixels / basePixelsPerSecond;
-            const candidateTime = Math.max(
-              0,
-              Math.min(totalTimelineDuration, draggingKeyframeState.initialTimestamp + deltaTime)
-            );
-            const snappedTime = applySnapping(candidateTime);
-            const roundedTime = Math.round(snappedTime * 100) / 100;
-            onUpdateEvent(draggingKeyframeState.eventId, { timestamp: roundedTime });
-            setLocalScrubTime(roundedTime);
-            onSeek(roundedTime);
-          });
+      } else if (draggingKeyframeState) {
+        const deltaPixels = e.clientX - draggingKeyframeState.startX;
+        const deltaTime = deltaPixels / basePixelsPerSecond;
+
+        if (draggingKeyframeState.mode === "move" || draggingKeyframeState.mode === "trim-start") {
+          setDraggingKeyframeState((prev) =>
+            prev ? { ...prev, currentDeltaSec: deltaTime } : null
+          );
+        } else if (draggingKeyframeState.mode === "trim-end") {
+          setDraggingKeyframeState((prev) =>
+            prev ? { ...prev, currentDurationDeltaSec: deltaTime } : null
+          );
         }
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
       if (scrubRafRef.current !== null) {
         cancelAnimationFrame(scrubRafRef.current);
         scrubRafRef.current = null;
       }
-      if (keyframeRafRef.current !== null) {
-        cancelAnimationFrame(keyframeRafRef.current);
-        keyframeRafRef.current = null;
+
+      if (marqueeSelection) {
+        const dragDist = Math.hypot(
+          e.clientX - marqueeSelection.startX,
+          e.clientY - marqueeSelection.startY
+        );
+
+        if (dragDist > 6 && onSelectMultiple) {
+          // Convert client X range to timeline time range
+          const timeA = calculateTimeFromClientX(marqueeSelection.startX);
+          const timeB = calculateTimeFromClientX(e.clientX);
+          const selStart = Math.min(timeA, timeB);
+          const selEnd = Math.max(timeA, timeB);
+
+          // Find clips overlapping this time span
+          const matchedClips = clips
+            .filter((c) => Math.max(c.startTimeline, selStart) <= Math.min(c.endTimeline, selEnd))
+            .map((c) => c.id);
+
+          // Find events overlapping this time span
+          const matchedEvents = events
+            .filter((ev) => {
+              const evDur = (ev.zoomInDuration ?? 0.4) + (ev.holdDuration ?? 1.4) + (ev.zoomOutDuration ?? 0.4);
+              const evEnd = ev.timestamp + evDur;
+              return Math.max(ev.timestamp, selStart) <= Math.min(evEnd, selEnd);
+            })
+            .map((ev) => ev.id);
+
+          onSelectMultiple(matchedClips, matchedEvents);
+        }
+        setMarqueeSelection(null);
       }
+
+      if (draggingKeyframeState && onUpdateEvent) {
+        const {
+          eventId,
+          mode,
+          initialTimestamp,
+          initialHoldDuration,
+          currentDeltaSec,
+          currentDurationDeltaSec,
+        } = draggingKeyframeState;
+
+        if (mode === "move") {
+          const candidateTime = Math.max(0, initialTimestamp + currentDeltaSec);
+          const snappedTime = applySnapping(candidateTime);
+          const roundedTime = Math.round(snappedTime * 100) / 100;
+          onUpdateEvent(eventId, { timestamp: roundedTime });
+          onSeek(roundedTime);
+        } else if (mode === "trim-start") {
+          const candidateTime = Math.max(0, initialTimestamp + currentDeltaSec);
+          const snappedTime = applySnapping(candidateTime);
+          const roundedTime = Math.round(snappedTime * 100) / 100;
+          const diff = roundedTime - initialTimestamp;
+          const newHold = Math.max(0.2, Math.round((initialHoldDuration - diff) * 100) / 100);
+          onUpdateEvent(eventId, { timestamp: roundedTime, holdDuration: newHold });
+          onSeek(roundedTime);
+        } else if (mode === "trim-end") {
+          const newHold = Math.max(0.2, Math.round((initialHoldDuration + currentDurationDeltaSec) * 100) / 100);
+          onUpdateEvent(eventId, { holdDuration: newHold });
+        }
+      }
+
       setIsScrubbing(false);
       setLocalScrubTime(null);
       setTrimmingState(null);
@@ -308,6 +446,7 @@ export function MultiTrackTimeline({
     trimmingState,
     draggingClipState,
     draggingKeyframeState,
+    marqueeSelection,
     calculateTimeFromClientX,
     basePixelsPerSecond,
     totalTimelineDuration,
@@ -316,6 +455,9 @@ export function MultiTrackTimeline({
     onTrimClip,
     onMoveClip,
     onUpdateEvent,
+    onSelectMultiple,
+    clips,
+    events,
   ]);
 
   // Split Action
@@ -326,7 +468,9 @@ export function MultiTrackTimeline({
 
   // Delete Action
   const handleTriggerDelete = () => {
-    if (selectedClipId) {
+    if ((selectedClipIds.length > 0 || selectedEventIds.length > 0) && onDeleteMultiple) {
+      onDeleteMultiple(selectedClipIds, selectedEventIds);
+    } else if (selectedClipId) {
       onDeleteClip(selectedClipId);
     } else if (activeClipUnderPlayhead) {
       onDeleteClip(activeClipUnderPlayhead.id);
@@ -368,9 +512,9 @@ export function MultiTrackTimeline({
             onClick={handleTriggerSplit}
             disabled={!activeClipUnderPlayhead}
             title="Split Clip at Playhead (S)"
-            className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-sky-500/20 text-slate-200 hover:text-sky-300 border border-white/10 hover:border-sky-400/40 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-rose-500/20 text-slate-200 hover:text-rose-300 border border-white/10 hover:border-rose-400/40 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
           >
-            <Scissors className="w-3.5 h-3.5 text-sky-400" />
+            <Scissors className="w-3.5 h-3.5 text-rose-400" />
             <span className="text-xs font-semibold">Split</span>
           </button>
 
@@ -405,7 +549,7 @@ export function MultiTrackTimeline({
             type="button"
             onClick={onAddKeyframeAtCurrentTime}
             title="Add 3D Dolly Zoom Target at Playhead (K)"
-            className="px-2.5 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-400/30 font-medium flex items-center gap-1.5 transition-all shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-400/30 font-medium flex items-center gap-1.5 transition-all shadow-glass-sm"
           >
             <Focus className="w-3.5 h-3.5" />
             <span className="text-xs">Add Zoom Keyframe</span>
@@ -451,7 +595,7 @@ export function MultiTrackTimeline({
             type="button"
             onClick={onTogglePlay}
             title={isPlaying ? "Pause (Space)" : "Play (Space)"}
-            className="w-8 h-8 rounded-xl bg-gradient-to-b from-sky-400 to-sky-600 hover:from-sky-300 hover:to-sky-500 text-white flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.4)] transition-transform active:scale-95"
+            className="w-8 h-8 rounded-xl bg-gradient-to-b from-rose-400 to-rose-600 hover:from-rose-300 hover:to-rose-500 text-white flex items-center justify-center shadow-[0_0_15px_rgba(251,113,133,0.4)] transition-transform active:scale-95"
           >
             {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
           </button>
@@ -468,7 +612,7 @@ export function MultiTrackTimeline({
 
           {/* Monospace SMPTE Timecode Badge */}
           <div className="ml-2 font-mono text-xs px-3 py-1 rounded-xl bg-black/40 border border-white/10 flex items-center gap-1.5 shadow-glass-inner">
-            <span className="text-sky-300 font-semibold">{formatSMPTETimecode(currentTime)}</span>
+            <span className="text-rose-300 font-semibold">{formatSMPTETimecode(currentTime)}</span>
             <span className="text-slate-500">/</span>
             <span className="text-slate-400">{formatSMPTETimecode(totalTimelineDuration)}</span>
           </div>
@@ -482,7 +626,7 @@ export function MultiTrackTimeline({
                 onClick={() => onSpeedChange(spd)}
                 className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-all ${
                   playbackSpeed === spd
-                    ? "bg-sky-500/25 text-sky-200 font-bold border border-sky-400/40"
+                    ? "bg-rose-500/25 text-rose-200 font-bold border border-rose-400/40"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -501,7 +645,7 @@ export function MultiTrackTimeline({
             title={snappingEnabled ? "Magnetic Snapping Enabled" : "Magnetic Snapping Disabled"}
             className={`p-1.5 rounded-lg border transition-all ${
               snappingEnabled
-                ? "bg-sky-500/20 text-sky-300 border-sky-400/40 shadow-glass-sm"
+                ? "bg-rose-500/20 text-rose-300 border-rose-400/40 shadow-glass-sm"
                 : "bg-white/[0.04] text-slate-400 border-white/10 hover:text-white"
             }`}
           >
@@ -515,7 +659,7 @@ export function MultiTrackTimeline({
             title={isLooping ? "Timeline Loop Enabled" : "Timeline Loop Disabled"}
             className={`p-1.5 rounded-lg border transition-all ${
               isLooping
-                ? "bg-sky-500/20 text-sky-300 border-sky-400/40 shadow-glass-sm"
+                ? "bg-rose-500/20 text-rose-300 border-rose-400/40 shadow-glass-sm"
                 : "bg-white/[0.04] text-slate-400 border-white/10 hover:text-white"
             }`}
           >
@@ -553,7 +697,7 @@ export function MultiTrackTimeline({
           {/* Header left placeholder */}
           <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-[11px] font-mono text-slate-400">
             <span>TRACKS</span>
-            <span className="text-[10px] text-sky-400/80">30 FPS</span>
+            <span className="text-[10px] text-rose-400/80">30 FPS</span>
           </div>
 
           {/* Timecode Ruler Canvas */}
@@ -588,112 +732,50 @@ export function MultiTrackTimeline({
               className="absolute top-0 z-40 -translate-x-1/2 pointer-events-none"
               style={{ left: `${playheadX}px` }}
             >
-              <div className="w-3 h-3 bg-sky-400 rotate-45 -mt-1.5 shadow-[0_0_10px_rgba(56,189,248,0.8)] border border-white" />
+              <div className="w-3 h-3 bg-rose-400 rotate-45 -mt-1.5 shadow-[0_0_10px_rgba(251,113,133,0.8)] border border-white" />
             </div>
           </div>
         </div>
 
         {/* Tracks Container */}
         <div
-          className="flex-1 flex flex-col relative"
+          onMouseDown={handleTracksMouseDown}
+          onContextMenu={(e) => e.preventDefault()}
+          className="tracks-canvas-layer flex-1 flex flex-col relative"
           style={{ width: `${timelineContentWidth + 144}px`, minWidth: "100%" }}
         >
+          {/* Marquee Selection Area Box (Active when holding right click and dragging across tracks) */}
+          {marqueeSelection && (
+            <div
+              className="absolute z-50 pointer-events-none rounded-lg border-2 border-rose-400/90 bg-rose-500/20 backdrop-blur-[2px] shadow-[0_0_20px_rgba(251,113,133,0.35)]"
+              style={{
+                left: `${Math.min(marqueeSelection.relStartX, marqueeSelection.relCurrentX)}px`,
+                top: `${Math.min(marqueeSelection.relStartY, marqueeSelection.relCurrentY)}px`,
+                width: `${Math.abs(marqueeSelection.relCurrentX - marqueeSelection.relStartX)}px`,
+                height: `${Math.abs(marqueeSelection.relCurrentY - marqueeSelection.relStartY)}px`,
+              }}
+            >
+              <div className="absolute -top-7 left-2 px-2 py-0.5 rounded-md bg-[#090D16]/95 border border-rose-400/60 text-[10px] font-mono text-rose-200 shadow-md">
+                Box Select (Release to select)
+              </div>
+            </div>
+          )}
+
           {/* Laser Playhead Needle running vertically across ALL tracks */}
           <div
-            className="absolute top-0 bottom-0 w-px bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.9)] z-30 pointer-events-none"
+            className="absolute top-0 bottom-0 w-px bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.9)] z-30 pointer-events-none"
             style={{ left: `${144 + playheadX}px` }}
           >
-            <div className="w-2 h-2 rounded-full bg-sky-300 absolute -top-1 -left-0.5" />
+            <div className="w-2 h-2 rounded-full bg-rose-300 absolute -top-1 -left-0.5" />
           </div>
 
           {/* ============================================================ */}
-          {/* TRACK 1: Action / Zoom Keyframe Track */}
+          {/* TRACK 1: Visual Video Track (Clips & Trim Handles) */}
           {/* ============================================================ */}
-          <div className="h-10 flex border-b border-white/[0.06] bg-black/20 hover:bg-white/[0.01] transition-colors relative group">
+          <div className="h-14 flex border-b border-white/[0.06] bg-black/30 relative">
             {/* Track Header */}
             <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-xs text-slate-300 sticky left-0 z-10">
-              <div className="flex items-center gap-1.5 font-medium text-sky-300">
-                <Focus className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Zoom AI</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setIsKeyframeTrackLocked(!isKeyframeTrackLocked)}
-                  className="text-slate-500 hover:text-slate-300"
-                >
-                  {isKeyframeTrackLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Track Lane */}
-            <div
-              onMouseDown={handleStartScrubbing}
-              className="flex-1 relative cursor-pointer overflow-hidden"
-            >
-              {events.map((ev) => {
-                const leftPx = timeToPixel(ev.timestamp);
-                const isNearCurrent = Math.abs(currentTime - ev.timestamp) < 0.3;
-                const isDraggingThis = draggingKeyframeState?.eventId === ev.id;
-
-                return (
-                  <div
-                    key={ev.id}
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      onSelectEvent(ev);
-                      onSeek(ev.timestamp);
-                      if (!isKeyframeTrackLocked && onUpdateEvent) {
-                        setDraggingKeyframeState({
-                          eventId: ev.id,
-                          startX: e.clientX,
-                          initialTimestamp: ev.timestamp,
-                        });
-                      }
-                    }}
-                    style={{ left: `${leftPx}px` }}
-                    title={`Drag horizontally to shift timecode. Zoom Target: ${ev.label || "Keyframe"} (${ev.zoom}x) at ${formatSMPTETimecode(ev.timestamp)}`}
-                    className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 cursor-ew-resize active:cursor-grabbing z-10 transition-transform hover:scale-125 group/pin select-none ${
-                      isDraggingThis ? "scale-135 z-30" : isNearCurrent ? "scale-125" : ""
-                    }`}
-                  >
-                    {/* Diamond Marker */}
-                    <div
-                      className={`w-4 h-4 rotate-45 rounded-sm flex items-center justify-center border transition-all ${
-                        isDraggingThis
-                          ? "bg-amber-400 border-white shadow-[0_0_16px_rgba(251,191,36,1)] scale-110"
-                          : ev.enabled
-                          ? isNearCurrent
-                            ? "bg-sky-400 border-white shadow-[0_0_12px_rgba(56,189,248,1)]"
-                            : "bg-sky-500/80 border-sky-300 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
-                          : "bg-slate-600/70 border-slate-500"
-                      }`}
-                    >
-                      <div className={`w-1.5 h-1.5 rounded-full ${isDraggingThis ? "bg-amber-950" : "bg-[#090D16]"}`} />
-                    </div>
-
-                    {/* Tooltip on hover / drag */}
-                    <div
-                      className={`absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/90 border border-white/20 text-[10px] font-mono text-white whitespace-nowrap pointer-events-none shadow-glass-sm z-30 transition-opacity ${
-                        isDraggingThis ? "opacity-100 border-amber-400/60 text-amber-200" : "opacity-0 group-hover/pin:opacity-100"
-                      }`}
-                    >
-                      {ev.zoom}x · {formatSMPTETimecode(ev.timestamp).substring(3, 8)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* ============================================================ */}
-          {/* TRACK 2: Visual Video Track (Clips & Trim Handles) */}
-          {/* ============================================================ */}
-          <div className="h-16 flex border-b border-white/[0.06] bg-black/30 relative">
-            {/* Track Header */}
-            <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-xs text-slate-300 sticky left-0 z-10">
-              <div className="flex items-center gap-1.5 font-medium text-emerald-300">
+              <div className="flex items-center gap-1.5 font-medium text-purple-300">
                 <VideoIcon className="w-3.5 h-3.5" />
                 <span className="text-[11px]">Video 1</span>
               </div>
@@ -717,13 +799,13 @@ export function MultiTrackTimeline({
                 const clipStartPx = timeToPixel(clip.startTimeline);
                 const clipEndPx = timeToPixel(clip.endTimeline);
                 const clipWidthPx = Math.max(16, clipEndPx - clipStartPx);
-                const isSelected = selectedClipId === clip.id;
+                const isSelected = selectedClipId === clip.id || selectedClipIds.includes(clip.id);
 
                 return (
                   <div
                     key={clip.id}
                     onMouseDown={(e) => {
-                      if (e.button !== 0) return;
+                      if (e.button !== 0 && e.button !== 2) return;
                       e.stopPropagation();
                       onSelectClip(clip.id);
                       setDraggingClipState({
@@ -734,14 +816,15 @@ export function MultiTrackTimeline({
                         startX: e.clientX,
                       });
                     }}
+                    onContextMenu={(e) => e.preventDefault()}
                     style={{
                       left: `${clipStartPx}px`,
                       width: `${clipWidthPx}px`,
                     }}
                     className={`absolute top-1.5 bottom-1.5 rounded-xl border transition-all overflow-hidden flex items-center justify-between group/clip select-none cursor-grab active:cursor-grabbing hover:brightness-110 ${
                       isSelected
-                        ? "bg-gradient-to-r from-sky-500/30 to-blue-600/30 border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.35)]"
-                        : "bg-gradient-to-r from-sky-950/50 to-blue-950/50 border-white/15 hover:border-sky-400/50"
+                        ? "bg-gradient-to-r from-purple-600/70 to-indigo-600/70 border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.35)] ring-2 ring-purple-400/80"
+                        : "bg-gradient-to-r from-purple-950/70 to-indigo-950/70 border-white/15 hover:border-purple-400/50"
                     }`}
                   >
                     {/* Left Trim Handle */}
@@ -757,24 +840,23 @@ export function MultiTrackTimeline({
                         });
                       }}
                       title="Drag to trim start of clip"
-                      className="w-3 h-full bg-white/[0.08] hover:bg-sky-400 hover:text-black cursor-ew-resize flex items-center justify-center transition-colors group-hover/clip:bg-white/[0.15] z-10"
+                      className="w-3 h-full bg-white/[0.08] hover:bg-purple-400 hover:text-black cursor-ew-resize flex items-center justify-center transition-colors group-hover/clip:bg-white/[0.15] z-10"
                     >
                       <div className="w-0.5 h-3 bg-white/60 rounded" />
                     </div>
 
                     {/* Clip Content Thumbnail & Metadata */}
                     <div className="flex-1 px-2 overflow-hidden flex items-center gap-2 pointer-events-none">
-                      {/* Filmstrip perforation preview */}
-                      <div className="w-6 h-6 rounded-md bg-white/[0.08] border border-white/10 flex items-center justify-center text-[9px] font-mono text-sky-300 flex-shrink-0">
+                      <div className="w-5 h-5 rounded-md bg-white/[0.08] border border-white/10 flex items-center justify-center text-[9px] font-mono text-purple-300 flex-shrink-0">
                         #{idx + 1}
                       </div>
 
-                      <div className="overflow-hidden">
+                      <div className="overflow-hidden flex items-center gap-2">
                         <div className="text-[11px] font-medium text-white truncate">
                           {clip.name}
                         </div>
-                        <div className="text-[9px] font-mono text-slate-400 truncate">
-                          {clip.duration.toFixed(1)}s · {clip.speed}x
+                        <div className="text-[9px] font-mono text-purple-200/80 truncate">
+                          {clip.duration.toFixed(1)}s · {clip.speed}X
                         </div>
                       </div>
                     </div>
@@ -792,9 +874,227 @@ export function MultiTrackTimeline({
                         });
                       }}
                       title="Drag to trim end of clip"
-                      className="w-3 h-full bg-white/[0.08] hover:bg-sky-400 hover:text-black cursor-ew-resize flex items-center justify-center transition-colors group-hover/clip:bg-white/[0.15] z-10"
+                      className="w-3 h-full bg-white/[0.08] hover:bg-purple-400 hover:text-black cursor-ew-resize flex items-center justify-center transition-colors group-hover/clip:bg-white/[0.15] z-10"
                     >
                       <div className="w-0.5 h-3 bg-white/60 rounded" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ============================================================ */}
+          {/* TRACK 2: Action / Zoom AI Capsule Bar Track (FocuSee Style) */}
+          {/* ============================================================ */}
+          <div className="h-12 flex border-b border-white/[0.06] bg-black/20 hover:bg-white/[0.01] transition-colors relative group">
+            {/* Track Header */}
+            <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-xs text-slate-300 sticky left-0 z-10">
+              <div className="flex items-center gap-1.5 font-medium text-blue-400">
+                <Focus className="w-3.5 h-3.5" />
+                <span className="text-[11px]">Zoom AI</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddKeyframeAtCurrentTime();
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-[10px] font-medium border border-blue-400/30 flex items-center gap-1 transition-colors"
+                  title="Add Zoom Effect at playhead"
+                >
+                  <Plus className="w-2.5 h-2.5" />
+                  <span>Add</span>
+                </button>
+                {onMergeNearbyClicks && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMergeNearbyClicks();
+                    }}
+                    className="px-1.5 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-medium border border-indigo-400/30 flex items-center gap-1 transition-colors"
+                    title="Group clicks within 1-2s into single continuous zoom sequences"
+                  >
+                    <span>Group Clicks</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsKeyframeTrackLocked(!isKeyframeTrackLocked)}
+                  className="text-slate-500 hover:text-slate-300"
+                >
+                  {isKeyframeTrackLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Track Lane */}
+            <div
+              onMouseDown={handleStartScrubbing}
+              className="flex-1 relative cursor-pointer overflow-hidden"
+            >
+              {events.map((ev) => {
+                const inDur = ev.zoomInDuration ?? 0.4;
+                const holdDur = ev.holdDuration ?? 1.4;
+                const outDur = ev.zoomOutDuration ?? 0.4;
+
+                // Live dynamic calculations during drag
+                const isDragging = draggingKeyframeState?.eventId === ev.id;
+                let effectiveTimestamp = ev.timestamp;
+                let effectiveHoldDuration = holdDur;
+
+                if (isDragging && draggingKeyframeState) {
+                  if (draggingKeyframeState.mode === "move") {
+                    effectiveTimestamp = Math.max(0, draggingKeyframeState.initialTimestamp + draggingKeyframeState.currentDeltaSec);
+                  } else if (draggingKeyframeState.mode === "trim-start") {
+                    effectiveTimestamp = Math.max(0, draggingKeyframeState.initialTimestamp + draggingKeyframeState.currentDeltaSec);
+                    const diff = effectiveTimestamp - draggingKeyframeState.initialTimestamp;
+                    effectiveHoldDuration = Math.max(0.2, draggingKeyframeState.initialHoldDuration - diff);
+                  } else if (draggingKeyframeState.mode === "trim-end") {
+                    effectiveHoldDuration = Math.max(0.2, draggingKeyframeState.initialHoldDuration + draggingKeyframeState.currentDurationDeltaSec);
+                  }
+                }
+
+                const liveDuration = inDur + effectiveHoldDuration + outDur;
+                const leftPx = timeToPixel(effectiveTimestamp);
+                const widthPx = Math.max(80, timeToPixel(effectiveTimestamp + liveDuration) - leftPx);
+                const isSelected = selectedEventId === ev.id || selectedEventIds.includes(ev.id);
+                const isNearCurrent = currentTime >= effectiveTimestamp && currentTime <= (effectiveTimestamp + liveDuration);
+
+                return (
+                  <div
+                    key={ev.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectEvent(ev);
+                      onSeek(effectiveTimestamp);
+                    }}
+                    onContextMenu={(e) => e.preventDefault()}
+                    style={{
+                      left: `${leftPx}px`,
+                      width: `${widthPx}px`,
+                    }}
+                    title={`Zoom Effect: ${ev.zoom || 2}X (${liveDuration.toFixed(1)}s). Left or Right-click & drag center to move, drag edges to trim.`}
+                    className={`absolute top-1.5 bottom-1.5 rounded-xl border flex items-center justify-between z-10 select-none group/zoom transition-all cursor-grab active:cursor-grabbing ${
+                      isSelected
+                        ? "bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 border-white text-white shadow-[0_0_18px_rgba(59,130,246,0.9)] ring-2 ring-blue-400 z-20 scale-[1.02]"
+                        : isNearCurrent
+                        ? "bg-gradient-to-r from-blue-600/90 via-blue-500/90 to-indigo-600/90 border-blue-400/70 text-white shadow-[0_0_12px_rgba(59,130,246,0.6)]"
+                        : "bg-blue-600/75 hover:bg-blue-600 border-blue-400/40 text-white shadow-md hover:shadow-lg"
+                    }`}
+                  >
+                    {/* Left Trim Handle */}
+                    <div
+                      onMouseDown={(e) => {
+                        if (isKeyframeTrackLocked) return;
+                        e.stopPropagation();
+                        onSelectEvent(ev);
+                        setDraggingKeyframeState({
+                          eventId: ev.id,
+                          mode: "trim-start",
+                          startX: e.clientX,
+                          initialTimestamp: ev.timestamp,
+                          initialHoldDuration: holdDur,
+                          currentDeltaSec: 0,
+                          currentDurationDeltaSec: 0,
+                        });
+                      }}
+                      title="Drag to adjust zoom start time"
+                      className="w-2.5 h-full cursor-ew-resize hover:bg-white/40 flex items-center justify-center rounded-l-xl transition-colors z-20"
+                    >
+                      <div className="w-0.5 h-3 bg-white/70 rounded-full" />
+                    </div>
+
+                    {/* Center Drag Area & Zoom Pill Badge */}
+                    <div
+                      onMouseDown={(e) => {
+                        if (isKeyframeTrackLocked) return;
+                        if (e.button !== 0 && e.button !== 2) return;
+                        e.stopPropagation();
+                        onSelectEvent(ev);
+                        setDraggingKeyframeState({
+                          eventId: ev.id,
+                          mode: "move",
+                          startX: e.clientX,
+                          initialTimestamp: ev.timestamp,
+                          initialHoldDuration: holdDur,
+                          currentDeltaSec: 0,
+                          currentDurationDeltaSec: 0,
+                        });
+                      }}
+                      className="flex-1 h-full flex items-center justify-center gap-1.5 px-2 truncate"
+                    >
+                      <Focus className="w-3.5 h-3.5 text-blue-100 flex-shrink-0" />
+                      <span className="text-xs font-bold text-white tracking-wide truncate">
+                        Zoom {ev.zoom || 2}X
+                      </span>
+                      {ev.targets && ev.targets.length > 1 && (
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-white/25 text-white rounded-full flex-shrink-0 border border-white/25">
+                          {ev.targets.length} Clicks
+                        </span>
+                      )}
+                      <span className="text-[10px] font-mono text-blue-200/90 hidden sm:inline">
+                        {liveDuration.toFixed(1)}s
+                      </span>
+                    </div>
+
+                    {/* Tick markers for multiple clicks inside the sequence */}
+                    {ev.targets && ev.targets.length > 1 && (
+                      <div className="absolute inset-x-3 bottom-0.5 pointer-events-none flex items-center h-1.5 overflow-hidden z-10">
+                        {ev.targets.map((tgt, tIdx) => {
+                          const relRatio = Math.max(0, Math.min(1, (tgt.timestamp - effectiveTimestamp) / liveDuration));
+                          return (
+                            <div
+                              key={tIdx}
+                              style={{ left: `${relRatio * 100}%` }}
+                              className="absolute w-1 h-1.5 bg-white/80 rounded-full -translate-x-1/2 shadow-sm"
+                              title={`Click ${tIdx + 1} at ${tgt.timestamp.toFixed(1)}s`}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Quick Delete Button */}
+                    {onDeleteEvent && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteEvent(ev.id);
+                        }}
+                        className={`p-1 text-white/70 hover:text-white hover:bg-rose-500/30 rounded-md mr-1 transition-all z-20 cursor-pointer ${
+                          isSelected ? "opacity-100 bg-black/20" : "opacity-0 group-hover/zoom:opacity-100"
+                        }`}
+                        title="Delete Zoom Effect (or press Delete key)"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+
+                    {/* Right Trim Handle */}
+                    <div
+                      onMouseDown={(e) => {
+                        if (isKeyframeTrackLocked) return;
+                        e.stopPropagation();
+                        onSelectEvent(ev);
+                        setDraggingKeyframeState({
+                          eventId: ev.id,
+                          mode: "trim-end",
+                          startX: e.clientX,
+                          initialTimestamp: ev.timestamp,
+                          initialHoldDuration: holdDur,
+                          currentDeltaSec: 0,
+                          currentDurationDeltaSec: 0,
+                        });
+                      }}
+                      title="Drag to adjust zoom duration"
+                      className="w-2.5 h-full cursor-ew-resize hover:bg-white/40 flex items-center justify-center rounded-r-xl transition-colors z-20"
+                    >
+                      <div className="w-0.5 h-3 bg-white/70 rounded-full" />
                     </div>
                   </div>
                 );
@@ -832,7 +1132,7 @@ export function MultiTrackTimeline({
                 const clipStartPx = timeToPixel(clip.startTimeline);
                 const clipEndPx = timeToPixel(clip.endTimeline);
                 const clipWidthPx = Math.max(16, clipEndPx - clipStartPx);
-                const isSelected = selectedClipId === clip.id;
+                const isSelected = selectedClipId === clip.id || selectedClipIds.includes(clip.id);
 
                 // Generate procedural waveform peaks
                 const numBars = Math.max(10, Math.floor(clipWidthPx / 4));
@@ -845,7 +1145,7 @@ export function MultiTrackTimeline({
                   <div
                     key={`audio-${clip.id}`}
                     onMouseDown={(e) => {
-                      if (e.button !== 0) return;
+                      if (e.button !== 0 && e.button !== 2) return;
                       e.stopPropagation();
                       onSelectClip(clip.id);
                       setDraggingClipState({
@@ -856,13 +1156,14 @@ export function MultiTrackTimeline({
                         startX: e.clientX,
                       });
                     }}
+                    onContextMenu={(e) => e.preventDefault()}
                     style={{
                       left: `${clipStartPx}px`,
                       width: `${clipWidthPx}px`,
                     }}
                     className={`absolute top-1.5 bottom-1.5 rounded-xl border overflow-hidden flex items-center justify-between group/clip select-none cursor-grab active:cursor-grabbing transition-all ${
                       isSelected
-                        ? "bg-indigo-600/30 border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.35)]"
+                        ? "bg-indigo-600/30 border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.35)] ring-2 ring-indigo-400/80"
                         : isAudioMuted
                         ? "bg-slate-900/40 border-white/10 opacity-40 hover:opacity-60"
                         : "bg-indigo-950/40 border-indigo-500/25 hover:border-indigo-400/50 hover:bg-indigo-900/30"
@@ -924,6 +1225,76 @@ export function MultiTrackTimeline({
               })}
             </div>
           </div>
+
+          {/* ============================================================ */}
+          {/* TRACK 4: Facecam / Webcam Track */}
+          {/* ============================================================ */}
+          {webcamClip && (
+            <div className="h-14 flex border-b border-white/[0.06] bg-black/25 relative">
+              {/* Track Header */}
+              <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-xs text-slate-300 sticky left-0 z-10">
+                <div className="flex items-center gap-1.5 font-medium text-emerald-400">
+                  <Camera className="w-3.5 h-3.5" />
+                  <span className="text-[11px]">Facecam</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {onToggleWebcamHidden && (
+                    <button
+                      type="button"
+                      onClick={onToggleWebcamHidden}
+                      className="text-slate-500 hover:text-slate-300"
+                      title={isWebcamHidden ? "Show Facecam PiP" : "Hide Facecam PiP"}
+                    >
+                      {isWebcamHidden ? (
+                        <EyeOff className="w-3 h-3 text-rose-400" />
+                      ) : (
+                        <Eye className="w-3 h-3 text-emerald-400" />
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Track Lane */}
+              <div
+                onMouseDown={handleStartScrubbing}
+                className="flex-1 relative cursor-pointer"
+              >
+                {(() => {
+                  const clipStartPx = timeToPixel(webcamClip.startTimeline);
+                  const clipEndPx = timeToPixel(webcamClip.endTimeline);
+                  const clipWidthPx = Math.max(16, clipEndPx - clipStartPx);
+                  return (
+                    <div
+                      style={{
+                        left: `${clipStartPx}px`,
+                        width: `${clipWidthPx}px`,
+                      }}
+                      className={`absolute top-1.5 bottom-1.5 rounded-xl border overflow-hidden flex items-center justify-between group/clip select-none transition-all ${
+                        isWebcamHidden
+                          ? "bg-emerald-950/20 border-emerald-500/20 opacity-40"
+                          : "bg-gradient-to-r from-emerald-900/60 to-teal-900/60 border-emerald-400/50 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
+                      }`}
+                    >
+                      <div className="flex-1 px-2.5 overflow-hidden flex items-center gap-2 pointer-events-none">
+                        <div className="w-5 h-5 rounded-full bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-[9px] font-mono text-emerald-300 flex-shrink-0">
+                          <Camera className="w-2.5 h-2.5" />
+                        </div>
+                        <div className="overflow-hidden flex items-center gap-2">
+                          <div className="text-[11px] font-medium text-emerald-200 truncate">
+                            {webcamClip.name || "Webcam Overlay"}
+                          </div>
+                          <div className="text-[9px] font-mono text-emerald-300/70 truncate">
+                            {webcamClip.duration.toFixed(1)}s (PiP)
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

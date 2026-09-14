@@ -99,14 +99,19 @@ export function LeftSettings({
   // 3D Screen Angle Presets
   const anglePresets: { id: ScreenAnglePreset; name: string; desc: string }[] = [
     {
-      id: "floating-dynamic",
-      name: "Floating Dynamic",
-      desc: "Subtle organic tilt with breathing hover in 3D space",
+      id: "simple-smooth",
+      name: "Simple Smooth",
+      desc: "Smooth zoom in & out without 3D tilt",
     },
     {
       id: "studio-front",
       name: "Studio Frontal",
       desc: "Front-facing luxury perspective with specular sheen",
+    },
+    {
+      id: "floating-dynamic",
+      name: "Floating Dynamic",
+      desc: "Subtle organic tilt with breathing hover in 3D space",
     },
     {
       id: "isometric",
@@ -158,8 +163,8 @@ export function LeftSettings({
       id: "cosmic-blue",
       name: "Cosmic Deep Space",
       category: "Dark Tech",
-      gradientCss: "from-sky-950 via-blue-950 to-dark-950",
-      colors: "#0284c7 to #090a0f",
+      gradientCss: "from-rose-950 via-blue-950 to-dark-950",
+      colors: "#e11d48 to #090a0f",
     },
     {
       id: "obsidian-dark",
@@ -201,7 +206,7 @@ export function LeftSettings({
       name: "Hyper Miami Neon",
       category: "Vibrant Abstract",
       gradientCss: "from-cyan-950 via-fuchsia-950 to-dark-950",
-      colors: "#06b6d4 to #d946ef",
+      colors: "#fb7185 to #d946ef",
     },
     {
       id: "solar-flare",
@@ -261,7 +266,7 @@ export function LeftSettings({
           onClick={() => setActiveTab("3d")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "3d"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-bold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="3D Cinematic Compositing Engine"
@@ -274,7 +279,7 @@ export function LeftSettings({
           onClick={() => setActiveTab("frame")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "frame"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-bold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Canvas Frame & Background"
@@ -287,7 +292,7 @@ export function LeftSettings({
           onClick={() => setActiveTab("video")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "video"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-bold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Video Input & Demo"
@@ -300,7 +305,7 @@ export function LeftSettings({
           onClick={() => setActiveTab("zoom")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "zoom"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-bold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Zoom & Motion Easing"
@@ -313,7 +318,7 @@ export function LeftSettings({
           onClick={() => setActiveTab("cursor")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "cursor"
-              ? "bg-sky-500/20 text-sky-200 border border-sky-400/30 shadow-glass-sm font-bold"
+              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Cursor & Click FX"
@@ -332,7 +337,7 @@ export function LeftSettings({
         {activeTab === "3d" && (
           <div className="space-y-5">
             <div>
-              <div className="flex items-center gap-1.5 text-sky-400 font-bold text-[10px] uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase tracking-wider mb-1">
                 <Cuboid className="w-3.5 h-3.5" />
                 <span>WebGL 3D Compositing</span>
               </div>
@@ -347,11 +352,11 @@ export function LeftSettings({
             {/* Conditional On-Click Only Animation Status Card */}
             <div className="p-4 rounded-xl glass-panel space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sky-300 font-bold text-xs">
-                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                <div className="flex items-center gap-2 text-rose-300 font-bold text-xs">
+                  <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
                   <span>On-Click Only Zoom Active</span>
                 </div>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-lg bg-sky-500/20 text-sky-200 border border-sky-400/30 font-mono font-semibold">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-200 border border-rose-400/30 font-mono font-semibold">
                   Static Wide Default
                 </span>
               </div>
@@ -364,7 +369,7 @@ export function LeftSettings({
             <div className="space-y-2.5 glass-panel p-4 rounded-xl">
               <label className="text-xs font-semibold text-slate-200 flex items-center justify-between">
                 <span>3D Screen Orientation</span>
-                <span className="text-[10px] text-sky-400 font-mono">Perspective Camera</span>
+                <span className="text-[10px] text-rose-400 font-mono">Perspective Camera</span>
               </label>
 
               <div className="grid grid-cols-2 gap-2">
@@ -376,13 +381,13 @@ export function LeftSettings({
                       onClick={() => onChangeConfig({ screenAnglePreset: ap.id })}
                       className={`p-2.5 rounded-xl text-left border transition-all duration-200 ${
                         isSelected
-                          ? "bg-sky-500/20 border-sky-400/40 text-white shadow-glass-sm"
+                          ? "bg-rose-500/20 border-rose-400/40 text-white shadow-glass-sm"
                           : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:border-white/20"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-bold text-xs text-white">{ap.name}</span>
-                        {isSelected && <Check className="w-3 h-3 text-sky-400" />}
+                        {isSelected && <Check className="w-3 h-3 text-rose-400" />}
                       </div>
                       <p className="text-[10px] text-slate-400 leading-tight">{ap.desc}</p>
                     </button>
@@ -405,7 +410,7 @@ export function LeftSettings({
                       onClick={() => onChangeConfig({ framingStyle: fs.id })}
                       className={`w-full p-2.5 rounded-xl text-left border transition-all duration-200 flex items-start justify-between ${
                         isSelected
-                          ? "bg-sky-500/20 border-sky-400/40 text-white shadow-glass-sm"
+                          ? "bg-rose-500/20 border-rose-400/40 text-white shadow-glass-sm"
                           : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white hover:border-white/20"
                       }`}
                     >
@@ -413,7 +418,7 @@ export function LeftSettings({
                         <div className="font-bold text-xs text-white">{fs.name}</div>
                         <div className="text-[10px] text-slate-400">{fs.desc}</div>
                       </div>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-sky-400 mt-0.5" />}
+                      {isSelected && <Check className="w-3.5 h-3.5 text-rose-400 mt-0.5" />}
                     </button>
                   );
                 })}
@@ -454,7 +459,7 @@ export function LeftSettings({
                   <div className="space-y-1 pt-1">
                     <div className="flex justify-between text-[10px] text-slate-400">
                       <span>Tilt Weight</span>
-                      <span className="font-mono text-sky-400">
+                      <span className="font-mono text-rose-400">
                         {Math.round((config.mouseParallaxIntensity ?? 0.65) * 100)}%
                       </span>
                     </div>
@@ -481,7 +486,7 @@ export function LeftSettings({
                   <div className="text-xs font-semibold text-slate-200">Glass Clearcoat & Reflections</div>
                   <div className="text-[10px] text-slate-400">Glossy surface sheen under studio keylights</div>
                 </div>
-                <span className="text-sky-400 font-mono font-bold text-xs">
+                <span className="text-rose-400 font-mono font-bold text-xs">
                   {Math.round((config.glassReflectionIntensity ?? 0.85) * 100)}%
                 </span>
               </div>
@@ -508,7 +513,7 @@ export function LeftSettings({
               <div className="flex items-center justify-between">
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-bold text-white cursor-pointer">
-                    <Square className="w-4 h-4 text-sky-400" />
+                    <Square className="w-4 h-4 text-rose-400" />
                     <span>Corner Radius / Round Border</span>
                   </label>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
@@ -526,7 +531,7 @@ export function LeftSettings({
                       const safeVal = isNaN(val) ? 0 : Math.max(0, Math.min(64, val));
                       onChangeConfig({ cornerRadius: safeVal });
                     }}
-                    className="w-10 bg-transparent text-right text-sky-400 font-mono font-bold text-xs outline-none"
+                    className="w-10 bg-transparent text-right text-rose-400 font-mono font-bold text-xs outline-none"
                   />
                   <span className="text-slate-400 font-mono text-[11px]">px</span>
                 </div>
@@ -556,7 +561,7 @@ export function LeftSettings({
                     onClick={() => onChangeConfig({ cornerRadius: rad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.cornerRadius === rad
-                        ? "bg-sky-500/20 text-sky-200 font-bold border border-sky-400/30 shadow-glass-sm"
+                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -574,7 +579,7 @@ export function LeftSettings({
         {activeTab === "frame" && (
           <div className="space-y-6">
             <div>
-              <div className="flex items-center gap-1.5 text-sky-400 font-bold text-[10px] uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase tracking-wider mb-1">
                 <LayoutTemplate className="w-3.5 h-3.5" />
                 <span>Visual Canvas Controls</span>
               </div>
@@ -600,7 +605,7 @@ export function LeftSettings({
                       const val = parseInt(e.target.value) || 0;
                       onChangeConfig({ padding: Math.max(0, Math.min(120, val)) });
                     }}
-                    className="w-14 bg-black/30 border border-white/[0.08] text-right px-2 py-0.5 rounded-lg text-sky-400 font-mono font-bold text-xs outline-none focus:border-sky-400"
+                    className="w-14 bg-black/30 border border-white/[0.08] text-right px-2 py-0.5 rounded-lg text-rose-400 font-mono font-bold text-xs outline-none focus:border-rose-400"
                   />
                   <span className="text-slate-400 font-mono text-xs">px</span>
                 </div>
@@ -623,7 +628,7 @@ export function LeftSettings({
                     onClick={() => onChangeConfig({ padding: pad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all duration-200 ${
                       config.padding === pad
-                        ? "bg-sky-500/20 text-sky-200 font-bold border border-sky-400/30 shadow-glass-sm"
+                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -638,7 +643,7 @@ export function LeftSettings({
               <div className="flex items-center justify-between">
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-bold text-white cursor-pointer">
-                    <Square className="w-4 h-4 text-sky-400" />
+                    <Square className="w-4 h-4 text-rose-400" />
                     <span>Corner Radius / Round Border</span>
                   </label>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
@@ -647,7 +652,7 @@ export function LeftSettings({
                 </div>
 
                 {/* Prominent numerical input box */}
-                <div className="flex items-center gap-1 bg-black/30 px-2.5 py-1 rounded-lg border border-white/[0.08] focus-within:border-sky-400 transition-colors">
+                <div className="flex items-center gap-1 bg-black/30 px-2.5 py-1 rounded-lg border border-white/[0.08] focus-within:border-rose-400 transition-colors">
                   <input
                     type="number"
                     min="0"
@@ -658,7 +663,7 @@ export function LeftSettings({
                       const safeVal = isNaN(val) ? 0 : Math.max(0, Math.min(64, val));
                       onChangeConfig({ cornerRadius: safeVal });
                     }}
-                    className="w-10 bg-transparent text-right text-sky-400 font-mono font-bold text-xs outline-none"
+                    className="w-10 bg-transparent text-right text-rose-400 font-mono font-bold text-xs outline-none"
                   />
                   <span className="text-slate-400 font-mono text-[11px]">px</span>
                 </div>
@@ -678,7 +683,7 @@ export function LeftSettings({
 
                 <div className="flex justify-between items-center text-[10px] font-mono">
                   <span className="text-slate-500">0px (Sharp)</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-200 font-bold text-[10px]">
+                  <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-400/30 text-rose-200 font-bold text-[10px]">
                     {config.cornerRadius === 0 ? "0px - Sharp Square" : `${config.cornerRadius}px Rounded Border`}
                   </span>
                   <span className="text-slate-500">64px (Pill)</span>
@@ -700,7 +705,7 @@ export function LeftSettings({
                     onClick={() => onChangeConfig({ cornerRadius: rad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all duration-200 ${
                       config.cornerRadius === rad
-                        ? "bg-sky-500/20 text-sky-200 font-bold border border-sky-400/30 shadow-glass-sm"
+                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -717,14 +722,14 @@ export function LeftSettings({
                   Backdrop Environment
                 </label>
                 {config.backgroundType === "transparent" ? (
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-semibold border border-sky-400/30">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-semibold border border-rose-400/30">
                     Transparent Active
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => onChangeConfig({ backgroundType: "transparent" })}
-                    className="text-[10px] text-slate-400 hover:text-sky-300 flex items-center gap-1 transition-colors"
+                    className="text-[10px] text-slate-400 hover:text-rose-300 flex items-center gap-1 transition-colors"
                   >
                     <Ban className="w-3 h-3" />
                     <span>Disable Background</span>
@@ -739,7 +744,7 @@ export function LeftSettings({
                   onClick={() => onChangeConfig({ backgroundType: "image" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "image"
-                      ? "bg-sky-500/20 text-sky-200 shadow-glass-sm font-semibold border border-sky-400/30"
+                      ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="Custom Image Background"
@@ -753,7 +758,7 @@ export function LeftSettings({
                   onClick={() => onChangeConfig({ backgroundType: "solid" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "solid"
-                      ? "bg-sky-500/20 text-sky-200 shadow-glass-sm font-semibold border border-sky-400/30"
+                      ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="Solid Color Background"
@@ -767,7 +772,7 @@ export function LeftSettings({
                   onClick={() => onChangeConfig({ backgroundType: "gradient" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "gradient"
-                      ? "bg-sky-500/20 text-sky-200 shadow-glass-sm font-semibold border border-sky-400/30"
+                      ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="Gradient Preset Background"
@@ -781,7 +786,7 @@ export function LeftSettings({
                   onClick={() => onChangeConfig({ backgroundType: "transparent" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "transparent"
-                      ? "bg-sky-500/20 text-sky-200 font-bold shadow-glass-sm border border-sky-400/30"
+                      ? "bg-rose-500/20 text-rose-200 font-bold shadow-glass-sm border border-rose-400/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="No Background / Transparent Video"
@@ -809,10 +814,10 @@ export function LeftSettings({
                   {/* Upload button / Dropzone */}
                   <div
                     onClick={() => imageInputRef.current?.click()}
-                    className="border border-dashed border-white/20 hover:border-sky-400/50 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-sky-500/10 group"
+                    className="border border-dashed border-white/20 hover:border-rose-400/50 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-rose-500/10 group"
                   >
                     <div className="flex items-center justify-center gap-2 text-xs text-slate-300 group-hover:text-white">
-                      <Upload className="w-3.5 h-3.5 text-sky-300" />
+                      <Upload className="w-3.5 h-3.5 text-rose-300" />
                       <span className="font-semibold">Upload Custom Background</span>
                     </div>
                     <p className="text-[10px] text-slate-400 mt-0.5">PNG, JPG, or WebP image</p>
@@ -828,7 +833,7 @@ export function LeftSettings({
                           alt="Custom Background"
                           className="w-10 h-7 rounded-lg object-cover border border-white/20"
                         />
-                        <span className="text-[11px] text-sky-300 font-medium">
+                        <span className="text-[11px] text-rose-300 font-medium">
                           Custom Image Applied
                         </span>
                       </div>
@@ -863,7 +868,7 @@ export function LeftSettings({
                             }
                             className={`p-2 rounded-xl text-left border transition-all relative overflow-hidden flex flex-col justify-end h-16 group ${
                               isSelected
-                                ? "border-sky-400 ring-1 ring-sky-400 shadow-glass-sm"
+                                ? "border-rose-400 ring-1 ring-rose-400 shadow-glass-sm"
                                 : "border-white/[0.08] hover:border-white/20 bg-white/[0.02]"
                             }`}
                           >
@@ -879,7 +884,7 @@ export function LeftSettings({
                                 {wp.name}
                               </span>
                               {isSelected && (
-                                <Check className="w-3 h-3 text-sky-300 stroke-[3]" />
+                                <Check className="w-3 h-3 text-rose-300 stroke-[3]" />
                               )}
                             </div>
                           </button>
@@ -945,7 +950,7 @@ export function LeftSettings({
                           onClick={() => onChangeConfig({ backgroundPreset: p.id })}
                           className={`p-2 rounded-xl text-left border transition-all flex flex-col justify-between h-16 relative overflow-hidden ${
                             isSelected
-                              ? "border-sky-400 ring-1 ring-sky-400 shadow-glass-sm"
+                              ? "border-rose-400 ring-1 ring-rose-400 shadow-glass-sm"
                               : "border-white/[0.08] hover:border-white/20 bg-white/[0.02]"
                           }`}
                         >
@@ -955,7 +960,7 @@ export function LeftSettings({
                               {p.name}
                             </span>
                             {isSelected && (
-                              <span className="w-4 h-4 rounded-full bg-sky-500/40 text-white flex items-center justify-center border border-sky-400/40">
+                              <span className="w-4 h-4 rounded-full bg-rose-500/40 text-white flex items-center justify-center border border-rose-400/40">
                                 <Check className="w-3 h-3 stroke-[3]" />
                               </span>
                             )}
@@ -973,7 +978,7 @@ export function LeftSettings({
               {/* 4. TRANSPARENT MODE */}
               {config.backgroundType === "transparent" && (
                 <div className="p-4 rounded-xl glass-panel space-y-2">
-                  <div className="flex items-center gap-2 text-sky-400 font-bold text-xs">
+                  <div className="flex items-center gap-2 text-rose-400 font-bold text-xs">
                     <Ban className="w-4 h-4" />
                     <span>No Background / Transparent Active</span>
                   </div>
@@ -994,7 +999,7 @@ export function LeftSettings({
                     onClick={() => onChangeConfig({ shadowIntensity: sh })}
                     className={`py-1.5 px-2.5 rounded-lg text-xs capitalize font-medium transition-all duration-200 ${
                       config.shadowIntensity === sh
-                        ? "bg-sky-500/20 text-sky-200 shadow-glass-sm font-semibold border border-sky-400/30"
+                        ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
                         : "bg-white/[0.03] text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -1029,7 +1034,7 @@ export function LeftSettings({
                 <div className="flex items-center gap-2 font-bold text-xs text-white">
                   <span
                     className={`w-2.5 h-2.5 rounded-full ${
-                      isRecording ? "bg-rose-500 animate-ping" : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.6)]"
+                      isRecording ? "bg-rose-500 animate-ping" : "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.6)]"
                     }`}
                   />
                   <span>Native Screen Recording</span>
@@ -1057,7 +1062,7 @@ export function LeftSettings({
                     </span>
                     <span className="text-slate-600">|</span>
                     <span className="text-slate-400">Clicks:</span>
-                    <span className="text-sky-300 font-bold">{clickCount}</span>
+                    <span className="text-rose-300 font-bold">{clickCount}</span>
                   </div>
 
                   <button
@@ -1071,9 +1076,9 @@ export function LeftSettings({
               ) : (
                 <button
                   onClick={onStartRecording}
-                  className="w-full py-2.5 px-4 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 hover:text-white font-semibold text-xs border border-sky-400/30 shadow-glass-sm flex items-center justify-center gap-2 transition-all group"
+                  className="w-full py-2.5 px-4 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 hover:text-white font-semibold text-xs border border-rose-400/30 shadow-glass-sm flex items-center justify-center gap-2 transition-all group"
                 >
-                  <Circle className="w-3.5 h-3.5 fill-sky-300 text-sky-300 group-hover:scale-110 transition-transform" />
+                  <Circle className="w-3.5 h-3.5 fill-sky-300 text-rose-300 group-hover:scale-110 transition-transform" />
                   <span>Start Screen Recording</span>
                 </button>
               )}
@@ -1089,7 +1094,7 @@ export function LeftSettings({
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-white/20 hover:border-sky-400 rounded-2xl p-5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-sky-500/5 group"
+              className="border-2 border-dashed border-white/20 hover:border-rose-400 rounded-2xl p-5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-rose-500/5 group"
             >
               <input
                 ref={fileInputRef}
@@ -1102,7 +1107,7 @@ export function LeftSettings({
                   }
                 }}
               />
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] group-hover:bg-sky-500/20 flex items-center justify-center mx-auto mb-2 text-slate-300 group-hover:text-sky-300 transition-colors border border-white/[0.1] group-hover:border-sky-400/40">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.06] group-hover:bg-rose-500/20 flex items-center justify-center mx-auto mb-2 text-slate-300 group-hover:text-rose-300 transition-colors border border-white/[0.1] group-hover:border-rose-400/40">
                 <Upload className="w-5 h-5" />
               </div>
               <p className="font-medium text-white mb-0.5">Click or drag video here</p>
@@ -1113,10 +1118,10 @@ export function LeftSettings({
               <button
                 onClick={onLoadDemo}
                 disabled={isGeneratingDemo}
-                className="w-full py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-sky-200 border border-white/[0.1] text-xs font-semibold flex items-center justify-center gap-2 transition-all group disabled:opacity-50 shadow-glass-sm"
+                className="w-full py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-rose-200 border border-white/[0.1] text-xs font-semibold flex items-center justify-center gap-2 transition-all group disabled:opacity-50 shadow-glass-sm"
               >
                 <FileVideo
-                  className={`w-4 h-4 text-sky-300 ${
+                  className={`w-4 h-4 text-rose-300 ${
                     isGeneratingDemo ? "animate-spin" : "group-hover:scale-105"
                   } transition-transform`}
                 />
@@ -1127,7 +1132,7 @@ export function LeftSettings({
             {metadata && (
               <div className="p-4 rounded-xl glass-panel space-y-2 mt-4">
                 <div className="flex items-center gap-2 text-white font-medium">
-                  <FileVideo className="w-4 h-4 text-sky-400" />
+                  <FileVideo className="w-4 h-4 text-rose-400" />
                   <span className="truncate">{metadata.name}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 pt-2 border-t border-white/[0.08]">
@@ -1156,7 +1161,7 @@ export function LeftSettings({
             <div className="space-y-2 glass-panel p-4 rounded-xl">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-slate-200">Dolly Zoom Depth</label>
-                <span className="text-sky-400 font-mono font-bold text-xs">
+                <span className="text-rose-400 font-mono font-bold text-xs">
                   {config.defaultZoomScale.toFixed(1)}x
                 </span>
               </div>
@@ -1185,7 +1190,7 @@ export function LeftSettings({
                     onClick={() => onChangeConfig({ zoomEasing: opt.id })}
                     className={`w-full p-2.5 rounded-xl text-left transition-all duration-200 flex items-start justify-between ${
                       config.zoomEasing === opt.id
-                        ? "bg-sky-500/20 border border-sky-400/30 text-white shadow-glass-sm"
+                        ? "bg-rose-500/20 border border-rose-400/30 text-white shadow-glass-sm"
                         : "bg-white/[0.03] hover:bg-white/[0.06] text-slate-400 hover:text-slate-200 border border-transparent"
                     }`}
                   >
@@ -1194,7 +1199,7 @@ export function LeftSettings({
                       <div className="text-[10px] text-slate-400">{opt.desc}</div>
                     </div>
                     {config.zoomEasing === opt.id && (
-                      <Check className="w-3.5 h-3.5 text-sky-400 flex-shrink-0 mt-0.5" />
+                      <Check className="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5" />
                     )}
                   </button>
                 ))}
@@ -1204,7 +1209,7 @@ export function LeftSettings({
             <div className="space-y-2 glass-panel p-4 rounded-xl">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-slate-200">Camera Dolly Speed</label>
-                <span className="text-sky-400 font-mono font-bold text-xs">
+                <span className="text-rose-400 font-mono font-bold text-xs">
                   {config.zoomDuration.toFixed(2)}s
                 </span>
               </div>
@@ -1240,7 +1245,7 @@ export function LeftSettings({
                     onClick={() => onChangeConfig({ cursorStyle: cs.id })}
                     className={`p-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                       config.cursorStyle === cs.id
-                        ? "bg-sky-500/20 text-sky-200 shadow-glass-sm font-semibold border border-sky-400/30"
+                        ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
                     }`}
                   >
@@ -1253,7 +1258,7 @@ export function LeftSettings({
             <div className="space-y-2 glass-panel p-4 rounded-xl">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-slate-200">Cursor Size</label>
-                <span className="text-sky-400 font-mono font-bold text-xs">{config.cursorSize}px</span>
+                <span className="text-rose-400 font-mono font-bold text-xs">{config.cursorSize}px</span>
               </div>
               <input
                 type="range"
