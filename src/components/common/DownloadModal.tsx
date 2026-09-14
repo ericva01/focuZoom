@@ -88,7 +88,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-rose-500/10 border border-rose-400/20 text-xs font-mono text-rose-300 mb-3 hover:bg-rose-500/20 hover:border-rose-400/40 transition-all cursor-pointer group"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-            <span>ELECTRON DESKTOP EDITION (v0.1.0)</span>
+            <span>NATIVE DESKTOP EDITION (v0.1.1)</span>
             <ExternalLink className="w-3 h-3 text-rose-400 group-hover:translate-x-0.5 transition-transform" />
           </a>
           <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
@@ -109,7 +109,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
                   Your download has started!
                 </p>
                 <p className="text-[11px] text-slate-400">
-                  Run <code className="text-white font-mono">Glideo.Studio-Setup-0.1.0.exe</code> once completed to install on your PC.
+                  Run <code className="text-white font-mono">Glideo_0.1.0_x64-setup.exe</code> (9.5 MB) once completed to install on your PC.
                 </p>
               </div>
             </div>
@@ -139,7 +139,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               </div>
               <div>
                 <div className="text-xs font-mono text-slate-500 uppercase">
-                  Official Installer (v0.1.0)
+                  Official Installer (v0.1.1)
                 </div>
                 <div className="text-base font-bold text-slate-950">
                   {userOS === "win"
@@ -152,8 +152,8 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             </div>
 
             <div className="flex items-center gap-2 pr-2">
-              <span className="text-xs font-mono font-semibold text-slate-600 hidden sm:inline">
-                {userOS === "win" ? "159 MB" : "Package"}
+              <span className="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 hidden sm:inline">
+                {userOS === "win" ? "9.5 MB" : "Package"}
               </span>
               <div className="w-8 h-8 rounded-full bg-slate-200 group-hover:bg-slate-300 flex items-center justify-center transition-colors">
                 <Download className="w-4 h-4 text-black" />
