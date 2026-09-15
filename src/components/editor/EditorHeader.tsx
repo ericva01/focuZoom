@@ -48,9 +48,10 @@ interface EditorHeaderProps {
   // Cursor Overlay Toggle
   showCursor?: boolean;
   onToggleCursor?: () => void;
-  // Webcam Facecam Toggle
+  // Webcam Facecam Toggle & Review
   enableWebcam?: boolean;
   onToggleWebcam?: () => void;
+  onOpenWebcamReview?: () => void;
   hasWebcamRecorded?: boolean;
   // Undo & Redo Controls
   canUndo?: boolean;
@@ -85,6 +86,7 @@ export function EditorHeader({
   onToggleCursor,
   enableWebcam = false,
   onToggleWebcam,
+  onOpenWebcamReview,
   hasWebcamRecorded = false,
   canUndo = false,
   canRedo = false,
@@ -213,16 +215,16 @@ export function EditorHeader({
           </Button>
         )}
 
-        {/* Webcam Facecam Quick Toggle Button */}
-        {onToggleWebcam && (
+        {/* Webcam Facecam Quick Toggle & Review Button */}
+        {(onOpenWebcamReview || onToggleWebcam) && (
           <Button
             variant={enableWebcam ? "secondary" : "ghost"}
             size="sm"
-            onClick={onToggleWebcam}
+            onClick={onOpenWebcamReview || onToggleWebcam}
             title={
               enableWebcam
-                ? "Webcam Face recording is ACTIVE (Click to turn off)"
-                : "Webcam Face recording is OFF (Click to enable)"
+                ? "Camera is ON — Click to review framing & settings"
+                : "Camera is OFF — Click to review camera preview before recording"
             }
             className={
               enableWebcam
@@ -241,7 +243,7 @@ export function EditorHeader({
                   : "bg-white/[0.08] text-slate-400"
               }`}
             >
-              {enableWebcam ? "ON" : "OFF"}
+              {enableWebcam ? "REVIEW" : "OFF"}
             </span>
           </Button>
         )}

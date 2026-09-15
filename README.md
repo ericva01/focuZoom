@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Glideo — Cinematic Screen Recording Post-Processing Studio
 
-## Getting Started
+<p align="center">
+  <img src="public/logo.png" alt="Glideo Logo" width="100" />
+</p>
 
-First, run the development server:
+<p align="center">
+  <strong>Transform raw screen recordings into professional, engaging video presentations with automated 3D camera dollies, cursor trails, and webcam picture-in-picture.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/ericva01/focuZoom/releases">
+    <img src="https://img.shields.io/github/downloads/ericva01/focuZoom/total?style=for-the-badge&color=fb7185&labelColor=1e293b&logo=github&label=TOTAL%20DOWNLOADS" alt="Total Downloads" />
+  </a>
+  <a href="https://github.com/ericva01/focuZoom/releases/latest">
+    <img src="https://img.shields.io/github/downloads/ericva01/focuZoom/latest/total?style=for-the-badge&color=fb7185&labelColor=1e293b&label=LATEST%20RELEASE" alt="Latest Downloads" />
+  </a>
+  <a href="https://github.com/ericva01/focuZoom/releases">
+    <img src="https://img.shields.io/github/v/release/ericva01/focuZoom?style=for-the-badge&color=fb7185&labelColor=1e293b&label=RELEASE" alt="GitHub Release" />
+  </a>
+  <a href="https://github.com/ericva01/focuZoom/stargazers">
+    <img src="https://img.shields.io/github/stars/ericva01/focuZoom?style=for-the-badge&color=fb7185&labelColor=1e293b&logo=github&label=STARS" alt="GitHub Stars" />
+  </a>
+</p>
+
+---
+
+## ✨ Features
+
+- 🎥 **3D Camera Dolly & Tilt Transitions:** Dynamic perspective shifts simulated in real time with WebGL & Three.js.
+- 🎯 **Intelligent Click & Zoom Keyframing:** Auto-detects clicks or lets you visually set focal points on the multi-track timeline.
+- 🫧 **Webcam Picture-in-Picture (PiP):** Floating facecam bubble with Circle, Rounded Square, and Square framing, border accents, and live audio VU meter.
+- ⚡ **Local & Offline Rendering:** Render directly on your device with hardware-accelerated VP9/VP8 WebM encoding.
+- 📁 **Custom Export Destination:** Choose your desired folder on any local drive before or after rendering.
+
+---
+
+## 🚀 Download & Installation
+
+### Windows Desktop (Recommended)
+Download the latest Windows installer from the [Releases Page](https://github.com/ericva01/focuZoom/releases):
+
+| Format | Download |
+| :--- | :--- |
+| **Windows Setup (.exe)** | [Download Glideo Setup](https://github.com/ericva01/focuZoom/releases/latest) |
+| **Windows Installer (.msi)** | [Download Glideo MSI](https://github.com/ericva01/focuZoom/releases/latest) |
+
+---
+
+## 🛠️ Development & Building
 
 ```bash
+# Clone the repository
+git clone https://github.com/ericva01/focuZoom.git
+cd focuZoom
+
+# Install dependencies
+npm install
+
+# Run web studio development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Run native desktop app in dev mode
+npx tauri dev
+
+# Build production desktop installer (.exe & .msi)
+npx tauri build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+Created by Eric Va. All rights reserved.

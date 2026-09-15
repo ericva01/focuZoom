@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Play,
   Pause,
   Crosshair,
   Check,
   Cuboid,
+  Camera,
 } from "lucide-react";
 import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint } from "@/types/editor";
 import { useThreeAnimationEngine } from "@/hooks/useThreeAnimationEngine";
@@ -68,36 +69,75 @@ export function VideoCanvas({
     initCustomY: 0.82,
   });
 
-  // Attach live stream or recorded URL to webcam video element
+  const effectiveWebcamUrl = webcamUrl || config.webcamConfig?.url || null;
+
+  // Robust attachment of stream or URL directly to video element upon mount
+  const setWebcamVideoEl = useCallback(
+    (el: HTMLVideoElement | null) => {
+      webcamVideoRef.current = el;
+      if (!el) return;
+
+      if (webcamStream) {
+        if (el.srcObject !== webcamStream) {
+          el.srcObject = webcamStream;
+          el.play().catch(() => {});
+        }
+      } else if (effectiveWebcamUrl) {
+        if (el.src !== effectiveWebcamUrl) {
+          el.srcObject = null;
+          el.src = effectiveWebcamUrl;
+          el.play().catch(() => {});
+        }
+      }
+    },
+    [webcamStream, effectiveWebcamUrl]
+  );
+
+  // Keep attached stream/url updated when props or config change
   useEffect(() => {
     const el = webcamVideoRef.current;
     if (!el) return;
     if (webcamStream) {
-      el.srcObject = webcamStream;
-      el.play().catch(() => {});
-    } else if (webcamUrl || config.webcamConfig?.url) {
-      el.srcObject = null;
-      el.src = webcamUrl || config.webcamConfig?.url || "";
-      el.play().catch(() => {});
+      if (el.srcObject !== webcamStream) {
+        el.srcObject = webcamStream;
+        el.play().catch(() => {});
+      }
+    } else if (effectiveWebcamUrl) {
+      if (el.src !== effectiveWebcamUrl) {
+        el.srcObject = null;
+        el.src = effectiveWebcamUrl;
+        el.play().catch(() => {});
+      }
     }
-  }, [webcamStream, webcamUrl, config.webcamConfig?.url]);
+  }, [webcamStream, effectiveWebcamUrl]);
 
   // Synchronize webcam video playback with main video playback
   useEffect(() => {
     const mainVid = videoRef.current;
     const camVid = webcamVideoRef.current;
-    if (!mainVid || !camVid || webcamStream) return;
+    if (!mainVid || !camVid || webcamStream || !effectiveWebcamUrl) return;
 
     const handleTimeUpdate = () => {
       if (Math.abs(camVid.currentTime - mainVid.currentTime) > 0.15) {
         camVid.currentTime = mainVid.currentTime;
       }
     };
-    const handlePlay = () => camVid.play().catch(() => {});
-    const handlePause = () => camVid.pause();
+    const handlePlay = () => {
+      camVid.play().catch(() => {});
+    };
+    const handlePause = () => {
+      camVid.pause();
+    };
     const handleSeeking = () => {
       camVid.currentTime = mainVid.currentTime;
     };
+
+    if (!mainVid.paused && camVid.paused) {
+      camVid.play().catch(() => {});
+    }
+    if (mainVid.currentTime > 0) {
+      camVid.currentTime = mainVid.currentTime;
+    }
 
     mainVid.addEventListener("timeupdate", handleTimeUpdate);
     mainVid.addEventListener("play", handlePlay);
@@ -110,7 +150,7 @@ export function VideoCanvas({
       mainVid.removeEventListener("pause", handlePause);
       mainVid.removeEventListener("seeking", handleSeeking);
     };
-  }, [videoRef, webcamStream]);
+  }, [videoRef, webcamStream, effectiveWebcamUrl, config.webcamConfig?.enabled]);
 
   // Initialize Three.js 3D WebGL animation engine
   const { cameraState, getVideoCoordinatesAtCanvasPos } = useThreeAnimationEngine(
@@ -388,7 +428,7 @@ export function VideoCanvas({
         )}
 
         {/* Floating Draggable Webcam PiP Overlay */}
-        {(webcamStream || webcamUrl || config.webcamConfig?.url) && config.webcamConfig?.enabled !== false && (
+        {(Boolean(config.webcamConfig?.enabled) || Boolean(webcamStream || webcamUrl || config.webcamConfig?.url)) && config.webcamConfig?.enabled !== false && (
           (() => {
             const wConfig = config.webcamConfig || {
               enabled: true,
@@ -480,14 +520,20 @@ export function VideoCanvas({
                   }}
                 >
                   <video
-                    ref={webcamVideoRef}
+                    ref={setWebcamVideoEl}
                     autoPlay
                     playsInline
                     muted
                     className={`w-full h-full object-cover pointer-events-none select-none ${
                       wConfig.mirror ? "scale-x-[-1]" : ""
-                    }`}
+                    } ${webcamStream || effectiveWebcamUrl ? "opacity-100" : "opacity-0"}`}
                   />
+                  {!(webcamStream || effectiveWebcamUrl) && (
+                    <div className="absolute inset-0 bg-[#090D16]/90 flex flex-col items-center justify-center gap-1.5 text-slate-400 p-2 text-center pointer-events-none">
+                      <Camera className="w-6 h-6 text-rose-400 animate-pulse" />
+                      <span className="text-[9px] font-mono text-slate-300">Camera Active</span>
+                    </div>
+                  )}
                   {/* Subtle hover badge */}
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/pip:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <span className="text-[10px] font-semibold text-white bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm">

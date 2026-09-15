@@ -9,6 +9,19 @@
     "core:default",
     "dialog:default",
     "fs:default",
+    "fs:read-all",
+    "fs:write-all",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        "**",
+        "$HOME/**",
+        "$DOWNLOAD/**",
+        "$DESKTOP/**",
+        "$DOCUMENT/**",
+        "$VIDEO/**"
+      ]
+    },
     "shell:default",
     "opener:default"
   ]

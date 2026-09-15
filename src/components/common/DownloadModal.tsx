@@ -81,16 +81,33 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
         {/* Modal Header */}
         <div className="text-center mb-6">
-          <a
-            href={GITHUB_RELEASES_PAGE}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-rose-500/10 border border-rose-400/20 text-xs font-mono text-rose-300 mb-3 hover:bg-rose-500/20 hover:border-rose-400/40 transition-all cursor-pointer group"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-            <span>NATIVE DESKTOP EDITION (v0.1.1)</span>
-            <ExternalLink className="w-3 h-3 text-rose-400 group-hover:translate-x-0.5 transition-transform" />
-          </a>
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+            <a
+              href={GITHUB_RELEASES_PAGE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-rose-500/10 border border-rose-400/20 text-xs font-mono text-rose-300 hover:bg-rose-500/20 hover:border-rose-400/40 transition-all cursor-pointer group"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+              <span>NATIVE DESKTOP (v0.1.1)</span>
+              <ExternalLink className="w-3 h-3 text-rose-400 group-hover:translate-x-0.5 transition-transform" />
+            </a>
+
+            <a
+              href={GITHUB_RELEASES_PAGE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center transition-opacity hover:opacity-80"
+              title="Live Download Count from GitHub"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://img.shields.io/github/downloads/ericva01/focuZoom/total?style=flat&color=fb7185&labelColor=1e293b&label=Downloads"
+                alt="Total Downloads"
+                className="h-[22px] rounded"
+              />
+            </a>
+          </div>
           <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Download Glideo
           </h3>

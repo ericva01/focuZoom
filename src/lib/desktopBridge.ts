@@ -175,27 +175,122 @@ export const desktopBridge = {
   },
 
   /**
-   * Native OS dialog to save exported video binary
+   * Lets user choose an export destination folder
    */
-  async saveExportedVideo(defaultName: string, buffer: ArrayBuffer): Promise<SaveDialogResult> {
+  async chooseExportFolder(): Promise<{ canceled: boolean; folderPath?: string }> {
+    if (isTauriEnvironment()) {
+      try {
+        const { open } = await import("@tauri-apps/plugin-dialog");
+        const selected = await open({
+          directory: true,
+          multiple: false,
+          title: "Select Destination Folder for Video Export",
+        });
+        if (!selected) return { canceled: true };
+        const folderPath = typeof selected === "string" ? selected : selected[0];
+        return { canceled: false, folderPath };
+      } catch (err) {
+        console.error("[DesktopBridge:Tauri] chooseExportFolder failed:", err);
+        return { canceled: true };
+      }
+    }
+
+    const extWin = typeof window !== "undefined" ? (window as unknown as {
+      electronAPI?: {
+        chooseExportFolder?: () => Promise<{ canceled: boolean; folderPath?: string }>;
+        showItemInFolder?: (filePath: string) => Promise<void>;
+      };
+      showDirectoryPicker?: (opts?: { mode?: string }) => Promise<{ name: string }>;
+      showSaveFilePicker?: (opts?: {
+        suggestedName?: string;
+        types?: Array<{ description: string; accept: Record<string, string[]> }>;
+      }) => Promise<{
+        name: string;
+        createWritable: () => Promise<{
+          write: (data: ArrayBuffer) => Promise<void>;
+          close: () => Promise<void>;
+        }>;
+      }>;
+    }) : undefined;
+
+    if (isElectronEnvironment() && extWin?.electronAPI?.chooseExportFolder) {
+      return extWin.electronAPI.chooseExportFolder();
+    }
+
+    // Modern browser Directory Picker API
+    if (extWin?.showDirectoryPicker) {
+      try {
+        const dirHandle = await extWin.showDirectoryPicker({
+          mode: "readwrite",
+        });
+        return { canceled: false, folderPath: dirHandle.name };
+      } catch {
+        return { canceled: true };
+      }
+    }
+
+    return { canceled: true };
+  },
+
+  /**
+   * Reveals a file or folder in the OS file manager (File Explorer on Windows, Finder on macOS)
+   */
+  async showInFolder(filePath: string): Promise<void> {
+    if (!filePath) return;
+    if (isTauriEnvironment()) {
+      try {
+        const { revealItemInDir } = await import("@tauri-apps/plugin-opener");
+        await revealItemInDir(filePath);
+        return;
+      } catch (err) {
+        console.warn("[DesktopBridge:Tauri] revealItemInDir failed:", err);
+      }
+    }
+    const extWin = typeof window !== "undefined" ? (window as unknown as {
+      electronAPI?: { showItemInFolder?: (p: string) => Promise<void> };
+    }) : undefined;
+    if (isElectronEnvironment() && extWin?.electronAPI?.showItemInFolder) {
+      return extWin.electronAPI.showItemInFolder(filePath);
+    }
+  },
+
+  /**
+   * Native OS dialog to save exported video binary to chosen folder
+   */
+  async saveExportedVideo(
+    defaultName: string,
+    buffer: ArrayBuffer,
+    destinationOverride?: string
+  ): Promise<SaveDialogResult> {
     if (isTauriEnvironment()) {
       try {
         const { save } = await import("@tauri-apps/plugin-dialog");
         const { writeFile } = await import("@tauri-apps/plugin-fs");
 
-        const targetPath = await save({
-          defaultPath: defaultName || "Glideo-Export.mp4",
-          filters: [
-            {
-              name: "MP4 Video (*.mp4)",
-              extensions: ["mp4"],
-            },
-            {
-              name: "WebM Video (*.webm)",
-              extensions: ["webm"],
-            },
-          ],
-        });
+        let targetPath: string | undefined = destinationOverride;
+
+        if (targetPath) {
+          // If destination is a folder, append file name
+          if (!targetPath.endsWith(".webm") && !targetPath.endsWith(".mp4")) {
+            const sep = targetPath.includes("/") ? "/" : "\\";
+            targetPath = `${targetPath}${targetPath.endsWith(sep) ? "" : sep}${defaultName || "Glideo-Export.webm"}`;
+          }
+        } else {
+          const selectedPath = await save({
+            defaultPath: defaultName || "Glideo-Export.webm",
+            filters: [
+              {
+                name: "WebM Video (*.webm)",
+                extensions: ["webm"],
+              },
+              {
+                name: "MP4 Video (*.mp4)",
+                extensions: ["mp4"],
+              },
+            ],
+          });
+          targetPath = selectedPath || undefined;
+        }
 
         if (!targetPath) {
           return { canceled: true };
@@ -213,13 +308,50 @@ export const desktopBridge = {
       return window.electronAPI.saveExportedVideo(defaultName, buffer);
     }
 
+    // Modern browser Save File Picker API: lets user choose destination folder & file
+    const extWin = typeof window !== "undefined" ? (window as unknown as {
+      showSaveFilePicker?: (opts?: {
+        suggestedName?: string;
+        types?: Array<{ description: string; accept: Record<string, string[]> }>;
+      }) => Promise<{
+        name: string;
+        createWritable: () => Promise<{
+          write: (data: ArrayBuffer) => Promise<void>;
+          close: () => Promise<void>;
+        }>;
+      }>;
+    }) : undefined;
+
+    if (extWin?.showSaveFilePicker) {
+      try {
+        const handle = await extWin.showSaveFilePicker({
+          suggestedName: defaultName || "Glideo-Export.webm",
+          types: [
+            {
+              description: "WebM Video (*.webm)",
+              accept: { "video/webm": [".webm"] },
+            },
+          ],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(buffer);
+        await writable.close();
+        return { canceled: false, filePath: handle.name };
+      } catch (err: unknown) {
+        if ((err as { name?: string })?.name === "AbortError") {
+          return { canceled: true };
+        }
+        // Fall back to standard anchor download
+      }
+    }
+
     // Web fallback: trigger browser binary download
     try {
-      const blob = new Blob([buffer], { type: "video/mp4" });
+      const blob = new Blob([buffer], { type: "video/webm" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = defaultName || "Glideo-Export.mp4";
+      a.download = defaultName || "Glideo-Export.webm";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

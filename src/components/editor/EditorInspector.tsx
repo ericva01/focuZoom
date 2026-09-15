@@ -62,6 +62,7 @@ interface EditorInspectorProps {
   availableCameras?: { deviceId: string; label: string }[];
   enableWebcam?: boolean;
   onToggleWebcam?: () => void;
+  onOpenWebcamReview?: () => void;
   selectedCameraId?: string | null;
   onSelectCameraId?: (id: string) => void;
 }
@@ -98,6 +99,7 @@ export function EditorInspector({
   availableCameras = [],
   enableWebcam = false,
   onToggleWebcam,
+  onOpenWebcamReview,
   selectedCameraId,
   onSelectCameraId,
 }: EditorInspectorProps) {
@@ -1414,6 +1416,19 @@ export function EditorInspector({
                 </button>
               </div>
             </div>
+
+            {/* Quick Button to Launch Webcam Review Modal */}
+            {onOpenWebcamReview && (
+              <Button
+                variant="secondary"
+                size="md"
+                className="w-full text-xs font-semibold"
+                onClick={onOpenWebcamReview}
+                leftIcon={<Camera className="w-3.5 h-3.5 text-rose-400" />}
+              >
+                Open Camera Review & Setup
+              </Button>
+            )}
 
             {/* Camera Device Selector */}
             {availableCameras.length > 0 && (

@@ -6,6 +6,7 @@ import { PreviewMonitor } from "@/components/editor/PreviewMonitor";
 import { EditorInspector } from "@/components/editor/EditorInspector";
 import { MultiTrackTimeline } from "@/components/editor/MultiTrackTimeline";
 import { ExportModal } from "@/components/editor/ExportModal";
+import { WebcamReviewModal } from "@/components/editor/WebcamReviewModal";
 import { useVideoPlayback } from "@/hooks/useVideoPlayback";
 import { useScreenRecorder } from "@/hooks/useScreenRecorder";
 import { generateSampleScreenRecording } from "@/utils/sampleVideoGenerator";
@@ -196,6 +197,7 @@ export default function EditorPage() {
   const [enableWebcam, setEnableWebcam] = useState<boolean>(false);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [isWebcamHidden, setIsWebcamHidden] = useState<boolean>(false);
+  const [isWebcamReviewOpen, setIsWebcamReviewOpen] = useState<boolean>(false);
 
   // Screen recording hook with automatic canvas import and click keyframe mapping
   const screenRecorder = useScreenRecorder({
@@ -931,25 +933,8 @@ export default function EditorPage() {
         showCursor={config.showCursor}
         onToggleCursor={() => handleUpdateConfig({ showCursor: !config.showCursor })}
         enableWebcam={enableWebcam}
-        onToggleWebcam={() => {
-          setEnableWebcam((prev) => !prev);
-          handleUpdateConfig({
-            webcamConfig: {
-              ...(config.webcamConfig || {
-                shape: "circle",
-                position: "bottom-right",
-                customX: 0.85,
-                customY: 0.82,
-                size: 180,
-                borderColor: "#fb7185",
-                borderWidth: 3,
-                shadow: true,
-                mirror: true,
-              }),
-              enabled: !enableWebcam,
-            },
-          });
-        }}
+        onToggleWebcam={() => setIsWebcamReviewOpen(true)}
+        onOpenWebcamReview={() => setIsWebcamReviewOpen(true)}
         hasWebcamRecorded={Boolean(metadata?.webcamUrl || config.webcamConfig?.url)}
         isRightCollapsed={isInspectorCollapsed}
         onToggleRightCollapse={() => setIsInspectorCollapsed((prev) => !prev)}
@@ -1125,6 +1110,7 @@ export default function EditorPage() {
               }}
               selectedCameraId={selectedCameraId}
               onSelectCameraId={setSelectedCameraId}
+              onOpenWebcamReview={() => setIsWebcamReviewOpen(true)}
             />
           </div>
         </div>
@@ -1212,6 +1198,41 @@ export default function EditorPage() {
         projectName={projectName}
         webcamConfig={config.webcamConfig}
         webcamUrl={metadata?.webcamUrl || config.webcamConfig?.url}
+      />
+
+      {/* 5. Pre-Recording Webcam Review & Setup Modal */}
+      <WebcamReviewModal
+        isOpen={isWebcamReviewOpen}
+        onClose={() => setIsWebcamReviewOpen(false)}
+        config={config}
+        onChangeConfig={handleUpdateConfig}
+        liveWebcamStream={screenRecorder.liveWebcamStream}
+        availableCameras={screenRecorder.availableCameras}
+        onStartWebcamPreview={screenRecorder.startWebcamPreview}
+        onStopWebcamPreview={screenRecorder.stopWebcamPreview}
+        onRefreshCameras={screenRecorder.refreshCameras}
+        enableWebcam={enableWebcam}
+        onSetEnableWebcam={(enabled) => {
+          setEnableWebcam(enabled);
+          handleUpdateConfig({
+            webcamConfig: {
+              ...(config.webcamConfig || {
+                shape: "circle",
+                position: "bottom-right",
+                customX: 0.85,
+                customY: 0.82,
+                size: 180,
+                borderColor: "#fb7185",
+                borderWidth: 3,
+                shadow: true,
+                mirror: true,
+              }),
+              enabled,
+            },
+          });
+        }}
+        onStartRecording={screenRecorder.startRecording}
+        isRecording={screenRecorder.isRecording}
       />
     </div>
   );
