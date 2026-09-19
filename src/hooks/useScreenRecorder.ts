@@ -81,6 +81,16 @@ export function useScreenRecorder({
   const webcamStreamRef = useRef<MediaStream | null>(null);
   const webcamRecorderRef = useRef<MediaRecorder | null>(null);
   const webcamChunksRef = useRef<Blob[]>([]);
+  const enableWebcamRef = useRef<boolean>(enableWebcam);
+  const webcamDeviceIdRef = useRef<string | null | undefined>(webcamDeviceId);
+
+  useEffect(() => {
+    enableWebcamRef.current = enableWebcam;
+  }, [enableWebcam]);
+
+  useEffect(() => {
+    webcamDeviceIdRef.current = webcamDeviceId;
+  }, [webcamDeviceId]);
 
   const startTimeRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -138,8 +148,8 @@ export function useScreenRecorder({
 
         const constraints: MediaStreamConstraints = {
           video: devId
-            ? { deviceId: { exact: devId }, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } }
-            : { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
+            ? { deviceId: { exact: devId }, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } }
+            : { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } },
           audio: false,
         };
 
@@ -226,33 +236,53 @@ export function useScreenRecorder({
 
     // Process recorded webcam video if active
     let recordedWebcamBlobUrl: string | null = null;
-    if (webcamRecorderRef.current && webcamRecorderRef.current.state !== "inactive") {
+    if (webcamRecorderRef.current) {
+      const camRec = webcamRecorderRef.current;
       try {
-        await new Promise<void>((resolve) => {
-          if (!webcamRecorderRef.current) return resolve();
-          const camRec = webcamRecorderRef.current;
-          camRec.onstop = () => {
-            if (webcamChunksRef.current.length > 0) {
-              const webcamBlob = new Blob(webcamChunksRef.current, {
-                type: camRec.mimeType || "video/webm",
-              });
-              recordedWebcamBlobUrl = URL.createObjectURL(webcamBlob);
+        if (camRec.state !== "inactive") {
+          await new Promise<void>((resolve) => {
+            const timeoutId = setTimeout(() => resolve(), 2500);
+            camRec.onstop = () => {
+              clearTimeout(timeoutId);
+              resolve();
+            };
+            if (camRec.state === "recording") {
+              try {
+                camRec.requestData();
+              } catch {}
             }
-            resolve();
-          };
-          camRec.stop();
-        });
+            try {
+              camRec.stop();
+            } catch {
+              resolve();
+            }
+          });
+        }
       } catch (camErr) {
         console.warn("[ScreenRecorder] Error finalizing webcam recorder:", camErr);
       }
     }
 
-    // Stop webcam stream tracks
+    // Always assemble recorded webcam blob if chunks were captured
+    if (webcamChunksRef.current && webcamChunksRef.current.length > 0) {
+      try {
+        const mimeType = webcamRecorderRef.current?.mimeType || "video/webm";
+        const webcamBlob = new Blob(webcamChunksRef.current, { type: mimeType });
+        if (webcamBlob.size > 0) {
+          recordedWebcamBlobUrl = URL.createObjectURL(webcamBlob);
+        }
+      } catch (blobErr) {
+        console.warn("[ScreenRecorder] Failed to create webcam blob URL:", blobErr);
+      }
+    }
+    webcamRecorderRef.current = null;
+
+    // Stop webcam stream tracks and clear live preview so it yields immediately to recorded playback
     if (webcamStreamRef.current) {
       webcamStreamRef.current.getTracks().forEach((track) => track.stop());
       webcamStreamRef.current = null;
-      setLiveWebcamStream(null);
     }
+    setLiveWebcamStream(null);
 
     const recorder = mediaRecorderRef.current;
     if (recorder && recorder.state !== "inactive") {
@@ -399,8 +429,12 @@ export function useScreenRecorder({
   }, [onImportRecording, defaultZoomScale]);
 
   // Start recording handler
-  const startRecording = useCallback(async (): Promise<boolean> => {
+  const startRecording = useCallback(async (options?: { enableWebcam?: boolean }): Promise<boolean> => {
     setError(null);
+    const shouldRecordWebcam =
+      options?.enableWebcam !== undefined
+        ? options.enableWebcam
+        : (enableWebcamRef.current ?? enableWebcam);
     recordedClicksRef.current = [];
     recordedTrailRef.current = [];
     chunksRef.current = [];
@@ -450,7 +484,9 @@ export function useScreenRecorder({
         try {
           stream = await navigator.mediaDevices.getDisplayMedia({
             video: {
-              displaySurface: "browser",
+              displaySurface: "monitor",
+              width: { ideal: 3840, max: 3840 },
+              height: { ideal: 2160, max: 2160 },
               frameRate: { ideal: 60, max: 60 },
             },
             audio: true,
@@ -458,6 +494,8 @@ export function useScreenRecorder({
         } catch {
           stream = await navigator.mediaDevices.getDisplayMedia({
             video: {
+              width: { ideal: 3840, max: 3840 },
+              height: { ideal: 2160, max: 2160 },
               frameRate: { ideal: 60, max: 60 },
             },
             audio: false,
@@ -478,7 +516,7 @@ export function useScreenRecorder({
 
       const recorder = new MediaRecorder(stream, {
         mimeType,
-        videoBitsPerSecond: 10000000, // 10 Mbps for crisp 1080p
+        videoBitsPerSecond: 25000000, // 25 Mbps for ultra-crisp 4K/1080p text and UI detail
       });
       mediaRecorderRef.current = recorder;
 
@@ -491,9 +529,9 @@ export function useScreenRecorder({
       // Listen for user clicking native "Stop sharing" browser bar
       const videoTrack = stream.getVideoTracks()[0];
       if (videoTrack) {
-        // Enforce motion content hint so Chromium does not drop frames during static screen periods
+        // Enforce detail content hint so Chromium does not compress or blur sharp UI text
         if ("contentHint" in videoTrack) {
-          (videoTrack as MediaStreamTrack & { contentHint?: string }).contentHint = "motion";
+          (videoTrack as MediaStreamTrack & { contentHint?: string }).contentHint = "detail";
         }
         trackSettingsRef.current = videoTrack.getSettings();
         videoTrack.onended = () => {
@@ -547,8 +585,9 @@ export function useScreenRecorder({
       clickListenerRef.current = handleClick;
 
       // Initialize secondary webcam recording if enabled BEFORE starting screen recorder
-      if (enableWebcam) {
+      if (shouldRecordWebcam) {
         try {
+          const targetDevId = webcamDeviceIdRef.current !== undefined ? webcamDeviceIdRef.current : webcamDeviceId;
           let camStream = webcamStreamRef.current;
           if (
             !camStream ||
@@ -556,7 +595,7 @@ export function useScreenRecorder({
             camStream.getVideoTracks().length === 0 ||
             camStream.getVideoTracks()[0].readyState === "ended"
           ) {
-            camStream = await startWebcamPreview(webcamDeviceId);
+            camStream = await startWebcamPreview(targetDevId);
           }
 
           if (camStream && camStream.active) {
@@ -574,7 +613,7 @@ export function useScreenRecorder({
 
             const camRecorder = new MediaRecorder(camStream, {
               mimeType: camMime,
-              videoBitsPerSecond: 2500000,
+              videoBitsPerSecond: 5000000,
             });
             webcamRecorderRef.current = camRecorder;
             camRecorder.ondataavailable = (ev) => {
@@ -582,7 +621,7 @@ export function useScreenRecorder({
                 webcamChunksRef.current.push(ev.data);
               }
             };
-            camRecorder.start(500);
+            camRecorder.start(250);
           }
         } catch (camErr) {
           console.warn("[ScreenRecorder] Failed to initialize webcam recording:", camErr);

@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import * as THREE from "three";
-import { ClickEvent, ClickTarget, CursorPoint, CanvasConfig, FramePreset } from "@/types/editor";
-import { applyEasing, sineEaseInOut, cubicEaseInOut, clamp } from "@/utils/easing";
+import { ClickEvent, ClickTarget, CursorPoint, CanvasConfig, FramePreset, TimelineClip } from "@/types/editor";
+import { applyEasing, cubicEaseInOut, clamp } from "@/utils/easing";
 
 interface ThreeCameraState {
   scale: number;
@@ -221,7 +221,10 @@ export function useThreeAnimationEngine(
   events: ClickEvent[],
   config: CanvasConfig,
   mousePosRef: React.RefObject<{ x: number; y: number }>,
-  cursorTrail?: CursorPoint[]
+  cursorTrail?: CursorPoint[],
+  hasActiveClip: boolean = true,
+  timelineTime?: number,
+  clips?: TimelineClip[]
 ) {
   const [cameraState, setCameraState] = useState<ThreeCameraState>({
     scale: 1.0,
@@ -247,6 +250,9 @@ export function useThreeAnimationEngine(
     rotX: 0,
     rotY: 0,
     rotZ: 0,
+    velRotX: 0,
+    velRotY: 0,
+    velRotZ: 0,
     haloScale: 0,
     haloOpacity: 0,
     cursorX: 0,
@@ -285,6 +291,12 @@ export function useThreeAnimationEngine(
   cursorTrailRef.current = cursorTrail;
   const mousePosRefCurrent = useRef(mousePosRef);
   mousePosRefCurrent.current = mousePosRef;
+  const hasActiveClipRef = useRef(hasActiveClip);
+  hasActiveClipRef.current = hasActiveClip;
+  const timelineTimeRef = useRef(timelineTime);
+  timelineTimeRef.current = timelineTime;
+  const clipsRef = useRef(clips);
+  clipsRef.current = clips;
 
   // Helper to create rounded rectangle shape in Three.js
   const createRoundedRectShape = (width: number, height: number, radius: number) => {
@@ -684,9 +696,9 @@ export function useThreeAnimationEngine(
   // Synchronize screen material clearcoat reflections and ripple color
   const updateMaterials = useCallback((cfg: CanvasConfig) => {
     if (screenMatRef.current) {
-      const reflectionStrength = cfg.glassReflectionIntensity ?? 0.85;
-      screenMatRef.current.clearcoat = 0.9 * reflectionStrength;
-      screenMatRef.current.reflectivity = 0.7 * reflectionStrength;
+      const reflectionStrength = (cfg.glassReflectionIntensity ?? 0.85) * 0.35;
+      screenMatRef.current.clearcoat = 0.2 * reflectionStrength;
+      screenMatRef.current.reflectivity = 0.15 * reflectionStrength;
       screenMatRef.current.needsUpdate = true;
     }
     if (haloMatRef.current) {
@@ -737,8 +749,8 @@ export function useThreeAnimationEngine(
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(canvas.width, canvas.height, false);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 1.0;
 
     // 2. Scene & Perspective Camera
     const scene = new THREE.Scene();
@@ -759,12 +771,12 @@ export function useThreeAnimationEngine(
     cameraRef.current = camera;
     smoothStateRef.current.camZ = initialBaseZ;
 
-    // 3. Studio Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    // 3. Studio Lighting (Uniform 1:1 screen illumination with soft directional bevel accent)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
 
-    // Key Light (Main soft specular caster)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    // Key Light (Gentle soft specular caster for bezel edge highlights without washing out screen text)
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.35);
     keyLight.position.set(3, 4, 4);
     scene.add(keyLight);
 
@@ -829,22 +841,25 @@ export function useThreeAnimationEngine(
     }
     screenGeo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
 
-    // Video Texture
+    // Video Texture (High-DPI Anisotropic Filtering for tack-sharp text & details at 3D angles)
     const videoTexture = new THREE.VideoTexture(video);
     videoTexture.colorSpace = THREE.SRGBColorSpace;
     videoTexture.minFilter = THREE.LinearFilter;
     videoTexture.magFilter = THREE.LinearFilter;
     videoTexture.generateMipmaps = false;
+    try {
+      videoTexture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+    } catch {}
 
-    // Luxury Screen Material (Clearcoat Glass Sheen + Specular Reflections)
-    const reflectionStrength = config.glassReflectionIntensity ?? 0.85;
+    // Pure Screen Material with 1:1 original color reproduction and zero milky glare
+    const reflectionStrength = (config.glassReflectionIntensity ?? 0.85) * 0.35;
     const screenMat = new THREE.MeshPhysicalMaterial({
       map: videoTexture,
-      roughness: 0.18,
-      metalness: 0.05,
-      clearcoat: 0.9 * reflectionStrength,
-      clearcoatRoughness: 0.08,
-      reflectivity: 0.7 * reflectionStrength,
+      roughness: 0.04,
+      metalness: 0.0,
+      clearcoat: 0.2 * reflectionStrength,
+      clearcoatRoughness: 0.04,
+      reflectivity: 0.15 * reflectionStrength,
       transparent: true,
     });
 
@@ -965,9 +980,11 @@ export function useThreeAnimationEngine(
       clock.getDelta();
       const t = clock.getElapsedTime();
 
-      // Frame-accurate playhead time directly locked to the active video frame
-      // Eliminates the progressive 150-300ms drift and delay over long recordings
-      const effectiveTime = video.currentTime;
+      // Frame-accurate playhead time directly locked to timeline time or active video frame
+      const effectiveTime =
+        timelineTimeRef.current !== undefined
+          ? timelineTimeRef.current
+          : video.currentTime;
       smoothedTimeRef.current = effectiveTime;
 
       // Dynamically sync WebGL buffer size, camera frustum, and aspect ratio on every frame
@@ -982,8 +999,22 @@ export function useThreeAnimationEngine(
         renderer.setSize(canvas.width, canvas.height, false);
       }
 
-      // Update Video Texture strictly when video is actively ready (readyState >= 2)
+      // Check whether a video clip is actively present on the timeline at the current playhead
+      const curClips = clipsRef.current;
+      let isClipActive = hasActiveClipRef.current;
+      if (curClips !== undefined) {
+        if (curClips.length === 0) {
+          isClipActive = false;
+        } else {
+          isClipActive = curClips.some(
+            (c) => effectiveTime >= c.startTimeline && effectiveTime <= c.endTimeline
+          );
+        }
+      }
+
+      // Update Video Texture strictly when video is actively ready (readyState >= 2) AND clip is active on timeline
       const isVideoReady =
+        isClipActive &&
         video.readyState >= 2 &&
         video.videoWidth > 0 &&
         video.videoHeight > 0;
@@ -1019,10 +1050,12 @@ export function useThreeAnimationEngine(
         if (bezelMesh) bezelMesh.scale.set(scaleX, scaleY, 1);
         if (shadowMesh) shadowMesh.scale.set(scaleX, scaleY, 1);
       } else {
-        // When video is not ready, keep screen hidden so the background gradient renders cleanly without any black rectangle
+        // When video is not ready or clip is deleted, keep screen completely hidden
         screenMesh.visible = false;
         if (bezelMesh) bezelMesh.visible = false;
         if (shadowMesh) shadowMesh.visible = false;
+        if (cursorSprite) cursorSprite.visible = false;
+        if (haloMesh) haloMesh.visible = false;
       }
 
       // 1. Identify Active Zoom / Keyframe Event with Smooth Transition Window
@@ -1040,7 +1073,13 @@ export function useThreeAnimationEngine(
       const curConfig = configRef.current;
       const curCursorTrail = cursorTrailRef.current;
 
-      // Zero-heap allocation loop across keyframe events
+      // Multi-keyframe evaluation loop with smooth quadratic blend weighting
+      let totalWeight = 0;
+      let blendedScale = 0;
+      let blendedFocalX = 0;
+      let blendedFocalY = 0;
+      let maxZoomProgress = 0;
+
       for (let i = 0; i < curEvents.length; i++) {
         const event = curEvents[i];
         if (!event.enabled) continue;
@@ -1048,13 +1087,15 @@ export function useThreeAnimationEngine(
         const zoomInDuration = Math.max(0.15, event.zoomInDuration ?? curConfig.zoomDuration ?? 0.45);
         const holdDuration = Math.max(0.2, event.holdDuration ?? curConfig.zoomHoldDuration ?? 1.2);
         const zoomOutDuration = Math.max(0.15, event.zoomOutDuration ?? curConfig.zoomOutDuration ?? curConfig.zoomDuration ?? 0.45);
-        const startTime = event.timestamp; // Begins precisely when the keyframe timestamp is hit
+        const startTime = event.timestamp;
         const peakTime = startTime + zoomInDuration;
         const holdEndTime = peakTime + holdDuration;
         const endTime = holdEndTime + zoomOutDuration;
 
         if (effectiveTime >= startTime && effectiveTime <= endTime) {
-          activeEvent = event;
+          if (!activeEvent || effectiveTime <= holdEndTime) {
+            activeEvent = event;
+          }
           const peakScale = event.zoom || curConfig.defaultZoomScale || 2.2;
 
           activeTargets =
@@ -1064,29 +1105,56 @@ export function useThreeAnimationEngine(
 
           // Dynamically track the cursor position at this exact video frame
           const cursorPosition = sampleCursorTrajectory(effectiveTime, event, curCursorTrail);
-          activeTargetX = cursorPosition.x;
-          activeTargetY = cursorPosition.y;
+          const evTargetX = cursorPosition.x;
+          const evTargetY = cursorPosition.y;
 
+          let evProgress = 0;
           if (effectiveTime < peakTime) {
             // Smooth acceleration into initial zoom target
             const prog = (effectiveTime - startTime) / zoomInDuration;
-            zoomProgress = applyEasing(prog, curConfig.zoomEasing);
+            evProgress = applyEasing(prog, curConfig.zoomEasing);
           } else if (effectiveTime <= holdEndTime) {
-            // Steady hold at peak zoom magnification - DO NOT ZOOM OUT BETWEEN CLICKS!
-            // Camera smoothly glides and follows the cursor wherever it moves
-            zoomProgress = 1.0;
+            // Steady hold at peak zoom magnification
+            evProgress = 1.0;
           } else {
-            // Smooth deceleration easing back to wide view after the entire sequence ends
+            // Smooth symmetrical deceleration easing back to wide view
             const prog = (effectiveTime - holdEndTime) / zoomOutDuration;
-            zoomProgress = 1.0 - sineEaseInOut(prog);
+            evProgress = 1.0 - applyEasing(prog, curConfig.zoomEasing);
           }
 
-          zoomProgress = clamp(zoomProgress, 0, 1);
-          targetDollyScale = 1.0 + (peakScale - 1.0) * zoomProgress;
-          targetFocalX = 0.5 + (activeTargetX - 0.5) * zoomProgress;
-          targetFocalY = 0.5 + (activeTargetY - 0.5) * zoomProgress;
-          break;
+          evProgress = clamp(evProgress, 0, 1);
+
+          if (evProgress > 0) {
+            const evScale = 1.0 + (peakScale - 1.0) * evProgress;
+            const evFocalX = 0.5 + (evTargetX - 0.5) * evProgress;
+            const evFocalY = 0.5 + (evTargetY - 0.5) * evProgress;
+
+            // Quadratic weighting for seamless multi-keyframe cross-fades
+            const weight = evProgress * evProgress;
+            blendedScale += evScale * weight;
+            blendedFocalX += evFocalX * weight;
+            blendedFocalY += evFocalY * weight;
+            totalWeight += weight;
+
+            if (evProgress > maxZoomProgress) {
+              maxZoomProgress = evProgress;
+              activeTargetX = evTargetX;
+              activeTargetY = evTargetY;
+            }
+          }
         }
+      }
+
+      if (totalWeight > 0.0001) {
+        targetDollyScale = blendedScale / totalWeight;
+        targetFocalX = blendedFocalX / totalWeight;
+        targetFocalY = blendedFocalY / totalWeight;
+        zoomProgress = maxZoomProgress;
+      } else {
+        targetDollyScale = 1.0;
+        targetFocalX = 0.5;
+        targetFocalY = 0.5;
+        zoomProgress = 0.0;
       }
 
       // Convert focal point to 3D screen plane coordinates with sub-pixel precision
@@ -1135,8 +1203,8 @@ export function useThreeAnimationEngine(
         smoothStateRef.current.velLookX = 0;
         smoothStateRef.current.velLookY = 0;
       } else {
-        // Silky smooth critically damped spring follower
-        const camSmoothTime = zoomProgress > 0.05 ? 0.20 : 0.26;
+        // Highly responsive critically damped follower eliminating lag and micro-stutter
+        const camSmoothTime = zoomProgress > 0.05 ? 0.08 : 0.14;
         const velXObj = { current: smoothStateRef.current.velCamX };
         const velYObj = { current: smoothStateRef.current.velCamY };
         const velZObj = { current: smoothStateRef.current.velCamZ };
@@ -1300,11 +1368,41 @@ export function useThreeAnimationEngine(
         smoothStateRef.current.rotX = 0;
         smoothStateRef.current.rotY = 0;
         smoothStateRef.current.rotZ = 0;
+        smoothStateRef.current.velRotX = 0;
+        smoothStateRef.current.velRotY = 0;
+        smoothStateRef.current.velRotZ = 0;
       } else {
-        const rotLerpFactor = 1.0 - Math.exp(-10.0 * dt);
-        smoothStateRef.current.rotX += (finalRotX - smoothStateRef.current.rotX) * rotLerpFactor;
-        smoothStateRef.current.rotY += (finalRotY - smoothStateRef.current.rotY) * rotLerpFactor;
-        smoothStateRef.current.rotZ += (finalRotZ - smoothStateRef.current.rotZ) * rotLerpFactor;
+        // Critically-damped angular spring follower: organic cinematic tilt without sudden snaps
+        const rotSmoothTime = 0.12;
+        const velRotXObj = { current: smoothStateRef.current.velRotX };
+        const velRotYObj = { current: smoothStateRef.current.velRotY };
+        const velRotZObj = { current: smoothStateRef.current.velRotZ };
+
+        smoothStateRef.current.rotX = smoothDamp(
+          smoothStateRef.current.rotX,
+          finalRotX,
+          velRotXObj,
+          rotSmoothTime,
+          dt
+        );
+        smoothStateRef.current.rotY = smoothDamp(
+          smoothStateRef.current.rotY,
+          finalRotY,
+          velRotYObj,
+          rotSmoothTime,
+          dt
+        );
+        smoothStateRef.current.rotZ = smoothDamp(
+          smoothStateRef.current.rotZ,
+          finalRotZ,
+          velRotZObj,
+          rotSmoothTime,
+          dt
+        );
+
+        smoothStateRef.current.velRotX = velRotXObj.current;
+        smoothStateRef.current.velRotY = velRotYObj.current;
+        smoothStateRef.current.velRotZ = velRotZObj.current;
       }
 
       screenGroup.rotation.set(

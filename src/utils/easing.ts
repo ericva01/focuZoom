@@ -19,6 +19,20 @@ export function smoothStep(t: number): number {
   return p * p * (3 - 2 * p);
 }
 
+/**
+ * Perlin's C2-continuous smootherstep: 6t^5 - 15t^4 + 10t^3
+ * Zero 1st and 2nd derivatives at t=0 and t=1, completely eliminating acceleration jolts.
+ */
+export function smootherStep(t: number): number {
+  const p = clamp(t, 0, 1);
+  return p * p * p * (p * (p * 6 - 15) + 10);
+}
+
+export function quinticEaseInOut(t: number): number {
+  const p = clamp(t, 0, 1);
+  return p < 0.5 ? 16 * p * p * p * p * p : 1 - Math.pow(-2 * p + 2, 5) / 2;
+}
+
 export function sineEaseInOut(t: number): number {
   const p = clamp(t, 0, 1);
   return -(Math.cos(Math.PI * p) - 1) / 2;
@@ -43,11 +57,11 @@ export function applyEasing(t: number, type: EasingType): number {
     case "spring":
       return springEase(t);
     case "smooth-step":
-      return smoothStep(t);
+      return smootherStep(t);
     case "linear":
       return clamp(t, 0, 1);
     default:
-      return sineEaseInOut(t);
+      return smootherStep(t);
   }
 }
 

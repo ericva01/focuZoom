@@ -65,6 +65,7 @@ interface EditorInspectorProps {
   onOpenWebcamReview?: () => void;
   selectedCameraId?: string | null;
   onSelectCameraId?: (id: string) => void;
+  onUploadWebcamFile?: (file: File) => void;
 }
 
 type InspectorTab = "clip" | "canvas" | "keyframes" | "media" | "cursor" | "webcam";
@@ -102,10 +103,12 @@ function EditorInspectorBase({
   onOpenWebcamReview,
   selectedCameraId,
   onSelectCameraId,
+  onUploadWebcamFile,
 }: EditorInspectorProps) {
   const [activeTab, setActiveTab] = useState<InspectorTab>("canvas");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const customBgInputRef = useRef<HTMLInputElement | null>(null);
+  const webcamFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const activeClip =
     clips.find((c) => c.id === selectedClipId) ||
@@ -1430,6 +1433,97 @@ function EditorInspectorBase({
               </Button>
             )}
 
+            {/* Import / Upload Webcam Video File */}
+            <div className="glass-panel p-4 rounded-xl space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-semibold text-white">Import Webcam Video File</h4>
+                  <p className="text-[11px] text-slate-400">
+                    Attach a recorded webcam video (MP4/WebM) to overlay as PiP on this project.
+                  </p>
+                </div>
+              </div>
+              <input
+                ref={webcamFileInputRef}
+                type="file"
+                accept="video/mp4,video/webm"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (onUploadWebcamFile) {
+                      onUploadWebcamFile(file);
+                    } else {
+                      const url = URL.createObjectURL(file);
+                      onChangeConfig({
+                        webcamConfig: {
+                          ...(config.webcamConfig || {
+                            shape: "circle",
+                            position: "bottom-right",
+                            customX: 0.85,
+                            customY: 0.82,
+                            size: 180,
+                            borderColor: "#fb7185",
+                            borderWidth: 3,
+                            shadow: true,
+                            mirror: true,
+                          }),
+                          enabled: true,
+                          url,
+                        },
+                      });
+                    }
+                  }
+                }}
+              />
+              <div className="flex items-center gap-2 pt-1">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={() => webcamFileInputRef.current?.click()}
+                  leftIcon={<Upload className="w-3.5 h-3.5 text-rose-400" />}
+                >
+                  {config.webcamConfig?.url ? "Replace Webcam Video" : "Upload Webcam Video (MP4/WebM)"}
+                </Button>
+                {config.webcamConfig?.url && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-rose-300 hover:text-rose-200 px-2 flex-shrink-0"
+                    title="Remove Webcam Overlay"
+                    onClick={() => {
+                      onChangeConfig({
+                        webcamConfig: {
+                          ...(config.webcamConfig || {
+                            shape: "circle",
+                            position: "bottom-right",
+                            customX: 0.85,
+                            customY: 0.82,
+                            size: 180,
+                            borderColor: "#fb7185",
+                            borderWidth: 3,
+                            shadow: true,
+                            mirror: true,
+                          }),
+                          enabled: false,
+                          url: null,
+                        },
+                      });
+                    }}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+              {config.webcamConfig?.url && (
+                <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 pt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span>Webcam video active</span>
+                </div>
+              )}
+            </div>
+
             {/* Camera Device Selector */}
             {availableCameras.length > 0 && (
               <div className="glass-panel p-4 rounded-xl space-y-2.5">
@@ -1770,6 +1864,7 @@ export const EditorInspector = memo(EditorInspectorBase, (prev, next) => {
   if (prev.enableWebcam !== next.enableWebcam) return false;
   if (prev.selectedCameraId !== next.selectedCameraId) return false;
   if (prev.availableCameras !== next.availableCameras) return false;
+  if (prev.onUploadWebcamFile !== next.onUploadWebcamFile) return false;
   // Throttle playhead time to 4Hz (every 0.25s) to eliminate 93% of Virtual DOM tree reconciliations
   if (Math.floor(prev.currentTime * 4) !== Math.floor(next.currentTime * 4)) return false;
   return true;

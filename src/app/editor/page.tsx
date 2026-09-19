@@ -110,10 +110,10 @@ export default function EditorPage() {
 
   // Effective project timeline duration computed from clips (stops playback at clip trim end like CapCut)
   const effectiveDuration = useMemo(() => {
-    if (clips.length === 0) return metadata?.duration || 10;
+    if (clips.length === 0) return 0;
     const maxEnd = clips.reduce((max, c) => Math.max(max, c.endTimeline), 0);
-    return maxEnd > 0 ? maxEnd : (metadata?.duration || 10);
-  }, [clips, metadata?.duration]);
+    return maxEnd;
+  }, [clips]);
 
   // Video playback controller hook bounded by effective timeline duration
   const playback = useVideoPlayback(videoRef, effectiveDuration);
@@ -224,8 +224,12 @@ export default function EditorPage() {
       setClips([initialClip]);
       setSelectedClipId(initialClip.id);
 
+      // Yield live camera preview so the recorded webcam clip takes over playback
+      setEnableWebcam(false);
+
       // If webcam was recorded, set up webcam config with recorded URL
       if (webcamBlobUrl) {
+        setMetadata((prev) => (prev ? { ...prev, webcamUrl: webcamBlobUrl } : recMeta));
         setConfig((prev) => ({
           ...prev,
           webcamConfig: {
@@ -376,6 +380,38 @@ export default function EditorPage() {
       playback.seek(0);
     };
   }, [config.defaultZoomScale, playback]);
+
+  // Handle user uploaded webcam video file (to attach to any screen recording or imported video)
+  const handleUploadWebcamFile = useCallback((file: File) => {
+    const url = URL.createObjectURL(file);
+    setMetadata((prev) => (prev ? { ...prev, webcamUrl: url } : {
+      name: file.name,
+      duration: 10,
+      width: 1920,
+      height: 1080,
+      fileSize: (file.size / (1024 * 1024)).toFixed(1) + " MB",
+      url,
+      webcamUrl: url,
+    }));
+    setConfig((prev) => ({
+      ...prev,
+      webcamConfig: {
+        ...(prev.webcamConfig || {
+          shape: "circle",
+          position: "bottom-right",
+          customX: 0.85,
+          customY: 0.82,
+          size: 180,
+          borderColor: "#fb7185",
+          borderWidth: 3,
+          shadow: true,
+          mirror: true,
+        }),
+        enabled: true,
+        url,
+      },
+    }));
+  }, []);
 
   // Handle native desktop video import
   const handleNativeOpenVideo = useCallback(async () => {
@@ -544,7 +580,20 @@ export default function EditorPage() {
   const handleDeleteMultiple = useCallback((clipIds: string[], eventIds: string[]) => {
     recordHistory();
     if (clipIds.length > 0) {
-      setClips((prev) => prev.filter((c) => !clipIds.includes(c.id)));
+      setClips((prev) => {
+        const remaining = prev.filter((c) => !clipIds.includes(c.id));
+        if (remaining.length === 0) {
+          if (playback.isPlaying) {
+            playback.pause();
+          }
+          playback.seek(0);
+          if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+          }
+        }
+        return remaining;
+      });
     }
     if (eventIds.length > 0) {
       setEvents((prev) => prev.filter((e) => !eventIds.includes(e.id)));
@@ -553,7 +602,7 @@ export default function EditorPage() {
     setSelectedEventIds([]);
     setSelectedClipId(null);
     setSelectedEventId(null);
-  }, [recordHistory]);
+  }, [recordHistory, playback, videoRef]);
 
   // Split / Cut Clip Action
   const handleSplitClip = useCallback(
@@ -653,10 +702,23 @@ export default function EditorPage() {
   const handleDeleteClip = useCallback(
     (clipId: string) => {
       recordHistory();
-      setClips((prev) => prev.filter((c) => c.id !== clipId));
+      setClips((prev) => {
+        const remaining = prev.filter((c) => c.id !== clipId);
+        if (remaining.length === 0) {
+          if (playback.isPlaying) {
+            playback.pause();
+          }
+          playback.seek(0);
+          if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+          }
+        }
+        return remaining;
+      });
       if (selectedClipId === clipId) setSelectedClipId(null);
     },
-    [recordHistory, selectedClipId]
+    [recordHistory, selectedClipId, playback, videoRef]
   );
 
   // Ripple Delete Clip Action
@@ -669,6 +731,17 @@ export default function EditorPage() {
 
         const gap = target.duration;
         const remaining = prev.filter((c) => c.id !== clipId);
+        if (remaining.length === 0) {
+          if (playback.isPlaying) {
+            playback.pause();
+          }
+          playback.seek(0);
+          if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+          }
+          return [];
+        }
         return remaining.map((c) => {
           if (c.startTimeline > target.startTimeline) {
             return {
@@ -682,7 +755,7 @@ export default function EditorPage() {
       });
       if (selectedClipId === clipId) setSelectedClipId(null);
     },
-    [recordHistory, selectedClipId]
+    [recordHistory, selectedClipId, playback, videoRef]
   );
 
   // Add click event from canvas click
@@ -1005,6 +1078,7 @@ export default function EditorPage() {
             videoRef={videoRef}
             canvasRef={canvasRef}
             videoSrc={videoSrc}
+            clips={clips}
             events={events}
             selectedEventId={selectedEventId}
             onUpdateEvent={handleUpdateEvent}
@@ -1024,6 +1098,7 @@ export default function EditorPage() {
             cursorTrail={metadata?.cursorTrail}
             webcamStream={screenRecorder.liveWebcamStream}
             webcamUrl={metadata?.webcamUrl || config.webcamConfig?.url}
+            isWebcamHidden={isWebcamHidden}
           />
         </div>
 
@@ -1109,6 +1184,7 @@ export default function EditorPage() {
               selectedCameraId={selectedCameraId}
               onSelectCameraId={setSelectedCameraId}
               onOpenWebcamReview={() => setIsWebcamReviewOpen(true)}
+              onUploadWebcamFile={handleUploadWebcamFile}
             />
           </div>
         </div>
@@ -1167,22 +1243,25 @@ export default function EditorPage() {
         }
         isWebcamHidden={isWebcamHidden}
         onToggleWebcamHidden={() => {
-          setIsWebcamHidden((prev) => !prev);
-          handleUpdateConfig({
-            webcamConfig: {
-              ...(config.webcamConfig || {
-                shape: "circle",
-                position: "bottom-right",
-                customX: 0.85,
-                customY: 0.82,
-                size: 180,
-                borderColor: "#fb7185",
-                borderWidth: 3,
-                shadow: true,
-                mirror: true,
-              }),
-              enabled: isWebcamHidden,
-            },
+          setIsWebcamHidden((prev) => {
+            const nextHidden = !prev;
+            handleUpdateConfig({
+              webcamConfig: {
+                ...(config.webcamConfig || {
+                  shape: "circle",
+                  position: "bottom-right",
+                  customX: 0.85,
+                  customY: 0.82,
+                  size: 180,
+                  borderColor: "#fb7185",
+                  borderWidth: 3,
+                  shadow: true,
+                  mirror: true,
+                }),
+                enabled: !nextHidden,
+              },
+            });
+            return nextHidden;
           });
         }}
       />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, memo } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import {
   Play,
   Pause,
@@ -8,8 +8,11 @@ import {
   Check,
   Cuboid,
   Camera,
+  Film,
+  Maximize,
+  Minimize,
 } from "lucide-react";
-import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint } from "@/types/editor";
+import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint, TimelineClip } from "@/types/editor";
 import { useThreeAnimationEngine } from "@/hooks/useThreeAnimationEngine";
 import { clamp } from "@/utils/easing";
 
@@ -29,7 +32,13 @@ interface VideoCanvasProps {
   onUpdateEvent?: (id: string, updates: Partial<ClickEvent>) => void;
   webcamStream?: MediaStream | null;
   webcamUrl?: string | null;
+  isWebcamHidden?: boolean;
   onChangeConfig?: (updates: Partial<CanvasConfig>) => void;
+  clips?: TimelineClip[];
+  currentTime?: number;
+  hasActiveClip?: boolean;
+  onToggleFullscreen?: () => void;
+  isFullscreen?: boolean;
 }
 
 function VideoCanvasBase({
@@ -48,7 +57,13 @@ function VideoCanvasBase({
   onUpdateEvent,
   webcamStream,
   webcamUrl,
+  isWebcamHidden = false,
   onChangeConfig,
+  clips,
+  currentTime,
+  hasActiveClip,
+  onToggleFullscreen,
+  isFullscreen,
 }: VideoCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hoverCoords, setHoverCoords] = useState<{ x: number; y: number } | null>(null);
@@ -77,35 +92,43 @@ function VideoCanvasBase({
       webcamVideoRef.current = el;
       if (!el) return;
 
-      if (webcamStream) {
+      // Prefer recorded/imported video file over live preview stream during editor playback
+      if (effectiveWebcamUrl) {
+        if (el.src !== effectiveWebcamUrl) {
+          el.srcObject = null;
+          el.src = effectiveWebcamUrl;
+        }
+        if (videoRef.current) {
+          try {
+            el.currentTime = videoRef.current.currentTime || 0;
+          } catch {}
+          if (!videoRef.current.paused) {
+            el.play().catch(() => {});
+          }
+        }
+      } else if (webcamStream) {
         if (el.srcObject !== webcamStream) {
           el.srcObject = webcamStream;
           el.play().catch(() => {});
         }
-      } else if (effectiveWebcamUrl) {
-        if (el.src !== effectiveWebcamUrl) {
-          el.srcObject = null;
-          el.src = effectiveWebcamUrl;
-          el.play().catch(() => {});
-        }
       }
     },
-    [webcamStream, effectiveWebcamUrl]
+    [webcamStream, effectiveWebcamUrl, videoRef]
   );
 
   // Keep attached stream/url updated when props or config change
   useEffect(() => {
     const el = webcamVideoRef.current;
     if (!el) return;
-    if (webcamStream) {
-      if (el.srcObject !== webcamStream) {
-        el.srcObject = webcamStream;
-        el.play().catch(() => {});
-      }
-    } else if (effectiveWebcamUrl) {
+    if (effectiveWebcamUrl) {
       if (el.src !== effectiveWebcamUrl) {
         el.srcObject = null;
         el.src = effectiveWebcamUrl;
+        el.play().catch(() => {});
+      }
+    } else if (webcamStream) {
+      if (el.srcObject !== webcamStream) {
+        el.srcObject = webcamStream;
         el.play().catch(() => {});
       }
     }
@@ -115,7 +138,7 @@ function VideoCanvasBase({
   useEffect(() => {
     const mainVid = videoRef.current;
     const camVid = webcamVideoRef.current;
-    if (!mainVid || !camVid || webcamStream || !effectiveWebcamUrl) return;
+    if (!mainVid || !camVid || !effectiveWebcamUrl) return;
 
     const handleTimeUpdate = () => {
       if (Math.abs(camVid.currentTime - mainVid.currentTime) > 0.15) {
@@ -152,6 +175,15 @@ function VideoCanvasBase({
     };
   }, [videoRef, webcamStream, effectiveWebcamUrl, config.webcamConfig?.enabled]);
 
+  // Determine if a video clip is actively present on the timeline
+  const effectiveHasActiveClip = useMemo(() => {
+    if (hasActiveClip !== undefined) return hasActiveClip;
+    if (!clips) return true;
+    if (clips.length === 0) return false;
+    if (currentTime === undefined) return clips.length > 0;
+    return clips.some((c) => currentTime >= c.startTimeline && currentTime <= c.endTimeline);
+  }, [hasActiveClip, clips, currentTime]);
+
   // Initialize Three.js 3D WebGL animation engine
   const { cameraState, getVideoCoordinatesAtCanvasPos } = useThreeAnimationEngine(
     videoRef,
@@ -160,7 +192,10 @@ function VideoCanvasBase({
     events,
     config,
     mousePosRef,
-    cursorTrail
+    cursorTrail,
+    effectiveHasActiveClip,
+    currentTime,
+    clips
   );
 
   // Set internal canvas resolution based on Aspect Ratio
@@ -330,6 +365,23 @@ function VideoCanvasBase({
         className="hidden"
       />
 
+      {/* Empty Timeline Stage Overlay when video clip has been deleted */}
+      {clips !== undefined && clips.length === 0 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 p-4 animate-in fade-in duration-200">
+          <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-[#090D16]/85 border border-white/10 backdrop-blur-md shadow-glass-lg max-w-sm text-center">
+            <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+              <Film className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">Timeline is Empty</p>
+              <p className="text-xs text-slate-400 mt-1">
+                The video clip was deleted from the timeline. Record screen or import video to continue editing.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Right-Click Moving Banner Overlay */}
       {isRightClickDragging && (
         <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-rose-400/60 bg-rose-950/90 text-white font-bold text-xs shadow-glass-md animate-pulse">
@@ -371,6 +423,12 @@ function VideoCanvasBase({
           width={defaultWidth}
           height={defaultHeight}
           onClick={handleCanvasClick}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            if (!isAddMode && onToggleFullscreen) {
+              onToggleFullscreen();
+            }
+          }}
           onMouseDown={handleCanvasMouseDown}
           onMouseUp={handleCanvasMouseUp}
           onMouseMove={handleMouseMove}
@@ -383,6 +441,21 @@ function VideoCanvasBase({
             aspectRatio: aspectCss,
           }}
         />
+
+        {/* Floating Fullscreen Button on Hover */}
+        {onToggleFullscreen && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFullscreen();
+            }}
+            title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
+            className="absolute top-4 right-4 z-30 p-2 rounded-xl glass-panel text-slate-300 hover:text-white shadow-glass-md backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10"
+          >
+            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+          </button>
+        )}
 
         {/* Center Hover Play/Pause Overlay indicator when not in Add mode */}
         {!isAddMode && (
@@ -427,7 +500,7 @@ function VideoCanvasBase({
         )}
 
         {/* Floating Draggable Webcam PiP Overlay */}
-        {(Boolean(config.webcamConfig?.enabled) || Boolean(webcamStream || webcamUrl || config.webcamConfig?.url)) && config.webcamConfig?.enabled !== false && (
+        {Boolean(effectiveWebcamUrl || webcamStream) && !isWebcamHidden && (
           (() => {
             const wConfig = config.webcamConfig || {
               enabled: true,

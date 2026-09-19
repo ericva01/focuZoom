@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   Play,
   Pause,
@@ -9,8 +10,10 @@ import {
   Repeat,
   Crosshair,
   Ratio,
+  Maximize,
+  Minimize,
 } from "lucide-react";
-import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint } from "@/types/editor";
+import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint, TimelineClip } from "@/types/editor";
 import { VideoCanvas } from "@/components/editor/VideoCanvas";
 import { Button } from "@/components/ui/Button";
 import { formatSMPTETimecode } from "./MultiTrackTimeline";
@@ -19,6 +22,7 @@ interface PreviewMonitorProps {
   videoRef: React.RefObject<HTMLVideoElement>;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   videoSrc: string | null;
+  clips?: TimelineClip[];
   events: ClickEvent[];
   config: CanvasConfig;
   onChangeConfig: (updates: Partial<CanvasConfig>) => void;
@@ -38,12 +42,14 @@ interface PreviewMonitorProps {
   onUpdateEvent?: (id: string, updates: Partial<ClickEvent>) => void;
   webcamStream?: MediaStream | null;
   webcamUrl?: string | null;
+  isWebcamHidden?: boolean;
 }
 
 export function PreviewMonitor({
   videoRef,
   canvasRef,
   videoSrc,
+  clips,
   events,
   config,
   onChangeConfig,
@@ -63,7 +69,59 @@ export function PreviewMonitor({
   onUpdateEvent,
   webcamStream,
   webcamUrl,
+  isWebcamHidden = false,
 }: PreviewMonitorProps) {
+  const monitorRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  const toggleFullscreen = useCallback(async () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (monitorRef.current?.requestFullscreen) {
+          await monitorRef.current.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn("Fullscreen toggle error:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFsChange);
+    document.addEventListener("webkitfullscreenchange", handleFsChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFsChange);
+      document.removeEventListener("webkitfullscreenchange", handleFsChange);
+    };
+  }, []);
+
+  // Keyboard shortcut: Press 'F' to toggle fullscreen when not in an input field
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeTag = (document.activeElement?.tagName || "").toLowerCase();
+      if (
+        activeTag === "input" ||
+        activeTag === "textarea" ||
+        (document.activeElement as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+      if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [toggleFullscreen]);
+
   const aspectRatios: { id: AspectRatio; label: string }[] = [
     { id: "16:9", label: "16:9 Landscape" },
     { id: "9:16", label: "9:16 Reel/TikTok" },
@@ -72,7 +130,12 @@ export function PreviewMonitor({
   ];
 
   return (
-    <div className="h-full flex flex-col bg-[#090D16]/50 select-none overflow-hidden relative">
+    <div
+      ref={monitorRef}
+      className={`h-full flex flex-col select-none overflow-hidden relative transition-colors duration-200 ${
+        isFullscreen ? "fixed inset-0 z-50 bg-[#06080F]" : "bg-[#090D16]/50"
+      }`}
+    >
       {/* 1. Monitor Top Control Bar */}
       <div className="h-10 px-4 border-b border-white/[0.08] bg-white/[0.02] flex items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
         {/* Left: Aspect Ratio Selector */}
@@ -102,7 +165,7 @@ export function PreviewMonitor({
           <span>{config.aspectRatio === "9:16" ? "1080x1920" : "1920x1080"} 60 FPS</span>
         </div>
 
-        {/* Right: Add Keyframe Mode Toggle */}
+        {/* Right: Add Keyframe Mode Toggle & Fullscreen Button */}
         <div className="flex items-center gap-2">
           <Button
             variant={isAddMode ? "active" : "secondary"}
@@ -113,6 +176,18 @@ export function PreviewMonitor({
           >
             {isAddMode ? "Click Video to Add Zoom" : "Click-to-Zoom Mode"}
           </Button>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
+            className={`p-1.5 rounded-xl border transition-all ${
+              isFullscreen
+                ? "bg-rose-500/20 text-rose-300 border-rose-400/30"
+                : "text-slate-400 hover:text-white border-white/10 bg-white/[0.04] hover:bg-white/[0.08]"
+            }`}
+          >
+            {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
+          </button>
         </div>
       </div>
 
@@ -122,6 +197,8 @@ export function PreviewMonitor({
           videoRef={videoRef}
           canvasRef={canvasRef}
           videoSrc={videoSrc}
+          clips={clips}
+          currentTime={currentTime}
           events={events}
           config={config}
           isPlaying={isPlaying}
@@ -134,7 +211,10 @@ export function PreviewMonitor({
           onUpdateEvent={onUpdateEvent}
           webcamStream={webcamStream}
           webcamUrl={webcamUrl}
+          isWebcamHidden={isWebcamHidden}
           onChangeConfig={onChangeConfig}
+          onToggleFullscreen={toggleFullscreen}
+          isFullscreen={isFullscreen}
         />
       </div>
 
@@ -181,7 +261,7 @@ export function PreviewMonitor({
           <span className="text-slate-400">{formatSMPTETimecode(duration)}</span>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={onToggleLoop}
@@ -189,10 +269,22 @@ export function PreviewMonitor({
             className={`p-1.5 rounded-lg border transition-all ${
               isLooping
                 ? "bg-rose-500/20 text-rose-300 border-rose-400/30"
-                : "text-slate-400 hover:text-white border-transparent"
+                : "text-slate-400 hover:text-white border-transparent hover:bg-white/[0.06]"
             }`}
           >
             <Repeat className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
+            className={`p-1.5 rounded-lg border transition-all ${
+              isFullscreen
+                ? "bg-rose-500/20 text-rose-300 border-rose-400/30"
+                : "text-slate-400 hover:text-white border-transparent hover:bg-white/[0.06]"
+            }`}
+          >
+            {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>

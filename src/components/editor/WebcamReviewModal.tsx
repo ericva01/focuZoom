@@ -31,7 +31,7 @@ export interface WebcamReviewModalProps {
   onRefreshCameras: () => Promise<{ deviceId: string; label: string }[]>;
   enableWebcam?: boolean;
   onSetEnableWebcam: (enabled: boolean) => void;
-  onStartRecording: () => Promise<boolean>;
+  onStartRecording: (options?: { enableWebcam?: boolean }) => Promise<boolean>;
   isRecording?: boolean;
 }
 
@@ -547,7 +547,7 @@ export function WebcamReviewModal({
                 onClick={async () => {
                   onSetEnableWebcam(true);
                   onClose();
-                  await onStartRecording();
+                  await onStartRecording({ enableWebcam: true });
                 }}
                 className="text-xs font-bold shadow-md shadow-rose-600/30"
                 leftIcon={<Play className="w-3.5 h-3.5 fill-white" />}
