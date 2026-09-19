@@ -27,7 +27,7 @@ interface EditorSettingsModalProps {
   onToggleAutoSave: (enabled: boolean) => void;
   autoSaveInterval: number;
   onChangeAutoSaveInterval: (interval: number) => void;
-  onSaveNow: () => void;
+  onSaveNow?: () => void;
   onClearCache?: () => void;
 }
 
@@ -255,11 +255,13 @@ export function EditorSettingsModal({
               variant="secondary"
               size="sm"
               onClick={() => {
-                onSaveNow();
+                if (onSaveNow) {
+                  onSaveNow();
+                }
                 onClose();
               }}
             >
-              Save Now & Close
+              {onSaveNow ? "Save Now & Close" : "Done"}
             </Button>
           </div>
         </div>

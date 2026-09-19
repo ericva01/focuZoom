@@ -17,6 +17,7 @@ import {
   Timer,
   EyeOff,
   Camera,
+  Ungroup,
 } from "lucide-react";
 import {
   CanvasConfig,
@@ -49,6 +50,7 @@ interface EditorInspectorProps {
   onSelectEvent: (event: ClickEvent) => void;
   onUpdateEvent: (id: string, updates: Partial<ClickEvent>) => void;
   onDeleteEvent: (id: string) => void;
+  onUngroupEvent?: (id: string) => void;
   onAddCurrentTimeEvent: () => void;
   metadata: VideoMetadata | null;
   onFileUpload: (file: File) => void;
@@ -87,6 +89,7 @@ function EditorInspectorBase({
   onSelectEvent,
   onUpdateEvent,
   onDeleteEvent,
+  onUngroupEvent,
   onAddCurrentTimeEvent,
   metadata,
   onFileUpload,
@@ -627,15 +630,28 @@ function EditorInspectorBase({
                       Zoom {selectedEvent.zoom || 2}X
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => onDeleteEvent(selectedEvent.id)}
-                    className="flex items-center gap-1 text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 transition-colors cursor-pointer"
-                    title="Delete this zoom effect (or press Delete key)"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    <span>Delete</span>
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    {selectedEvent.targets && selectedEvent.targets.length > 1 && onUngroupEvent && (
+                      <button
+                        type="button"
+                        onClick={() => onUngroupEvent(selectedEvent.id)}
+                        className="flex items-center gap-1 text-amber-300 hover:text-amber-200 text-xs px-2 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/30 transition-colors cursor-pointer"
+                        title={`Ungroup into ${selectedEvent.targets.length} discrete zoom keyframes`}
+                      >
+                        <Ungroup className="w-3 h-3" />
+                        <span>Ungroup ({selectedEvent.targets.length})</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => onDeleteEvent(selectedEvent.id)}
+                      className="flex items-center gap-1 text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                      title="Delete this zoom effect (or press Delete key)"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Zoom Magnification Scale Pills */}

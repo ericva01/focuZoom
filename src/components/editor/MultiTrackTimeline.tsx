@@ -27,6 +27,8 @@ import {
   Plus,
   X,
   Camera,
+  Ungroup,
+  Group,
 } from "lucide-react";
 import { ClickEvent, TimelineClip } from "@/types/editor";
 
@@ -48,6 +50,8 @@ interface MultiTrackTimelineProps {
   onDeleteEvent?: (id: string) => void;
   onAddKeyframeAtCurrentTime: () => void;
   onMergeNearbyClicks?: () => void;
+  onUngroupEvent?: (eventId: string) => void;
+  onGroupSelectedEvents?: (eventIds: string[]) => void;
   clips: TimelineClip[];
   selectedClipId: string | null;
   selectedClipIds?: string[];
@@ -177,6 +181,8 @@ function MultiTrackTimelineBase({
   onDeleteEvent,
   onAddKeyframeAtCurrentTime,
   onMergeNearbyClicks,
+  onUngroupEvent,
+  onGroupSelectedEvents,
   clips,
   selectedClipId,
   onSelectClip,
@@ -1022,6 +1028,45 @@ function MultiTrackTimelineBase({
                   <Plus className="w-2.5 h-2.5" />
                   <span>Add</span>
                 </button>
+
+                {/* Ungroup button: when active selected event has multiple targets */}
+                {selectedEventId && (() => {
+                  const activeEv = events.find((e) => e.id === selectedEventId);
+                  if (activeEv && activeEv.targets && activeEv.targets.length > 1 && onUngroupEvent) {
+                    return (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onUngroupEvent(activeEv.id);
+                        }}
+                        className="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold border border-amber-400/40 flex items-center gap-1 transition-colors shadow-sm"
+                        title={`Ungroup into ${activeEv.targets.length} discrete zoom keyframes`}
+                      >
+                        <Ungroup className="w-2.5 h-2.5" />
+                        <span>Ungroup ({activeEv.targets.length})</span>
+                      </button>
+                    );
+                  }
+                  return null;
+                })()}
+
+                {/* Group Selected button: when 2 or more events are selected */}
+                {selectedEventIds.length > 1 && onGroupSelectedEvents && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onGroupSelectedEvents(selectedEventIds);
+                    }}
+                    className="px-1.5 py-0.5 rounded bg-indigo-500/30 hover:bg-indigo-500/40 text-indigo-200 text-[10px] font-bold border border-indigo-400/40 flex items-center gap-1 transition-colors shadow-sm"
+                    title={`Group ${selectedEventIds.length} selected zoom keyframes into 1 section`}
+                  >
+                    <Group className="w-2.5 h-2.5" />
+                    <span>Group ({selectedEventIds.length})</span>
+                  </button>
+                )}
+
                 {onMergeNearbyClicks && (
                   <button
                     type="button"
@@ -1030,9 +1075,10 @@ function MultiTrackTimelineBase({
                       onMergeNearbyClicks();
                     }}
                     className="px-1.5 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-[10px] font-medium border border-indigo-400/30 flex items-center gap-1 transition-colors"
-                    title="Group clicks within 1-2s into single continuous zoom sequences"
+                    title="Auto-group rapid burst clicks (< 0.8s) into smooth continuous sections"
                   >
-                    <span>Group Clicks</span>
+                    <Combine className="w-2.5 h-2.5" />
+                    <span>Auto Group</span>
                   </button>
                 )}
                 <button
@@ -1083,8 +1129,15 @@ function MultiTrackTimelineBase({
                     key={ev.id}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSelectEvent(ev);
-                      onSeek(effectiveTimestamp);
+                      if ((e.shiftKey || e.ctrlKey || e.metaKey) && onSelectMultiple) {
+                        const newEventIds = selectedEventIds.includes(ev.id)
+                          ? selectedEventIds.filter((id) => id !== ev.id)
+                          : [...selectedEventIds, ev.id];
+                        onSelectMultiple(selectedClipIds, newEventIds);
+                      } else {
+                        onSelectEvent(ev);
+                        onSeek(effectiveTimestamp);
+                      }
                     }}
                     onContextMenu={(e) => e.preventDefault()}
                     style={{
@@ -1170,6 +1223,24 @@ function MultiTrackTimelineBase({
                           );
                         })}
                       </div>
+                    )}
+
+                    {/* Quick Ungroup Button if event has multiple targets */}
+                    {ev.targets && ev.targets.length > 1 && onUngroupEvent && (
+                      <button
+                        type="button"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onUngroupEvent(ev.id);
+                        }}
+                        className={`p-1 text-amber-200/90 hover:text-white hover:bg-amber-500/30 rounded-md mr-1 transition-all z-20 cursor-pointer ${
+                          isSelected ? "opacity-100 bg-black/20" : "opacity-0 group-hover/zoom:opacity-100"
+                        }`}
+                        title={`Ungroup into ${ev.targets.length} discrete keyframes`}
+                      >
+                        <Ungroup className="w-3 h-3" />
+                      </button>
                     )}
 
                     {/* Quick Delete Button */}

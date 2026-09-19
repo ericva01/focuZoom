@@ -16,18 +16,86 @@ import {
   ChevronRight,
   ShieldCheck,
   Sparkles,
+  Settings,
 } from "lucide-react";
 import { getSavedProjects, deleteProject, saveProject, SavedProject } from "@/utils/projectStorage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AspectRatio } from "@/types/editor";
 import { AboutView } from "@/components/about/AboutView";
 import { desktopBridge } from "@/lib/desktopBridge";
+import { EditorSettingsModal, ThemeMode } from "@/components/editor/EditorSettingsModal";
 
 export function DesktopAppDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"home" | "projects" | "about">("home");
   const [searchQuery, setSearchQuery] = useState("");
   const [savedProjects, setSavedProjects] = useState<SavedProject[]>([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("glideo_theme") as ThemeMode | null;
+      return saved || "dark";
+    }
+    return "dark";
+  });
+
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("glideo_autosave_enabled") !== "false";
+    }
+    return true;
+  });
+
+  const [autoSaveInterval, setAutoSaveInterval] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      return parseInt(localStorage.getItem("glideo_autosave_interval") || "5", 10);
+    }
+    return 5;
+  });
+
+  // Apply theme class to document element
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("light");
+      root.classList.remove("dark");
+    } else if (theme === "dark") {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    } else {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (isDark) {
+        root.classList.add("dark");
+        root.classList.remove("light");
+      } else {
+        root.classList.add("light");
+        root.classList.remove("dark");
+      }
+    }
+  }, [theme]);
+
+  const handleThemeChange = (newTheme: ThemeMode) => {
+    setTheme(newTheme);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glideo_theme", newTheme);
+    }
+  };
+
+  const handleToggleAutoSave = (enabled: boolean) => {
+    setAutoSaveEnabled(enabled);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glideo_autosave_enabled", enabled ? "true" : "false");
+    }
+  };
+
+  const handleChangeAutoSaveInterval = (interval: number) => {
+    setAutoSaveInterval(interval);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glideo_autosave_interval", interval.toString());
+    }
+  };
 
   useEffect(() => {
     setSavedProjects(getSavedProjects());
@@ -186,6 +254,14 @@ export function DesktopAppDashboard() {
               <Sparkles className={`w-4 h-4 ${activeTab === "about" ? "text-rose-400" : "text-slate-400"}`} />
               <span>About Creator</span>
             </button>
+
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all cursor-pointer"
+            >
+              <Settings className="w-4 h-4 text-slate-400" />
+              <span>Settings</span>
+            </button>
           </nav>
         </div>
 
@@ -229,6 +305,15 @@ export function DesktopAppDashboard() {
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>New Video</span>
+            </button>
+
+            {/* Settings Button */}
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+              title="Application Settings (Theme, Auto-Save, Storage)"
+            >
+              <Settings className="w-4 h-4" />
             </button>
 
             {/* User Profile Avatar */}
@@ -443,6 +528,18 @@ export function DesktopAppDashboard() {
           )}
         </div>
       </main>
+
+      {/* Global Application Settings Modal */}
+      <EditorSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        theme={theme}
+        onThemeChange={handleThemeChange}
+        autoSaveEnabled={autoSaveEnabled}
+        onToggleAutoSave={handleToggleAutoSave}
+        autoSaveInterval={autoSaveInterval}
+        onChangeAutoSaveInterval={handleChangeAutoSaveInterval}
+      />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { WebcamReviewModal } from "@/components/editor/WebcamReviewModal";
 import { useVideoPlayback } from "@/hooks/useVideoPlayback";
 import { useScreenRecorder } from "@/hooks/useScreenRecorder";
 import { generateSampleScreenRecording } from "@/utils/sampleVideoGenerator";
-import { clusterNearbyClicks } from "@/utils/clickClusterer";
+import { clusterNearbyClicks, ungroupClickEvent, groupClickEvents } from "@/utils/clickClusterer";
 import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   AspectRatio,
@@ -263,7 +263,7 @@ export default function EditorPage() {
       }
 
       if (recEvents && recEvents.length > 0) {
-        setEvents(clusterNearbyClicks(recEvents, 1.8, config.defaultZoomScale, recMeta.cursorTrail));
+        setEvents(clusterNearbyClicks(recEvents, 0.8, config.defaultZoomScale, recMeta.cursorTrail));
       } else {
         setEvents([
           {
@@ -963,11 +963,11 @@ export default function EditorPage() {
       enabled: true,
     };
 
-    setEvents((prev) =>
-      clusterNearbyClicks([...prev, newEvent], 1.8, config.defaultZoomScale, metadata?.cursorTrail)
-    );
+    recordHistory();
+    setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
+    setSelectedEventId(newEvent.id);
     setIsAddMode(false);
-  }, [playback.currentTime, config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
+  }, [playback.currentTime, config.defaultZoomScale, recordHistory]);
 
   // Add event at current playhead time
   const handleAddCurrentTimeEvent = useCallback(() => {
@@ -978,13 +978,16 @@ export default function EditorPage() {
       x: 0.5,
       y: 0.5,
       zoom: config.defaultZoomScale,
+      holdDuration: 1.2,
+      zoomInDuration: 0.4,
+      zoomOutDuration: 0.4,
       label: `Target at ${playback.currentTime.toFixed(1)}s`,
       enabled: true,
     };
-    setEvents((prev) =>
-      clusterNearbyClicks([...prev, newEvent], 1.8, config.defaultZoomScale, metadata?.cursorTrail)
-    );
-  }, [playback.currentTime, config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
+    recordHistory();
+    setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
+    setSelectedEventId(newEvent.id);
+  }, [playback.currentTime, config.defaultZoomScale, recordHistory]);
 
   const handleUpdateEvent = useCallback((id: string, updates: Partial<ClickEvent>) => {
     recordHistory();
@@ -1029,8 +1032,43 @@ export default function EditorPage() {
 
   const handleMergeNearbyClicks = useCallback(() => {
     recordHistory();
-    setEvents((prev) => clusterNearbyClicks(prev, 1.8, config.defaultZoomScale, metadata?.cursorTrail));
+    setEvents((prev) => clusterNearbyClicks(prev, 0.8, config.defaultZoomScale, metadata?.cursorTrail));
   }, [config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
+
+  const handleUngroupEvent = useCallback((eventId: string) => {
+    const targetEvent = events.find((e) => e.id === eventId);
+    if (!targetEvent || !targetEvent.targets || targetEvent.targets.length <= 1) return;
+
+    recordHistory();
+    const unpacked = ungroupClickEvent(targetEvent);
+    setEvents((prev) => {
+      const idx = prev.findIndex((e) => e.id === eventId);
+      if (idx === -1) return prev;
+      const nextList = [...prev.slice(0, idx), ...unpacked, ...prev.slice(idx + 1)];
+      return nextList.sort((a, b) => a.timestamp - b.timestamp);
+    });
+    setSelectedEventId(unpacked[0]?.id || null);
+    setSelectedEventIds([]);
+  }, [events, recordHistory]);
+
+  const handleGroupSelectedEvents = useCallback((targetIds?: string[]) => {
+    const ids = targetIds || selectedEventIds;
+    if (!ids || ids.length < 2) return;
+
+    const eventsToGroup = events.filter((e) => ids.includes(e.id));
+    if (eventsToGroup.length < 2) return;
+
+    recordHistory();
+    const grouped = groupClickEvents(eventsToGroup, config.defaultZoomScale, metadata?.cursorTrail);
+    if (!grouped) return;
+
+    setEvents((prev) => {
+      const filtered = prev.filter((e) => !ids.includes(e.id));
+      return [...filtered, grouped].sort((a, b) => a.timestamp - b.timestamp);
+    });
+    setSelectedEventId(grouped.id);
+    setSelectedEventIds([]);
+  }, [config.defaultZoomScale, events, metadata?.cursorTrail, recordHistory, selectedEventIds]);
 
   const handleSelectEvent = useCallback((event: ClickEvent) => {
     setSelectedEventId(event.id);
@@ -1350,6 +1388,7 @@ export default function EditorPage() {
               onSelectEvent={handleSelectEvent}
               onUpdateEvent={handleUpdateEvent}
               onDeleteEvent={handleDeleteEvent}
+              onUngroupEvent={handleUngroupEvent}
               onAddCurrentTimeEvent={handleAddCurrentTimeEvent}
               metadata={metadata}
               onFileUpload={handleFileUpload}
@@ -1411,6 +1450,8 @@ export default function EditorPage() {
         onDeleteMultiple={handleDeleteMultiple}
         onUpdateEvent={handleUpdateEvent}
         onDeleteEvent={handleDeleteEvent}
+        onUngroupEvent={handleUngroupEvent}
+        onGroupSelectedEvents={handleGroupSelectedEvents}
         onAddKeyframeAtCurrentTime={handleAddCurrentTimeEvent}
         onMergeNearbyClicks={handleMergeNearbyClicks}
         clips={clips}

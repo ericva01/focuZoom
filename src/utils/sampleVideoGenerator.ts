@@ -84,7 +84,7 @@ export async function generateSampleScreenRecording(): Promise<{
           },
         ];
 
-        const clustered = clusterNearbyClicks(defaultEvents, 1.8, 2.2, sampleCursorTrail);
+        const clustered = clusterNearbyClicks(defaultEvents, 0.8, 2.2, sampleCursorTrail);
 
         resolve({
           blobUrl,

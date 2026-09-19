@@ -331,7 +331,7 @@ export function useScreenRecorder({
 
             const clusteredClicks = clusterNearbyClicks(
               sortedClicks,
-              1.8,
+              0.8,
               defaultZoomScale,
               fullTrail
             );
@@ -409,7 +409,7 @@ export function useScreenRecorder({
           );
           const clusteredClicks = clusterNearbyClicks(
             sortedClicks,
-            2.0,
+            0.8,
             defaultZoomScale,
             fullTrail
           );
