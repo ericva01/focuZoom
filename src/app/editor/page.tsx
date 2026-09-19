@@ -273,9 +273,9 @@ export default function EditorPage() {
   });
 
   // Partial update helper for config
-  const handleUpdateConfig = (updates: Partial<CanvasConfig>) => {
+  const handleUpdateConfig = useCallback((updates: Partial<CanvasConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
-  };
+  }, []);
 
   // Load procedural demo recording
   const handleLoadDemo = useCallback(async () => {
@@ -600,7 +600,6 @@ export default function EditorPage() {
   // Trim Clip Action
   const handleTrimClip = useCallback(
     (clipId: string, newStart: number, newEnd: number) => {
-      recordHistory();
       setClips((prev) => {
         const target = prev.find((c) => c.id === clipId);
         if (!target) return prev;
@@ -624,13 +623,12 @@ export default function EditorPage() {
         playback.seek(newEnd);
       }
     },
-    [playback, recordHistory]
+    [playback]
   );
 
   // Move / Reposition Clip on Timeline
   const handleMoveClip = useCallback(
     (clipId: string, newStart: number) => {
-      recordHistory();
       setClips((prev) => {
         const target = prev.find((c) => c.id === clipId);
         if (!target) return prev;
@@ -648,7 +646,7 @@ export default function EditorPage() {
         });
       });
     },
-    [recordHistory]
+    []
   );
 
   // Delete Clip Action
@@ -688,7 +686,7 @@ export default function EditorPage() {
   );
 
   // Add click event from canvas click
-  const handleAddClickAtCoords = (x: number, y: number) => {
+  const handleAddClickAtCoords = useCallback((x: number, y: number) => {
     recordHistory();
     const newEvent: ClickEvent = {
       id: "click-" + Date.now(),
@@ -704,7 +702,7 @@ export default function EditorPage() {
       clusterNearbyClicks([...prev, newEvent], 1.8, config.defaultZoomScale, metadata?.cursorTrail)
     );
     setIsAddMode(false);
-  };
+  }, [playback.currentTime, config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
 
   // Add event at current playhead time
   const handleAddCurrentTimeEvent = useCallback(() => {
@@ -723,7 +721,7 @@ export default function EditorPage() {
     );
   }, [playback.currentTime, config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
 
-  const handleUpdateEvent = (id: string, updates: Partial<ClickEvent>) => {
+  const handleUpdateEvent = useCallback((id: string, updates: Partial<ClickEvent>) => {
     recordHistory();
     setEvents((prev) =>
       prev.map((e) => {
@@ -756,7 +754,7 @@ export default function EditorPage() {
         return updated;
       })
     );
-  };
+  }, [recordHistory]);
 
   const handleDeleteEvent = useCallback((id: string) => {
     recordHistory();
@@ -1151,6 +1149,7 @@ export default function EditorPage() {
         canRedo={future.length > 0}
         onUndo={handleUndo}
         onRedo={handleRedo}
+        onCommitHistory={recordHistory}
         webcamClip={
           (metadata?.webcamUrl || config.webcamConfig?.url)
             ? {

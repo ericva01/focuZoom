@@ -1,0 +1,62 @@
+name: "Release Glideo"
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest"
+            target: "aarch64-apple-darwin"
+            description: "Apple Silicon (M1/M2/M3/M4)"
+          - platform: "macos-13"
+            target: "x86_64-apple-darwin"
+            description: "Intel Mac"
+          - platform: "windows-latest"
+            target: "x86_64-pc-windows-msvc"
+            description: "Windows x64"
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Tauri Action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name || 'v0.1.0' }}
+          releaseName: 'Glideo ${{ github.ref_name || 'v0.1.0' }}'
+          releaseBody: |
+            ## Glideo Desktop Release
+            
+            Download the installer for your operating system:
+            - **Mac (Apple Silicon M1/M2/M3/M4)**: Download the `..._aarch64.dmg`
+            - **Mac (Intel)**: Download the `..._x64.dmg`
+            - **Windows (10 / 11)**: Download the `...-setup.exe` or `..._x64_en-US.msi`
+          releaseDraft: false
+          prerelease: false
+          args: --target ${{ matrix.target }}

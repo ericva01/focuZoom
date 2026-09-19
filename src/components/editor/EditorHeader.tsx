@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -65,7 +65,7 @@ interface EditorHeaderProps {
   onToggleRightCollapse?: () => void;
 }
 
-export function EditorHeader({
+function EditorHeaderBase({
   projectName,
   onProjectNameChange,
   aspectRatio,
@@ -402,3 +402,5 @@ export function EditorHeader({
     </header>
   );
 }
+
+export const EditorHeader = memo(EditorHeaderBase);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import {
   Play,
   Pause,
@@ -32,7 +32,7 @@ interface VideoCanvasProps {
   onChangeConfig?: (updates: Partial<CanvasConfig>) => void;
 }
 
-export function VideoCanvas({
+function VideoCanvasBase({
   videoRef,
   canvasRef,
   videoSrc,
@@ -156,6 +156,7 @@ export function VideoCanvas({
   const { cameraState, getVideoCoordinatesAtCanvasPos } = useThreeAnimationEngine(
     videoRef,
     canvasRef,
+    videoSrc,
     events,
     config,
     mousePosRef,
@@ -319,17 +320,15 @@ export function VideoCanvas({
       {/* Ambient background glow */}
       <div className="absolute w-[600px] h-[450px] bg-rose-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
 
-      {/* Hidden HTML5 Video element used as texture source */}
-      {videoSrc && (
-        <video
-          ref={videoRef}
-          src={videoSrc}
-          playsInline
-          muted
-          crossOrigin="anonymous"
-          className="hidden"
-        />
-      )}
+      {/* Hidden HTML5 Video element used as texture source - ALWAYS mounted so videoRef is immediately available */}
+      <video
+        ref={videoRef}
+        src={videoSrc || undefined}
+        playsInline
+        muted
+        crossOrigin="anonymous"
+        className="hidden"
+      />
 
       {/* Right-Click Moving Banner Overlay */}
       {isRightClickDragging && (
@@ -549,3 +548,5 @@ export function VideoCanvas({
     </div>
   );
 }
+
+export const VideoCanvas = memo(VideoCanvasBase);

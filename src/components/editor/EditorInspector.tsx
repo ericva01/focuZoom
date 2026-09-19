@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import {
   Scissors,
   Focus,
@@ -69,7 +69,7 @@ interface EditorInspectorProps {
 
 type InspectorTab = "clip" | "canvas" | "keyframes" | "media" | "cursor" | "webcam";
 
-export function EditorInspector({
+function EditorInspectorBase({
   config,
   onChangeConfig,
   clips,
@@ -1755,3 +1755,22 @@ export function EditorInspector({
     </div>
   );
 }
+
+export const EditorInspector = memo(EditorInspectorBase, (prev, next) => {
+  if (prev.config !== next.config) return false;
+  if (prev.clips !== next.clips) return false;
+  if (prev.selectedClipId !== next.selectedClipId) return false;
+  if (prev.events !== next.events) return false;
+  if (prev.selectedEventId !== next.selectedEventId) return false;
+  if (prev.metadata !== next.metadata) return false;
+  if (prev.isGeneratingDemo !== next.isGeneratingDemo) return false;
+  if (prev.isRecording !== next.isRecording) return false;
+  if (prev.recordingDuration !== next.recordingDuration) return false;
+  if (prev.clickCount !== next.clickCount) return false;
+  if (prev.enableWebcam !== next.enableWebcam) return false;
+  if (prev.selectedCameraId !== next.selectedCameraId) return false;
+  if (prev.availableCameras !== next.availableCameras) return false;
+  // Throttle playhead time to 4Hz (every 0.25s) to eliminate 93% of Virtual DOM tree reconciliations
+  if (Math.floor(prev.currentTime * 4) !== Math.floor(next.currentTime * 4)) return false;
+  return true;
+});

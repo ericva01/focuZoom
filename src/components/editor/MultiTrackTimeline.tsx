@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo, memo } from "react";
 import {
   Play,
   Pause,
@@ -64,10 +64,78 @@ interface MultiTrackTimelineProps {
   canRedo?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
+  onCommitHistory?: () => void;
   webcamClip?: TimelineClip | null;
   isWebcamHidden?: boolean;
   onToggleWebcamHidden?: () => void;
 }
+
+/**
+ * Ultra-lightweight HTML5 Canvas Waveform Peak Visualizer
+ * Replaces hundreds/thousands of DOM divs with 1 fast paint call per audio clip
+ */
+const AudioWaveformCanvas = memo(function AudioWaveformCanvas({
+  width,
+  height,
+  isSelected,
+  clipId,
+}: {
+  width: number;
+  height: number;
+  isSelected: boolean;
+  clipId: string;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+    const renderWidth = Math.max(10, Math.floor(width));
+    const renderHeight = Math.max(10, Math.floor(height));
+
+    canvas.width = renderWidth * dpr;
+    canvas.height = renderHeight * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, renderWidth, renderHeight);
+
+    const barWidth = 2;
+    const barGap = 2;
+    const step = barWidth + barGap;
+    const count = Math.floor(renderWidth / step);
+    const midY = renderHeight / 2;
+
+    ctx.fillStyle = isSelected ? "#a5b4fc" : "rgba(129, 140, 248, 0.75)";
+
+    const baseSeed = (clipId.charCodeAt(0) || 42) * 17;
+    for (let i = 0; i < count; i++) {
+      const seed = (baseSeed + i * 23) % 100;
+      const hPercent = (20 + Math.sin(i * 0.4) * 15 + (seed % 35)) / 100;
+      const barH = Math.max(4, renderHeight * 0.75 * hPercent);
+      const x = i * step;
+      const y = midY - barH / 2;
+
+      if (typeof ctx.roundRect === "function") {
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barH, 1);
+        ctx.fill();
+      } else {
+        ctx.fillRect(x, y, barWidth, barH);
+      }
+    }
+  }, [width, height, isSelected, clipId]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ width: `${Math.max(10, width)}px`, height: `${height}px` }}
+      className="pointer-events-none"
+    />
+  );
+});
 
 /**
  * Formats seconds into HH:MM:SS:FF (30fps SMPTE style)
@@ -87,7 +155,7 @@ export function formatSMPTETimecode(seconds: number, fps = 30): string {
     .padStart(2, "0")}`;
 }
 
-export function MultiTrackTimeline({
+function MultiTrackTimelineBase({
   currentTime,
   duration,
   isPlaying,
@@ -121,6 +189,7 @@ export function MultiTrackTimeline({
   canRedo = false,
   onUndo,
   onRedo,
+  onCommitHistory,
   webcamClip,
   isWebcamHidden = false,
   onToggleWebcamHidden,
@@ -204,10 +273,17 @@ export function MultiTrackTimeline({
     [timelineContentWidth, totalTimelineDuration]
   );
 
+  // Magnetic snapping indicator state
+  const [activeSnapTime, setActiveSnapTime] = useState<number | null>(null);
+  const latestClientXRef = useRef<number>(0);
+
   // Apply snapping if active (snaps to 0, keyframes, clip boundaries, playhead)
   const applySnapping = useCallback(
     (time: number): number => {
-      if (!snappingEnabled) return time;
+      if (!snappingEnabled) {
+        if (activeSnapTime !== null) setActiveSnapTime(null);
+        return time;
+      }
       const snapThresholdSec = 8 / basePixelsPerSecond; // within 8 pixels
 
       const snapPoints: number[] = [0, totalTimelineDuration];
@@ -221,12 +297,14 @@ export function MultiTrackTimeline({
 
       for (const pt of snapPoints) {
         if (Math.abs(time - pt) < snapThresholdSec) {
+          setActiveSnapTime(pt);
           return pt;
         }
       }
+      if (activeSnapTime !== null) setActiveSnapTime(null);
       return time;
     },
-    [snappingEnabled, basePixelsPerSecond, totalTimelineDuration, events, clips]
+    [snappingEnabled, basePixelsPerSecond, totalTimelineDuration, events, clips, activeSnapTime]
   );
 
   // Exact coordinate to time converter accounting for 144px sticky left header and horizontal scroll
@@ -247,6 +325,7 @@ export function MultiTrackTimeline({
   // Handle Scrubbing Click & Drag starting anywhere on tracks or ruler
   const handleStartScrubbing = (e: React.MouseEvent) => {
     if (e.button !== 0) return;
+    latestClientXRef.current = e.clientX;
     const seekTime = calculateTimeFromClientX(e.clientX);
     setLocalScrubTime(seekTime);
     onSeek(seekTime);
@@ -307,11 +386,11 @@ export function MultiTrackTimeline({
       }
 
       if (isScrubbing) {
-        const clientX = e.clientX;
+        latestClientXRef.current = e.clientX;
         if (scrubRafRef.current === null) {
           scrubRafRef.current = requestAnimationFrame(() => {
             scrubRafRef.current = null;
-            const seekTime = calculateTimeFromClientX(clientX);
+            const seekTime = calculateTimeFromClientX(latestClientXRef.current);
             setLocalScrubTime(seekTime);
             onSeek(seekTime);
           });
@@ -427,6 +506,7 @@ export function MultiTrackTimeline({
         }
       }
 
+      setActiveSnapTime(null);
       setIsScrubbing(false);
       setLocalScrubTime(null);
       setTrimmingState(null);
@@ -436,10 +516,14 @@ export function MultiTrackTimeline({
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("pointermove", handleMouseMove);
+    window.addEventListener("pointerup", handleMouseUp);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("pointermove", handleMouseMove);
+      window.removeEventListener("pointerup", handleMouseUp);
     };
   }, [
     isScrubbing,
@@ -495,10 +579,13 @@ export function MultiTrackTimeline({
   };
 
   const rulerInterval = getRulerInterval();
-  const rulerTicks: number[] = [];
-  for (let t = 0; t <= totalTimelineDuration + rulerInterval; t += rulerInterval) {
-    rulerTicks.push(t);
-  }
+  const rulerTicks = useMemo(() => {
+    const ticks: number[] = [];
+    for (let t = 0; t <= totalTimelineDuration + rulerInterval; t += rulerInterval) {
+      ticks.push(t);
+    }
+    return ticks;
+  }, [totalTimelineDuration, rulerInterval]);
 
   return (
     <div className="h-72 border-t border-white/[0.1] bg-[#090D16]/95 backdrop-blur-2xl flex flex-col select-none relative z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
@@ -676,7 +763,7 @@ export function MultiTrackTimeline({
               step="0.1"
               value={zoomScale}
               onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-              className="w-18 accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+              className="w-18 accent-rose-400 cursor-pointer h-1 bg-white/10 rounded"
               title="Timeline Scale Zoom"
             />
             <ZoomIn className="w-3 h-3 text-slate-400" />
@@ -730,7 +817,11 @@ export function MultiTrackTimeline({
             {/* Laser Scrubbing Playhead Indicator on Ruler */}
             <div
               className="absolute top-0 z-40 -translate-x-1/2 pointer-events-none"
-              style={{ left: `${playheadX}px` }}
+              style={{
+                transform: `translate3d(${playheadX}px, 0, 0)`,
+                left: 0,
+                willChange: "transform",
+              }}
             >
               <div className="w-3 h-3 bg-rose-400 rotate-45 -mt-1.5 shadow-[0_0_10px_rgba(251,113,133,0.8)] border border-white" />
             </div>
@@ -764,10 +855,31 @@ export function MultiTrackTimeline({
           {/* Laser Playhead Needle running vertically across ALL tracks */}
           <div
             className="absolute top-0 bottom-0 w-px bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.9)] z-30 pointer-events-none"
-            style={{ left: `${144 + playheadX}px` }}
+            style={{
+              transform: `translate3d(${144 + playheadX}px, 0, 0)`,
+              left: 0,
+              willChange: "transform",
+            }}
           >
             <div className="w-2 h-2 rounded-full bg-rose-300 absolute -top-1 -left-0.5" />
           </div>
+
+          {/* Magnetic Snapping Guideline (appears when aligning clips or keyframes) */}
+          {activeSnapTime !== null && (
+            <div
+              className="absolute top-0 bottom-0 w-px bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.9)] z-40 pointer-events-none"
+              style={{
+                transform: `translate3d(${144 + timeToPixel(activeSnapTime)}px, 0, 0)`,
+                left: 0,
+                willChange: "transform",
+              }}
+            >
+              <div className="px-1.5 py-0.5 rounded bg-amber-500 text-black text-[9px] font-mono font-bold absolute -top-4 -translate-x-1/2 whitespace-nowrap shadow-md flex items-center gap-0.5">
+                <Magnet className="w-2.5 h-2.5" />
+                <span>{formatSMPTETimecode(activeSnapTime).substring(3, 8)}</span>
+              </div>
+            </div>
+          )}
 
           {/* ============================================================ */}
           {/* TRACK 1: Visual Video Track (Clips & Trim Handles) */}
@@ -808,6 +920,7 @@ export function MultiTrackTimeline({
                       if (e.button !== 0 && e.button !== 2) return;
                       e.stopPropagation();
                       onSelectClip(clip.id);
+                      onCommitHistory?.();
                       setDraggingClipState({
                         clipId: clip.id,
                         initialStartTimeline: clip.startTimeline,
@@ -831,6 +944,7 @@ export function MultiTrackTimeline({
                     <div
                       onMouseDown={(e) => {
                         e.stopPropagation();
+                        onCommitHistory?.();
                         setTrimmingState({
                           clipId: clip.id,
                           handle: "start",
@@ -865,6 +979,7 @@ export function MultiTrackTimeline({
                     <div
                       onMouseDown={(e) => {
                         e.stopPropagation();
+                        onCommitHistory?.();
                         setTrimmingState({
                           clipId: clip.id,
                           handle: "end",
@@ -1134,13 +1249,6 @@ export function MultiTrackTimeline({
                 const clipWidthPx = Math.max(16, clipEndPx - clipStartPx);
                 const isSelected = selectedClipId === clip.id || selectedClipIds.includes(clip.id);
 
-                // Generate procedural waveform peaks
-                const numBars = Math.max(10, Math.floor(clipWidthPx / 4));
-                const waveformHeights = Array.from({ length: numBars }, (_, i) => {
-                  const seed = (clip.id.charCodeAt(0) * 17 + i * 23) % 100;
-                  return 20 + Math.sin(i * 0.4) * 15 + (seed % 35);
-                });
-
                 return (
                   <div
                     key={`audio-${clip.id}`}
@@ -1148,6 +1256,7 @@ export function MultiTrackTimeline({
                       if (e.button !== 0 && e.button !== 2) return;
                       e.stopPropagation();
                       onSelectClip(clip.id);
+                      onCommitHistory?.();
                       setDraggingClipState({
                         clipId: clip.id,
                         initialStartTimeline: clip.startTimeline,
@@ -1173,6 +1282,7 @@ export function MultiTrackTimeline({
                     <div
                       onMouseDown={(e) => {
                         e.stopPropagation();
+                        onCommitHistory?.();
                         setTrimmingState({
                           clipId: clip.id,
                           handle: "start",
@@ -1187,26 +1297,26 @@ export function MultiTrackTimeline({
                       <div className="w-0.5 h-2.5 bg-white/60 rounded" />
                     </div>
 
-                    {/* Procedural Waveform Display */}
-                    <div className="flex-1 h-full flex items-center px-1.5 gap-[2px] overflow-hidden pointer-events-none">
-                      <span className="text-[9px] font-mono text-indigo-300 font-semibold truncate mr-1">
+                    {/* Canvas Waveform Peak Display */}
+                    <div className="flex-1 h-full flex items-center px-2 gap-2 overflow-hidden pointer-events-none relative">
+                      <span className="text-[9px] font-mono text-indigo-300 font-semibold truncate select-none bg-indigo-950/70 px-1.5 py-0.5 rounded backdrop-blur-sm border border-indigo-500/20 z-10 flex-shrink-0">
                         {clip.name}
                       </span>
-                      {waveformHeights.map((h, i) => (
-                        <div
-                          key={i}
-                          style={{ height: `${h}%` }}
-                          className={`w-[2px] rounded-full flex-shrink-0 ${
-                            isSelected ? "bg-indigo-300" : "bg-indigo-400/70"
-                          }`}
+                      <div className="flex-1 h-full flex items-center overflow-hidden">
+                        <AudioWaveformCanvas
+                          width={Math.max(10, clipWidthPx - 36)}
+                          height={26}
+                          isSelected={isSelected}
+                          clipId={clip.id}
                         />
-                      ))}
+                      </div>
                     </div>
 
                     {/* Right Trim Handle */}
                     <div
                       onMouseDown={(e) => {
                         e.stopPropagation();
+                        onCommitHistory?.();
                         setTrimmingState({
                           clipId: clip.id,
                           handle: "end",
@@ -1300,3 +1410,5 @@ export function MultiTrackTimeline({
     </div>
   );
 }
+
+export const MultiTrackTimeline = memo(MultiTrackTimelineBase);

@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import {
   Focus,
   Plus,
@@ -27,7 +28,7 @@ interface ClickInspectorProps {
   onToggleAddMode: () => void;
 }
 
-export function ClickInspector({
+function ClickInspectorBase({
   events,
   currentTime,
   onSelectEvent,
@@ -199,3 +200,10 @@ export function ClickInspector({
     </aside>
   );
 }
+
+export const ClickInspector = memo(ClickInspectorBase, (prev, next) => {
+  if (prev.events !== next.events) return false;
+  if (prev.isAddMode !== next.isAddMode) return false;
+  if (Math.floor(prev.currentTime * 4) !== Math.floor(next.currentTime * 4)) return false;
+  return true;
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import {
   Upload,
   Sliders,
@@ -42,7 +42,7 @@ interface LeftSettingsProps {
   onStopRecording?: () => void;
 }
 
-export function LeftSettings({
+function LeftSettingsBase({
   config,
   onChangeConfig,
   metadata,
@@ -1291,3 +1291,5 @@ export function LeftSettings({
     </aside>
   );
 }
+
+export const LeftSettings = memo(LeftSettingsBase);

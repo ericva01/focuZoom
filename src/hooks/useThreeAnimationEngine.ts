@@ -217,6 +217,7 @@ function sampleCursorTrajectory(
 export function useThreeAnimationEngine(
   videoRef: React.RefObject<HTMLVideoElement>,
   canvasRef: React.RefObject<HTMLCanvasElement>,
+  videoSrc: string | null,
   events: ClickEvent[],
   config: CanvasConfig,
   mousePosRef: React.RefObject<{ x: number; y: number }>,
@@ -261,7 +262,29 @@ export function useThreeAnimationEngine(
   const lastScaleRef = useRef<number>(1.0);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const screenMeshRef = useRef<THREE.Mesh | null>(null);
+  const bezelMeshRef = useRef<THREE.Mesh | null>(null);
+  const shadowMeshRef = useRef<THREE.Mesh | null>(null);
+  const shadowTexRef = useRef<THREE.CanvasTexture | null>(null);
+  const backdropMeshRef = useRef<THREE.Mesh | null>(null);
+  const haloMeshRef = useRef<THREE.Mesh | null>(null);
+  const haloMatRef = useRef<THREE.MeshBasicMaterial | null>(null);
+  const cursorSpriteRef = useRef<THREE.Sprite | null>(null);
+  const cursorMatRef = useRef<THREE.SpriteMaterial | null>(null);
+  const screenMatRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
   const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
+  const lastUploadedVideoTimeRef = useRef<number>(-1);
+
+  // Mutable refs for zero-overhead dynamic updates without tearing down WebGL
+  const configRef = useRef(config);
+  configRef.current = config;
+  const eventsRef = useRef(events);
+  eventsRef.current = events;
+  const cursorTrailRef = useRef(cursorTrail);
+  cursorTrailRef.current = cursorTrail;
+  const mousePosRefCurrent = useRef(mousePosRef);
+  mousePosRefCurrent.current = mousePosRef;
 
   // Helper to create rounded rectangle shape in Three.js
   const createRoundedRectShape = (width: number, height: number, radius: number) => {
@@ -554,6 +577,149 @@ export function useThreeAnimationEngine(
     return { texture: tex, anchorU, anchorV };
   };
 
+  // Synchronize dynamic background changes without tearing down WebGL
+  const updateBackdrop = useCallback((cfg: CanvasConfig) => {
+    const scene = sceneRef.current;
+    const renderer = rendererRef.current;
+    const backdropMesh = backdropMeshRef.current;
+    if (!scene || !backdropMesh || !renderer) return;
+
+    if (cfg.backgroundType === "transparent") {
+      renderer.setClearColor(0x000000, 0);
+      backdropMesh.visible = false;
+      return;
+    }
+
+    backdropMesh.visible = true;
+    const bgMat = backdropMesh.material as THREE.MeshBasicMaterial;
+
+    if (cfg.backgroundType === "solid") {
+      const col = new THREE.Color(cfg.solidBackgroundColor || "#06402B");
+      renderer.setClearColor(col, 1);
+      if (bgMat.map) {
+        bgMat.map.dispose();
+        bgMat.map = null;
+      }
+      bgMat.color = col;
+      bgMat.needsUpdate = true;
+    } else if (cfg.backgroundType === "gradient") {
+      renderer.setClearColor(0x06402B, 1);
+      if (bgMat.map) bgMat.map.dispose();
+      const newTex = createGradientTexture(cfg.backgroundPreset, cfg.customGradientFrom, cfg.customGradientTo);
+      bgMat.color.set(0xffffff);
+      bgMat.map = newTex;
+      bgMat.needsUpdate = true;
+    } else if (cfg.backgroundType === "image" && cfg.customBackgroundImage) {
+      renderer.setClearColor(0x06402B, 1);
+      if (bgMat.map) bgMat.map.dispose();
+      const loader = new THREE.TextureLoader();
+      const newTex = loader.load(cfg.customBackgroundImage);
+      newTex.colorSpace = THREE.SRGBColorSpace;
+      bgMat.color.set(0xffffff);
+      bgMat.map = newTex;
+      bgMat.needsUpdate = true;
+    }
+  }, []);
+
+  // Synchronize corner radius and shadow without tearing down WebGL
+  const updateCornerRadiusAndShadow = useCallback((cornerRadius: number, shadowIntensity: string) => {
+    const screenMesh = screenMeshRef.current;
+    const bezelMesh = bezelMeshRef.current;
+    const shadowMesh = shadowMeshRef.current;
+    if (!screenMesh || !bezelMesh) return;
+
+    const screenW = 2.4;
+    const screenH = 1.35;
+    const cornerRadiusPx = typeof cornerRadius === "number" ? cornerRadius : 20;
+    const radiusNorm = (cornerRadiusPx / 64) * 0.22;
+
+    const screenShape = createRoundedRectShape(screenW, screenH, radiusNorm);
+    const newScreenGeo = new THREE.ShapeGeometry(screenShape, 32);
+
+    const posAttr = newScreenGeo.attributes.position;
+    const uvs: number[] = [];
+    for (let i = 0; i < posAttr.count; i++) {
+      const px = posAttr.getX(i);
+      const py = posAttr.getY(i);
+      uvs.push((px + screenW / 2) / screenW, (py + screenH / 2) / screenH);
+    }
+    newScreenGeo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+
+    screenMesh.geometry.dispose();
+    screenMesh.geometry = newScreenGeo;
+
+    const newBezelGeo = new THREE.ExtrudeGeometry(screenShape, { depth: 0.03, bevelEnabled: false, steps: 1 });
+    bezelMesh.geometry.dispose();
+    bezelMesh.geometry = newBezelGeo;
+
+    if (shadowMesh) {
+      if (shadowIntensity === "none") {
+        shadowMesh.visible = false;
+      } else {
+        if (shadowTexRef.current) shadowTexRef.current.dispose();
+        const newShadowTex = createSoftShadowTexture(radiusNorm, shadowIntensity);
+        shadowTexRef.current = newShadowTex;
+        const sMat = shadowMesh.material as THREE.MeshBasicMaterial;
+        sMat.map = newShadowTex;
+        sMat.opacity = shadowIntensity === "cinematic" ? 0.7 : shadowIntensity === "neon" ? 0.8 : 0.4;
+        sMat.needsUpdate = true;
+        shadowMesh.visible = true;
+      }
+    }
+  }, []);
+
+  // Synchronize cursor pointer styling
+  const updateCursor = useCallback((style: string, color: string) => {
+    const cursorSprite = cursorSpriteRef.current;
+    const cursorMat = cursorMatRef.current;
+    if (!cursorSprite || !cursorMat) return;
+
+    const cursorInfo = createCursorTexture(style, color);
+    if (cursorMat.map) cursorMat.map.dispose();
+    cursorMat.map = cursorInfo.texture;
+    cursorMat.needsUpdate = true;
+    cursorSprite.center.set(cursorInfo.anchorU, cursorInfo.anchorV);
+  }, []);
+
+  // Synchronize screen material clearcoat reflections and ripple color
+  const updateMaterials = useCallback((cfg: CanvasConfig) => {
+    if (screenMatRef.current) {
+      const reflectionStrength = cfg.glassReflectionIntensity ?? 0.85;
+      screenMatRef.current.clearcoat = 0.9 * reflectionStrength;
+      screenMatRef.current.reflectivity = 0.7 * reflectionStrength;
+      screenMatRef.current.needsUpdate = true;
+    }
+    if (haloMatRef.current) {
+      haloMatRef.current.color.set(new THREE.Color(cfg.rippleColor || "#fb7185"));
+    }
+  }, []);
+
+  // Dedicated light effect: only re-applies updated properties to Three.js objects without tearing down WebGL
+  useEffect(() => {
+    updateBackdrop(configRef.current);
+    updateCornerRadiusAndShadow(config.cornerRadius ?? 20, config.shadowIntensity ?? "cinematic");
+    updateCursor(config.cursorStyle, config.cursorColor);
+    updateMaterials(configRef.current);
+  }, [
+    config.backgroundType,
+    config.backgroundPreset,
+    config.customGradientFrom,
+    config.customGradientTo,
+    config.solidBackgroundColor,
+    config.customBackgroundImage,
+    config.cornerRadius,
+    config.shadowIntensity,
+    config.glassReflectionIntensity,
+    config.rippleColor,
+    config.cursorStyle,
+    config.cursorColor,
+    updateBackdrop,
+    updateCornerRadiusAndShadow,
+    updateCursor,
+    updateMaterials,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  ]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
@@ -760,7 +926,32 @@ export function useThreeAnimationEngine(
     cursorSprite.position.z = 0.018;
     screenGroup.add(cursorSprite);
 
+    // Save Three.js object references for zero-teardown dynamic synchronization
+    rendererRef.current = renderer;
+    sceneRef.current = scene;
+    screenMeshRef.current = screenMesh;
+    bezelMeshRef.current = bezelMesh;
+    shadowMeshRef.current = shadowMesh;
+    shadowTexRef.current = shadowTex;
+    backdropMeshRef.current = backdropMesh;
+    haloMeshRef.current = haloMesh;
+    haloMatRef.current = haloMat;
+    cursorSpriteRef.current = cursorSprite;
+    cursorMatRef.current = cursorMat;
+    screenMatRef.current = screenMat;
 
+    // Video event listeners ensuring immediate GPU texture upload upon load or seek
+    const handleVideoEvent = () => {
+      lastUploadedVideoTimeRef.current = -1;
+      if (videoTexture) {
+        videoTexture.needsUpdate = true;
+      }
+    };
+    video.addEventListener("loadeddata", handleVideoEvent);
+    video.addEventListener("loadedmetadata", handleVideoEvent);
+    video.addEventListener("canplay", handleVideoEvent);
+    video.addEventListener("seeked", handleVideoEvent);
+    video.addEventListener("playing", handleVideoEvent);
 
     // Main 60 FPS Render Loop
     const clock = new THREE.Clock();
@@ -801,7 +992,13 @@ export function useThreeAnimationEngine(
       let screenH = 1.35;
 
       if (isVideoReady) {
-        videoTexture.needsUpdate = true;
+        // Upload to GPU when playing, scrubbing, or on initial load / state change (lastUploadedVideoTimeRef.current === -1)
+        const isPlaying = !video.paused && !video.ended;
+        const timeChanged = Math.abs(video.currentTime - lastUploadedVideoTimeRef.current) > 0.0005;
+        if (isPlaying || timeChanged || lastUploadedVideoTimeRef.current === -1) {
+          videoTexture.needsUpdate = true;
+          lastUploadedVideoTimeRef.current = video.currentTime;
+        }
         screenMesh.visible = true;
         if (bezelMesh) bezelMesh.visible = true;
         if (shadowMesh) shadowMesh.visible = true;
@@ -838,12 +1035,19 @@ export function useThreeAnimationEngine(
       let activeTargetY = 0.5;
       let activeTargets: ClickTarget[] = [];
 
-      const enabledEvents = events.filter((e) => e.enabled);
+      // Read mutable refs for zero-overhead dynamic updates without tearing down WebGL
+      const curEvents = eventsRef.current;
+      const curConfig = configRef.current;
+      const curCursorTrail = cursorTrailRef.current;
 
-      for (const event of enabledEvents) {
-        const zoomInDuration = Math.max(0.15, event.zoomInDuration ?? config.zoomDuration ?? 0.45);
-        const holdDuration = Math.max(0.2, event.holdDuration ?? config.zoomHoldDuration ?? 1.2);
-        const zoomOutDuration = Math.max(0.15, event.zoomOutDuration ?? config.zoomOutDuration ?? config.zoomDuration ?? 0.45);
+      // Zero-heap allocation loop across keyframe events
+      for (let i = 0; i < curEvents.length; i++) {
+        const event = curEvents[i];
+        if (!event.enabled) continue;
+
+        const zoomInDuration = Math.max(0.15, event.zoomInDuration ?? curConfig.zoomDuration ?? 0.45);
+        const holdDuration = Math.max(0.2, event.holdDuration ?? curConfig.zoomHoldDuration ?? 1.2);
+        const zoomOutDuration = Math.max(0.15, event.zoomOutDuration ?? curConfig.zoomOutDuration ?? curConfig.zoomDuration ?? 0.45);
         const startTime = event.timestamp; // Begins precisely when the keyframe timestamp is hit
         const peakTime = startTime + zoomInDuration;
         const holdEndTime = peakTime + holdDuration;
@@ -851,7 +1055,7 @@ export function useThreeAnimationEngine(
 
         if (effectiveTime >= startTime && effectiveTime <= endTime) {
           activeEvent = event;
-          const peakScale = event.zoom || config.defaultZoomScale || 2.2;
+          const peakScale = event.zoom || curConfig.defaultZoomScale || 2.2;
 
           activeTargets =
             event.targets && event.targets.length > 0
@@ -859,14 +1063,14 @@ export function useThreeAnimationEngine(
               : [{ timestamp: event.timestamp, x: event.x, y: event.y, label: event.label }];
 
           // Dynamically track the cursor position at this exact video frame
-          const cursorPosition = sampleCursorTrajectory(effectiveTime, event, cursorTrail);
+          const cursorPosition = sampleCursorTrajectory(effectiveTime, event, curCursorTrail);
           activeTargetX = cursorPosition.x;
           activeTargetY = cursorPosition.y;
 
           if (effectiveTime < peakTime) {
             // Smooth acceleration into initial zoom target
             const prog = (effectiveTime - startTime) / zoomInDuration;
-            zoomProgress = applyEasing(prog, config.zoomEasing);
+            zoomProgress = applyEasing(prog, curConfig.zoomEasing);
           } else if (effectiveTime <= holdEndTime) {
             // Steady hold at peak zoom magnification - DO NOT ZOOM OUT BETWEEN CLICKS!
             // Camera smoothly glides and follows the cursor wherever it moves
@@ -890,7 +1094,7 @@ export function useThreeAnimationEngine(
       const focus3DY = -(targetFocalY - 0.5) * screenH;
 
       // 2. Physical 3D Camera Dolly Zoom & Dynamic Viewport Sizing
-      const clampedPad = Math.max(0, Math.min(120, config.padding ?? 36));
+      const clampedPad = Math.max(0, Math.min(120, curConfig.padding ?? 36));
       // Dynamic fill factor: 0.96 at 0px padding down to 0.55 at 120px padding
       const targetFill = 0.96 - (clampedPad / 120) * 0.41;
 
@@ -998,7 +1202,7 @@ export function useThreeAnimationEngine(
       let floatRotX = 0;
       let floatRotY = 0;
 
-      if (config.enableFloatingMotion) {
+      if (curConfig.enableFloatingMotion) {
         floatY = Math.sin(t * 1.5) * 0.032;
         floatRotX = Math.sin(t * 1.1) * 0.016;
         floatRotY = Math.cos(t * 0.8) * 0.022;
@@ -1008,10 +1212,11 @@ export function useThreeAnimationEngine(
       let parallaxRotX = 0;
       let parallaxRotY = 0;
 
-      if (config.enableMouseParallax && mousePosRef.current) {
-        const pIntensity = config.mouseParallaxIntensity ?? 0.65;
-        parallaxRotY = mousePosRef.current.x * 0.18 * pIntensity;
-        parallaxRotX = -mousePosRef.current.y * 0.12 * pIntensity;
+      const activeMousePos = mousePosRefCurrent.current?.current;
+      if (curConfig.enableMouseParallax && activeMousePos) {
+        const pIntensity = curConfig.mouseParallaxIntensity ?? 0.65;
+        parallaxRotY = activeMousePos.x * 0.18 * pIntensity;
+        parallaxRotX = -activeMousePos.y * 0.12 * pIntensity;
       }
 
       // 5. Dynamic 3D Cursor Tracking Tilt:
@@ -1027,7 +1232,7 @@ export function useThreeAnimationEngine(
       // Evaluate 3D angle preset specifically for the active zoom event so editing one effect doesn't distort all
       const effectiveAnglePreset =
         (activeEvent && activeEvent.screenAnglePreset) ||
-        config.screenAnglePreset ||
+        curConfig.screenAnglePreset ||
         "studio-front";
 
       let eventPitch = 0;
@@ -1114,11 +1319,11 @@ export function useThreeAnimationEngine(
         const evX = (activeTargetX - 0.5) * screenW;
         const evY = -(activeTargetY - 0.5) * screenH;
 
-        cursorSprite.visible = config.showCursor !== false;
+        cursorSprite.visible = curConfig.showCursor !== false;
         cursorSprite.position.set(evX, evY, 0.022);
 
         // Maintain sharp, natural cursor scale during camera dolly zoom
-        const baseCursorScale = (config.cursorSize || 22) / 220;
+        const baseCursorScale = (curConfig.cursorSize || 22) / 220;
         const distFactor = Math.pow(smoothStateRef.current.camZ / baseZ, 0.65);
         const dynamicScale = baseCursorScale * distFactor;
         cursorSprite.scale.set(dynamicScale, dynamicScale, 1);
@@ -1137,7 +1342,7 @@ export function useThreeAnimationEngine(
           }
         }
 
-        if (activeHaloTarget && config.showRipple) {
+        if (activeHaloTarget && curConfig.showRipple) {
           const prog = activeDelta / haloDuration;
           const fade = 1.0 - prog;
           const hX = (activeHaloTarget.x - 0.5) * screenW;
@@ -1156,11 +1361,11 @@ export function useThreeAnimationEngine(
       }
 
       // 6. Render the 3D Scene
-      if (config.backgroundType === "transparent") {
+      if (curConfig.backgroundType === "transparent") {
         renderer.setClearColor(0x000000, 0);
         if (backdropMesh) backdropMesh.visible = false;
-      } else if (config.backgroundType === "solid") {
-        renderer.setClearColor(new THREE.Color(config.solidBackgroundColor || "#06402B"), 1);
+      } else if (curConfig.backgroundType === "solid") {
+        renderer.setClearColor(new THREE.Color(curConfig.solidBackgroundColor || "#06402B"), 1);
         if (backdropMesh) backdropMesh.visible = true;
       } else {
         renderer.setClearColor(0x06402B, 1);
@@ -1225,8 +1430,26 @@ export function useThreeAnimationEngine(
       if (shadowTex) {
         shadowTex.dispose();
       }
+      video.removeEventListener("loadeddata", handleVideoEvent);
+      video.removeEventListener("loadedmetadata", handleVideoEvent);
+      video.removeEventListener("canplay", handleVideoEvent);
+      video.removeEventListener("seeked", handleVideoEvent);
+      video.removeEventListener("playing", handleVideoEvent);
+      rendererRef.current = null;
+      sceneRef.current = null;
+      screenMeshRef.current = null;
+      bezelMeshRef.current = null;
+      shadowMeshRef.current = null;
+      shadowTexRef.current = null;
+      backdropMeshRef.current = null;
+      haloMeshRef.current = null;
+      haloMatRef.current = null;
+      cursorSpriteRef.current = null;
+      cursorMatRef.current = null;
+      screenMatRef.current = null;
     };
-  }, [videoRef, canvasRef, events, config, mousePosRef, cursorTrail]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoRef, canvasRef, videoSrc]);
 
   const captureSnapshot = useCallback((): string | null => {
     if (!canvasRef.current) return null;

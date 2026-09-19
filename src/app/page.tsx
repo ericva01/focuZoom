@@ -29,17 +29,27 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#030509] text-slate-100 selection:bg-rose-400 selection:text-black">
+    <div className="website-ui min-h-screen flex flex-col bg-[#030509] text-slate-100 selection:bg-rose-400 selection:text-black">
       <Navbar />
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1">
         <HeroSection />
-        <FeatureGrid />
-        <ProcessSection />
+        <div className="content-auto">
+          <FeatureGrid />
+        </div>
+        <div className="content-auto">
+          <ProcessSection />
+        </div>
         <BannerMarquee />
-        <ComparisonDemo />
-        <DesktopProjectHub />
+        <div className="content-auto">
+          <ComparisonDemo />
+        </div>
+        <div className="content-auto">
+          <DesktopProjectHub />
+        </div>
       </main>
-      <Footer />
+      <div className="content-auto">
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -181,8 +181,9 @@ body {
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(99, 102, 241, 0.04) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(251, 113, 133, 0.08) 0%, rgba(99, 102, 241, 0.04) 45%, transparent 70%);
   filter: blur(80px);
+  transform: translateZ(0);
 }
 
 .ambient-backdrop::after {
@@ -193,6 +194,52 @@ body {
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, rgba(56, 189, 248, 0.03) 50%, transparent 75%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, rgba(251, 113, 133, 0.03) 50%, transparent 75%);
   filter: blur(90px);
+  transform: translateZ(0);
+}
+
+/* GPU Hardware-Accelerated Compositing & Performance Helpers */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* Skip layout calculations for offscreen viewport sections */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 750px;
+}
+
+/* Marketing website interaction styles, isolated from the editor. */
+.website-ui :is(a, button, input, textarea, [role="slider"]):focus-visible {
+  outline: 2px solid #fda4af;
+  outline-offset: 5px;
+}
+.website-ui section[id] {
+  scroll-margin-top: 100px;
+}
+.website-skip-link {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  z-index: 60;
+  transform: translateY(-160%);
+  border-radius: 8px;
+  background: #fff;
+  color: #030509;
+  padding: 12px 18px;
+}
+.website-skip-link:focus {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .website-ui *, .website-ui *::before, .website-ui *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
