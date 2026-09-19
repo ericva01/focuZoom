@@ -19,12 +19,22 @@ import {
   VideoMetadata,
   TimelineClip,
 } from "@/types/editor";
-import { getProjectById, saveProject, SavedProject } from "@/utils/projectStorage";
+import { SavedProject } from "@/utils/projectStorage";
+import {
+  saveProjectWithMedia,
+  loadProjectWithMedia,
+  getLastActiveProjectId,
+  setLastActiveProjectId,
+  deleteProjectFromDB,
+} from "@/utils/indexedDBStorage";
+import { EditorSettingsModal, ThemeMode } from "@/components/editor/EditorSettingsModal";
 import { desktopBridge } from "@/lib/desktopBridge";
 
 export default function EditorPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoBlobRef = useRef<Blob | null>(null);
+  const webcamBlobRef = useRef<Blob | null>(null);
 
   // Inspector panel resize and collapse state (top-right)
   const [inspectorWidth, setInspectorWidth] = useState<number>(380);
@@ -203,7 +213,9 @@ export default function EditorPage() {
   const screenRecorder = useScreenRecorder({
     enableWebcam,
     webcamDeviceId: selectedCameraId,
-    onImportRecording: ({ blobUrl, metadata: recMeta, events: recEvents, webcamBlobUrl }) => {
+    onImportRecording: ({ blobUrl, metadata: recMeta, events: recEvents, webcamBlobUrl, videoBlob, webcamBlob }) => {
+      if (videoBlob) videoBlobRef.current = videoBlob;
+      if (webcamBlob) webcamBlobRef.current = webcamBlob;
       setVideoSrc(blobUrl);
       setMetadata(recMeta);
       setProjectName(recMeta.name.replace(/\.[^/.]+$/, ""));
@@ -335,6 +347,7 @@ export default function EditorPage() {
 
   // Handle user uploaded file
   const handleFileUpload = useCallback((file: File) => {
+    videoBlobRef.current = file;
     const url = URL.createObjectURL(file);
     setVideoSrc(url);
 
@@ -383,6 +396,7 @@ export default function EditorPage() {
 
   // Handle user uploaded webcam video file (to attach to any screen recording or imported video)
   const handleUploadWebcamFile = useCallback((file: File) => {
+    webcamBlobRef.current = file;
     const url = URL.createObjectURL(file);
     setMetadata((prev) => (prev ? { ...prev, webcamUrl: url } : {
       name: file.name,
@@ -439,89 +453,274 @@ export default function EditorPage() {
   const createdAtRef = useRef<number>(Date.now());
   const [isSavedFeedback, setIsSavedFeedback] = useState<boolean>(false);
 
-  // Load project by ?id=... or set aspect ratio from ?ratio=...
-  useEffect(() => {
+  // Auto-Save Configuration (default 5s interval)
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get("id");
-      const ratio = params.get("ratio") as AspectRatio | null;
+      const saved = localStorage.getItem("glideo_autosave_enabled");
+      return saved !== null ? saved === "true" : true;
+    }
+    return true;
+  });
 
-      if (id) {
-        const saved = getProjectById(id);
-        if (saved) {
-          projectIdRef.current = saved.id;
-          createdAtRef.current = saved.createdAt;
-          setProjectName(saved.name);
-          if (saved.config) {
-            setConfig((prev) => ({ ...prev, ...saved.config }));
-          }
-          if (saved.clips && saved.clips.length > 0) {
-            setClips(saved.clips);
-            setSelectedClipId(saved.clips[0].id);
-          }
-          if (saved.events && saved.events.length > 0) {
-            setEvents(saved.events);
-          }
-          return;
-        }
+  const [autoSaveInterval, setAutoSaveInterval] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("glideo_autosave_interval");
+      return saved ? parseInt(saved, 10) || 5 : 5;
+    }
+    return 5;
+  });
+
+  const [autoSaveStatus, setAutoSaveStatus] = useState<string | null>(null);
+  const isDirtyRef = useRef<boolean>(false);
+
+  // Theme Mode (dark, light, system)
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("glideo_theme") as ThemeMode | null;
+      return saved || "dark";
+    }
+    return "dark";
+  });
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("light");
+      root.classList.remove("dark");
+    } else if (theme === "dark") {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    } else {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (isDark) {
+        root.classList.add("dark");
+        root.classList.remove("light");
+      } else {
+        root.classList.add("light");
+        root.classList.remove("dark");
       }
+    }
+  }, [theme]);
+
+  const handleThemeChange = (newTheme: ThemeMode) => {
+    setTheme(newTheme);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glideo_theme", newTheme);
+    }
+  };
+
+  const handleToggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    handleThemeChange(next);
+  };
+
+  // Persistent Project Initial Mount Loader
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let isMounted = true;
+    const loadInitialProject = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlId = params.get("id");
+      const lastId = getLastActiveProjectId();
+      const targetId = urlId || lastId;
+      const ratio = params.get("ratio") as AspectRatio | null;
 
       if (ratio) {
         setConfig((prev) => ({ ...prev, aspectRatio: ratio }));
       }
-    }
-  }, []);
 
-  // Save current project state
-  const handleSaveProject = useCallback(async () => {
-    let thumbnail: string | undefined = undefined;
-    if (canvasRef.current) {
-      try {
-        thumbnail = canvasRef.current.toDataURL("image/jpeg", 0.6);
-      } catch (err) {
-        console.warn("Could not capture thumbnail:", err);
+      if (targetId) {
+        try {
+          const loaded = await loadProjectWithMedia(targetId);
+          if (loaded && isMounted) {
+            const { project: saved, videoBlob, webcamBlob } = loaded;
+            projectIdRef.current = saved.id;
+            createdAtRef.current = saved.createdAt;
+            setProjectName(saved.name);
+
+            if (saved.config) {
+              setConfig((prev) => ({ ...prev, ...saved.config }));
+            }
+            if (saved.clips && saved.clips.length > 0) {
+              setClips(saved.clips);
+              setSelectedClipId(saved.clips[0].id);
+            }
+            if (saved.events && saved.events.length > 0) {
+              setEvents(saved.events);
+            }
+
+            let liveVideoUrl: string | null = null;
+            if (videoBlob) {
+              videoBlobRef.current = videoBlob;
+              liveVideoUrl = URL.createObjectURL(videoBlob);
+              setVideoSrc(liveVideoUrl);
+            }
+
+            let liveWebcamUrl: string | null = null;
+            if (webcamBlob) {
+              webcamBlobRef.current = webcamBlob;
+              liveWebcamUrl = URL.createObjectURL(webcamBlob);
+            }
+
+            if (liveVideoUrl) {
+              setMetadata({
+                name: saved.videoFileName || `${saved.name}.webm`,
+                duration: saved.duration || 10,
+                width: 1920,
+                height: 1080,
+                url: liveVideoUrl,
+                webcamUrl: liveWebcamUrl || undefined,
+              });
+            }
+
+            if (liveWebcamUrl) {
+              setConfig((prev) => ({
+                ...prev,
+                webcamConfig: {
+                  ...(prev.webcamConfig || {
+                    shape: "circle",
+                    position: "bottom-right",
+                    customX: 0.85,
+                    customY: 0.82,
+                    size: 180,
+                    borderColor: "#fb7185",
+                    borderWidth: 3,
+                    shadow: true,
+                    mirror: true,
+                  }),
+                  enabled: true,
+                  url: liveWebcamUrl,
+                },
+              }));
+            }
+
+            setLastActiveProjectId(saved.id);
+            window.history.replaceState(null, "", `?id=${saved.id}`);
+            return;
+          }
+        } catch (err) {
+          console.warn("[Glideo] Error loading project from IndexedDB:", err);
+        }
       }
-    }
 
-    const currentId = projectIdRef.current || `proj-${Date.now()}`;
-    projectIdRef.current = currentId;
-
-    const calcDuration = clips.reduce(
-      (max, c) => Math.max(max, c.endTimeline),
-      metadata?.duration || 10
-    );
-
-    const projectData: SavedProject = {
-      id: currentId,
-      name: projectName,
-      createdAt: createdAtRef.current,
-      updatedAt: Date.now(),
-      duration: Math.round(calcDuration * 10) / 10,
-      aspectRatio: config.aspectRatio,
-      clipCount: clips.length,
-      keyframeCount: events.length,
-      thumbnail,
-      videoFileName: metadata?.name || "recording.mp4",
-      config,
-      clips,
-      events,
+      // If no saved project exists at all, load sample demo
+      if (isMounted) {
+        handleLoadDemo();
+      }
     };
 
-    saveProject(projectData);
-    setIsSavedFeedback(true);
-    setTimeout(() => setIsSavedFeedback(false), 2200);
+    loadInitialProject();
 
-    if (typeof window !== "undefined" && window.electronAPI) {
-      console.log("[Glideo] Project successfully saved to workspace:", projectData.name);
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save current project state (supports manual Ctrl+S/button or silent auto-save)
+  const handleSaveProject = useCallback(
+    async (isSilent = false) => {
+      let thumbnail: string | undefined = undefined;
+      if (canvasRef.current) {
+        try {
+          thumbnail = canvasRef.current.toDataURL("image/jpeg", 0.6);
+        } catch (err) {
+          console.warn("Could not capture thumbnail:", err);
+        }
+      }
+
+      const currentId = projectIdRef.current || `proj-${Date.now()}`;
+      projectIdRef.current = currentId;
+
+      const calcDuration = clips.reduce(
+        (max, c) => Math.max(max, c.endTimeline),
+        metadata?.duration || 10
+      );
+
+      const projectData: SavedProject = {
+        id: currentId,
+        name: projectName,
+        createdAt: createdAtRef.current,
+        updatedAt: Date.now(),
+        duration: Math.round(calcDuration * 10) / 10,
+        aspectRatio: config.aspectRatio,
+        clipCount: clips.length,
+        keyframeCount: events.length,
+        thumbnail,
+        videoFileName: metadata?.name || "recording.mp4",
+        config,
+        clips,
+        events,
+      };
+
+      try {
+        await saveProjectWithMedia(projectData, videoBlobRef.current, webcamBlobRef.current);
+        isDirtyRef.current = false;
+
+        if (typeof window !== "undefined") {
+          window.history.replaceState(null, "", `?id=${currentId}`);
+        }
+
+        if (!isSilent) {
+          setIsSavedFeedback(true);
+          setTimeout(() => setIsSavedFeedback(false), 2200);
+        } else {
+          setAutoSaveStatus("Auto-saved");
+          setTimeout(() => setAutoSaveStatus(null), 3000);
+        }
+
+        if (typeof window !== "undefined" && window.electronAPI) {
+          console.log("[Glideo] Project successfully saved to workspace:", projectData.name);
+        }
+      } catch (err) {
+        console.error("[Glideo] Failed to save project:", err);
+      }
+    },
+    [clips, config, events, metadata?.duration, metadata?.name, projectName]
+  );
+
+  // Mark dirty when user modifies clips, events, config, or project name
+  useEffect(() => {
+    isDirtyRef.current = true;
+  }, [clips, events, config, projectName]);
+
+  // Periodic Auto-Save Timer (runs every autoSaveInterval seconds)
+  useEffect(() => {
+    if (!autoSaveEnabled || autoSaveInterval <= 0) return;
+
+    const timer = setInterval(() => {
+      if (isDirtyRef.current && (videoSrc || clips.length > 0)) {
+        handleSaveProject(true);
+      }
+    }, autoSaveInterval * 1000);
+
+    return () => clearInterval(timer);
+  }, [autoSaveEnabled, autoSaveInterval, handleSaveProject, videoSrc, clips.length]);
+
+  const handleToggleAutoSave = (enabled: boolean) => {
+    setAutoSaveEnabled(enabled);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glideo_autosave_enabled", enabled ? "true" : "false");
     }
-  }, [clips, config, events, metadata?.duration, metadata?.name, projectName]);
+  };
+
+  const handleChangeAutoSaveInterval = (interval: number) => {
+    setAutoSaveInterval(interval);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("glideo_autosave_interval", interval.toString());
+    }
+  };
 
   // Global Ctrl+S keyboard shortcut
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
-        handleSaveProject();
+        handleSaveProject(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -535,7 +734,7 @@ export default function EditorPage() {
         if (action === "file:open") {
           handleNativeOpenVideo();
         } else if (action === "file:save") {
-          handleSaveProject();
+          handleSaveProject(false);
         } else if (action === "file:export") {
           setIsExportOpen(true);
         } else if (action === "file:new") {
@@ -543,6 +742,8 @@ export default function EditorPage() {
           setEvents([]);
           setVideoSrc(null);
           setMetadata(null);
+          videoBlobRef.current = null;
+          webcamBlobRef.current = null;
           projectIdRef.current = `proj-${Date.now()}`;
           setProjectName("New Project");
         }
@@ -550,15 +751,6 @@ export default function EditorPage() {
       return cleanup;
     }
   }, [handleNativeOpenVideo, handleSaveProject]);
-
-  // Auto-load demo on initial mount if not loading a saved project
-  useEffect(() => {
-    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-    if (!params.get("id")) {
-      handleLoadDemo();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Multi-selection handler passed to MultiTrackTimeline
   const handleSelectMultiple = useCallback((clipIds: string[], eventIds: string[]) => {
@@ -979,7 +1171,11 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#090D16] text-slate-100 overflow-hidden font-sans select-none relative">
+    <div
+      className={`flex flex-col h-screen w-screen transition-colors duration-200 ${
+        theme === "light" ? "bg-[#F1F5F9] text-slate-800" : "bg-[#090D16] text-slate-100"
+      } overflow-hidden font-sans select-none relative`}
+    >
       {/* Subtle atmospheric ambient glow */}
       <div className="ambient-backdrop pointer-events-none" />
 
@@ -1013,6 +1209,10 @@ export default function EditorPage() {
         canRedo={future.length > 0}
         onUndo={handleUndo}
         onRedo={handleRedo}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        autoSaveStatus={autoSaveStatus}
       />
 
       {/* Floating Active Recording HUD Overlay */}
@@ -1311,6 +1511,24 @@ export default function EditorPage() {
         }}
         onStartRecording={screenRecorder.startRecording}
         isRecording={screenRecorder.isRecording}
+      />
+
+      {/* 6. Settings Modal (Theme, Auto-Save, Storage) */}
+      <EditorSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        theme={theme}
+        onThemeChange={handleThemeChange}
+        autoSaveEnabled={autoSaveEnabled}
+        onToggleAutoSave={handleToggleAutoSave}
+        autoSaveInterval={autoSaveInterval}
+        onChangeAutoSaveInterval={handleChangeAutoSaveInterval}
+        onSaveNow={() => handleSaveProject(false)}
+        onClearCache={() => {
+          if (projectIdRef.current) {
+            deleteProjectFromDB(projectIdRef.current);
+          }
+        }}
       />
     </div>
   );

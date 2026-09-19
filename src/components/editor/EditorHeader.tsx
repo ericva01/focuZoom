@@ -21,6 +21,9 @@ import {
   Check,
   Undo2,
   Redo2,
+  Settings,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { AspectRatio } from "@/types/editor";
 
@@ -63,6 +66,11 @@ interface EditorHeaderProps {
   onToggleLeftCollapse?: () => void;
   isRightCollapsed?: boolean;
   onToggleRightCollapse?: () => void;
+  // Theme & Settings
+  theme?: "dark" | "light" | "system";
+  onToggleTheme?: () => void;
+  onOpenSettings?: () => void;
+  autoSaveStatus?: string | null;
 }
 
 function EditorHeaderBase({
@@ -96,6 +104,10 @@ function EditorHeaderBase({
   onToggleLeftCollapse,
   isRightCollapsed = false,
   onToggleRightCollapse,
+  theme = "dark",
+  onToggleTheme,
+  onOpenSettings,
+  autoSaveStatus,
 }: EditorHeaderProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
@@ -346,22 +358,29 @@ function EditorHeaderBase({
         )}
 
         {onSaveProject && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onSaveProject}
-            disabled={!isReady}
-            title="Save project to workspace and local storage (Ctrl/Cmd+S)"
-            leftIcon={
-              isSavedFeedback ? (
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-              ) : (
-                <Save className="w-3.5 h-3.5 text-rose-400" />
-              )
-            }
-          >
-            <span>{isSavedFeedback ? "Saved!" : "Save"}</span>
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onSaveProject}
+              disabled={!isReady}
+              title="Save project to local offline storage (Ctrl/Cmd+S)"
+              leftIcon={
+                isSavedFeedback ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <Save className="w-3.5 h-3.5 text-rose-400" />
+                )
+              }
+            >
+              <span>{isSavedFeedback ? "Saved!" : "Save"}</span>
+            </Button>
+            {autoSaveStatus && (
+              <span className="text-[10px] text-emerald-400/90 font-mono hidden xl:inline animate-in fade-in">
+                {autoSaveStatus}
+              </span>
+            )}
+          </div>
         )}
 
         <Button
@@ -373,6 +392,32 @@ function EditorHeaderBase({
         >
           <span>Export Video</span>
         </Button>
+
+        {onToggleTheme && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onToggleTheme}
+            title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+          >
+            {theme === "light" ? (
+              <Moon className="w-3.5 h-3.5 text-slate-400 hover:text-slate-200" />
+            ) : (
+              <Sun className="w-3.5 h-3.5 text-amber-400 hover:text-amber-300" />
+            )}
+          </Button>
+        )}
+
+        {onOpenSettings && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onOpenSettings}
+            title="Settings (Theme, 5s Auto-Save, Storage)"
+          >
+            <Settings className="w-3.5 h-3.5 text-slate-400 hover:text-white" />
+          </Button>
+        )}
 
         <Link href="/contact">
           <Button

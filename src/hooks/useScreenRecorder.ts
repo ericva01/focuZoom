@@ -10,6 +10,8 @@ export interface ScreenRecorderResult {
   metadata: VideoMetadata;
   events: ClickEvent[];
   webcamBlobUrl?: string | null;
+  videoBlob?: Blob | null;
+  webcamBlob?: Blob | null;
 }
 
 export interface UseScreenRecorderOptions {
@@ -236,6 +238,7 @@ export function useScreenRecorder({
 
     // Process recorded webcam video if active
     let recordedWebcamBlobUrl: string | null = null;
+    let recordedWebcamBlob: Blob | null = null;
     if (webcamRecorderRef.current) {
       const camRec = webcamRecorderRef.current;
       try {
@@ -269,6 +272,7 @@ export function useScreenRecorder({
         const mimeType = webcamRecorderRef.current?.mimeType || "video/webm";
         const webcamBlob = new Blob(webcamChunksRef.current, { type: mimeType });
         if (webcamBlob.size > 0) {
+          recordedWebcamBlob = webcamBlob;
           recordedWebcamBlobUrl = URL.createObjectURL(webcamBlob);
         }
       } catch (blobErr) {
@@ -352,6 +356,8 @@ export function useScreenRecorder({
               metadata,
               events: clusteredClicks,
               webcamBlobUrl: recordedWebcamBlobUrl,
+              videoBlob: blob,
+              webcamBlob: recordedWebcamBlob,
             });
           };
 

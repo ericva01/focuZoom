@@ -27,6 +27,31 @@
   --glass-shadow-inner: inset 0 1px 1px 0 rgba(255, 255, 255, 0.14);
 }
 
+:root.light, .light {
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --foreground-muted: #64748B;
+
+  /* Glass Surface Fills for Light Theme */
+  --glass-bg-subtle: rgba(0, 0, 0, 0.03);
+  --glass-bg-surface: rgba(255, 255, 255, 0.85);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.95);
+  --glass-bg-highlight: #FFFFFF;
+  --glass-bg-sunken: rgba(0, 0, 0, 0.05);
+
+  /* Glass Borders for Light Theme */
+  --glass-border-subtle: rgba(0, 0, 0, 0.08);
+  --glass-border-medium: rgba(0, 0, 0, 0.12);
+  --glass-border-strong: rgba(0, 0, 0, 0.20);
+  --glass-border-accent: rgba(244, 63, 94, 0.35);
+
+  /* Glass Shadows for Light Theme */
+  --glass-shadow-sm: 0 2px 8px 0 rgba(0, 0, 0, 0.06);
+  --glass-shadow-md: 0 8px 32px 0 rgba(0, 0, 0, 0.10);
+  --glass-shadow-lg: 0 16px 48px 0 rgba(0, 0, 0, 0.14);
+  --glass-shadow-inner: inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
 /* Google Sans Typography (Bundled Offline for Next.js & Electron) */
 @font-face {
   font-family: 'Google Sans';
