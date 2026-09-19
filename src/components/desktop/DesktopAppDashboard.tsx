@@ -257,9 +257,9 @@ export function DesktopAppDashboard() {
 
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-white/[0.08] border border-transparent hover:border-white/10 transition-all cursor-pointer group"
             >
-              <Settings className="w-4 h-4 text-slate-400" />
+              <Settings className="w-4 h-4 text-rose-400 group-hover:rotate-45 transition-transform duration-300" />
               <span>Settings</span>
             </button>
           </nav>
@@ -307,13 +307,14 @@ export function DesktopAppDashboard() {
               <span>New Video</span>
             </button>
 
-            {/* Settings Button */}
+            {/* Prominent Settings Button */}
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="p-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-slate-200 hover:text-white text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95 group"
               title="Application Settings (Theme, Auto-Save, Storage)"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-3.5 h-3.5 text-rose-400 group-hover:rotate-45 transition-transform duration-300" />
+              <span>Settings</span>
             </button>
 
             {/* User Profile Avatar */}
