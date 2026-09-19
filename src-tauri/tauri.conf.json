@@ -29,6 +29,9 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "resources": [
+      "WebView2Loader.dll"
+    ],
     "category": "Video",
     "shortDescription": "Cross-Platform Video Editing Workspace with Dynamic 3D Camera Animations",
     "icon": [
@@ -80,7 +83,8 @@
       },
       "nsis": {
         "installerIcon": "icons/icon.ico",
-        "uninstallerIcon": "icons/icon.ico"
+        "uninstallerIcon": "icons/icon.ico",
+        "installerHooks": "nsis-hooks.nsh"
       }
     },
     "android": {
