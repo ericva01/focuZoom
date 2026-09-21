@@ -899,7 +899,7 @@ export function DesktopAppDashboard() {
               }`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>Glideo Studio Desktop v0.1.1</h3>
+                    <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>FucuFlow Studio Desktop v0.1.4</h3>
                     <p className={`text-xs mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>Created by Eric Va • Permissive MIT License</p>
                   </div>
                   <a

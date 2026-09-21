@@ -19,19 +19,33 @@ interface DownloadModalProps {
   onClose: () => void;
 }
 
-const GITHUB_RELEASE_DOWNLOAD =
-  process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
-  "https://github.com/ericva01/focuZoom/releases/download/v0.1.1/Glideo_0.1.0_x64-setup.exe";
-const GITHUB_RELEASE_DOWNLOAD_MAC =
-  "https://github.com/ericva01/focuZoom/releases/download/v0.1.1/Glideo_0.1.0_aarch64.dmg";
-const GITHUB_RELEASE_DOWNLOAD_LINUX =
-  "https://github.com/ericva01/focuZoom/releases/download/v0.1.1/Glideo_0.1.0_amd64.AppImage";
-const GITHUB_RELEASES_PAGE = "https://github.com/ericva01/focuZoom/releases/tag/v0.1.1";
+const DEFAULT_TAG = "v0.1.4";
+const GITHUB_REPO = "ericva01/focuZoom";
+const GITHUB_RELEASES_PAGE = `https://github.com/${GITHUB_REPO}/releases/latest`;
 
 export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
   const [userOS, setUserOS] = useState<"win" | "mac" | "linux">("win");
   const [activeDownloadOS, setActiveDownloadOS] = useState<"win" | "mac" | "linux">("win");
   const [downloadStarted, setDownloadStarted] = useState(false);
+  const [releaseTag, setReleaseTag] = useState<string>(DEFAULT_TAG);
+  const [downloadUrls, setDownloadUrls] = useState<{
+    win: { url: string; filename: string };
+    mac: { url: string; filename: string };
+    linux: { url: string; filename: string };
+  }>({
+    win: {
+      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_x64-setup.exe`,
+      filename: "FucuFlow_0.1.4_x64-setup.exe",
+    },
+    mac: {
+      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_aarch64.dmg`,
+      filename: "FucuFlow_0.1.4_aarch64.dmg",
+    },
+    linux: {
+      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_amd64.AppImage`,
+      filename: "FucuFlow_0.1.4_amd64.AppImage",
+    },
+  });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -49,6 +63,51 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
     }
   }, []);
 
+  // Dynamically fetch the latest release from GitHub API so download links always point to the newest version
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLatestRelease = async () => {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
+          headers: { Accept: "application/vnd.github.v3+json" },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!isMounted || !data) return;
+
+        const tag = data.tag_name || DEFAULT_TAG;
+        setReleaseTag(tag);
+
+        const assets: Array<{ name: string; browser_download_url: string }> = data.assets || [];
+        const winAsset = assets.find((a) => a.name.endsWith(".exe") || a.name.endsWith(".msi"));
+        const macAsset = assets.find((a) => a.name.endsWith(".dmg") || a.name.endsWith(".app.tar.gz"));
+        const linuxAsset = assets.find((a) => a.name.endsWith(".AppImage") || a.name.endsWith(".deb"));
+
+        setDownloadUrls({
+          win: {
+            url: winAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_x64-setup.exe`,
+            filename: winAsset?.name || `FucuFlow_${tag.replace(/^v/, "")}_x64-setup.exe`,
+          },
+          mac: {
+            url: macAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_aarch64.dmg`,
+            filename: macAsset?.name || `FucuFlow_${tag.replace(/^v/, "")}_aarch64.dmg`,
+          },
+          linux: {
+            url: linuxAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_amd64.AppImage`,
+            filename: linuxAsset?.name || `FucuFlow_${tag.replace(/^v/, "")}_amd64.AppImage`,
+          },
+        });
+      } catch (err) {
+        console.warn("[FucuFlow] Could not fetch latest release info:", err);
+      }
+    };
+
+    fetchLatestRelease();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -62,28 +121,11 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
   const handleDownload = (os: "win" | "mac" | "linux") => {
     setActiveDownloadOS(os);
-    const isLocal =
-      typeof window !== "undefined" &&
-      (window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1");
-
-    let downloadUrl = "";
-    let filename = "";
-
-    if (os === "win") {
-      downloadUrl = isLocal ? "/downloads/Glideo_0.1.0_x64-setup.exe" : GITHUB_RELEASE_DOWNLOAD;
-      filename = "Glideo_0.1.0_x64-setup.exe";
-    } else if (os === "mac") {
-      downloadUrl = GITHUB_RELEASE_DOWNLOAD_MAC;
-      filename = "Glideo_0.1.0_aarch64.dmg";
-    } else {
-      downloadUrl = GITHUB_RELEASE_DOWNLOAD_LINUX;
-      filename = "Glideo_0.1.0_amd64.AppImage";
-    }
+    const target = downloadUrls[os];
 
     const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.setAttribute("download", filename);
+    link.href = target.url;
+    link.setAttribute("download", target.filename);
     link.target = "_blank";
     link.rel = "noopener noreferrer";
     document.body.appendChild(link);
@@ -120,7 +162,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/25 text-xs font-mono font-bold text-[#FF6B2C] hover:bg-[#FFE6D6] transition-all cursor-pointer group"
             >
               <span className="w-2 h-2 rounded-full bg-[#FF6B2C] animate-pulse" />
-              <span>NATIVE DESKTOP v0.1.1</span>
+              <span>NATIVE DESKTOP {releaseTag}</span>
               <ExternalLink className="w-3 h-3 text-[#FF6B2C] group-hover:translate-x-0.5 transition-transform" />
             </a>
 
@@ -141,7 +183,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
           </div>
 
           <h3 className="text-2xl sm:text-3xl font-extrabold text-[#111318] tracking-tight">
-            Download Glideo Desktop
+            Download FucuFlow Desktop
           </h3>
           <p className="text-[#667085] text-xs sm:text-sm mt-1.5 max-w-md mx-auto leading-relaxed">
             Experience 100% offline recording, local hardware acceleration, and automated 3D camera zooms directly on your device.
@@ -159,13 +201,13 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
                 </p>
                 <p className="text-xs text-[#667085] mt-1 leading-relaxed">
                   {activeDownloadOS === "win" && (
-                    <>Run <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">Glideo_0.1.0_x64-setup.exe</code> (9.5 MB) once finished to install.</>
+                    <>Run <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">{downloadUrls.win.filename}</code> once finished to install.</>
                   )}
                   {activeDownloadOS === "mac" && (
-                    <>Open <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">Glideo_0.1.0_aarch64.dmg</code> and drag Glideo to Applications.</>
+                    <>Open <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">{downloadUrls.mac.filename}</code> and drag FucuFlow to Applications.</>
                   )}
                   {activeDownloadOS === "linux" && (
-                    <>Run in terminal: <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">chmod +x Glideo*.AppImage && ./Glideo*.AppImage</code></>
+                    <>Run in terminal: <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">chmod +x FucuFlow*.AppImage && ./FucuFlow*.AppImage</code></>
                   )}
                 </p>
               </div>
@@ -195,7 +237,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               </div>
               <div>
                 <div className="text-[10px] font-mono text-white/80 font-bold uppercase tracking-wider">
-                  OFFICIAL INSTALLER (v0.1.1)
+                  OFFICIAL INSTALLER ({releaseTag})
                 </div>
                 <div className="text-base sm:text-lg font-bold text-white leading-tight">
                   {userOS === "win"
@@ -209,7 +251,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
             <div className="flex items-center gap-2 pr-1">
               <span className="text-xs font-mono font-bold text-white bg-white/20 px-2.5 py-1 rounded-full hidden sm:inline">
-                {userOS === "win" ? "9.5 MB" : "Official Package"}
+                {releaseTag}
               </span>
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#FF6B2C] group-hover:scale-105 flex items-center justify-center transition-transform shrink-0 shadow-sm">
                 <Download className="w-4 h-4 text-[#FF6B2C]" />

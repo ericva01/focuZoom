@@ -1,6 +1,6 @@
 {
   "name": "fucuflow",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "author": "Eric Va",
   "description": "Cross-Platform Video Editing Workspace with Dynamic 3D Camera Animations",
   "scripts": {
