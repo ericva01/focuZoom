@@ -70,14 +70,13 @@ export function Navbar() {
             <span className="px-1.5 py-0.5 rounded bg-[#FFF1E8] text-[#FF6B2C] text-[10px] font-bold">★ Open Source</span>
           </a>
 
-          <button
-            type="button"
-            onClick={() => setDownloadOpen(true)}
+          <Link
+            href="/download"
             className="hidden items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors lg:inline-flex cursor-pointer shadow-xs active:scale-95"
           >
             <Download size={14} className="text-[#FF6B2C]" />
             <span>Download</span>
-          </button>
+          </Link>
 
           <Link
             href="/desktop"
@@ -132,15 +131,13 @@ export function Navbar() {
                   <span>Launch App</span>
                   <ArrowRight size={16} />
                 </Link>
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    setDownloadOpen(true);
-                  }}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] py-2.5 text-xs font-medium text-[#667085] hover:bg-[#F8F9FB]"
+                <Link
+                  href="/download"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] py-2.5 text-xs font-medium text-[#667085] hover:bg-[#F8F9FB] hover:text-[#111318]"
                 >
-                  <Download size={14} /> Download Desktop Client
-                </button>
+                  <Download size={14} className="text-[#FF6B2C]" /> Download Desktop Client
+                </Link>
               </div>
             </SheetContent>
           </Sheet>

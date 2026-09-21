@@ -28,7 +28,7 @@ export default function ProductPage() {
                 Every tool you need to create <span className="text-[#FF6B2C]">studio-grade</span> video.
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-[#667085] leading-relaxed">
-                Glideo is a fast, modern, and open-source video creation suite. Record your screen, automatically animate smooth camera focus, trim multiple tracks, and export crisp 4K videos without subscription paywalls or cloud lock-in.
+                FucuFlow is a fast, modern, and open-source video creation suite. Record your screen, automatically animate smooth camera focus, trim multiple tracks, and export crisp 4K videos without subscription paywalls or cloud lock-in.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link

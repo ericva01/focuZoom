@@ -44,7 +44,7 @@ export function Footer() {
               <li><Link href="/features" className="hover:text-[#FF6B2C] transition-colors">Features</Link></li>
               <li><Link href="/editor" className="hover:text-[#FF6B2C] transition-colors">Screen Studio</Link></li>
               <li><Link href="/open-source" className="hover:text-[#FF6B2C] transition-colors">Open Source (MIT)</Link></li>
-              <li><Link href="/desktop" className="hover:text-[#FF6B2C] transition-colors">Download App</Link></li>
+              <li><Link href="/download" className="hover:text-[#FF6B2C] transition-colors">Downloads & Releases</Link></li>
             </ul>
           </div>
 

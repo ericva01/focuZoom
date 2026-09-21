@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Download,
   Monitor,
@@ -319,6 +320,18 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
               <span className="text-xs font-bold">Linux</span>
               <span className="text-[10px] font-mono text-[#667085]">.AppImage</span>
             </button>
+          </div>
+
+          {/* Link to all releases page */}
+          <div className="mt-3.5 text-center">
+            <Link
+              href="/download"
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6B2C] hover:text-[#E85A1F] transition-colors"
+            >
+              <span>View all releases, architectures & changelog</span>
+              <ExternalLink size={12} />
+            </Link>
           </div>
         </div>
 
