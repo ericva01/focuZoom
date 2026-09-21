@@ -72,9 +72,9 @@ export default function EditorPage() {
     // Backdrop & Geometry
     backgroundType: "gradient",
     backgroundPreset: "mesh-purple",
-    solidBackgroundColor: "#06402B",
-    customGradientFrom: "#1e1b4b",
-    customGradientTo: "#fb7185",
+    solidBackgroundColor: "#111318",
+    customGradientFrom: "#17191F",
+    customGradientTo: "#FF6B2C",
     cornerRadius: 20,
     padding: 36,
     shadowIntensity: "cinematic",
@@ -90,10 +90,10 @@ export default function EditorPage() {
     // Cursor & FX
     showCursor: true,
     cursorStyle: "macos-arrow",
-    cursorColor: "#fb7185",
+    cursorColor: "#FF6B2C",
     cursorSize: 22,
     showRipple: false,
-    rippleColor: "#fb7185",
+    rippleColor: "#FF6B2C",
 
     aspectRatio: "16:9",
     playbackSpeed: 1.0,
@@ -106,7 +106,7 @@ export default function EditorPage() {
       customX: 0.85,
       customY: 0.82,
       size: 180,
-      borderColor: "#fb7185",
+      borderColor: "#FF6B2C",
       borderWidth: 3,
       shadow: true,
       mirror: true,
@@ -229,7 +229,7 @@ export default function EditorPage() {
         duration: recDuration,
         startTimeline: 0,
         endTimeline: recDuration,
-        color: "#e11d48",
+        color: "#FF6B2C",
         speed: 1.0,
       };
       recordHistory();
@@ -317,7 +317,7 @@ export default function EditorPage() {
         duration: sample.duration,
         startTimeline: 0,
         endTimeline: sample.duration,
-        color: "#e11d48",
+        color: "#FF6B2C",
         speed: 1.0,
       };
       setClips([initialClip]);
@@ -385,7 +385,7 @@ export default function EditorPage() {
         duration: vidDur,
         startTimeline: 0,
         endTimeline: vidDur,
-        color: "#e11d48",
+        color: "#FF6B2C",
         speed: 1.0,
       };
       setClips([initialClip]);

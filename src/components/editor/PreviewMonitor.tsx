@@ -140,7 +140,7 @@ export function PreviewMonitor({
       <div className="h-10 px-4 border-b border-white/[0.08] bg-white/[0.02] flex items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
         {/* Left: Aspect Ratio Selector */}
         <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10 shadow-glass-inner">
-          <Ratio className="w-3.5 h-3.5 text-rose-400 ml-1 mr-0.5" />
+          <Ratio className="w-3.5 h-3.5 text-[#FF6B2C] ml-1 mr-0.5" />
           {aspectRatios.map((ar) => (
             <button
               key={ar.id}
@@ -148,7 +148,7 @@ export function PreviewMonitor({
               onClick={() => onChangeConfig({ aspectRatio: ar.id })}
               className={`px-2 py-0.5 rounded-lg text-[11px] font-mono transition-all ${
                 config.aspectRatio === ar.id
-                  ? "bg-rose-500/25 text-rose-200 font-bold border border-rose-400/40 shadow-glass-sm"
+                  ? "bg-[#FF6B2C]/25 text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
                   : "text-slate-400 hover:text-white"
               }`}
             >
@@ -182,7 +182,7 @@ export function PreviewMonitor({
             title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
             className={`p-1.5 rounded-xl border transition-all ${
               isFullscreen
-                ? "bg-rose-500/20 text-rose-300 border-rose-400/30"
+                ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/30"
                 : "text-slate-400 hover:text-white border-white/10 bg-white/[0.04] hover:bg-white/[0.08]"
             }`}
           >
@@ -241,7 +241,7 @@ export function PreviewMonitor({
             type="button"
             onClick={onTogglePlay}
             title={isPlaying ? "Pause" : "Play"}
-            className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 flex items-center justify-center border border-rose-400/30 shadow-glass-sm"
+            className="w-6 h-6 rounded-lg bg-[#FF6B2C]/20 text-[#FF8A4C] hover:bg-[#FF6B2C]/30 flex items-center justify-center border border-[#FF6B2C]/30 shadow-glass-sm"
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
           </button>
@@ -268,7 +268,7 @@ export function PreviewMonitor({
             title={isLooping ? "Looping On" : "Looping Off"}
             className={`p-1.5 rounded-lg border transition-all ${
               isLooping
-                ? "bg-rose-500/20 text-rose-300 border-rose-400/30"
+                ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/30"
                 : "text-slate-400 hover:text-white border-transparent hover:bg-white/[0.06]"
             }`}
           >
@@ -280,7 +280,7 @@ export function PreviewMonitor({
             title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
             className={`p-1.5 rounded-lg border transition-all ${
               isFullscreen
-                ? "bg-rose-500/20 text-rose-300 border-rose-400/30"
+                ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/30"
                 : "text-slate-400 hover:text-white border-transparent hover:bg-white/[0.06]"
             }`}
           >

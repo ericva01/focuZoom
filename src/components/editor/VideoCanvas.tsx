@@ -353,7 +353,7 @@ function VideoCanvasBase({
       className="w-full h-full min-h-0 bg-transparent flex flex-col items-center justify-center p-2 sm:p-3 overflow-hidden relative select-none"
     >
       {/* Ambient background glow */}
-      <div className="absolute w-[600px] h-[450px] bg-rose-500/[0.05] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute w-[600px] h-[450px] bg-[#FF6B2C]/[0.05] rounded-full blur-[140px] pointer-events-none" />
 
       {/* Hidden HTML5 Video element used as texture source - ALWAYS mounted so videoRef is immediately available */}
       <video
@@ -369,7 +369,7 @@ function VideoCanvasBase({
       {clips !== undefined && clips.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 p-4 animate-in fade-in duration-200">
           <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-[#090D16]/85 border border-white/10 backdrop-blur-md shadow-glass-lg max-w-sm text-center">
-            <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+            <div className="w-12 h-12 rounded-xl bg-[#FF6B2C]/10 border border-[#FF6B2C]/20 flex items-center justify-center text-[#FF6B2C]">
               <Film className="w-6 h-6" />
             </div>
             <div>
@@ -384,24 +384,24 @@ function VideoCanvasBase({
 
       {/* Right-Click Moving Banner Overlay */}
       {isRightClickDragging && (
-        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-rose-400/60 bg-rose-950/90 text-white font-bold text-xs shadow-glass-md animate-pulse">
-          <Crosshair className="w-4 h-4 text-rose-300 animate-spin" />
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-[#FF6B2C]/60 bg-[#17191F]/95 text-white font-bold text-xs shadow-glass-md animate-pulse">
+          <Crosshair className="w-4 h-4 text-[#FF8A4C] animate-spin" />
           <span>Moving Focus Point: ({Math.round((hoverCoords?.x ?? 0.5) * 100)}%, {Math.round((hoverCoords?.y ?? 0.5) * 100)}%) · Release to save</span>
         </div>
       )}
 
       {/* Mode Banner Overlay */}
       {isAddMode && !isRightClickDragging && (
-        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-rose-400/40 text-white font-bold text-xs shadow-glass-md animate-pulse">
-          <Crosshair className="w-4 h-4 text-rose-400" />
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-[#FF6B2C]/40 text-white font-bold text-xs shadow-glass-md animate-pulse">
+          <Crosshair className="w-4 h-4 text-[#FF6B2C]" />
           <span>3D Focal Target Mode: Click on any element on the 3D screen to set a camera dolly target!</span>
         </div>
       )}
 
       {/* Just Added Confirmation Toast */}
       {justAddedToast && (
-        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl glass-panel-elevated border-rose-400/50 text-white font-semibold text-xs shadow-glass-md animate-in fade-in zoom-in duration-200">
-          <Check className="w-4 h-4 text-rose-400" />
+        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl glass-panel-elevated border-[#FF6B2C]/50 text-white font-semibold text-xs shadow-glass-md animate-in fade-in zoom-in duration-200">
+          <Check className="w-4 h-4 text-[#FF6B2C]" />
           <span>3D Target set at ({Math.round(justAddedToast.x * 100)}%, {Math.round(justAddedToast.y * 100)}%)!</span>
         </div>
       )}
@@ -472,7 +472,7 @@ function VideoCanvasBase({
 
         {/* Live 3D Camera Zoom Indicator HUD Badge */}
         <div className="absolute bottom-4 left-4 z-20 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl glass-panel text-xs shadow-glass-md backdrop-blur-xl">
-          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-rose-400 animate-pulse" : "text-slate-400"}`} />
+          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-[#FF6B2C] animate-pulse" : "text-slate-400"}`} />
           <span className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider hidden sm:inline">
             3D Studio
           </span>
@@ -480,7 +480,7 @@ function VideoCanvasBase({
             {cameraState.scale.toFixed(2)}x Dolly
           </span>
           {cameraState.isZoomed && (
-            <span className="text-[10px] text-rose-200 font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-500/20 border border-rose-400/30 shadow-glass-sm">
+            <span className="text-[10px] text-[#FF8A4C] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 shadow-glass-sm">
               Focus Active
             </span>
           )}
@@ -489,7 +489,7 @@ function VideoCanvasBase({
         {/* Coordinate Crosshair Tracker during Add Mode */}
         {isAddMode && hoverCoords && (
           <div
-            className="absolute pointer-events-none z-20 px-2.5 py-1 rounded-lg glass-panel text-rose-300 font-mono text-[10px] border-rose-400/40 shadow-glass-sm -translate-x-1/2 -translate-y-8"
+            className="absolute pointer-events-none z-20 px-2.5 py-1 rounded-lg glass-panel text-[#FF8A4C] font-mono text-[10px] border-[#FF6B2C]/40 shadow-glass-sm -translate-x-1/2 -translate-y-8"
             style={{
               left: `${hoverCoords.x * 100}%`,
               top: `${hoverCoords.y * 100}%`,
@@ -509,7 +509,7 @@ function VideoCanvasBase({
               customX: 0.85,
               customY: 0.82,
               size: 180,
-              borderColor: "#fb7185",
+              borderColor: "#FF6B2C",
               borderWidth: 3,
               shadow: true,
               mirror: true,
@@ -573,7 +573,7 @@ function VideoCanvasBase({
                 onMouseDown={handleWebcamMouseDown}
                 title="Drag to reposition webcam bubble"
                 className={`absolute z-30 cursor-move group/pip transition-shadow ${
-                  isDraggingWebcam ? "ring-2 ring-rose-400 scale-105" : "hover:scale-[1.02]"
+                  isDraggingWebcam ? "ring-2 ring-[#FF6B2C] scale-105" : "hover:scale-[1.02]"
                 }`}
                 style={{
                   left: `${posX * 100}%`,
@@ -588,7 +588,7 @@ function VideoCanvasBase({
                     wConfig.shadow ? "shadow-[0_10px_35px_rgba(0,0,0,0.6)]" : ""
                   }`}
                   style={{
-                    border: `${wConfig.borderWidth}px solid ${wConfig.borderColor || "#fb7185"}`,
+                    border: `${wConfig.borderWidth}px solid ${wConfig.borderColor || "#FF6B2C"}`,
                   }}
                 >
                   <video
@@ -602,7 +602,7 @@ function VideoCanvasBase({
                   />
                   {!(webcamStream || effectiveWebcamUrl) && (
                     <div className="absolute inset-0 bg-[#090D16]/90 flex flex-col items-center justify-center gap-1.5 text-slate-400 p-2 text-center pointer-events-none">
-                      <Camera className="w-6 h-6 text-rose-400 animate-pulse" />
+                      <Camera className="w-6 h-6 text-[#FF6B2C] animate-pulse" />
                       <span className="text-[9px] font-mono text-slate-300">Camera Active</span>
                     </div>
                   )}

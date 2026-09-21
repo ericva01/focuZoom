@@ -13,8 +13,8 @@ export function ComparisonDemo() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-14 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md text-xs font-medium text-rose-200">
-            <svg className="w-3.5 h-3.5 text-rose-400 fill-current" viewBox="0 0 24 24">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md text-xs font-medium text-[#FF8A4C]">
+            <svg className="w-3.5 h-3.5 text-[#FF6B2C] fill-current" viewBox="0 0 24 24">
               <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
             </svg>
             <span>Visual Comparison</span>
@@ -22,7 +22,7 @@ export function ComparisonDemo() {
 
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
             See the transformation <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-200 via-blue-200 to-indigo-100">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8A4C] via-blue-200 to-indigo-100">
               in real time.
             </span>
           </h2>
@@ -34,37 +34,37 @@ export function ComparisonDemo() {
 
         {/* Interactive Comparison Container */}
         <div className="max-w-4xl mx-auto">
-          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-[#080D1A]/90 border border-white/15 aspect-[16/9] shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(251,113,133,0.1)] backdrop-blur-2xl select-none">
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-[#080D1A]/90 border border-white/15 aspect-[16/9] shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(255,107,44,0.1)] backdrop-blur-2xl select-none">
             {/* 1. Behind / Full: Cinematic Version */}
             <div className="absolute inset-0 bg-[#080D1A] p-6 sm:p-10 flex items-center justify-center">
               <div className="w-full h-full rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md p-6 relative overflow-hidden flex flex-col justify-center items-center text-center">
                 {/* Visual elements of zoomed state */}
                 <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-400/80" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF6B2C]/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
                   <span className="text-xs font-mono text-slate-300 ml-2">Glideo (Zoomed & Framed)</span>
                 </div>
 
                 <div className="scale-125 transition-transform duration-300 space-y-2.5">
-                  <div className="px-4 py-2 rounded-full bg-rose-500/20 text-rose-200 font-medium text-xs border border-rose-400/30 shadow-[0_0_20px_rgba(251,113,133,0.2)] backdrop-blur-md inline-flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                  <div className="px-4 py-2 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] font-medium text-xs border border-[#FF6B2C]/30 shadow-[0_0_20px_rgba(255,107,44,0.2)] backdrop-blur-md inline-flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                     <span>Click Target: Auto-Zoom 2.2x</span>
                   </div>
-                  <p className="text-xs text-rose-300/80 font-mono">
+                  <p className="text-xs text-[#FF8A4C]/80 font-mono">
                     Smooth Easing Pan · Technical Ripple Active
                   </p>
                 </div>
 
                 {/* Animated Ripple Mock */}
-                <div className="absolute w-28 h-28 rounded-full border border-rose-400/40 animate-ping pointer-events-none" />
-                <div className="absolute w-14 h-14 rounded-full bg-rose-500/15 border border-rose-400/50 backdrop-blur-sm pointer-events-none" />
+                <div className="absolute w-28 h-28 rounded-full border border-[#FF6B2C]/40 animate-ping pointer-events-none" />
+                <div className="absolute w-14 h-14 rounded-full bg-[#FF6B2C]/15 border border-[#FF6B2C]/50 backdrop-blur-sm pointer-events-none" />
               </div>
             </div>
 
             {/* 2. Overlaid / Clipped: Raw Standard Version */}
             <div
-              className="absolute inset-y-0 left-0 overflow-hidden bg-[#060914] border-r border-rose-400/80 shadow-[0_0_20px_rgba(251,113,133,0.5)]"
+              className="absolute inset-y-0 left-0 overflow-hidden bg-[#060914] border-r border-[#FF6B2C]/80 shadow-[0_0_20px_rgba(255,107,44,0.5)]"
               style={{ width: `${sliderPosition}%` }}
             >
               <div className="w-[896px] h-full p-4 sm:p-8 flex items-center justify-center bg-[#070A16]">
@@ -109,7 +109,7 @@ export function ComparisonDemo() {
             </div>
 
             <div className="absolute top-4 right-4 z-10 pointer-events-none">
-              <span className="px-3 py-1.5 rounded-full text-[11px] font-mono font-medium bg-rose-500/20 text-rose-200 border border-rose-400/30 backdrop-blur-md shadow-[0_0_15px_rgba(251,113,133,0.3)]">
+              <span className="px-3 py-1.5 rounded-full text-[11px] font-mono font-medium bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30 backdrop-blur-md shadow-[0_0_15px_rgba(255,107,44,0.3)]">
                 After: Glideo
               </span>
             </div>

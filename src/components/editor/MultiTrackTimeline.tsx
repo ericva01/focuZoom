@@ -22,7 +22,7 @@ import {
   Focus,
   Undo2,
   Redo2,
-  Video as VideoIcon,
+  Video,
   Mic,
   Plus,
   X,
@@ -207,6 +207,7 @@ function MultiTrackTimelineBase({
   const [snappingEnabled, setSnappingEnabled] = useState<boolean>(true);
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
   const [isVideoHidden, setIsVideoHidden] = useState<boolean>(false);
+  const [isVideoTrackLocked, setIsVideoTrackLocked] = useState<boolean>(false);
   const [isKeyframeTrackLocked, setIsKeyframeTrackLocked] = useState<boolean>(false);
 
   // Right-Click Marquee Box Selection State
@@ -605,9 +606,9 @@ function MultiTrackTimelineBase({
             onClick={handleTriggerSplit}
             disabled={!activeClipUnderPlayhead}
             title="Split Clip at Playhead (S)"
-            className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-rose-500/20 text-slate-200 hover:text-rose-300 border border-white/10 hover:border-rose-400/40 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-[#FF6B2C]/20 text-slate-200 hover:text-[#FF8A4C] border border-white/10 hover:border-[#FF6B2C]/40 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
           >
-            <Scissors className="w-3.5 h-3.5 text-rose-400" />
+            <Scissors className="w-3.5 h-3.5 text-[#FF6B2C]" />
             <span className="text-xs font-semibold">Split</span>
           </button>
 
@@ -617,9 +618,9 @@ function MultiTrackTimelineBase({
             onClick={handleTriggerDelete}
             disabled={!activeSelectedClip}
             title="Delete Selected Clip (Del)"
-            className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-rose-500/20 text-slate-200 hover:text-rose-300 border border-white/10 hover:border-rose-400/40 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-[#FF6B2C]/20 text-slate-200 hover:text-[#FF8A4C] border border-white/10 hover:border-[#FF6B2C]/40 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
           >
-            <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+            <Trash2 className="w-3.5 h-3.5 text-[#FF6B2C]" />
             <span className="text-xs">Delete</span>
           </button>
 
@@ -642,7 +643,7 @@ function MultiTrackTimelineBase({
             type="button"
             onClick={onAddKeyframeAtCurrentTime}
             title="Add 3D Dolly Zoom Target at Playhead (K)"
-            className="px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-400/30 font-medium flex items-center gap-1.5 transition-all shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-[#FF6B2C]/15 hover:bg-[#FF6B2C]/25 text-[#FF8A4C] border border-[#FF6B2C]/30 font-medium flex items-center gap-1.5 transition-all shadow-glass-sm"
           >
             <Focus className="w-3.5 h-3.5" />
             <span className="text-xs">Add Zoom Keyframe</span>
@@ -688,7 +689,7 @@ function MultiTrackTimelineBase({
             type="button"
             onClick={onTogglePlay}
             title={isPlaying ? "Pause (Space)" : "Play (Space)"}
-            className="w-8 h-8 rounded-xl bg-gradient-to-b from-rose-400 to-rose-600 hover:from-rose-300 hover:to-rose-500 text-white flex items-center justify-center shadow-[0_0_15px_rgba(251,113,133,0.4)] transition-transform active:scale-95"
+            className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#FF7A3D] to-[#FF6B2C] hover:from-[#FF8A4C] hover:to-[#E85A1F] text-white flex items-center justify-center shadow-[0_0_15px_rgba(255,107,44,0.4)] transition-transform active:scale-95"
           >
             {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
           </button>
@@ -705,7 +706,7 @@ function MultiTrackTimelineBase({
 
           {/* Monospace SMPTE Timecode Badge */}
           <div className="ml-2 font-mono text-xs px-3 py-1 rounded-xl bg-black/40 border border-white/10 flex items-center gap-1.5 shadow-glass-inner">
-            <span className="text-rose-300 font-semibold">{formatSMPTETimecode(currentTime)}</span>
+            <span className="text-[#FF8A4C] font-semibold">{formatSMPTETimecode(currentTime)}</span>
             <span className="text-slate-500">/</span>
             <span className="text-slate-400">{formatSMPTETimecode(totalTimelineDuration)}</span>
           </div>
@@ -719,7 +720,7 @@ function MultiTrackTimelineBase({
                 onClick={() => onSpeedChange(spd)}
                 className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-all ${
                   playbackSpeed === spd
-                    ? "bg-rose-500/25 text-rose-200 font-bold border border-rose-400/40"
+                    ? "bg-[#FF6B2C]/25 text-[#FF8A4C] font-bold border border-[#FF6B2C]/40"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -738,7 +739,7 @@ function MultiTrackTimelineBase({
             title={snappingEnabled ? "Magnetic Snapping Enabled" : "Magnetic Snapping Disabled"}
             className={`p-1.5 rounded-lg border transition-all ${
               snappingEnabled
-                ? "bg-rose-500/20 text-rose-300 border-rose-400/40 shadow-glass-sm"
+                ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm"
                 : "bg-white/[0.04] text-slate-400 border-white/10 hover:text-white"
             }`}
           >
@@ -752,7 +753,7 @@ function MultiTrackTimelineBase({
             title={isLooping ? "Timeline Loop Enabled" : "Timeline Loop Disabled"}
             className={`p-1.5 rounded-lg border transition-all ${
               isLooping
-                ? "bg-rose-500/20 text-rose-300 border-rose-400/40 shadow-glass-sm"
+                ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm"
                 : "bg-white/[0.04] text-slate-400 border-white/10 hover:text-white"
             }`}
           >
@@ -769,7 +770,7 @@ function MultiTrackTimelineBase({
               step="0.1"
               value={zoomScale}
               onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-              className="w-18 accent-rose-400 cursor-pointer h-1 bg-white/10 rounded"
+              className="w-18 accent-[#FF6B2C] cursor-pointer h-1 bg-white/10 rounded"
               title="Timeline Scale Zoom"
             />
             <ZoomIn className="w-3 h-3 text-slate-400" />
@@ -790,7 +791,7 @@ function MultiTrackTimelineBase({
           {/* Header left placeholder */}
           <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-[11px] font-mono text-slate-400">
             <span>TRACKS</span>
-            <span className="text-[10px] text-rose-400/80">30 FPS</span>
+            <span className="text-[10px] text-[#FF8A4C]/80">30 FPS</span>
           </div>
 
           {/* Timecode Ruler Canvas */}
@@ -829,7 +830,7 @@ function MultiTrackTimelineBase({
                 willChange: "transform",
               }}
             >
-              <div className="w-3 h-3 bg-rose-400 rotate-45 -mt-1.5 shadow-[0_0_10px_rgba(251,113,133,0.8)] border border-white" />
+              <div className="w-3 h-3 bg-[#FF6B2C] rotate-45 -mt-1.5 shadow-[0_0_10px_rgba(255,107,44,0.8)] border border-white" />
             </div>
           </div>
         </div>
@@ -844,7 +845,7 @@ function MultiTrackTimelineBase({
           {/* Marquee Selection Area Box (Active when holding right click and dragging across tracks) */}
           {marqueeSelection && (
             <div
-              className="absolute z-50 pointer-events-none rounded-lg border-2 border-rose-400/90 bg-rose-500/20 backdrop-blur-[2px] shadow-[0_0_20px_rgba(251,113,133,0.35)]"
+              className="absolute z-50 pointer-events-none rounded-lg border-2 border-[#FF6B2C]/90 bg-[#FF6B2C]/20 backdrop-blur-[2px] shadow-[0_0_20px_rgba(255,107,44,0.35)]"
               style={{
                 left: `${Math.min(marqueeSelection.relStartX, marqueeSelection.relCurrentX)}px`,
                 top: `${Math.min(marqueeSelection.relStartY, marqueeSelection.relCurrentY)}px`,
@@ -852,7 +853,7 @@ function MultiTrackTimelineBase({
                 height: `${Math.abs(marqueeSelection.relCurrentY - marqueeSelection.relStartY)}px`,
               }}
             >
-              <div className="absolute -top-7 left-2 px-2 py-0.5 rounded-md bg-[#090D16]/95 border border-rose-400/60 text-[10px] font-mono text-rose-200 shadow-md">
+              <div className="absolute -top-7 left-2 px-2 py-0.5 rounded-md bg-[#090D16]/95 border border-[#FF6B2C]/60 text-[10px] font-mono text-orange-200 shadow-md">
                 Box Select (Release to select)
               </div>
             </div>
@@ -860,41 +861,24 @@ function MultiTrackTimelineBase({
 
           {/* Laser Playhead Needle running vertically across ALL tracks */}
           <div
-            className="absolute top-0 bottom-0 w-px bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.9)] z-30 pointer-events-none"
+            className="absolute top-0 bottom-0 w-px bg-[#FF6B2C] shadow-[0_0_8px_rgba(255,107,44,0.9)] z-30 pointer-events-none"
             style={{
               transform: `translate3d(${144 + playheadX}px, 0, 0)`,
               left: 0,
               willChange: "transform",
             }}
           >
-            <div className="w-2 h-2 rounded-full bg-rose-300 absolute -top-1 -left-0.5" />
+            <div className="w-2 h-2 rounded-full bg-[#FF8A4C] absolute -top-1 -left-0.5" />
           </div>
 
-          {/* Magnetic Snapping Guideline (appears when aligning clips or keyframes) */}
-          {activeSnapTime !== null && (
-            <div
-              className="absolute top-0 bottom-0 w-px bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.9)] z-40 pointer-events-none"
-              style={{
-                transform: `translate3d(${144 + timeToPixel(activeSnapTime)}px, 0, 0)`,
-                left: 0,
-                willChange: "transform",
-              }}
-            >
-              <div className="px-1.5 py-0.5 rounded bg-amber-500 text-black text-[9px] font-mono font-bold absolute -top-4 -translate-x-1/2 whitespace-nowrap shadow-md flex items-center gap-0.5">
-                <Magnet className="w-2.5 h-2.5" />
-                <span>{formatSMPTETimecode(activeSnapTime).substring(3, 8)}</span>
-              </div>
-            </div>
-          )}
-
           {/* ============================================================ */}
-          {/* TRACK 1: Visual Video Track (Clips & Trim Handles) */}
+          {/* TRACK 1: Main Video Clips Track */}
           {/* ============================================================ */}
-          <div className="h-14 flex border-b border-white/[0.06] bg-black/30 relative">
+          <div className="h-16 flex border-b border-white/[0.06] bg-black/30 relative">
             {/* Track Header */}
             <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-xs text-slate-300 sticky left-0 z-10">
-              <div className="flex items-center gap-1.5 font-medium text-purple-300">
-                <VideoIcon className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 font-medium text-slate-200">
+                <Video className="w-3.5 h-3.5 text-blue-400" />
                 <span className="text-[11px]">Video 1</span>
               </div>
               <div className="flex items-center gap-1">
@@ -903,12 +887,19 @@ function MultiTrackTimelineBase({
                   onClick={() => setIsVideoHidden(!isVideoHidden)}
                   className="text-slate-500 hover:text-slate-300"
                 >
-                  {isVideoHidden ? <EyeOff className="w-3 h-3 text-rose-400" /> : <Eye className="w-3 h-3" />}
+                  {isVideoHidden ? <EyeOff className="w-3 h-3 text-red-400" /> : <Eye className="w-3 h-3" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsVideoTrackLocked(!isVideoTrackLocked)}
+                  className="text-slate-500 hover:text-slate-300"
+                >
+                  {isVideoTrackLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                 </button>
               </div>
             </div>
 
-            {/* Track Lane with Visual Clip Blocks */}
+            {/* Track Lane with Clips */}
             <div
               onMouseDown={handleStartScrubbing}
               className="flex-1 relative cursor-pointer"
@@ -1006,14 +997,14 @@ function MultiTrackTimelineBase({
           </div>
 
           {/* ============================================================ */}
-          {/* TRACK 2: Action / Zoom AI Capsule Bar Track (FocuSee Style) */}
+          {/* TRACK 2: Action / Auto Zoom Capsule Bar Track */}
           {/* ============================================================ */}
           <div className="h-12 flex border-b border-white/[0.06] bg-black/20 hover:bg-white/[0.01] transition-colors relative group">
             {/* Track Header */}
             <div className="w-36 flex-shrink-0 border-r border-white/[0.08] bg-black/40 px-3 flex items-center justify-between text-xs text-slate-300 sticky left-0 z-10">
               <div className="flex items-center gap-1.5 font-medium text-blue-400">
                 <Focus className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Zoom AI</span>
+                <span className="text-[11px]">Auto Zoom</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <button
@@ -1252,7 +1243,7 @@ function MultiTrackTimelineBase({
                           e.stopPropagation();
                           onDeleteEvent(ev.id);
                         }}
-                        className={`p-1 text-white/70 hover:text-white hover:bg-rose-500/30 rounded-md mr-1 transition-all z-20 cursor-pointer ${
+                        className={`p-1 text-white/70 hover:text-white hover:bg-[#FF6B2C]/30 rounded-md mr-1 transition-all z-20 cursor-pointer ${
                           isSelected ? "opacity-100 bg-black/20" : "opacity-0 group-hover/zoom:opacity-100"
                         }`}
                         title="Delete Zoom Effect (or press Delete key)"
@@ -1304,7 +1295,7 @@ function MultiTrackTimelineBase({
                   onClick={() => setIsAudioMuted(!isAudioMuted)}
                   className="text-slate-500 hover:text-slate-300"
                 >
-                  {isAudioMuted ? <VolumeX className="w-3 h-3 text-rose-400" /> : <Volume2 className="w-3 h-3" />}
+                  {isAudioMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3" />}
                 </button>
               </div>
             </div>
@@ -1427,7 +1418,7 @@ function MultiTrackTimelineBase({
                       title={isWebcamHidden ? "Show Facecam PiP" : "Hide Facecam PiP"}
                     >
                       {isWebcamHidden ? (
-                        <EyeOff className="w-3 h-3 text-rose-400" />
+                        <EyeOff className="w-3 h-3 text-slate-500" />
                       ) : (
                         <Eye className="w-3 h-3 text-emerald-400" />
                       )}

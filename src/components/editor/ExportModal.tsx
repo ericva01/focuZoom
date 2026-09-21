@@ -170,7 +170,7 @@ export function ExportModal({
         customX: 0.85,
         customY: 0.82,
         size: 180,
-        borderColor: "#fb7185",
+        borderColor: "#FF6B2C",
         borderWidth: 3,
         shadow: true,
         mirror: true,
@@ -229,7 +229,7 @@ export function ExportModal({
             exportCtx.save();
             exportCtx.translate(posX, posY);
             exportCtx.lineWidth = wConfig.borderWidth * scaleFactor;
-            exportCtx.strokeStyle = wConfig.borderColor || "#fb7185";
+            exportCtx.strokeStyle = wConfig.borderColor || "#FF6B2C";
             exportCtx.beginPath();
             if (wConfig.shape === "circle") {
               exportCtx.arc(0, 0, bubbleSize / 2, 0, Math.PI * 2);
@@ -310,7 +310,7 @@ export function ExportModal({
           particleCount: 100,
           spread: 80,
           origin: { y: 0.5 },
-          colors: ["#fb7185", "#818cf8", "#c084fc"],
+          colors: ["#FF6B2C", "#818cf8", "#c084fc"],
         });
       } catch {
         // ignore
@@ -467,7 +467,7 @@ export function ExportModal({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-center text-rose-300">
+            <div className="w-8 h-8 rounded-xl bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF8A4C]">
               <Film className="w-4 h-4" />
             </div>
             <div>
@@ -512,7 +512,7 @@ export function ExportModal({
                   onClick={() => setExportFps(30)}
                   className={`p-2.5 rounded-xl border text-xs text-left transition-all duration-200 ${
                     exportFps === 30
-                      ? "bg-rose-500/20 border-rose-400/30 text-white shadow-glass-sm"
+                      ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-white shadow-glass-sm"
                       : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white"
                   }`}
                 >
@@ -525,7 +525,7 @@ export function ExportModal({
                   onClick={() => setExportFps(60)}
                   className={`p-2.5 rounded-xl border text-xs text-left transition-all duration-200 ${
                     exportFps === 60
-                      ? "bg-rose-500/20 border-rose-400/30 text-white shadow-glass-sm"
+                      ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-white shadow-glass-sm"
                       : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white"
                   }`}
                 >
@@ -544,7 +544,7 @@ export function ExportModal({
                   onClick={() => setBitrate(8000000)}
                   className={`p-2.5 rounded-xl border text-xs text-left transition-all duration-200 ${
                     bitrate === 8000000
-                      ? "bg-rose-500/20 border-rose-400/30 text-white shadow-glass-sm"
+                      ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-white shadow-glass-sm"
                       : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white"
                   }`}
                 >
@@ -557,7 +557,7 @@ export function ExportModal({
                   onClick={() => setBitrate(16000000)}
                   className={`p-2.5 rounded-xl border text-xs text-left transition-all duration-200 ${
                     bitrate === 16000000
-                      ? "bg-rose-500/20 border-rose-400/30 text-white shadow-glass-sm"
+                      ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-white shadow-glass-sm"
                       : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white"
                   }`}
                 >
@@ -571,14 +571,14 @@ export function ExportModal({
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-mono font-medium text-slate-300 flex items-center gap-1.5">
-                  <Folder className="w-3.5 h-3.5 text-rose-400" />
+                  <Folder className="w-3.5 h-3.5 text-[#FF6B2C]" />
                   <span>Export Destination Folder</span>
                 </label>
                 {exportFolder && (
                   <button
                     type="button"
                     onClick={() => setExportFolder(null)}
-                    className="text-[10px] text-slate-400 hover:text-rose-300 transition-colors"
+                    className="text-[10px] text-slate-400 hover:text-[#FF8A4C] transition-colors"
                   >
                     Reset
                   </button>
@@ -606,7 +606,7 @@ export function ExportModal({
                     isSelectingFolder ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <FolderOpen className="w-3.5 h-3.5 text-rose-400" />
+                      <FolderOpen className="w-3.5 h-3.5 text-[#FF6B2C]" />
                     )
                   }
                   className="text-xs shrink-0"
@@ -619,7 +619,7 @@ export function ExportModal({
             {/* Why real-time explanation callout */}
             <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400 space-y-1">
               <div className="flex items-center gap-1.5 text-slate-200 font-semibold text-[11px]">
-                <Info className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                <Info className="w-3.5 h-3.5 text-[#FF6B2C] flex-shrink-0" />
                 <span>Estimated Export Duration: ~{Math.ceil(duration)}s</span>
               </div>
               <p className="text-[10px] text-slate-400 leading-relaxed">
@@ -630,7 +630,7 @@ export function ExportModal({
             <Button
               variant="primary"
               size="lg"
-              className="w-full font-bold shadow-md shadow-rose-600/30"
+              className="w-full font-bold shadow-md shadow-orange/30"
               onClick={startExport}
               leftIcon={<Download className="w-4 h-4" />}
             >
@@ -642,7 +642,7 @@ export function ExportModal({
         {/* State 2: Export in Progress */}
         {isExporting && (
           <div className="py-6 text-center space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin text-rose-400 mx-auto" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#FF6B2C] mx-auto" />
             <div className="space-y-0.5">
               <div className="text-white font-medium text-xs">Rendering 3D Frame by Frame...</div>
               <div className="text-[11px] text-slate-400">
@@ -654,7 +654,7 @@ export function ExportModal({
             <div className="space-y-2">
               <div className="w-full h-2.5 rounded-full bg-black/40 overflow-hidden border border-white/[0.08]">
                 <div
-                  className="h-full bg-gradient-to-r from-rose-500 to-rose-400 transition-all duration-100 shadow-[0_0_10px_rgba(251,113,133,0.5)]"
+                  className="h-full bg-gradient-to-r from-[#FF7A3D] to-[#FF8A4C] transition-all duration-100 shadow-[0_0_10px_rgba(255,107,44,0.5)]"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -662,7 +662,7 @@ export function ExportModal({
                 <span className="text-slate-400 font-medium">
                   {remainingSec > 0 ? `~${remainingSec}s remaining` : "Finalizing file..."}
                 </span>
-                <span className="text-rose-400 font-semibold">
+                <span className="text-[#FF6B2C] font-semibold">
                   {Math.round(progress)}% Complete
                 </span>
               </div>
@@ -682,8 +682,8 @@ export function ExportModal({
         {/* State 3: Export Complete */}
         {exportedUrl && (
           <div className="space-y-3.5 animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-3 rounded-xl glass-panel border-rose-400/30 text-rose-300 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-rose-400" />
+            <div className="p-3 rounded-xl glass-panel border-[#FF6B2C]/30 text-[#FF8A4C] text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#FF6B2C]" />
               <div className="flex-1 min-w-0">
                 <div className="font-semibold">Video rendered successfully ({fileSize})</div>
                 {savedFilePath && (
@@ -712,7 +712,7 @@ export function ExportModal({
                       <Download className="w-3.5 h-3.5" />
                     )
                   }
-                  className="font-semibold shadow-md shadow-rose-600/20"
+                  className="font-semibold shadow-md shadow-orange/20"
                 >
                   {savedFilePath ? "Save Copy..." : exportFolder ? "Save to Folder" : "Save Video..."}
                 </Button>
@@ -721,7 +721,7 @@ export function ExportModal({
                   <Button
                     variant="secondary"
                     onClick={handleShowInFolder}
-                    leftIcon={<ExternalLink className="w-3.5 h-3.5 text-rose-400" />}
+                    leftIcon={<ExternalLink className="w-3.5 h-3.5 text-[#FF6B2C]" />}
                   >
                     Open Folder
                   </Button>
@@ -730,7 +730,7 @@ export function ExportModal({
                     variant="secondary"
                     onClick={() => handleSaveVideo(true)}
                     disabled={isSaving}
-                    leftIcon={<FolderOpen className="w-3.5 h-3.5 text-rose-400" />}
+                    leftIcon={<FolderOpen className="w-3.5 h-3.5 text-[#FF6B2C]" />}
                   >
                     Choose Folder...
                   </Button>

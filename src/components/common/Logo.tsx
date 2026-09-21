@@ -4,33 +4,34 @@ interface LogoProps {
   size?: "sm" | "md" | "lg";
   showText?: boolean;
   className?: string;
+  theme?: "dark" | "light" | "auto";
 }
 
 export function Logo({ size = "md", showText = true, className = "" }: LogoProps) {
   const iconSizes = {
-    sm: { img: 26, text: "text-sm tracking-wider" },
-    md: { img: 32, text: "text-base tracking-wider" },
-    lg: { img: 40, text: "text-lg tracking-wider" },
+    sm: { img: 28, text: "text-base tracking-tight" },
+    md: { img: 36, text: "text-lg tracking-tight" },
+    lg: { img: 44, text: "text-xl tracking-tight" },
   }[size];
 
   return (
     <div className={`flex items-center gap-2.5 group select-none ${className}`}>
-      {/* Generated High-Res Glideo App Logo */}
-      <div className="relative rounded-xl overflow-hidden shadow-[0_0_15px_rgba(251,113,133,0.35)] border border-rose-400/30 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(251,113,133,0.5)] transition-all duration-300 flex-shrink-0">
+      {/* Glideo Official Brand Logo Mark */}
+      <div className="relative flex items-center justify-center transition-transform duration-200 group-hover:scale-105 flex-shrink-0">
         <Image
-          src="/logo.png"
-          alt="Glideo"
+          src="/icon.png"
+          alt="Glideo Logo"
           width={iconSizes.img}
           height={iconSizes.img}
-          className="object-cover"
           priority
+          className="object-contain drop-shadow-[0_2px_8px_rgba(255,107,44,0.3)]"
         />
       </div>
 
-      {/* Brand Name */}
+      {/* Brand Name in Orange */}
       {showText && (
-        <span className={`font-bold text-white uppercase font-sans ${iconSizes.text}`}>
-          GLIDEO
+        <span className={`font-extrabold font-sans text-[#FF6B2C] tracking-tight ${iconSizes.text}`}>
+          Glideo
         </span>
       )}
     </div>

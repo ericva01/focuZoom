@@ -163,7 +163,7 @@ function LeftSettingsBase({
       id: "cosmic-blue",
       name: "Cosmic Deep Space",
       category: "Dark Tech",
-      gradientCss: "from-rose-950 via-blue-950 to-dark-950",
+      gradientCss: "from-amber-950 via-blue-950 to-dark-950",
       colors: "#e11d48 to #090a0f",
     },
     {
@@ -198,7 +198,7 @@ function LeftSettingsBase({
       id: "sunset",
       name: "Sunset Crimson",
       category: "Vibrant Abstract",
-      gradientCss: "from-rose-950 via-amber-950 to-zinc-950",
+      gradientCss: "from-amber-950 via-amber-950 to-zinc-950",
       colors: "#e11d48 to #d97706",
     },
     {
@@ -206,7 +206,7 @@ function LeftSettingsBase({
       name: "Hyper Miami Neon",
       category: "Vibrant Abstract",
       gradientCss: "from-cyan-950 via-fuchsia-950 to-dark-950",
-      colors: "#fb7185 to #d946ef",
+      colors: "#FF6B2C to #d946ef",
     },
     {
       id: "solar-flare",
@@ -266,7 +266,7 @@ function LeftSettingsBase({
           onClick={() => setActiveTab("3d")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "3d"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="3D Cinematic Compositing Engine"
@@ -279,7 +279,7 @@ function LeftSettingsBase({
           onClick={() => setActiveTab("frame")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "frame"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Canvas Frame & Background"
@@ -292,7 +292,7 @@ function LeftSettingsBase({
           onClick={() => setActiveTab("video")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "video"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Video Input & Demo"
@@ -305,7 +305,7 @@ function LeftSettingsBase({
           onClick={() => setActiveTab("zoom")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "zoom"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Zoom & Motion Easing"
@@ -318,7 +318,7 @@ function LeftSettingsBase({
           onClick={() => setActiveTab("cursor")}
           className={`py-2 rounded-xl flex flex-col items-center gap-1 font-semibold transition-all duration-200 ${
             activeTab === "cursor"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-bold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-bold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
           }`}
           title="Cursor & Click FX"
@@ -337,7 +337,7 @@ function LeftSettingsBase({
         {activeTab === "3d" && (
           <div className="space-y-5">
             <div>
-              <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-1.5 text-[#FF6B2C] font-bold text-[10px] uppercase tracking-wider mb-1">
                 <Cuboid className="w-3.5 h-3.5" />
                 <span>WebGL 3D Compositing</span>
               </div>
@@ -352,11 +352,11 @@ function LeftSettingsBase({
             {/* Conditional On-Click Only Animation Status Card */}
             <div className="p-4 rounded-xl glass-panel space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-rose-300 font-bold text-xs">
-                  <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                <div className="flex items-center gap-2 text-[#FF8A4C] font-bold text-xs">
+                  <span className="w-2 h-2 rounded-full bg-[#FF6B2C] animate-pulse" />
                   <span>On-Click Only Zoom Active</span>
                 </div>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-200 border border-rose-400/30 font-mono font-semibold">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-lg bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 font-mono font-semibold">
                   Static Wide Default
                 </span>
               </div>
@@ -369,7 +369,7 @@ function LeftSettingsBase({
             <div className="space-y-2.5 glass-panel p-4 rounded-xl">
               <label className="text-xs font-semibold text-slate-200 flex items-center justify-between">
                 <span>3D Screen Orientation</span>
-                <span className="text-[10px] text-rose-400 font-mono">Perspective Camera</span>
+                <span className="text-[10px] text-[#FF6B2C] font-mono">Perspective Camera</span>
               </label>
 
               <div className="grid grid-cols-2 gap-2">
@@ -381,13 +381,13 @@ function LeftSettingsBase({
                       onClick={() => onChangeConfig({ screenAnglePreset: ap.id })}
                       className={`p-2.5 rounded-xl text-left border transition-all duration-200 ${
                         isSelected
-                          ? "bg-rose-500/20 border-rose-400/40 text-white shadow-glass-sm"
+                          ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-white shadow-glass-sm"
                           : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:border-white/20"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-bold text-xs text-white">{ap.name}</span>
-                        {isSelected && <Check className="w-3 h-3 text-rose-400" />}
+                        {isSelected && <Check className="w-3 h-3 text-[#FF6B2C]" />}
                       </div>
                       <p className="text-[10px] text-slate-400 leading-tight">{ap.desc}</p>
                     </button>
@@ -410,7 +410,7 @@ function LeftSettingsBase({
                       onClick={() => onChangeConfig({ framingStyle: fs.id })}
                       className={`w-full p-2.5 rounded-xl text-left border transition-all duration-200 flex items-start justify-between ${
                         isSelected
-                          ? "bg-rose-500/20 border-rose-400/40 text-white shadow-glass-sm"
+                          ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-white shadow-glass-sm"
                           : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white hover:border-white/20"
                       }`}
                     >
@@ -418,7 +418,7 @@ function LeftSettingsBase({
                         <div className="font-bold text-xs text-white">{fs.name}</div>
                         <div className="text-[10px] text-slate-400">{fs.desc}</div>
                       </div>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-rose-400 mt-0.5" />}
+                      {isSelected && <Check className="w-3.5 h-3.5 text-[#FF6B2C] mt-0.5" />}
                     </button>
                   );
                 })}
@@ -459,7 +459,7 @@ function LeftSettingsBase({
                   <div className="space-y-1 pt-1">
                     <div className="flex justify-between text-[10px] text-slate-400">
                       <span>Tilt Weight</span>
-                      <span className="font-mono text-rose-400">
+                      <span className="font-mono text-[#FF6B2C]">
                         {Math.round((config.mouseParallaxIntensity ?? 0.65) * 100)}%
                       </span>
                     </div>
@@ -486,7 +486,7 @@ function LeftSettingsBase({
                   <div className="text-xs font-semibold text-slate-200">Glass Clearcoat & Reflections</div>
                   <div className="text-[10px] text-slate-400">Glossy surface sheen under studio keylights</div>
                 </div>
-                <span className="text-rose-400 font-mono font-bold text-xs">
+                <span className="text-[#FF6B2C] font-mono font-bold text-xs">
                   {Math.round((config.glassReflectionIntensity ?? 0.85) * 100)}%
                 </span>
               </div>
@@ -513,7 +513,7 @@ function LeftSettingsBase({
               <div className="flex items-center justify-between">
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-bold text-white cursor-pointer">
-                    <Square className="w-4 h-4 text-rose-400" />
+                    <Square className="w-4 h-4 text-[#FF6B2C]" />
                     <span>Corner Radius / Round Border</span>
                   </label>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
@@ -531,7 +531,7 @@ function LeftSettingsBase({
                       const safeVal = isNaN(val) ? 0 : Math.max(0, Math.min(64, val));
                       onChangeConfig({ cornerRadius: safeVal });
                     }}
-                    className="w-10 bg-transparent text-right text-rose-400 font-mono font-bold text-xs outline-none"
+                    className="w-10 bg-transparent text-right text-[#FF6B2C] font-mono font-bold text-xs outline-none"
                   />
                   <span className="text-slate-400 font-mono text-[11px]">px</span>
                 </div>
@@ -561,7 +561,7 @@ function LeftSettingsBase({
                     onClick={() => onChangeConfig({ cornerRadius: rad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.cornerRadius === rad
-                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -579,7 +579,7 @@ function LeftSettingsBase({
         {activeTab === "frame" && (
           <div className="space-y-6">
             <div>
-              <div className="flex items-center gap-1.5 text-rose-400 font-bold text-[10px] uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-1.5 text-[#FF6B2C] font-bold text-[10px] uppercase tracking-wider mb-1">
                 <LayoutTemplate className="w-3.5 h-3.5" />
                 <span>Visual Canvas Controls</span>
               </div>
@@ -605,7 +605,7 @@ function LeftSettingsBase({
                       const val = parseInt(e.target.value) || 0;
                       onChangeConfig({ padding: Math.max(0, Math.min(120, val)) });
                     }}
-                    className="w-14 bg-black/30 border border-white/[0.08] text-right px-2 py-0.5 rounded-lg text-rose-400 font-mono font-bold text-xs outline-none focus:border-rose-400"
+                    className="w-14 bg-black/30 border border-white/[0.08] text-right px-2 py-0.5 rounded-lg text-[#FF6B2C] font-mono font-bold text-xs outline-none focus:border-[#FF6B2C]"
                   />
                   <span className="text-slate-400 font-mono text-xs">px</span>
                 </div>
@@ -628,7 +628,7 @@ function LeftSettingsBase({
                     onClick={() => onChangeConfig({ padding: pad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all duration-200 ${
                       config.padding === pad
-                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -643,7 +643,7 @@ function LeftSettingsBase({
               <div className="flex items-center justify-between">
                 <div>
                   <label className="flex items-center gap-1.5 text-xs font-bold text-white cursor-pointer">
-                    <Square className="w-4 h-4 text-rose-400" />
+                    <Square className="w-4 h-4 text-[#FF6B2C]" />
                     <span>Corner Radius / Round Border</span>
                   </label>
                   <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">
@@ -652,7 +652,7 @@ function LeftSettingsBase({
                 </div>
 
                 {/* Prominent numerical input box */}
-                <div className="flex items-center gap-1 bg-black/30 px-2.5 py-1 rounded-lg border border-white/[0.08] focus-within:border-rose-400 transition-colors">
+                <div className="flex items-center gap-1 bg-black/30 px-2.5 py-1 rounded-lg border border-white/[0.08] focus-within:border-[#FF6B2C] transition-colors">
                   <input
                     type="number"
                     min="0"
@@ -663,7 +663,7 @@ function LeftSettingsBase({
                       const safeVal = isNaN(val) ? 0 : Math.max(0, Math.min(64, val));
                       onChangeConfig({ cornerRadius: safeVal });
                     }}
-                    className="w-10 bg-transparent text-right text-rose-400 font-mono font-bold text-xs outline-none"
+                    className="w-10 bg-transparent text-right text-[#FF6B2C] font-mono font-bold text-xs outline-none"
                   />
                   <span className="text-slate-400 font-mono text-[11px]">px</span>
                 </div>
@@ -683,7 +683,7 @@ function LeftSettingsBase({
 
                 <div className="flex justify-between items-center text-[10px] font-mono">
                   <span className="text-slate-500">0px (Sharp)</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 border border-rose-400/30 text-rose-200 font-bold text-[10px]">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-[#FF8A4C] font-bold text-[10px]">
                     {config.cornerRadius === 0 ? "0px - Sharp Square" : `${config.cornerRadius}px Rounded Border`}
                   </span>
                   <span className="text-slate-500">64px (Pill)</span>
@@ -705,7 +705,7 @@ function LeftSettingsBase({
                     onClick={() => onChangeConfig({ cornerRadius: rad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all duration-200 ${
                       config.cornerRadius === rad
-                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -722,14 +722,14 @@ function LeftSettingsBase({
                   Backdrop Environment
                 </label>
                 {config.backgroundType === "transparent" ? (
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-semibold border border-rose-400/30">
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] font-semibold border border-[#FF6B2C]/30">
                     Transparent Active
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => onChangeConfig({ backgroundType: "transparent" })}
-                    className="text-[10px] text-slate-400 hover:text-rose-300 flex items-center gap-1 transition-colors"
+                    className="text-[10px] text-slate-400 hover:text-[#FF8A4C] flex items-center gap-1 transition-colors"
                   >
                     <Ban className="w-3 h-3" />
                     <span>Disable Background</span>
@@ -744,7 +744,7 @@ function LeftSettingsBase({
                   onClick={() => onChangeConfig({ backgroundType: "image" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "image"
-                      ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
+                      ? "bg-[#FF6B2C]/20 text-[#FF8A4C] shadow-glass-sm font-semibold border border-[#FF6B2C]/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="Custom Image Background"
@@ -758,7 +758,7 @@ function LeftSettingsBase({
                   onClick={() => onChangeConfig({ backgroundType: "solid" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "solid"
-                      ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
+                      ? "bg-[#FF6B2C]/20 text-[#FF8A4C] shadow-glass-sm font-semibold border border-[#FF6B2C]/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="Solid Color Background"
@@ -772,7 +772,7 @@ function LeftSettingsBase({
                   onClick={() => onChangeConfig({ backgroundType: "gradient" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "gradient"
-                      ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
+                      ? "bg-[#FF6B2C]/20 text-[#FF8A4C] shadow-glass-sm font-semibold border border-[#FF6B2C]/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="Gradient Preset Background"
@@ -786,7 +786,7 @@ function LeftSettingsBase({
                   onClick={() => onChangeConfig({ backgroundType: "transparent" })}
                   className={`py-1.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-1 ${
                     config.backgroundType === "transparent"
-                      ? "bg-rose-500/20 text-rose-200 font-bold shadow-glass-sm border border-rose-400/30"
+                      ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold shadow-glass-sm border border-[#FF6B2C]/30"
                       : "text-slate-400 hover:text-white"
                   }`}
                   title="No Background / Transparent Video"
@@ -814,10 +814,10 @@ function LeftSettingsBase({
                   {/* Upload button / Dropzone */}
                   <div
                     onClick={() => imageInputRef.current?.click()}
-                    className="border border-dashed border-white/20 hover:border-rose-400/50 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-rose-500/10 group"
+                    className="border border-dashed border-white/20 hover:border-[#FF6B2C]/50 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-[#FF6B2C]/10 group"
                   >
                     <div className="flex items-center justify-center gap-2 text-xs text-slate-300 group-hover:text-white">
-                      <Upload className="w-3.5 h-3.5 text-rose-300" />
+                      <Upload className="w-3.5 h-3.5 text-[#FF8A4C]" />
                       <span className="font-semibold">Upload Custom Background</span>
                     </div>
                     <p className="text-[10px] text-slate-400 mt-0.5">PNG, JPG, or WebP image</p>
@@ -833,14 +833,14 @@ function LeftSettingsBase({
                           alt="Custom Background"
                           className="w-10 h-7 rounded-lg object-cover border border-white/20"
                         />
-                        <span className="text-[11px] text-rose-300 font-medium">
+                        <span className="text-[11px] text-[#FF8A4C] font-medium">
                           Custom Image Applied
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={() => onChangeConfig({ customBackgroundImage: null })}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/[0.08] transition-colors"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-[#FF6B2C] hover:bg-white/[0.08] transition-colors"
                         title="Remove custom background image"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -868,7 +868,7 @@ function LeftSettingsBase({
                             }
                             className={`p-2 rounded-xl text-left border transition-all relative overflow-hidden flex flex-col justify-end h-16 group ${
                               isSelected
-                                ? "border-rose-400 ring-1 ring-rose-400 shadow-glass-sm"
+                                ? "border-[#FF6B2C] ring-1 ring-[#FF6B2C] shadow-glass-sm"
                                 : "border-white/[0.08] hover:border-white/20 bg-white/[0.02]"
                             }`}
                           >
@@ -884,7 +884,7 @@ function LeftSettingsBase({
                                 {wp.name}
                               </span>
                               {isSelected && (
-                                <Check className="w-3 h-3 text-rose-300 stroke-[3]" />
+                                <Check className="w-3 h-3 text-[#FF8A4C] stroke-[3]" />
                               )}
                             </div>
                           </button>
@@ -950,7 +950,7 @@ function LeftSettingsBase({
                           onClick={() => onChangeConfig({ backgroundPreset: p.id })}
                           className={`p-2 rounded-xl text-left border transition-all flex flex-col justify-between h-16 relative overflow-hidden ${
                             isSelected
-                              ? "border-rose-400 ring-1 ring-rose-400 shadow-glass-sm"
+                              ? "border-[#FF6B2C] ring-1 ring-[#FF6B2C] shadow-glass-sm"
                               : "border-white/[0.08] hover:border-white/20 bg-white/[0.02]"
                           }`}
                         >
@@ -960,7 +960,7 @@ function LeftSettingsBase({
                               {p.name}
                             </span>
                             {isSelected && (
-                              <span className="w-4 h-4 rounded-full bg-rose-500/40 text-white flex items-center justify-center border border-rose-400/40">
+                              <span className="w-4 h-4 rounded-full bg-[#FF6B2C]/40 text-white flex items-center justify-center border border-[#FF6B2C]/40">
                                 <Check className="w-3 h-3 stroke-[3]" />
                               </span>
                             )}
@@ -978,7 +978,7 @@ function LeftSettingsBase({
               {/* 4. TRANSPARENT MODE */}
               {config.backgroundType === "transparent" && (
                 <div className="p-4 rounded-xl glass-panel space-y-2">
-                  <div className="flex items-center gap-2 text-rose-400 font-bold text-xs">
+                  <div className="flex items-center gap-2 text-[#FF6B2C] font-bold text-xs">
                     <Ban className="w-4 h-4" />
                     <span>No Background / Transparent Active</span>
                   </div>
@@ -999,7 +999,7 @@ function LeftSettingsBase({
                     onClick={() => onChangeConfig({ shadowIntensity: sh })}
                     className={`py-1.5 px-2.5 rounded-lg text-xs capitalize font-medium transition-all duration-200 ${
                       config.shadowIntensity === sh
-                        ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] shadow-glass-sm font-semibold border border-[#FF6B2C]/30"
                         : "bg-white/[0.03] text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] border border-transparent"
                     }`}
                   >
@@ -1026,7 +1026,7 @@ function LeftSettingsBase({
             <div
               className={`p-4 rounded-xl transition-all ${
                 isRecording
-                  ? "glass-panel-elevated border-rose-500/60 shadow-[0_0_30px_rgba(244,63,94,0.25)]"
+                  ? "glass-panel-elevated border-[#FF6B2C]/60 shadow-[0_0_30px_rgba(244,63,94,0.25)]"
                   : "glass-panel"
               }`}
             >
@@ -1034,13 +1034,13 @@ function LeftSettingsBase({
                 <div className="flex items-center gap-2 font-bold text-xs text-white">
                   <span
                     className={`w-2.5 h-2.5 rounded-full ${
-                      isRecording ? "bg-rose-500 animate-ping" : "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.6)]"
+                      isRecording ? "bg-[#FF6B2C] animate-ping" : "bg-[#FF6B2C] shadow-[0_0_8px_rgba(255,107,44,0.6)]"
                     }`}
                   />
                   <span>Native Screen Recording</span>
                 </div>
                 {isRecording && (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/40">
                     REC
                   </span>
                 )}
@@ -1054,20 +1054,20 @@ function LeftSettingsBase({
 
               {isRecording ? (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between bg-black/30 px-3 py-1.5 rounded-lg border border-rose-500/30 text-xs font-mono">
+                  <div className="flex items-center justify-between bg-black/30 px-3 py-1.5 rounded-lg border border-[#FF6B2C]/30 text-xs font-mono">
                     <span className="text-slate-400">Duration:</span>
-                    <span className="text-rose-400 font-bold">
+                    <span className="text-[#FF6B2C] font-bold">
                       {Math.floor(recordingDuration / 60).toString().padStart(2, "0")}:
                       {Math.floor(recordingDuration % 60).toString().padStart(2, "0")}
                     </span>
                     <span className="text-slate-600">|</span>
                     <span className="text-slate-400">Clicks:</span>
-                    <span className="text-rose-300 font-bold">{clickCount}</span>
+                    <span className="text-[#FF8A4C] font-bold">{clickCount}</span>
                   </div>
 
                   <button
                     onClick={onStopRecording}
-                    className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all"
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#E85A1F] hover:bg-[#FF6B2C] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all"
                   >
                     <Square className="w-3.5 h-3.5 fill-white" />
                     <span>Stop Recording & Import</span>
@@ -1076,9 +1076,9 @@ function LeftSettingsBase({
               ) : (
                 <button
                   onClick={onStartRecording}
-                  className="w-full py-2.5 px-4 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 hover:text-white font-semibold text-xs border border-rose-400/30 shadow-glass-sm flex items-center justify-center gap-2 transition-all group"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#FF6B2C]/20 hover:bg-[#FF6B2C]/30 text-[#FF8A4C] hover:text-white font-semibold text-xs border border-[#FF6B2C]/30 shadow-glass-sm flex items-center justify-center gap-2 transition-all group"
                 >
-                  <Circle className="w-3.5 h-3.5 fill-sky-300 text-rose-300 group-hover:scale-110 transition-transform" />
+                  <Circle className="w-3.5 h-3.5 fill-sky-300 text-[#FF8A4C] group-hover:scale-110 transition-transform" />
                   <span>Start Screen Recording</span>
                 </button>
               )}
@@ -1094,7 +1094,7 @@ function LeftSettingsBase({
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-white/20 hover:border-rose-400 rounded-2xl p-5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-rose-500/5 group"
+              className="border-2 border-dashed border-white/20 hover:border-[#FF6B2C] rounded-2xl p-5 text-center cursor-pointer transition-colors bg-white/[0.02] hover:bg-[#FF6B2C]/5 group"
             >
               <input
                 ref={fileInputRef}
@@ -1107,7 +1107,7 @@ function LeftSettingsBase({
                   }
                 }}
               />
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] group-hover:bg-rose-500/20 flex items-center justify-center mx-auto mb-2 text-slate-300 group-hover:text-rose-300 transition-colors border border-white/[0.1] group-hover:border-rose-400/40">
+              <div className="w-10 h-10 rounded-xl bg-white/[0.06] group-hover:bg-[#FF6B2C]/20 flex items-center justify-center mx-auto mb-2 text-slate-300 group-hover:text-[#FF8A4C] transition-colors border border-white/[0.1] group-hover:border-[#FF6B2C]/40">
                 <Upload className="w-5 h-5" />
               </div>
               <p className="font-medium text-white mb-0.5">Click or drag video here</p>
@@ -1118,10 +1118,10 @@ function LeftSettingsBase({
               <button
                 onClick={onLoadDemo}
                 disabled={isGeneratingDemo}
-                className="w-full py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-rose-200 border border-white/[0.1] text-xs font-semibold flex items-center justify-center gap-2 transition-all group disabled:opacity-50 shadow-glass-sm"
+                className="w-full py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-[#FF8A4C] border border-white/[0.1] text-xs font-semibold flex items-center justify-center gap-2 transition-all group disabled:opacity-50 shadow-glass-sm"
               >
                 <FileVideo
-                  className={`w-4 h-4 text-rose-300 ${
+                  className={`w-4 h-4 text-[#FF8A4C] ${
                     isGeneratingDemo ? "animate-spin" : "group-hover:scale-105"
                   } transition-transform`}
                 />
@@ -1132,7 +1132,7 @@ function LeftSettingsBase({
             {metadata && (
               <div className="p-4 rounded-xl glass-panel space-y-2 mt-4">
                 <div className="flex items-center gap-2 text-white font-medium">
-                  <FileVideo className="w-4 h-4 text-rose-400" />
+                  <FileVideo className="w-4 h-4 text-[#FF6B2C]" />
                   <span className="truncate">{metadata.name}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 pt-2 border-t border-white/[0.08]">
@@ -1161,7 +1161,7 @@ function LeftSettingsBase({
             <div className="space-y-2 glass-panel p-4 rounded-xl">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-slate-200">Dolly Zoom Depth</label>
-                <span className="text-rose-400 font-mono font-bold text-xs">
+                <span className="text-[#FF6B2C] font-mono font-bold text-xs">
                   {config.defaultZoomScale.toFixed(1)}x
                 </span>
               </div>
@@ -1190,7 +1190,7 @@ function LeftSettingsBase({
                     onClick={() => onChangeConfig({ zoomEasing: opt.id })}
                     className={`w-full p-2.5 rounded-xl text-left transition-all duration-200 flex items-start justify-between ${
                       config.zoomEasing === opt.id
-                        ? "bg-rose-500/20 border border-rose-400/30 text-white shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-white shadow-glass-sm"
                         : "bg-white/[0.03] hover:bg-white/[0.06] text-slate-400 hover:text-slate-200 border border-transparent"
                     }`}
                   >
@@ -1199,7 +1199,7 @@ function LeftSettingsBase({
                       <div className="text-[10px] text-slate-400">{opt.desc}</div>
                     </div>
                     {config.zoomEasing === opt.id && (
-                      <Check className="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5" />
+                      <Check className="w-3.5 h-3.5 text-[#FF6B2C] flex-shrink-0 mt-0.5" />
                     )}
                   </button>
                 ))}
@@ -1209,7 +1209,7 @@ function LeftSettingsBase({
             <div className="space-y-2 glass-panel p-4 rounded-xl">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-slate-200">Camera Dolly Speed</label>
-                <span className="text-rose-400 font-mono font-bold text-xs">
+                <span className="text-[#FF6B2C] font-mono font-bold text-xs">
                   {config.zoomDuration.toFixed(2)}s
                 </span>
               </div>
@@ -1245,7 +1245,7 @@ function LeftSettingsBase({
                     onClick={() => onChangeConfig({ cursorStyle: cs.id })}
                     className={`p-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                       config.cursorStyle === cs.id
-                        ? "bg-rose-500/20 text-rose-200 shadow-glass-sm font-semibold border border-rose-400/30"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] shadow-glass-sm font-semibold border border-[#FF6B2C]/30"
                         : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.06]"
                     }`}
                   >
@@ -1258,7 +1258,7 @@ function LeftSettingsBase({
             <div className="space-y-2 glass-panel p-4 rounded-xl">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-medium text-slate-200">Cursor Size</label>
-                <span className="text-rose-400 font-mono font-bold text-xs">{config.cursorSize}px</span>
+                <span className="text-[#FF6B2C] font-mono font-bold text-xs">{config.cursorSize}px</span>
               </div>
               <input
                 type="range"

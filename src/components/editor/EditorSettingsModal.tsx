@@ -94,7 +94,7 @@ export function EditorSettingsModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400">
+            <div className="w-8 h-8 rounded-xl bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF6B2C]">
               <Save className="w-4 h-4" />
             </div>
             <div>
@@ -123,11 +123,11 @@ export function EditorSettingsModal({
                 onClick={() => onThemeChange("dark")}
                 className={`p-3 rounded-2xl border text-left flex flex-col items-center gap-2 transition-all ${
                   theme === "dark"
-                    ? "bg-rose-500/20 border-rose-400/50 text-white shadow-glass-sm"
+                    ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-white shadow-glass-sm"
                     : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
                 }`}
               >
-                <Moon className={`w-5 h-5 ${theme === "dark" ? "text-rose-400" : ""}`} />
+                <Moon className={`w-5 h-5 ${theme === "dark" ? "text-[#FF6B2C]" : ""}`} />
                 <span className="text-xs font-bold">Dark Mode</span>
               </button>
 
@@ -136,7 +136,7 @@ export function EditorSettingsModal({
                 onClick={() => onThemeChange("light")}
                 className={`p-3 rounded-2xl border text-left flex flex-col items-center gap-2 transition-all ${
                   theme === "light"
-                    ? "bg-rose-500/20 border-rose-400/50 text-white shadow-glass-sm"
+                    ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-white shadow-glass-sm"
                     : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
                 }`}
               >
@@ -149,11 +149,11 @@ export function EditorSettingsModal({
                 onClick={() => onThemeChange("system")}
                 className={`p-3 rounded-2xl border text-left flex flex-col items-center gap-2 transition-all ${
                   theme === "system"
-                    ? "bg-rose-500/20 border-rose-400/50 text-white shadow-glass-sm"
+                    ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-white shadow-glass-sm"
                     : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
                 }`}
               >
-                <Laptop className={`w-5 h-5 ${theme === "system" ? "text-rose-400" : ""}`} />
+                <Laptop className={`w-5 h-5 ${theme === "system" ? "text-[#FF6B2C]" : ""}`} />
                 <span className="text-xs font-bold">System</span>
               </button>
             </div>
@@ -163,7 +163,7 @@ export function EditorSettingsModal({
           <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-rose-400" />
+                <Clock className="w-4 h-4 text-[#FF6B2C]" />
                 <div>
                   <h4 className="text-xs font-bold text-white">Auto-Save</h4>
                   <p className="text-[11px] text-slate-400">Save timeline & zoom keyframes automatically</p>
@@ -173,7 +173,7 @@ export function EditorSettingsModal({
                 type="button"
                 onClick={() => onToggleAutoSave(!autoSaveEnabled)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  autoSaveEnabled ? "bg-rose-500" : "bg-white/20"
+                  autoSaveEnabled ? "bg-[#FF6B2C]" : "bg-white/20"
                 }`}
               >
                 <span
@@ -195,13 +195,13 @@ export function EditorSettingsModal({
                       onClick={() => onChangeAutoSaveInterval(item.value)}
                       className={`p-2.5 rounded-xl border text-left text-xs transition-all ${
                         autoSaveInterval === item.value
-                          ? "bg-rose-500/20 border-rose-400/50 text-rose-200 font-bold"
+                          ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-[#FF8A4C] font-bold"
                           : "bg-black/30 border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.04]"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span>{item.label}</span>
-                        {autoSaveInterval === item.value && <Check className="w-3.5 h-3.5 text-rose-400" />}
+                        {autoSaveInterval === item.value && <Check className="w-3.5 h-3.5 text-[#FF6B2C]" />}
                       </div>
                       <p className="text-[10px] text-slate-500 font-normal mt-0.5">{item.desc}</p>
                     </button>
@@ -234,7 +234,7 @@ export function EditorSettingsModal({
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-white/10 text-slate-400 hover:text-rose-300 hover:border-rose-400/30 transition-all text-xs"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-white/10 text-slate-400 hover:text-[#FF8A4C] hover:border-[#FF6B2C]/30 transition-all text-xs"
                 >
                   <Trash2 className="w-3 h-3" />
                   <span>{clearedFeedback ? "Cleared!" : "Clear Cache"}</span>

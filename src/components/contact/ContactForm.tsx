@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import confetti from "canvas-confetti";
-import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2, Sparkles } from "lucide-react";
 
 export function ContactForm() {
   const [formData, setFormData] = useState({
@@ -63,23 +63,27 @@ export function ContactForm() {
   };
 
   return (
-    <div className="rounded-3xl p-8 sm:p-10 bg-[#080d1a]/85 border border-white/[0.1] shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(147,51,234,0.12)] backdrop-blur-2xl">
-      <div className="mb-6 space-y-1">
-        <div className="text-[10px] font-mono tracking-wider text-rose-400 uppercase">
-          CUSTOMER SERVICE & LOGISTICS
+    <div className="rounded-3xl p-8 sm:p-10 bg-white border border-[#E5E7EB] shadow-xs">
+      <div className="mb-6 space-y-2">
+        <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider text-[#FF6B2C] uppercase bg-[#FFF1E8] px-3 py-1 rounded-full border border-[#FF6B2C]/20">
+          <Sparkles size={13} />
+          <span>INQUIRIES & FEEDBACK</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Customer Service and Logistics Excellence
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111318] tracking-tight">
+          Send a Message to Eric Va
         </h2>
+        <p className="text-xs sm:text-sm text-[#667085] leading-relaxed">
+          Have an idea for a feature, encountered a bug, or want to discuss the roadmap? Drop a note below.
+        </p>
       </div>
 
       {isSuccess ? (
         <div className="py-12 text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center mx-auto shadow-lg">
+          <div className="w-16 h-16 rounded-full bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center mx-auto shadow-sm">
             <CheckCircle2 className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-bold text-white">Message Dispatched</h3>
-          <p className="text-sm text-slate-300 max-w-sm mx-auto">
+          <h3 className="text-xl font-bold text-[#111318]">Message Dispatched</h3>
+          <p className="text-xs sm:text-sm text-[#667085] max-w-sm mx-auto leading-relaxed">
             Your message has been delivered directly to Eric Va. We typically reply within 24 hours.
           </p>
           <button
@@ -88,7 +92,7 @@ export function ContactForm() {
               setIsSuccess(false);
               setFormData({ name: "", email: "", subject: "Feature Suggestion", message: "" });
             }}
-            className="px-6 py-2.5 rounded-full bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all cursor-pointer"
+            className="px-6 py-2.5 rounded-xl bg-[#111318] text-white text-xs font-bold hover:bg-[#22252e] transition-all cursor-pointer"
           >
             Send Another Message
           </button>
@@ -96,58 +100,64 @@ export function ContactForm() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            <label className="block text-xs font-bold text-[#111318] mb-1.5">Your Name</label>
             <input
               type="text"
-              placeholder="Name"
+              placeholder="Eric Va"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-5 py-3.5 rounded-full bg-white/[0.04] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-400 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#111318] placeholder-[#9CA3AF] text-sm focus:outline-none focus:border-[#FF6B2C] focus:bg-white transition-colors"
             />
-            {errors.name && <p className="text-xs text-rose-400 mt-1 pl-4">{errors.name}</p>}
+            {errors.name && <p className="text-xs text-rose-500 mt-1 pl-1">{errors.name}</p>}
           </div>
 
           <div>
+            <label className="block text-xs font-bold text-[#111318] mb-1.5">Your Email</label>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="you@example.com"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-5 py-3.5 rounded-full bg-white/[0.04] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-400 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#111318] placeholder-[#9CA3AF] text-sm focus:outline-none focus:border-[#FF6B2C] focus:bg-white transition-colors"
             />
-            {errors.email && <p className="text-xs text-rose-400 mt-1 pl-4">{errors.email}</p>}
+            {errors.email && <p className="text-xs text-rose-500 mt-1 pl-1">{errors.email}</p>}
           </div>
 
           <div>
+            <label className="block text-xs font-bold text-[#111318] mb-1.5">Topic / Subject</label>
             <input
               type="text"
-              placeholder="Topic / Inquiries"
+              placeholder="Feature Suggestion, Bug Report, etc."
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              className="w-full px-5 py-3.5 rounded-full bg-white/[0.04] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-400 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#111318] placeholder-[#9CA3AF] text-sm focus:outline-none focus:border-[#FF6B2C] focus:bg-white transition-colors"
             />
           </div>
 
           <div>
+            <label className="block text-xs font-bold text-[#111318] mb-1.5">Message</label>
             <textarea
               rows={4}
-              placeholder="Message"
+              placeholder="Describe your suggestion or message in detail..."
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full p-5 rounded-2xl bg-white/[0.04] border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-purple-400 transition-colors resize-none"
+              className="w-full p-4 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] text-[#111318] placeholder-[#9CA3AF] text-sm focus:outline-none focus:border-[#FF6B2C] focus:bg-white transition-colors resize-none"
             />
-            {errors.message && <p className="text-xs text-rose-400 mt-1 pl-2">{errors.message}</p>}
+            {errors.message && <p className="text-xs text-rose-500 mt-1 pl-1">{errors.message}</p>}
           </div>
 
           <div className="pt-2 flex justify-end">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group inline-flex items-center gap-3 px-7 py-3 rounded-full bg-white text-black text-xs font-bold hover:bg-slate-200 transition-all cursor-pointer shadow-lg active:scale-95 disabled:opacity-50"
+              className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#FF6B2C] text-white text-xs font-bold hover:bg-[#E85A1F] transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-50"
             >
               <span>{isSubmitting ? "Sending..." : "Submit Inquiry"}</span>
-              <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-                {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
-              </div>
+              {isSubmitting ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              )}
             </button>
           </div>
         </form>

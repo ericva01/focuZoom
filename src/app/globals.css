@@ -240,11 +240,11 @@ body {
 
 /* Marketing website interaction styles, isolated from the editor. */
 .website-ui :is(a, button, input, textarea, [role="slider"]):focus-visible {
-  outline: 2px solid #fda4af;
-  outline-offset: 5px;
+  outline: 2px solid #FF6B2C;
+  outline-offset: 3px;
 }
 .website-ui section[id] {
-  scroll-margin-top: 100px;
+  scroll-margin-top: 90px;
 }
 .website-skip-link {
   position: absolute;
@@ -252,10 +252,13 @@ body {
   left: 16px;
   z-index: 60;
   transform: translateY(-160%);
-  border-radius: 8px;
-  background: #fff;
-  color: #030509;
-  padding: 12px 18px;
+  border-radius: 9999px;
+  background: #111318;
+  color: #FFFFFF;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 .website-skip-link:focus {
   transform: translateY(0);

@@ -84,11 +84,11 @@ export function Timeline({
         >
           {/* Played Progress bar */}
           <div
-            className="h-full bg-gradient-to-r from-rose-500 to-rose-400 rounded-full relative shadow-[0_0_12px_rgba(251,113,133,0.4)]"
+            className="h-full bg-gradient-to-r from-[#FF7A3D] to-[#FF8A4C] rounded-full relative shadow-[0_0_12px_rgba(255,107,44,0.4)]"
             style={{ width: `${progressPercent}%` }}
           >
             {/* Playhead thumb */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-glass-md border-2 border-rose-400 scale-90 group-hover:scale-110 transition-transform" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-glass-md border-2 border-[#FF6B2C] scale-90 group-hover:scale-110 transition-transform" />
           </div>
 
           {/* Hover indicator tooltip */}
@@ -112,7 +112,7 @@ export function Timeline({
                   onSelectEvent(ev);
                 }}
                 className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full z-10 transition-transform hover:scale-150 flex items-center justify-center border border-white/60 ${
-                  ev.enabled ? "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.6)]" : "bg-slate-600 opacity-60"
+                  ev.enabled ? "bg-[#FF6B2C] shadow-[0_0_8px_rgba(255,107,44,0.6)]" : "bg-slate-600 opacity-60"
                 }`}
                 style={{ left: `${eventPercent}%` }}
                 title={`Zoom Event: ${ev.label || "Click target"} at ${formatTimecode(ev.timestamp)} (${ev.zoom}x)`}
@@ -129,7 +129,7 @@ export function Timeline({
         {/* Left: Timecode & Add Click Event Mode Button */}
         <div className="flex items-center gap-3">
           <div className="font-mono text-xs font-semibold text-white bg-white/[0.04] px-3 py-1 rounded-xl border border-white/[0.08] flex items-center gap-1.5 shadow-glass-sm">
-            <Clock className="w-3.5 h-3.5 text-rose-400" />
+            <Clock className="w-3.5 h-3.5 text-[#FF6B2C]" />
             <span>{formatTimecode(currentTime)}</span>
             <span className="text-slate-500">/</span>
             <span className="text-slate-400">{formatTimecode(duration)}</span>
@@ -196,7 +196,7 @@ export function Timeline({
                 onClick={() => onSpeedChange(spd)}
                 className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono transition-all duration-200 ${
                   playbackSpeed === spd
-                    ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
+                    ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
                     : "text-slate-400 hover:text-white"
                 }`}
               >

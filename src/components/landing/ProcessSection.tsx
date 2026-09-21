@@ -103,7 +103,7 @@ export function ProcessSection() {
 
                   {/* Middle: Tag & Title */}
                   <div className="flex-1 md:px-8 space-y-1">
-                    <div className="text-[10px] font-mono tracking-wider text-rose-400 uppercase">
+                    <div className="text-[10px] font-mono tracking-wider text-[#FF6B2C] uppercase">
                       {step.tag}
                     </div>
                     <div className="text-base sm:text-lg font-medium text-white">

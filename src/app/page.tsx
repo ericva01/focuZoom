@@ -4,11 +4,17 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { FeatureGrid } from "@/components/landing/FeatureGrid";
-import { ProcessSection } from "@/components/landing/ProcessSection";
-import { BannerMarquee } from "@/components/landing/BannerMarquee";
-import { ComparisonDemo } from "@/components/landing/ComparisonDemo";
-import { DesktopProjectHub } from "@/components/landing/DesktopProjectHub";
+import { CoreFeaturesSection } from "@/components/landing/CoreFeaturesSection";
+import { CollaborationShowcase } from "@/components/landing/CollaborationShowcase";
+import { RecordingWorkflow } from "@/components/landing/RecordingWorkflow";
+import { MeetingExperience } from "@/components/landing/MeetingExperience";
+import { TeamWorkspaceSection } from "@/components/landing/TeamWorkspaceSection";
+import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
+import { IntegrationsSection } from "@/components/landing/IntegrationsSection";
+import { SecuritySection } from "@/components/landing/SecuritySection";
+import { OpenSourcePillarsSection } from "@/components/landing/OpenSourcePillarsSection";
+import { FaqSection } from "@/components/landing/FaqSection";
+import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import { DesktopAppDashboard } from "@/components/desktop/DesktopAppDashboard";
 
 import { isDesktopApp } from "@/lib/desktopBridge";
@@ -29,27 +35,72 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="website-ui min-h-screen flex flex-col bg-[#030509] text-slate-100 selection:bg-rose-400 selection:text-black">
+    <div className="website-ui min-h-screen flex flex-col bg-[#F8F9FB] text-[#111318] selection:bg-[#FFF1E8] selection:text-[#FF6B2C]">
+      {/* 1. Navbar */}
       <Navbar />
+
       <main id="main-content" tabIndex={-1} className="flex-1">
+        {/* 1. Hero */}
         <HeroSection />
+
+        {/* 2. Core Features Modular Grid */}
         <div className="content-auto">
-          <FeatureGrid />
+          <CoreFeaturesSection />
         </div>
+
+        {/* 4. Video Collaboration Showcase */}
         <div className="content-auto">
-          <ProcessSection />
+          <CollaborationShowcase />
         </div>
-        <BannerMarquee />
+
+        {/* 5. Recording Workflow Pipeline */}
         <div className="content-auto">
-          <ComparisonDemo />
+          <RecordingWorkflow />
         </div>
+
+        {/* 6. Meeting Experience Showcase */}
         <div className="content-auto">
-          <DesktopProjectHub />
+          <MeetingExperience />
+        </div>
+
+        {/* 7. Team Workspace */}
+        <div className="content-auto">
+          <TeamWorkspaceSection />
+        </div>
+
+        {/* 8. Analytics */}
+        <div className="content-auto">
+          <AnalyticsSection />
+        </div>
+
+        {/* 9. Integrations */}
+        <div className="content-auto">
+          <IntegrationsSection />
+        </div>
+
+        {/* 10. Security */}
+        <div className="content-auto">
+          <SecuritySection />
+        </div>
+
+        {/* 11. Open Source Pillars */}
+        <div className="content-auto">
+          <OpenSourcePillarsSection />
+        </div>
+
+        {/* 12. FAQ */}
+        <div className="content-auto">
+          <FaqSection />
+        </div>
+
+        {/* 13. Final CTA */}
+        <div className="content-auto">
+          <FinalCtaSection />
         </div>
       </main>
-      <div className="content-auto">
-        <Footer />
-      </div>
+
+      {/* 14. Footer */}
+      <Footer />
     </div>
   );
 }

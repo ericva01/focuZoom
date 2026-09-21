@@ -140,7 +140,7 @@ function EditorInspectorBase({
     { id: "midnight-titanium", name: "Titanium", class: "from-zinc-800 via-stone-900 to-black" },
     { id: "aurora-glow", name: "Aurora Cyan", class: "from-teal-500 via-cyan-600 to-indigo-800" },
     { id: "hyper-neon", name: "Hyper Neon", class: "from-fuchsia-600 via-pink-600 to-cyan-500" },
-    { id: "sunset", name: "Sunset Gold", class: "from-amber-600 via-orange-600 to-rose-700" },
+    { id: "sunset", name: "Sunset Gold", class: "from-amber-600 via-orange-600 to-orange-700" },
     { id: "solar-flare", name: "Solar Flare", class: "from-red-600 via-amber-600 to-orange-500" },
     { id: "pastel-dream", name: "Pastel Dream", class: "from-indigo-900 via-purple-900 to-pink-900" },
   ];
@@ -163,7 +163,7 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("clip")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "clip"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
@@ -176,7 +176,7 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("canvas")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "canvas"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
@@ -189,14 +189,14 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("keyframes")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "keyframes"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
           <Focus className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Zoom</span>
           {events.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-rose-400/20 text-rose-300 text-[10px] font-mono flex items-center justify-center">
+            <span className="w-4 h-4 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] text-[10px] font-mono flex items-center justify-center">
               {events.length}
             </span>
           )}
@@ -207,7 +207,7 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("webcam")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "webcam"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
           title="Webcam Facecam PiP settings"
@@ -224,7 +224,7 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("cursor")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "cursor"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
@@ -237,7 +237,7 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("media")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "media"
-              ? "bg-rose-500/20 text-rose-200 border border-rose-400/30 shadow-glass-sm font-semibold"
+              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
               : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
           }`}
         >
@@ -262,7 +262,7 @@ function EditorInspectorBase({
                     onClick={() => onSelectClip(clip.id)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all whitespace-nowrap ${
                       selectedClipId === clip.id
-                        ? "bg-rose-500/25 text-rose-200 border border-rose-400/40 font-semibold"
+                        ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border border-[#FF6B2C]/40 font-semibold"
                         : "bg-white/[0.04] text-slate-400 hover:text-white border border-transparent"
                     }`}
                   >
@@ -278,7 +278,7 @@ function EditorInspectorBase({
                 <div className="glass-panel p-4 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-white">Active Clip Properties</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-400/30">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30">
                       ID: {activeClip.id}
                     </span>
                   </div>
@@ -293,7 +293,7 @@ function EditorInspectorBase({
 
                     <div className="p-2.5 rounded-lg bg-black/30 border border-white/10">
                       <span className="text-[10px] text-slate-400 block">Duration</span>
-                      <span className="font-mono text-rose-300 font-semibold">
+                      <span className="font-mono text-[#FF8A4C] font-semibold">
                         {activeClip.duration.toFixed(2)}s
                       </span>
                     </div>
@@ -308,7 +308,7 @@ function EditorInspectorBase({
                       variant="secondary"
                       size="sm"
                       onClick={() => onSplitClip(activeClip.id, currentTime)}
-                      leftIcon={<Scissors className="w-3.5 h-3.5 text-rose-400" />}
+                      leftIcon={<Scissors className="w-3.5 h-3.5 text-[#FF6B2C]" />}
                       className="w-full justify-start"
                     >
                       Split Here
@@ -358,7 +358,7 @@ function EditorInspectorBase({
                 <div className="glass-panel p-4 rounded-xl space-y-2.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-slate-200">Clip Playback Speed</label>
-                    <span className="text-xs font-mono text-rose-400 font-bold">{config.playbackSpeed}x</span>
+                    <span className="text-xs font-mono text-[#FF6B2C] font-bold">{config.playbackSpeed}x</span>
                   </div>
                   <div className="grid grid-cols-4 gap-1.5">
                     {[0.5, 1.0, 1.5, 2.0].map((spd) => (
@@ -368,7 +368,7 @@ function EditorInspectorBase({
                         onClick={() => onChangeConfig({ playbackSpeed: spd })}
                         className={`py-1.5 rounded-lg text-xs font-mono transition-all ${
                           config.playbackSpeed === spd
-                            ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30 shadow-glass-sm"
+                            ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
                             : "bg-white/[0.04] text-slate-300 hover:text-white border border-transparent"
                         }`}
                       >
@@ -410,7 +410,7 @@ function EditorInspectorBase({
                       pIdx === 0 ? "col-span-2" : ""
                     } ${
                       config.screenAnglePreset === preset.id
-                        ? "bg-rose-500/20 text-rose-200 border-rose-400/40 shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                     }`}
                   >
@@ -425,7 +425,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-white">Stage Inset (Padding)</label>
-                <div className="flex items-center gap-1 font-mono text-xs text-rose-400 font-bold">
+                <div className="flex items-center gap-1 font-mono text-xs text-[#FF6B2C] font-bold">
                   <span>{config.padding}</span>
                   <span className="text-slate-400">px</span>
                 </div>
@@ -449,7 +449,7 @@ function EditorInspectorBase({
                     onClick={() => onChangeConfig({ padding: pad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.padding === pad
-                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30"
                         : "bg-white/[0.04] text-slate-400 hover:text-white"
                     }`}
                   >
@@ -463,7 +463,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-white">Corner Curvature</label>
-                <div className="flex items-center gap-1 font-mono text-xs text-rose-400 font-bold">
+                <div className="flex items-center gap-1 font-mono text-xs text-[#FF6B2C] font-bold">
                   <span>{config.cornerRadius}</span>
                   <span className="text-slate-400">px</span>
                 </div>
@@ -487,7 +487,7 @@ function EditorInspectorBase({
                     onClick={() => onChangeConfig({ cornerRadius: rad })}
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.cornerRadius === rad
-                        ? "bg-rose-500/20 text-rose-200 font-bold border border-rose-400/30"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30"
                         : "bg-white/[0.04] text-slate-400 hover:text-white"
                     }`}
                   >
@@ -513,7 +513,7 @@ function EditorInspectorBase({
                     onClick={() => onChangeConfig({ backgroundType: type.id })}
                     className={`py-1 rounded-lg text-xs font-medium transition-all ${
                       config.backgroundType === type.id
-                        ? "bg-rose-500/25 text-rose-200 border border-rose-400/40 shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
@@ -532,7 +532,7 @@ function EditorInspectorBase({
                       onClick={() => onChangeConfig({ backgroundPreset: g.id })}
                       className={`h-10 rounded-xl bg-gradient-to-r ${g.class} p-2 text-left flex items-end justify-between border transition-all ${
                         config.backgroundPreset === g.id
-                          ? "border-white ring-2 ring-rose-400/60 shadow-glass-md"
+                          ? "border-white ring-2 ring-[#FF6B2C]/60 shadow-glass-md"
                           : "border-white/15 opacity-80 hover:opacity-100"
                       }`}
                     >
@@ -557,7 +557,7 @@ function EditorInspectorBase({
                       onClick={() => onChangeConfig({ solidBackgroundColor: c.hex })}
                       className={`h-10 rounded-xl p-2 text-left border flex items-end justify-between transition-all ${
                         config.solidBackgroundColor === c.hex
-                          ? "border-white ring-2 ring-rose-400/60"
+                          ? "border-white ring-2 ring-[#FF6B2C]/60"
                           : "border-white/15 opacity-80 hover:opacity-100"
                       }`}
                       style={{ backgroundColor: c.hex }}
@@ -585,7 +585,7 @@ function EditorInspectorBase({
                     size="sm"
                     className="w-full"
                     onClick={() => customBgInputRef.current?.click()}
-                    leftIcon={<ImageIcon className="w-3.5 h-3.5 text-rose-400" />}
+                    leftIcon={<ImageIcon className="w-3.5 h-3.5 text-[#FF6B2C]" />}
                   >
                     Select Background Image
                   </Button>
@@ -602,9 +602,9 @@ function EditorInspectorBase({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <Focus className="w-4 h-4 text-rose-400" />
+                <Focus className="w-4 h-4 text-[#FF6B2C]" />
                 <span className="text-xs font-semibold text-white">Zoom Keyframes</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30">
                   {events.length}
                 </span>
               </div>
@@ -645,7 +645,7 @@ function EditorInspectorBase({
                     <button
                       type="button"
                       onClick={() => onDeleteEvent(selectedEvent.id)}
-                      className="flex items-center gap-1 text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                      className="flex items-center gap-1 text-[#FF6B2C] hover:text-[#FF8A4C] text-xs px-2 py-1 rounded bg-[#FF6B2C]/10 hover:bg-[#FF6B2C]/20 transition-colors cursor-pointer"
                       title="Delete this zoom effect (or press Delete key)"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -805,7 +805,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-3.5 rounded-xl space-y-3 border-white/10 bg-white/[0.02]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
-                  <Clock className="w-3.5 h-3.5 text-rose-400" />
+                  <Clock className="w-3.5 h-3.5 text-[#FF6B2C]" />
                   <span>Default Camera Timing</span>
                 </div>
                 <span className="text-[10px] text-slate-400">Global defaults</span>
@@ -836,7 +836,7 @@ function EditorInspectorBase({
                       }
                       className={`py-1 px-2 rounded-lg text-[10px] font-medium border transition-all ${
                         isActive
-                          ? "bg-rose-500/20 text-rose-200 border-rose-400/40 font-semibold"
+                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 font-semibold"
                           : "bg-white/[0.03] text-slate-400 border-white/10 hover:text-white hover:bg-white/[0.06]"
                       }`}
                     >
@@ -851,7 +851,7 @@ function EditorInspectorBase({
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-slate-400">Dolly-In</span>
-                    <span className="font-mono text-rose-400 font-bold">{(config.zoomDuration ?? 0.6).toFixed(2)}s</span>
+                    <span className="font-mono text-[#FF6B2C] font-bold">{(config.zoomDuration ?? 0.6).toFixed(2)}s</span>
                   </div>
                   <input
                     type="range"
@@ -885,7 +885,7 @@ function EditorInspectorBase({
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-slate-400">Zoom-Out</span>
-                    <span className="font-mono text-rose-400 font-bold">{(config.zoomOutDuration ?? 0.6).toFixed(2)}s</span>
+                    <span className="font-mono text-[#FF6B2C] font-bold">{(config.zoomOutDuration ?? 0.6).toFixed(2)}s</span>
                   </div>
                   <input
                     type="range"
@@ -923,14 +923,14 @@ function EditorInspectorBase({
                       }}
                       className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-3 ${
                         isNearCurrent
-                          ? "bg-rose-500/15 border-rose-400/50 shadow-glass-md"
+                          ? "bg-[#FF6B2C]/15 border-[#FF6B2C]/50 shadow-glass-md"
                           : "bg-black/40 border-white/10 hover:border-white/20 hover:bg-white/[0.03]"
                       }`}
                     >
                       {/* Top Bar: Identifier, Timestamp, Delete */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-rose-500/20 border border-rose-400/30 text-rose-300 font-mono text-[10px] flex items-center justify-center font-bold">
+                          <span className="w-5 h-5 rounded-md bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-[#FF8A4C] font-mono text-[10px] flex items-center justify-center font-bold">
                             #{index + 1}
                           </span>
                           <span className="text-xs font-semibold text-white">
@@ -946,7 +946,7 @@ function EditorInspectorBase({
                               onSelectEvent(ev);
                               onSeek?.(ev.timestamp);
                             }}
-                            className="px-2 py-0.5 rounded-md bg-white/[0.06] hover:bg-rose-500/20 text-[11px] font-mono text-rose-300 border border-white/10 hover:border-rose-400/40 transition-colors cursor-pointer"
+                            className="px-2 py-0.5 rounded-md bg-white/[0.06] hover:bg-[#FF6B2C]/20 text-[11px] font-mono text-[#FF8A4C] border border-white/10 hover:border-[#FF6B2C]/40 transition-colors cursor-pointer"
                             title="Jump playhead to this keyframe"
                           >
                             {formatSMPTETimecode(ev.timestamp).substring(3, 8)}
@@ -957,7 +957,7 @@ function EditorInspectorBase({
                               e.stopPropagation();
                               onDeleteEvent(ev.id);
                             }}
-                            className="text-slate-500 hover:text-rose-400 p-1 transition-colors cursor-pointer"
+                            className="text-slate-500 hover:text-[#FF6B2C] p-1 transition-colors cursor-pointer"
                             title="Delete Keyframe"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -983,7 +983,7 @@ function EditorInspectorBase({
                             >
                               -
                             </button>
-                            <span className="font-mono text-xs text-rose-400 font-semibold w-12 text-center">
+                            <span className="font-mono text-xs text-[#FF6B2C] font-semibold w-12 text-center">
                               {ev.timestamp.toFixed(2)}s
                             </span>
                             <button
@@ -1036,7 +1036,7 @@ function EditorInspectorBase({
                               }}
                               className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
                                 ev.zoom === scale
-                                  ? "bg-rose-500/25 text-rose-200 border border-rose-400/40 font-bold"
+                                  ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border border-[#FF6B2C]/40 font-bold"
                                   : "bg-white/[0.04] text-slate-400 hover:text-white border border-transparent"
                               }`}
                             >
@@ -1050,11 +1050,11 @@ function EditorInspectorBase({
                       <div className="pt-2 border-t border-white/[0.06] space-y-2.5">
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="font-medium text-slate-300 flex items-center gap-1">
-                            <Timer className="w-3 h-3 text-rose-400" />
+                            <Timer className="w-3 h-3 text-[#FF6B2C]" />
                             Zoom & Hold Timing
                           </span>
                           <span className="text-[10px] font-mono text-slate-400">
-                            Span: <span className="text-rose-300 font-semibold">{totalSpan.toFixed(2)}s</span>
+                            Span: <span className="text-[#FF8A4C] font-semibold">{totalSpan.toFixed(2)}s</span>
                           </span>
                         </div>
 
@@ -1062,7 +1062,7 @@ function EditorInspectorBase({
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px]">
                             <span className="text-slate-400">Dolly-In Duration</span>
-                            <span className="font-mono text-rose-400 font-bold">{inDur.toFixed(2)}s</span>
+                            <span className="font-mono text-[#FF6B2C] font-bold">{inDur.toFixed(2)}s</span>
                           </div>
                           <input
                             type="range"
@@ -1102,7 +1102,7 @@ function EditorInspectorBase({
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px]">
                             <span className="text-slate-400">Zoom-Out Duration</span>
-                            <span className="font-mono text-rose-400 font-bold">{outDur.toFixed(2)}s</span>
+                            <span className="font-mono text-[#FF6B2C] font-bold">{outDur.toFixed(2)}s</span>
                           </div>
                           <input
                             type="range"
@@ -1123,7 +1123,7 @@ function EditorInspectorBase({
                           <div className="h-1.5 w-full rounded-full bg-black/40 overflow-hidden flex border border-white/[0.06]">
                             <div
                               style={{ width: `${(inDur / totalSpan) * 100}%` }}
-                              className="bg-rose-400 h-full"
+                              className="bg-[#FF6B2C] h-full"
                               title={`Dolly-In: ${inDur.toFixed(2)}s`}
                             />
                             <div
@@ -1133,7 +1133,7 @@ function EditorInspectorBase({
                             />
                             <div
                               style={{ width: `${(outDur / totalSpan) * 100}%` }}
-                              className="bg-rose-500 h-full"
+                              className="bg-[#FF6B2C] h-full"
                               title={`Zoom-Out: ${outDur.toFixed(2)}s`}
                             />
                           </div>
@@ -1162,8 +1162,8 @@ function EditorInspectorBase({
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-white">Screen Capture Hub</span>
                 {isRecording && (
-                  <span className="flex items-center gap-1 text-rose-400 font-mono text-[11px] font-bold animate-pulse">
-                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  <span className="flex items-center gap-1 text-[#FF6B2C] font-mono text-[11px] font-bold animate-pulse">
+                    <span className="w-2 h-2 rounded-full bg-[#FF6B2C]" />
                     REC
                   </span>
                 )}
@@ -1171,9 +1171,9 @@ function EditorInspectorBase({
 
               {isRecording ? (
                 <div className="space-y-2">
-                  <div className="p-3 rounded-lg bg-rose-950/30 border border-rose-500/30 flex items-center justify-between font-mono text-xs">
+                  <div className="p-3 rounded-lg bg-[#17191F] border border-[#FF6B2C]/30 flex items-center justify-between font-mono text-xs">
                     <span className="text-slate-300">Elapsed:</span>
-                    <span className="text-rose-400 font-bold">
+                    <span className="text-[#FF6B2C] font-bold">
                       {Math.floor(recordingDuration / 60)
                         .toString()
                         .padStart(2, "0")}
@@ -1215,7 +1215,7 @@ function EditorInspectorBase({
                 className="w-full"
                 onClick={onLoadDemo}
                 isLoading={isGeneratingDemo}
-                leftIcon={<Film className="w-3.5 h-3.5 text-rose-400" />}
+                leftIcon={<Film className="w-3.5 h-3.5 text-[#FF6B2C]" />}
               >
                 Load Sample Screen Recording
               </Button>
@@ -1274,13 +1274,13 @@ function EditorInspectorBase({
         {activeTab === "cursor" && (
           <div className="space-y-4">
             {/* Master Cursor Overlay Switch */}
-            <div className="glass-panel p-4 rounded-xl space-y-3 border-rose-500/30 bg-gradient-to-r from-rose-950/20 to-transparent">
+            <div className="glass-panel p-4 rounded-xl space-y-3 border-[#FF6B2C]/30 bg-gradient-to-r from-amber-950/20 to-transparent">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div
                     className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
                       config.showCursor
-                        ? "bg-rose-500/20 border-rose-400/40 text-rose-300 shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-[#FF8A4C] shadow-glass-sm"
                         : "bg-white/[0.04] border-white/10 text-slate-500"
                     }`}
                   >
@@ -1302,7 +1302,7 @@ function EditorInspectorBase({
                   type="button"
                   onClick={() => onChangeConfig({ showCursor: !config.showCursor })}
                   className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
-                    config.showCursor ? "bg-rose-500 shadow-[0_0_12px_rgba(251,113,133,0.5)]" : "bg-white/15"
+                    config.showCursor ? "bg-[#FF6B2C] shadow-[0_0_12px_rgba(255,107,44,0.5)]" : "bg-white/15"
                   }`}
                   title={config.showCursor ? "Hide cursor overlay" : "Show cursor overlay"}
                 >
@@ -1331,7 +1331,7 @@ function EditorInspectorBase({
                     onClick={() => onChangeConfig({ cursorStyle: cur.id })}
                     className={`p-2.5 rounded-xl text-left border transition-all ${
                       config.cursorStyle === cur.id
-                        ? "bg-rose-500/20 text-rose-200 border-rose-400/40 shadow-glass-sm"
+                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
                         : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                     }`}
                   >
@@ -1345,7 +1345,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-white">Cursor Size</label>
-                <span className="font-mono text-rose-400 font-bold">{config.cursorSize}px</span>
+                <span className="font-mono text-[#FF6B2C] font-bold">{config.cursorSize}px</span>
               </div>
               <input
                 type="range"
@@ -1365,7 +1365,7 @@ function EditorInspectorBase({
                   type="button"
                   onClick={() => onChangeConfig({ showRipple: !config.showRipple })}
                   className={`w-10 h-5 rounded-full transition-colors relative ${
-                    config.showRipple ? "bg-rose-500" : "bg-white/10"
+                    config.showRipple ? "bg-[#FF6B2C]" : "bg-white/10"
                   }`}
                 >
                   <div
@@ -1411,7 +1411,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#fb7185",
+                            borderColor: "#FF6B2C",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -1443,7 +1443,7 @@ function EditorInspectorBase({
                 size="md"
                 className="w-full text-xs font-semibold"
                 onClick={onOpenWebcamReview}
-                leftIcon={<Camera className="w-3.5 h-3.5 text-rose-400" />}
+                leftIcon={<Camera className="w-3.5 h-3.5 text-[#FF6B2C]" />}
               >
                 Open Camera Review & Setup
               </Button>
@@ -1479,7 +1479,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#fb7185",
+                            borderColor: "#FF6B2C",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -1498,7 +1498,7 @@ function EditorInspectorBase({
                   size="sm"
                   className="w-full text-xs"
                   onClick={() => webcamFileInputRef.current?.click()}
-                  leftIcon={<Upload className="w-3.5 h-3.5 text-rose-400" />}
+                  leftIcon={<Upload className="w-3.5 h-3.5 text-[#FF6B2C]" />}
                 >
                   {config.webcamConfig?.url ? "Replace Webcam Video" : "Upload Webcam Video (MP4/WebM)"}
                 </Button>
@@ -1506,7 +1506,7 @@ function EditorInspectorBase({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-rose-300 hover:text-rose-200 px-2 flex-shrink-0"
+                    className="text-xs text-[#FF8A4C] hover:text-[#FF8A4C] px-2 flex-shrink-0"
                     title="Remove Webcam Overlay"
                     onClick={() => {
                       onChangeConfig({
@@ -1517,7 +1517,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#fb7185",
+                            borderColor: "#FF6B2C",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -1558,7 +1558,7 @@ function EditorInspectorBase({
                           customX: 0.85,
                           customY: 0.82,
                           size: 180,
-                          borderColor: "#fb7185",
+                          borderColor: "#FF6B2C",
                           borderWidth: 3,
                           shadow: true,
                           mirror: true,
@@ -1567,7 +1567,7 @@ function EditorInspectorBase({
                       },
                     });
                   }}
-                  className="w-full bg-[#090D16] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-rose-400 transition-colors"
+                  className="w-full bg-[#090D16] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#FF6B2C] transition-colors"
                 >
                   {availableCameras.map((cam) => (
                     <option key={cam.deviceId} value={cam.deviceId}>
@@ -1602,7 +1602,7 @@ function EditorInspectorBase({
                               customX: 0.85,
                               customY: 0.82,
                               size: 180,
-                              borderColor: "#fb7185",
+                              borderColor: "#FF6B2C",
                               borderWidth: 3,
                               shadow: true,
                               mirror: true,
@@ -1613,7 +1613,7 @@ function EditorInspectorBase({
                       }
                       className={`p-2.5 rounded-xl text-center border transition-all ${
                         currentShape === sh.id
-                          ? "bg-rose-500/20 text-rose-200 border-rose-400/40 shadow-glass-sm"
+                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
                           : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                       }`}
                     >
@@ -1649,7 +1649,7 @@ function EditorInspectorBase({
                               customX: 0.85,
                               customY: 0.82,
                               size: 180,
-                              borderColor: "#fb7185",
+                              borderColor: "#FF6B2C",
                               borderWidth: 3,
                               shadow: true,
                               mirror: true,
@@ -1662,7 +1662,7 @@ function EditorInspectorBase({
                       }
                       className={`p-2 rounded-xl text-center border transition-all text-xs font-medium ${
                         currentPos === pos.id
-                          ? "bg-rose-500/20 text-rose-200 border-rose-400/40 font-semibold"
+                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 font-semibold"
                           : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                       }`}
                     >
@@ -1680,7 +1680,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-white">Bubble Size</label>
-                <span className="font-mono text-rose-400 font-bold">
+                <span className="font-mono text-[#FF6B2C] font-bold">
                   {config.webcamConfig?.size || 180}px
                 </span>
               </div>
@@ -1699,7 +1699,7 @@ function EditorInspectorBase({
                         customX: 0.85,
                         customY: 0.82,
                         size: 180,
-                        borderColor: "#fb7185",
+                        borderColor: "#FF6B2C",
                         borderWidth: 3,
                         shadow: true,
                         mirror: true,
@@ -1708,7 +1708,7 @@ function EditorInspectorBase({
                     },
                   })
                 }
-                className="w-full accent-rose-500 cursor-pointer h-1 bg-white/10 rounded"
+                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-white/10 rounded"
               />
             </div>
 
@@ -1731,7 +1731,7 @@ function EditorInspectorBase({
                           customX: 0.85,
                           customY: 0.82,
                           size: 180,
-                          borderColor: "#fb7185",
+                          borderColor: "#FF6B2C",
                           borderWidth: 3,
                           shadow: true,
                           mirror: true,
@@ -1741,7 +1741,7 @@ function EditorInspectorBase({
                     })
                   }
                   className={`w-10 h-5 rounded-full transition-colors relative ${
-                    config.webcamConfig?.mirror ?? true ? "bg-rose-500" : "bg-white/10"
+                    config.webcamConfig?.mirror ?? true ? "bg-[#FF6B2C]" : "bg-white/10"
                   }`}
                 >
                   <div
@@ -1769,7 +1769,7 @@ function EditorInspectorBase({
                           customX: 0.85,
                           customY: 0.82,
                           size: 180,
-                          borderColor: "#fb7185",
+                          borderColor: "#FF6B2C",
                           borderWidth: 3,
                           shadow: true,
                           mirror: true,
@@ -1779,7 +1779,7 @@ function EditorInspectorBase({
                     })
                   }
                   className={`w-10 h-5 rounded-full transition-colors relative ${
-                    config.webcamConfig?.shadow ?? true ? "bg-rose-500" : "bg-white/10"
+                    config.webcamConfig?.shadow ?? true ? "bg-[#FF6B2C]" : "bg-white/10"
                   }`}
                 >
                   <div
@@ -1795,7 +1795,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-white">Border Width</label>
-                <span className="font-mono text-rose-400 font-bold">
+                <span className="font-mono text-[#FF6B2C] font-bold">
                   {config.webcamConfig?.borderWidth ?? 3}px
                 </span>
               </div>
@@ -1814,7 +1814,7 @@ function EditorInspectorBase({
                         customX: 0.85,
                         customY: 0.82,
                         size: 180,
-                        borderColor: "#fb7185",
+                        borderColor: "#FF6B2C",
                         borderWidth: 3,
                         shadow: true,
                         mirror: true,
@@ -1823,7 +1823,7 @@ function EditorInspectorBase({
                     },
                   })
                 }
-                className="w-full accent-rose-500 cursor-pointer h-1 bg-white/10 rounded"
+                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-white/10 rounded"
               />
 
               <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between">
@@ -1831,7 +1831,7 @@ function EditorInspectorBase({
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
-                    value={config.webcamConfig?.borderColor || "#fb7185"}
+                    value={config.webcamConfig?.borderColor || "#FF6B2C"}
                     onChange={(e) =>
                       onChangeConfig({
                         webcamConfig: {
@@ -1842,7 +1842,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#fb7185",
+                            borderColor: "#FF6B2C",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -1854,7 +1854,7 @@ function EditorInspectorBase({
                     className="w-7 h-7 rounded-lg border border-white/20 bg-transparent cursor-pointer"
                   />
                   <span className="font-mono text-xs text-slate-300 uppercase">
-                    {config.webcamConfig?.borderColor || "#fb7185"}
+                    {config.webcamConfig?.borderColor || "#FF6B2C"}
                   </span>
                 </div>
               </div>
