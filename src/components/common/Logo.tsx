@@ -16,11 +16,11 @@ export function Logo({ size = "md", showText = true, className = "" }: LogoProps
 
   return (
     <div className={`flex items-center gap-2.5 group select-none ${className}`}>
-      {/* Glideo Official Brand Logo Mark */}
+      {/* FucuFlow Official Brand Logo Mark */}
       <div className="relative flex items-center justify-center transition-transform duration-200 group-hover:scale-105 flex-shrink-0">
         <Image
           src="/icon.png"
-          alt="Glideo Logo"
+          alt="FucuFlow Logo"
           width={iconSizes.img}
           height={iconSizes.img}
           priority
@@ -31,7 +31,7 @@ export function Logo({ size = "md", showText = true, className = "" }: LogoProps
       {/* Brand Name in Orange */}
       {showText && (
         <span className={`font-extrabold font-sans text-[#FF6B2C] tracking-tight ${iconSizes.text}`}>
-          Glideo
+          FucuFlow
         </span>
       )}
     </div>

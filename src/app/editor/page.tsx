@@ -10,7 +10,7 @@ import { WebcamReviewModal } from "@/components/editor/WebcamReviewModal";
 import { useVideoPlayback } from "@/hooks/useVideoPlayback";
 import { useScreenRecorder } from "@/hooks/useScreenRecorder";
 import { generateSampleScreenRecording } from "@/utils/sampleVideoGenerator";
-import { clusterNearbyClicks, ungroupClickEvent, groupClickEvents } from "@/utils/clickClusterer";
+import { clusterNearbyClicks, ungroupClickEvent, groupClickEvents, mergeOverlappingEvents } from "@/utils/clickClusterer";
 import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   AspectRatio,
@@ -82,10 +82,10 @@ export default function EditorPage() {
 
     // Camera & Zoom
     defaultZoomScale: 2.2,
-    zoomEasing: "spring",
-    zoomDuration: 0.6,
-    zoomHoldDuration: 1.4,
-    zoomOutDuration: 0.6,
+    zoomEasing: "cubic-out",
+    zoomDuration: 0.85,
+    zoomHoldDuration: 1.6,
+    zoomOutDuration: 0.85,
 
     // Cursor & FX
     showCursor: true,
@@ -953,46 +953,59 @@ export default function EditorPage() {
   // Add click event from canvas click
   const handleAddClickAtCoords = useCallback((x: number, y: number) => {
     recordHistory();
+    const inDur = config.zoomDuration ?? 0.85;
+    const holdDur = config.zoomHoldDuration ?? 1.6;
+    const outDur = config.zoomOutDuration ?? 0.85;
     const newEvent: ClickEvent = {
       id: "click-" + Date.now(),
       timestamp: Math.round(playback.currentTime * 10) / 10,
       x: Math.round(x * 1000) / 1000,
       y: Math.round(y * 1000) / 1000,
       zoom: config.defaultZoomScale,
+      zoomInDuration: inDur,
+      holdDuration: holdDur,
+      zoomOutDuration: outDur,
       label: `Target (${Math.round(x * 100)}%, ${Math.round(y * 100)}%)`,
       enabled: true,
     };
 
-    recordHistory();
-    setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
+    setEvents((prev) => {
+      const merged = mergeOverlappingEvents([...prev, newEvent], config.defaultZoomScale, metadata?.cursorTrail);
+      return merged.sort((a, b) => a.timestamp - b.timestamp);
+    });
     setSelectedEventId(newEvent.id);
     setIsAddMode(false);
-  }, [playback.currentTime, config.defaultZoomScale, recordHistory]);
+  }, [playback.currentTime, config.defaultZoomScale, config.zoomDuration, config.zoomHoldDuration, config.zoomOutDuration, metadata?.cursorTrail, recordHistory]);
 
   // Add event at current playhead time
   const handleAddCurrentTimeEvent = useCallback(() => {
     recordHistory();
+    const inDur = config.zoomDuration ?? 0.85;
+    const holdDur = config.zoomHoldDuration ?? 1.6;
+    const outDur = config.zoomOutDuration ?? 0.85;
     const newEvent: ClickEvent = {
       id: "click-" + Date.now(),
       timestamp: Math.round(playback.currentTime * 10) / 10,
       x: 0.5,
       y: 0.5,
       zoom: config.defaultZoomScale,
-      holdDuration: 1.2,
-      zoomInDuration: 0.4,
-      zoomOutDuration: 0.4,
+      holdDuration: holdDur,
+      zoomInDuration: inDur,
+      zoomOutDuration: outDur,
       label: `Target at ${playback.currentTime.toFixed(1)}s`,
       enabled: true,
     };
-    recordHistory();
-    setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
+    setEvents((prev) => {
+      const merged = mergeOverlappingEvents([...prev, newEvent], config.defaultZoomScale, metadata?.cursorTrail);
+      return merged.sort((a, b) => a.timestamp - b.timestamp);
+    });
     setSelectedEventId(newEvent.id);
-  }, [playback.currentTime, config.defaultZoomScale, recordHistory]);
+  }, [playback.currentTime, config.defaultZoomScale, config.zoomDuration, config.zoomHoldDuration, config.zoomOutDuration, metadata?.cursorTrail, recordHistory]);
 
   const handleUpdateEvent = useCallback((id: string, updates: Partial<ClickEvent>) => {
     recordHistory();
-    setEvents((prev) =>
-      prev.map((e) => {
+    setEvents((prev) => {
+      const updatedList = prev.map((e) => {
         if (e.id !== id) return e;
         const updated = { ...e, ...updates };
         if (updates.x !== undefined || updates.y !== undefined) {
@@ -1020,9 +1033,14 @@ export default function EditorPage() {
           }
         }
         return updated;
-      })
-    );
-  }, [recordHistory]);
+      });
+
+      if (updates.timestamp !== undefined || updates.holdDuration !== undefined) {
+        return mergeOverlappingEvents(updatedList, config.defaultZoomScale, metadata?.cursorTrail);
+      }
+      return updatedList;
+    });
+  }, [config.defaultZoomScale, metadata?.cursorTrail, recordHistory]);
 
   const handleDeleteEvent = useCallback((id: string) => {
     recordHistory();
@@ -1352,7 +1370,7 @@ export default function EditorPage() {
               e.stopPropagation();
               setIsInspectorCollapsed((prev) => !prev);
             }}
-            className="absolute z-30 w-4 h-7 rounded-l-md bg-[#090D16]/90 hover:bg-white/[0.12] border border-r-0 border-white/[0.12] text-slate-300 hover:text-white flex items-center justify-center shadow-glass-sm -left-4 transition-colors backdrop-blur-md"
+            className="absolute z-30 w-4 h-7 rounded-l-md bg-white/95 dark:bg-[#090D16]/90 hover:bg-slate-100 dark:hover:bg-white/[0.12] border border-r-0 border-slate-300 dark:border-white/[0.12] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-center shadow-glass-sm -left-4 transition-colors backdrop-blur-md"
             title={isInspectorCollapsed ? "Expand Inspector" : "Collapse Inspector"}
           >
             {isInspectorCollapsed ? (

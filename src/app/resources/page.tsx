@@ -6,8 +6,8 @@ import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import { BookOpen, HardDrive, Keyboard, ArrowRight, ExternalLink, Sparkles, MessageSquare } from "lucide-react";
 
 export const metadata = {
-  title: "Resources & Documentation — Glideo Studio",
-  description: "User guides, keyboard shortcuts, documentation, and community resources for Glideo Studio.",
+  title: "Resources & Documentation — FucuFlow Studio",
+  description: "User guides, keyboard shortcuts, documentation, and community resources for FucuFlow Studio.",
 };
 
 const shortcuts = [

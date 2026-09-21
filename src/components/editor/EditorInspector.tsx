@@ -155,16 +155,16 @@ function EditorInspectorBase({
   ];
 
   return (
-    <div className="h-full flex flex-col bg-[#090D16]/90 backdrop-blur-xl border-l border-white/[0.08] select-none overflow-hidden">
+    <div className="h-full flex flex-col bg-white/95 dark:bg-[#090D16]/90 backdrop-blur-xl border-l border-slate-200 dark:border-white/[0.08] select-none overflow-hidden text-slate-800 dark:text-slate-100">
       {/* 1. Inspector Tab Dock */}
-      <div className="p-2 border-b border-white/[0.08] bg-white/[0.02] flex items-center gap-1">
+      <div className="p-2 border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] flex items-center gap-1">
         <button
           type="button"
           onClick={() => setActiveTab("clip")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "clip"
-              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
           }`}
         >
           <Scissors className="w-3.5 h-3.5" />
@@ -176,8 +176,8 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("canvas")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "canvas"
-              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
           }`}
         >
           <Palette className="w-3.5 h-3.5" />
@@ -189,14 +189,14 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("keyframes")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "keyframes"
-              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
           }`}
         >
           <Focus className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Zoom</span>
           {events.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] text-[10px] font-mono flex items-center justify-center">
+            <span className="w-4 h-4 rounded-full bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] text-[10px] font-mono flex items-center justify-center">
               {events.length}
             </span>
           )}
@@ -207,15 +207,15 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("webcam")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "webcam"
-              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
           }`}
           title="Webcam Facecam PiP settings"
         >
           <Camera className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Face</span>
           {enableWebcam && (
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
           )}
         </button>
 
@@ -224,8 +224,8 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("cursor")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "cursor"
-              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
           }`}
         >
           <MousePointer className="w-3.5 h-3.5" />
@@ -237,8 +237,8 @@ function EditorInspectorBase({
           onClick={() => setActiveTab("media")}
           className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "media"
-              ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
           }`}
         >
           <Upload className="w-3.5 h-3.5" />
@@ -277,23 +277,23 @@ function EditorInspectorBase({
                 {/* Active Clip Card */}
                 <div className="glass-panel p-4 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-white">Active Clip Properties</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white">Active Clip Properties</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30">
                       ID: {activeClip.id}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/10">
-                      <span className="text-[10px] text-slate-400 block">Timeline In / Out</span>
-                      <span className="font-mono text-white font-medium">
+                    <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/10">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Timeline In / Out</span>
+                      <span className="font-mono text-slate-800 dark:text-white font-medium">
                         {formatSMPTETimecode(activeClip.startTimeline).substring(3, 8)} - {formatSMPTETimecode(activeClip.endTimeline).substring(3, 8)}
                       </span>
                     </div>
 
-                    <div className="p-2.5 rounded-lg bg-black/30 border border-white/10">
-                      <span className="text-[10px] text-slate-400 block">Duration</span>
-                      <span className="font-mono text-[#FF8A4C] font-semibold">
+                    <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/10">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Duration</span>
+                      <span className="font-mono text-[#FF6B2C] dark:text-[#FF8A4C] font-semibold">
                         {activeClip.duration.toFixed(2)}s
                       </span>
                     </div>
@@ -302,7 +302,7 @@ function EditorInspectorBase({
 
                 {/* Quick Edit Actions */}
                 <div className="glass-panel p-4 rounded-xl space-y-3">
-                  <span className="text-xs font-semibold text-white block">Cut & Trim Shortcuts</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-white block">Cut & Trim Shortcuts</span>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       variant="secondary"
@@ -499,8 +499,8 @@ function EditorInspectorBase({
 
             {/* Background Type & Presets */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
-              <label className="text-xs font-semibold text-white block">Background Style</label>
-              <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10 text-xs">
+              <label className="text-xs font-semibold text-slate-800 dark:text-white block">Background Style</label>
+              <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 text-xs">
                 {[
                   { id: "gradient" as const, label: "Gradient" },
                   { id: "solid" as const, label: "Solid" },
@@ -513,8 +513,8 @@ function EditorInspectorBase({
                     onClick={() => onChangeConfig({ backgroundType: type.id })}
                     className={`py-1 rounded-lg text-xs font-medium transition-all ${
                       config.backgroundType === type.id
-                        ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
+                        : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                     }`}
                   >
                     {type.label}
@@ -924,16 +924,16 @@ function EditorInspectorBase({
                       className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-3 ${
                         isNearCurrent
                           ? "bg-[#FF6B2C]/15 border-[#FF6B2C]/50 shadow-glass-md"
-                          : "bg-black/40 border-white/10 hover:border-white/20 hover:bg-white/[0.03]"
+                          : "bg-slate-100 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-200/50 dark:hover:bg-white/[0.03]"
                       }`}
                     >
                       {/* Top Bar: Identifier, Timestamp, Delete */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-[#FF8A4C] font-mono text-[10px] flex items-center justify-center font-bold">
+                          <span className="w-5 h-5 rounded-md bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-[#FF6B2C] dark:text-[#FF8A4C] font-mono text-[10px] flex items-center justify-center font-bold">
                             #{index + 1}
                           </span>
-                          <span className="text-xs font-semibold text-white">
+                          <span className="text-xs font-semibold text-slate-800 dark:text-white">
                             {ev.label || `Zoom Target ${index + 1}`}
                           </span>
                         </div>
@@ -946,7 +946,7 @@ function EditorInspectorBase({
                               onSelectEvent(ev);
                               onSeek?.(ev.timestamp);
                             }}
-                            className="px-2 py-0.5 rounded-md bg-white/[0.06] hover:bg-[#FF6B2C]/20 text-[11px] font-mono text-[#FF8A4C] border border-white/10 hover:border-[#FF6B2C]/40 transition-colors cursor-pointer"
+                            className="px-2 py-0.5 rounded-md bg-slate-200/70 hover:bg-[#FF6B2C]/20 text-[11px] font-mono text-[#FF6B2C] dark:text-[#FF8A4C] border border-slate-300 dark:border-white/10 hover:border-[#FF6B2C]/40 dark:bg-white/[0.06] transition-colors cursor-pointer"
                             title="Jump playhead to this keyframe"
                           >
                             {formatSMPTETimecode(ev.timestamp).substring(3, 8)}
@@ -957,7 +957,7 @@ function EditorInspectorBase({
                               e.stopPropagation();
                               onDeleteEvent(ev.id);
                             }}
-                            className="text-slate-500 hover:text-[#FF6B2C] p-1 transition-colors cursor-pointer"
+                            className="text-slate-400 hover:text-[#FF6B2C] dark:text-slate-500 p-1 transition-colors cursor-pointer"
                             title="Delete Keyframe"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -966,7 +966,7 @@ function EditorInspectorBase({
                       </div>
 
                       {/* Timestamp Adjuster with Real-Time Video Seek */}
-                      <div className="space-y-2 bg-black/30 p-2.5 rounded-lg border border-white/[0.06]">
+                      <div className="space-y-2 bg-slate-100 dark:bg-black/30 p-2.5 rounded-lg border border-slate-200 dark:border-white/[0.06]">
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="text-slate-400">Keyframe Time:</span>
                           <div className="flex items-center gap-1.5">
@@ -1120,7 +1120,7 @@ function EditorInspectorBase({
 
                         {/* Visual Timeline Span Bar */}
                         <div className="pt-1">
-                          <div className="h-1.5 w-full rounded-full bg-black/40 overflow-hidden flex border border-white/[0.06]">
+                          <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-black/40 overflow-hidden flex border border-slate-300 dark:border-white/[0.06]">
                             <div
                               style={{ width: `${(inDur / totalSpan) * 100}%` }}
                               className="bg-[#FF6B2C] h-full"
@@ -1567,7 +1567,7 @@ function EditorInspectorBase({
                       },
                     });
                   }}
-                  className="w-full bg-[#090D16] border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#FF6B2C] transition-colors"
+                  className="w-full bg-slate-100 dark:bg-[#090D16] border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none focus:border-[#FF6B2C] transition-colors"
                 >
                   {availableCameras.map((cam) => (
                     <option key={cam.deviceId} value={cam.deviceId}>

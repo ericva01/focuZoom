@@ -4,8 +4,8 @@ import { ContactInfo } from "@/components/contact/ContactInfo";
 import { ContactForm } from "@/components/contact/ContactForm";
 
 export const metadata = {
-  title: "Contact & Community — Glideo Studio",
-  description: "Get in touch with the Glideo team for product feedback, bug reports, feature requests, and open-source inquiries.",
+  title: "Contact & Community — FucuFlow Studio",
+  description: "Get in touch with the FucuFlow team for product feedback, bug reports, feature requests, and open-source inquiries.",
 };
 
 export default function ContactPage() {

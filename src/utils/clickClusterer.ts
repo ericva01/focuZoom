@@ -1,14 +1,127 @@
 import { ClickEvent, ClickTarget, CursorPoint } from "@/types/editor";
 
 /**
- * Automatically groups rapid burst clicks (e.g. clicks within 0.5s - 0.8s)
- * into a single unified Zoom sequence section.
+ * Calculates Euclidean distance between two 2D points (normalized 0..1).
+ */
+export function getPointsDistance(x1: number, y1: number, x2: number, y2: number): number {
+  return Math.hypot(x2 - x1, y2 - y1);
+}
+
+/**
+ * Calculates a sticky anchor point for nearby targets.
+ * If multiple consecutive targets are within `threshold` (default 0.18, ~18% screen space),
+ * they share the common cluster centroid to keep the camera completely steady & fixed.
+ */
+export function applyStickyAnchorsToTargets(
+  targets: ClickTarget[],
+  threshold: number = 0.18
+): ClickTarget[] {
+  if (!targets || targets.length <= 1) return targets;
+
+  const result: ClickTarget[] = [];
+  let cluster: ClickTarget[] = [targets[0]];
+
+  for (let i = 1; i < targets.length; i++) {
+    const current = targets[i];
+    const firstInCluster = cluster[0];
+    const dist = getPointsDistance(firstInCluster.x, firstInCluster.y, current.x, current.y);
+
+    if (dist <= threshold) {
+      cluster.push(current);
+    } else {
+      // Calculate cluster centroid
+      const avgX = cluster.reduce((sum, t) => sum + t.x, 0) / cluster.length;
+      const avgY = cluster.reduce((sum, t) => sum + t.y, 0) / cluster.length;
+      const roundX = Math.round(avgX * 1000) / 1000;
+      const roundY = Math.round(avgY * 1000) / 1000;
+
+      for (const t of cluster) {
+        result.push({
+          ...t,
+          x: roundX,
+          y: roundY,
+        });
+      }
+      cluster = [current];
+    }
+  }
+
+  if (cluster.length > 0) {
+    const avgX = cluster.reduce((sum, t) => sum + t.x, 0) / cluster.length;
+    const avgY = cluster.reduce((sum, t) => sum + t.y, 0) / cluster.length;
+    const roundX = Math.round(avgX * 1000) / 1000;
+    const roundY = Math.round(avgY * 1000) / 1000;
+
+    for (const t of cluster) {
+      result.push({
+        ...t,
+        x: roundX,
+        y: roundY,
+      });
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Automatically detects and merges any overlapping timeline animation keyframes
+ * into a single unified grouped section.
  *
- * Inside this section:
- * - The zoom initiates smoothly on the first click.
- * - Stays zoomed in while gliding between consecutive click targets.
- * - Caps group duration to ~3.2s so the camera returns to 1.0x wide view between actions!
- * - Never chains normal paced clicks indefinitely.
+ * Prevents camera collision and jitter when keyframes are close or overlap.
+ */
+export function mergeOverlappingEvents(
+  events: ClickEvent[],
+  defaultZoom: number = 2.2,
+  fullTrail?: CursorPoint[]
+): ClickEvent[] {
+  if (!events || events.length <= 1) return events || [];
+
+  // Sort chronologically by start timestamp
+  const sorted = [...events].sort((a, b) => a.timestamp - b.timestamp);
+  const merged: ClickEvent[] = [];
+  let currentGroup: ClickEvent[] = [sorted[0]];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const nextEv = sorted[i];
+    const prevEv = currentGroup[currentGroup.length - 1];
+
+    // Compute end time of the active group
+    const groupFirstTime = currentGroup[0].timestamp;
+    const groupLastEnd = currentGroup.reduce((maxEnd, ev) => {
+      const inD = ev.zoomInDuration ?? 0.8;
+      const holdD = ev.holdDuration ?? 1.4;
+      const outD = ev.zoomOutDuration ?? 0.8;
+      return Math.max(maxEnd, ev.timestamp + inD + holdD + outD);
+    }, groupFirstTime);
+
+    // Overlap condition: next event starts before previous group finishes (or within 0.15s buffer)
+    if (nextEv.timestamp < groupLastEnd + 0.15) {
+      currentGroup.push(nextEv);
+    } else {
+      if (currentGroup.length === 1) {
+        merged.push(currentGroup[0]);
+      } else {
+        const grouped = groupClickEvents(currentGroup, defaultZoom, fullTrail);
+        if (grouped) merged.push(grouped);
+      }
+      currentGroup = [nextEv];
+    }
+  }
+
+  if (currentGroup.length === 1) {
+    merged.push(currentGroup[0]);
+  } else if (currentGroup.length > 1) {
+    const grouped = groupClickEvents(currentGroup, defaultZoom, fullTrail);
+    if (grouped) merged.push(grouped);
+  }
+
+  return merged;
+}
+
+/**
+ * Automatically groups rapid burst clicks (e.g. clicks within 0.8s)
+ * into a single unified Zoom sequence section.
  */
 export function clusterNearbyClicks(
   clicks: ClickEvent[],
@@ -59,16 +172,10 @@ export function clusterNearbyClicks(
   if (dedupedTargets.length === 0) return [];
 
   // Step 2: Group clicks into non-overlapping unified zoom sections
-  // A click belongs to the active cluster ONLY if:
-  // (a) gap from the last click in cluster <= thresholdSec (e.g. 0.8s rapid burst / double-click)
-  // AND
-  // (b) total duration span of the cluster <= MAX_GROUP_SPAN (e.g. 3.2s)
-  // This ensures bursts of clicks are smoothly grouped, but the camera returns
-  // to 1.0x wide view between distinct actions rather than staying zoomed perpetually!
-  const MAX_GROUP_SPAN = 3.2;
-  const inDur = 0.4;
-  const outDur = 0.4;
-  const baseHoldAfterLast = 1.0;
+  const MAX_GROUP_SPAN = 4.0;
+  const inDur = 0.8;
+  const outDur = 0.8;
+  const baseHoldAfterLast = 1.4;
 
   const targetGroups: ClickTarget[][] = [];
   let currentGroup: ClickTarget[] = [];
@@ -81,7 +188,6 @@ export function clusterNearbyClicks(
       const gapFromPrev = target.timestamp - prevTarget.timestamp;
       const groupSpan = target.timestamp - currentGroup[0].timestamp;
 
-      // Group together if it's a rapid burst (<= 0.8s) and does not exceed maximum section duration
       if (gapFromPrev <= thresholdSec && groupSpan <= MAX_GROUP_SPAN) {
         currentGroup.push(target);
       } else {
@@ -95,14 +201,14 @@ export function clusterNearbyClicks(
     targetGroups.push(currentGroup);
   }
 
-  // Step 3: Convert each target group into a single ClickEvent
+  // Step 3: Convert each target group into a single ClickEvent with sticky anchors
   const clusters: ClickEvent[] = [];
   for (let idx = 0; idx < targetGroups.length; idx++) {
-    const group = targetGroups[idx];
+    const rawGroup = targetGroups[idx];
+    const group = applyStickyAnchorsToTargets(rawGroup, 0.18);
     const firstTarget = group[0];
     const lastTarget = group[group.length - 1];
 
-    // Find any matching style properties from the original clicks
     const matchedOriginal = clicks.find(
       (c) => Math.abs(c.timestamp - firstTarget.timestamp) < 0.15
     ) || clicks[0];
@@ -111,17 +217,15 @@ export function clusterNearbyClicks(
     const actualInDur = matchedOriginal?.zoomInDuration ?? inDur;
     const actualOutDur = matchedOriginal?.zoomOutDuration ?? outDur;
 
-    // Total hold ensures the zoom remains active from first click through last click + hold
     const spanBetweenFirstAndLast = lastTarget.timestamp - firstTarget.timestamp;
     const totalHold =
       group.length > 1
-        ? Math.min(3.2, Math.max(0.8, Math.round((spanBetweenFirstAndLast + baseHoldAfterLast) * 10) / 10))
-        : (matchedOriginal?.holdDuration ?? 1.2);
+        ? Math.min(4.5, Math.max(1.0, Math.round((spanBetweenFirstAndLast + baseHoldAfterLast) * 10) / 10))
+        : (matchedOriginal?.holdDuration ?? 1.4);
 
     const startTime = Math.round(firstTarget.timestamp * 100) / 100;
     const endTime = startTime + actualInDur + totalHold + actualOutDur;
 
-    // Extract continuous cursor points that occur during this zoom window
     let eventTrail: CursorPoint[] | undefined;
     if (fullTrail && fullTrail.length > 0) {
       eventTrail = fullTrail.filter(
@@ -164,24 +268,8 @@ export function clusterNearbyClicks(
     });
   }
 
-  // Ensure strict chronological sorting
-  clusters.sort((a, b) => a.timestamp - b.timestamp);
-
-  // Safety pass: if any consecutive clusters still touch or overlap, adjust hold duration so there is a clean gap (return to 1.0x)
-  for (let i = 0; i < clusters.length - 1; i++) {
-    const cur = clusters[i];
-    const nxt = clusters[i + 1];
-    const curEnd = cur.timestamp + (cur.zoomInDuration ?? 0.4) + (cur.holdDuration ?? 1.2) + (cur.zoomOutDuration ?? 0.4);
-    if (curEnd > nxt.timestamp) {
-      const maxAvailableHold = Math.max(
-        0.3,
-        nxt.timestamp - cur.timestamp - (cur.zoomInDuration ?? 0.4) - (cur.zoomOutDuration ?? 0.4) - 0.1
-      );
-      cur.holdDuration = Math.round(maxAvailableHold * 10) / 10;
-    }
-  }
-
-  return clusters;
+  // Safety pass: merge any remaining overlaps
+  return mergeOverlappingEvents(clusters, defaultZoom, fullTrail);
 }
 
 /**
@@ -191,9 +279,9 @@ export function ungroupClickEvent(event: ClickEvent): ClickEvent[] {
   if (!event.targets || event.targets.length <= 1) {
     return [{ ...event, targets: undefined }];
   }
-  const defaultIn = event.zoomInDuration ?? 0.4;
-  const defaultOut = event.zoomOutDuration ?? 0.4;
-  const defaultHold = 1.2;
+  const defaultIn = event.zoomInDuration ?? 0.8;
+  const defaultOut = event.zoomOutDuration ?? 0.8;
+  const defaultHold = 1.4;
 
   return event.targets.map((tgt, idx) => ({
     id: `${event.id}-part-${idx}-${Math.round(tgt.timestamp * 100)}`,
@@ -213,7 +301,7 @@ export function ungroupClickEvent(event: ClickEvent): ClickEvent[] {
 }
 
 /**
- * Groups multiple discrete ClickEvents into a single unified multi-target ClickEvent
+ * Groups multiple discrete ClickEvents into a single unified multi-target ClickEvent with sticky anchors
  */
 export function groupClickEvents(
   events: ClickEvent[],
@@ -223,12 +311,12 @@ export function groupClickEvents(
   if (!events || events.length === 0) return null;
   if (events.length === 1) return events[0];
 
-  const allTargets: ClickTarget[] = [];
+  const rawTargets: ClickTarget[] = [];
   for (const ev of events) {
     if (ev.targets && ev.targets.length > 0) {
-      allTargets.push(...ev.targets);
+      rawTargets.push(...ev.targets);
     } else {
-      allTargets.push({
+      rawTargets.push({
         timestamp: ev.timestamp,
         x: ev.x,
         y: ev.y,
@@ -236,17 +324,20 @@ export function groupClickEvents(
       });
     }
   }
-  allTargets.sort((a, b) => a.timestamp - b.timestamp);
+  rawTargets.sort((a, b) => a.timestamp - b.timestamp);
+
+  // Apply sticky centroid anchoring for nearby buttons
+  const allTargets = applyStickyAnchorsToTargets(rawTargets, 0.18);
 
   const first = allTargets[0];
   const last = allTargets[allTargets.length - 1];
   const sortedEvents = events.slice().sort((a, b) => a.timestamp - b.timestamp);
   const firstEv = sortedEvents[0];
   const zoom = firstEv.zoom || defaultZoom;
-  const inDur = firstEv.zoomInDuration ?? 0.4;
-  const outDur = firstEv.zoomOutDuration ?? 0.4;
+  const inDur = firstEv.zoomInDuration ?? 0.8;
+  const outDur = firstEv.zoomOutDuration ?? 0.8;
   const span = last.timestamp - first.timestamp;
-  const holdDuration = Math.min(6.0, Math.max(1.0, Math.round((span + 0.8) * 10) / 10));
+  const holdDuration = Math.min(6.0, Math.max(1.2, Math.round((span + 1.2) * 10) / 10));
 
   const startTime = Math.round(first.timestamp * 100) / 100;
   const endTime = startTime + inDur + holdDuration + outDur;

@@ -3,8 +3,8 @@ import { Footer } from "@/components/common/Footer";
 import { AboutView } from "@/components/about/AboutView";
 
 export const metadata = {
-  title: "About Glideo — Screen Recording & Editing Studio",
-  description: "Learn about Glideo, the open-source screen recording and editing studio by Eric Va. Discover its purpose, local-first architecture, and mission.",
+  title: "About FucuFlow — Screen Recording & Auto-Zoom Studio",
+  description: "Learn about FucuFlow, the open-source screen recording and editing studio by Eric Va. Discover its purpose, local-first architecture, and mission.",
 };
 
 export default function AboutPage() {

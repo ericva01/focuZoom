@@ -11,7 +11,7 @@ export function Footer() {
           
           {/* Col 1: Brand & Newsletter */}
           <div className="col-span-2 md:col-span-4 space-y-4">
-            <Link href="/" aria-label="Glideo home">
+            <Link href="/" aria-label="FucuFlow home">
               <Logo size="md" theme="light" />
             </Link>
             <p className="text-xs text-[#667085] leading-relaxed max-w-sm">
@@ -65,18 +65,17 @@ export function Footer() {
             <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">Resources</p>
             <ul className="space-y-2 text-xs text-[#667085]">
               <li><Link href="/resources" className="hover:text-[#FF6B2C] transition-colors">Documentation</Link></li>
-              <li><Link href="/open-source" className="hover:text-[#FF6B2C] transition-colors">Open Source (MIT)</Link></li>
-              <li><Link href="/about" className="hover:text-[#FF6B2C] transition-colors">About Glideo</Link></li>
-              <li><Link href="/contact" className="hover:text-[#FF6B2C] transition-colors">Contact Support</Link></li>
-              <li><a href="https://github.com/ericva01/focuZoom/discussions" target="_blank" rel="noreferrer" className="hover:text-[#FF6B2C] transition-colors">Community Forum</a></li>
+              <li><Link href="/resources" className="hover:text-[#FF6B2C] transition-colors">Shortcuts</Link></li>
+              <li><Link href="/about" className="hover:text-[#FF6B2C] transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-[#FF6B2C] transition-colors">Contact</Link></li>
+              <li><Link href="/contact" className="hover:text-[#FF6B2C] transition-colors">Community</Link></li>
             </ul>
           </div>
 
-          {/* Col 5: Company & Legal */}
+          {/* Col 5: Trust & Legal */}
           <div className="col-span-1 md:col-span-2 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">Company</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">Trust</p>
             <ul className="space-y-2 text-xs text-[#667085]">
-              <li><Link href="/about" className="hover:text-[#FF6B2C] transition-colors">Our Story</Link></li>
               <li><Link href="/contact" className="hover:text-[#FF6B2C] transition-colors">Security & Trust</Link></li>
               <li><Link href="/about" className="hover:text-[#FF6B2C] transition-colors">Privacy Policy</Link></li>
               <li><Link href="/about" className="hover:text-[#FF6B2C] transition-colors">Terms of Service</Link></li>
@@ -87,7 +86,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#667085]">
-          <p>© {new Date().getFullYear()} Glideo Inc. All rights reserved. Crafted for high-impact teams.</p>
+          <p>© {new Date().getFullYear()} FucuFlow Inc. All rights reserved. Crafted for high-impact teams.</p>
           <div className="flex items-center gap-4">
             <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-[#FF6B2C] transition-colors" aria-label="GitHub">
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">

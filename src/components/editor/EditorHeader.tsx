@@ -125,7 +125,7 @@ function EditorHeaderBase({
   };
 
   return (
-    <header className="h-14 border-b border-white/[0.08] bg-[#090D16]/80 backdrop-blur-xl px-4 flex items-center justify-between z-30 select-none">
+    <header className="h-14 border-b border-slate-200 dark:border-white/[0.08] bg-white/90 dark:bg-[#090D16]/80 backdrop-blur-xl px-4 flex items-center justify-between z-30 select-none text-slate-800 dark:text-slate-100">
       {/* Left: Brand, Back & Sidebar Toggle */}
       <div className="flex items-center gap-2">
         {onToggleLeftCollapse && (
@@ -138,7 +138,7 @@ function EditorHeaderBase({
             {isLeftCollapsed ? (
               <PanelLeftOpen className="w-4 h-4 text-[#FF6B2C]" />
             ) : (
-              <PanelLeftClose className="w-4 h-4 text-slate-400" />
+              <PanelLeftClose className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             )}
           </Button>
         )}
@@ -154,7 +154,7 @@ function EditorHeaderBase({
         </Link>
 
         <div className="flex items-center gap-2.5 ml-1">
-          <Link href="/" title="Glideo Home">
+          <Link href="/" title="FucuFlow Home">
             <Logo size="sm" showText={false} />
           </Link>
 
@@ -168,15 +168,15 @@ function EditorHeaderBase({
                 onBlur={() => setIsEditingTitle(false)}
                 onKeyDown={(e) => e.key === "Enter" && setIsEditingTitle(false)}
                 autoFocus
-                className="glass-input text-white text-xs font-semibold px-2.5 py-1 rounded-lg outline-none w-48"
+                className="glass-input text-slate-900 dark:text-white text-xs font-semibold px-2.5 py-1 rounded-lg outline-none w-48"
               />
             ) : (
               <button
                 onClick={() => setIsEditingTitle(true)}
-                className="text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/[0.06] px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1.5 group border border-transparent hover:border-white/[0.08]"
+                className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/[0.06] px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1.5 group border border-transparent hover:border-slate-300 dark:hover:border-white/[0.08]"
               >
                 <span>{projectName}</span>
-                <span className="text-[10px] text-slate-500 group-hover:text-[#FF8A4C]">✎</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#FF8A4C]">✎</span>
               </button>
             )}
           </div>
@@ -184,9 +184,9 @@ function EditorHeaderBase({
       </div>
 
       {/* Center: Aspect Ratio Selector */}
-      <div className="hidden md:flex items-center gap-1 bg-white/[0.03] p-1 rounded-xl border border-white/[0.08] backdrop-blur-md text-xs">
-        <div className="flex items-center gap-1 px-2.5 text-slate-400 text-[11px] font-medium">
-          <Ratio className="w-3.5 h-3.5 text-slate-400" />
+      <div className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-white/[0.03] p-1 rounded-xl border border-slate-200 dark:border-white/[0.08] backdrop-blur-md text-xs">
+        <div className="flex items-center gap-1 px-2.5 text-slate-500 dark:text-slate-400 text-[11px] font-medium">
+          <Ratio className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
           <span>Canvas:</span>
         </div>
         {aspectRatios.map((ratio) => (
@@ -195,8 +195,8 @@ function EditorHeaderBase({
             onClick={() => onAspectRatioChange(ratio.value)}
             className={`px-3 py-1 rounded-lg font-medium transition-all duration-200 ${
               aspectRatio === ratio.value
-                ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-semibold border border-[#FF6B2C]/40 shadow-glass-sm"
-                : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.05]"
+                ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-semibold border border-[#FF6B2C]/40 shadow-glass-sm"
+                : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.05]"
             }`}
           >
             {ratio.label}
@@ -333,7 +333,7 @@ function EditorHeaderBase({
         </Button>
 
         {onUndo && (
-          <div className="flex items-center gap-0.5 bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.08]">
+          <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-white/[0.04] p-0.5 rounded-lg border border-slate-200 dark:border-white/[0.08]">
             <Button
               variant="ghost"
               size="icon-sm"
@@ -341,7 +341,7 @@ function EditorHeaderBase({
               disabled={!canUndo}
               title="Undo (Ctrl+Z)"
             >
-              <Undo2 className="w-3.5 h-3.5 text-slate-300" />
+              <Undo2 className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
             </Button>
             {onRedo && (
               <Button
@@ -351,7 +351,7 @@ function EditorHeaderBase({
                 disabled={!canRedo}
                 title="Redo (Ctrl+Y or Ctrl+Shift+Z)"
               >
-                <Redo2 className="w-3.5 h-3.5 text-slate-300" />
+                <Redo2 className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
               </Button>
             )}
           </div>
@@ -367,7 +367,7 @@ function EditorHeaderBase({
               title="Save project to local offline storage (Ctrl/Cmd+S)"
               leftIcon={
                 isSavedFeedback ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
                 ) : (
                   <Save className="w-3.5 h-3.5 text-[#FF6B2C]" />
                 )
@@ -376,7 +376,7 @@ function EditorHeaderBase({
               <span>{isSavedFeedback ? "Saved!" : "Save"}</span>
             </Button>
             {autoSaveStatus && (
-              <span className="text-[10px] text-emerald-400/90 font-mono hidden xl:inline animate-in fade-in">
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400/90 font-mono hidden xl:inline animate-in fade-in">
                 {autoSaveStatus}
               </span>
             )}
@@ -401,7 +401,7 @@ function EditorHeaderBase({
             title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
           >
             {theme === "light" ? (
-              <Moon className="w-3.5 h-3.5 text-slate-400 hover:text-slate-200" />
+              <Moon className="w-3.5 h-3.5 text-slate-600 hover:text-slate-900" />
             ) : (
               <Sun className="w-3.5 h-3.5 text-amber-400 hover:text-amber-300" />
             )}
@@ -415,7 +415,7 @@ function EditorHeaderBase({
             onClick={onOpenSettings}
             title="Settings (Theme, 5s Auto-Save, Storage)"
           >
-            <Settings className="w-3.5 h-3.5 text-slate-400 hover:text-white" />
+            <Settings className="w-3.5 h-3.5 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" />
           </Button>
         )}
 
@@ -439,7 +439,7 @@ function EditorHeaderBase({
             {isRightCollapsed ? (
               <PanelRightOpen className="w-4 h-4 text-[#FF6B2C]" />
             ) : (
-              <PanelRightClose className="w-4 h-4 text-slate-400" />
+              <PanelRightClose className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             )}
           </Button>
         )}

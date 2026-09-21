@@ -29,7 +29,7 @@ export function Navbar() {
 
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
-        <Link href="/" aria-label="Glideo home" className="flex items-center gap-2">
+        <Link href="/" aria-label="FucuFlow home" className="flex items-center gap-2">
           <Logo size="md" theme="light" />
         </Link>
 

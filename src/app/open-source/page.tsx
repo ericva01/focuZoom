@@ -5,8 +5,8 @@ import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import { ArrowRight, Sparkles, Code2, Heart, Terminal, Lock, CheckCircle2, Cpu } from "lucide-react";
 
 export const metadata = {
-  title: "Open Source — Glideo Studio",
-  description: "Glideo is 100% Free & Open Source under the permissive MIT License. Zero telemetry, local-first architecture, and community driven.",
+  title: "Open Source — FucuFlow Studio",
+  description: "FucuFlow is 100% Free & Open Source under the permissive MIT License. Zero telemetry, local-first architecture, and community driven.",
 };
 
 export default function OpenSourcePage() {

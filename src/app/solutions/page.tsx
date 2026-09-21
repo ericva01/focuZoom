@@ -5,8 +5,8 @@ import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import { ArrowRight, Sparkles, Terminal, Palette, Headphones, Video, Rocket, CheckCircle2 } from "lucide-react";
 
 export const metadata = {
-  title: "Solutions — Glideo Studio",
-  description: "Explore Glideo solutions for software engineering demos, product design critiques, customer success, async standups, and sales outreach.",
+  title: "Solutions — FucuFlow Studio",
+  description: "Explore FucuFlow solutions for software engineering demos, product design critiques, customer success, async standups, and sales outreach.",
 };
 
 const solutions = [

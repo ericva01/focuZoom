@@ -1,4 +1,4 @@
-name: "Release Glideo"
+name: "Release FucuFlow"
 
 on:
   push:
@@ -24,8 +24,8 @@ jobs:
             target: "aarch64-apple-darwin"
             description: "macOS Apple Silicon (.dmg)"
 
-          # Intel macOS -> produces .dmg and .app
-          - platform: "macos-13"
+          # Intel macOS -> cross-compiled on macos-latest (macos-13 has been retired by GitHub)
+          - platform: "macos-latest"
             target: "x86_64-apple-darwin"
             description: "macOS Intel (.dmg)"
 
@@ -79,22 +79,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.event.inputs.tag || github.ref_name }}
-          releaseName: 'Glideo ${{ github.event.inputs.tag || github.ref_name }}'
+          releaseName: 'FucuFlow ${{ github.event.inputs.tag || github.ref_name }}'
           releaseBody: |
-            ## Glideo Desktop Multi-Platform Release
+            ## FucuFlow Desktop Multi-Platform Release
             
             Download the native installer for your operating system:
             
             ### 🍎 macOS
-            - **Apple Silicon (M1 / M2 / M3 / M4)**: `Glideo_..._aarch64.dmg`
-            - **Intel Mac**: `Glideo_..._x64.dmg`
+            - **Apple Silicon (M1 / M2 / M3 / M4)**: `FucuFlow_..._aarch64.dmg`
+            - **Intel Mac**: `FucuFlow_..._x64.dmg`
             
             ### 🐧 Linux
-            - **Universal Linux (Recommended)**: `Glideo_..._amd64.AppImage` *(Run: `chmod +x Glideo*.AppImage && ./Glideo*.AppImage`)*
-            - **Debian / Ubuntu / Linux Mint**: `glideo_..._amd64.deb` *(Run: `sudo dpkg -i glideo*.deb`)*
+            - **Universal Linux (Recommended)**: `FucuFlow_..._amd64.AppImage` *(Run: `chmod +x FucuFlow*.AppImage && ./FucuFlow*.AppImage`)*
+            - **Debian / Ubuntu / Linux Mint**: `fucuflow_..._amd64.deb` *(Run: `sudo dpkg -i fucuflow*.deb`)*
             
             ### 🪟 Windows
-            - **Windows 10 / 11 64-bit**: `Glideo_..._x64-setup.exe` (or `.msi`)
+            - **Windows 10 / 11 64-bit**: `FucuFlow_..._x64-setup.exe` (or `.msi`)
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}

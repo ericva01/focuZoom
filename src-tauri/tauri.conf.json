@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Glideo",
+  "productName": "FucuFlow",
   "version": "0.1.0",
-  "identifier": "com.glideo.studio",
+  "identifier": "com.fucuflow.studio",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Glideo",
+        "title": "FucuFlow",
         "url": "desktop",
         "width": 1440,
         "height": 920,

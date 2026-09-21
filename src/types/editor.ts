@@ -36,6 +36,7 @@ export interface ClickTarget {
   x: number; // normalized 0.0 to 1.0
   y: number; // normalized 0.0 to 1.0
   label?: string;
+  zoom?: number;
 }
 
 export interface CursorPoint {

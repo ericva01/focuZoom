@@ -6,8 +6,8 @@ import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import { ArrowRight, Focus, ShieldCheck, Sparkles, Sliders, CheckCircle2 } from "lucide-react";
 
 export const metadata = {
-  title: "Product Overview — Glideo Studio",
-  description: "Discover Glideo's complete studio suite for modern screen recordings, automated zoom keyframes, and local-first video creation.",
+  title: "Product Overview — FucuFlow Studio",
+  description: "Discover FucuFlow's complete studio suite for modern screen recordings, automated zoom keyframes, and local-first video creation.",
 };
 
 export default function ProductPage() {

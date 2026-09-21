@@ -182,11 +182,23 @@ function sampleCursorTrajectory(
             y: clamp(seqTargets[i].y, 0.02, 0.98),
           };
         }
-        // Pan in advance towards target B so camera is already centered on the target at click timestamp tB
-        const panDuration = Math.min(0.8, segSpan * 0.75);
+
+        // Sticky camera lock for nearby buttons:
+        // If distance between target A and target B is within 18% of screen,
+        // keep the camera locked and sticky at target A. Do not jerk or pan between adjacent buttons!
+        const targetDist = Math.hypot(seqTargets[i + 1].x - seqTargets[i].x, seqTargets[i + 1].y - seqTargets[i].y);
+        if (targetDist < 0.18) {
+          return {
+            x: clamp(seqTargets[i].x, 0.02, 0.98),
+            y: clamp(seqTargets[i].y, 0.02, 0.98),
+          };
+        }
+
+        // For genuinely distant targets: smooth, slow, gentle pan towards target B
+        const panDuration = Math.min(1.2, Math.max(0.6, segSpan * 0.75));
         const panStartTime = tB - panDuration;
         if (effectiveTime < panStartTime) {
-          // Hold at target A
+          // Hold steady at target A
           return {
             x: clamp(seqTargets[i].x, 0.02, 0.98),
             y: clamp(seqTargets[i].y, 0.02, 0.98),
@@ -1084,9 +1096,9 @@ export function useThreeAnimationEngine(
         const event = curEvents[i];
         if (!event.enabled) continue;
 
-        const zoomInDuration = Math.max(0.15, event.zoomInDuration ?? curConfig.zoomDuration ?? 0.45);
-        const holdDuration = Math.max(0.2, event.holdDuration ?? curConfig.zoomHoldDuration ?? 1.2);
-        const zoomOutDuration = Math.max(0.15, event.zoomOutDuration ?? curConfig.zoomOutDuration ?? curConfig.zoomDuration ?? 0.45);
+        const zoomInDuration = Math.max(0.3, event.zoomInDuration ?? curConfig.zoomDuration ?? 0.85);
+        const holdDuration = Math.max(0.4, event.holdDuration ?? curConfig.zoomHoldDuration ?? 1.4);
+        const zoomOutDuration = Math.max(0.3, event.zoomOutDuration ?? curConfig.zoomOutDuration ?? curConfig.zoomDuration ?? 0.85);
         const startTime = event.timestamp;
         const peakTime = startTime + zoomInDuration;
         const holdEndTime = peakTime + holdDuration;
@@ -1203,8 +1215,8 @@ export function useThreeAnimationEngine(
         smoothStateRef.current.velLookX = 0;
         smoothStateRef.current.velLookY = 0;
       } else {
-        // Highly responsive critically damped follower eliminating lag and micro-stutter
-        const camSmoothTime = zoomProgress > 0.05 ? 0.08 : 0.14;
+        // Highly responsive critically damped follower with gentle cinematic deceleration
+        const camSmoothTime = zoomProgress > 0.05 ? 0.32 : 0.38;
         const velXObj = { current: smoothStateRef.current.velCamX };
         const velYObj = { current: smoothStateRef.current.velCamY };
         const velZObj = { current: smoothStateRef.current.velCamZ };

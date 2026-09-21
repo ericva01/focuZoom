@@ -368,13 +368,13 @@ function VideoCanvasBase({
       {/* Empty Timeline Stage Overlay when video clip has been deleted */}
       {clips !== undefined && clips.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 p-4 animate-in fade-in duration-200">
-          <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-[#090D16]/85 border border-white/10 backdrop-blur-md shadow-glass-lg max-w-sm text-center">
+          <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-white/90 dark:bg-[#090D16]/85 border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-glass-lg max-w-sm text-center">
             <div className="w-12 h-12 rounded-xl bg-[#FF6B2C]/10 border border-[#FF6B2C]/20 flex items-center justify-center text-[#FF6B2C]">
               <Film className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Timeline is Empty</p>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-sm font-semibold text-slate-800 dark:text-white">Timeline is Empty</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 The video clip was deleted from the timeline. Record screen or import video to continue editing.
               </p>
             </div>
@@ -409,9 +409,9 @@ function VideoCanvasBase({
       {/* Canvas Wrapper - Centered Bounding Box */}
       <div
         onContextMenu={(e) => e.preventDefault()}
-        className={`relative flex items-center justify-center max-h-full max-w-full rounded-2xl overflow-hidden shadow-glass-lg border border-white/[0.12] group ${
+        className={`relative flex items-center justify-center max-h-full max-w-full rounded-2xl overflow-hidden shadow-glass-lg border border-slate-300 dark:border-white/[0.12] group ${
           config.backgroundType === "transparent"
-            ? "bg-[#090D16] [background-image:linear-gradient(45deg,rgba(255,255,255,0.03)_25%,transparent_25%),linear-gradient(-45deg,rgba(255,255,255,0.03)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgba(255,255,255,0.03)_75%),linear-gradient(-45deg,transparent_75%,rgba(255,255,255,0.03)_75%)] [background-size:20px_20px] [background-position:0_0,0_10px,10px_-10px,-10px_0px]"
+            ? "bg-slate-200 dark:bg-[#090D16] [background-image:linear-gradient(45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(-45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgba(0,0,0,0.05)_75%),linear-gradient(-45deg,transparent_75%,rgba(0,0,0,0.05)_75%)] [background-size:20px_20px] [background-position:0_0,0_10px,10px_-10px,-10px_0px]"
             : "bg-transparent"
         }`}
         style={{
@@ -601,9 +601,9 @@ function VideoCanvasBase({
                     } ${webcamStream || effectiveWebcamUrl ? "opacity-100" : "opacity-0"}`}
                   />
                   {!(webcamStream || effectiveWebcamUrl) && (
-                    <div className="absolute inset-0 bg-[#090D16]/90 flex flex-col items-center justify-center gap-1.5 text-slate-400 p-2 text-center pointer-events-none">
+                    <div className="absolute inset-0 bg-white/90 dark:bg-[#090D16]/90 flex flex-col items-center justify-center gap-1.5 text-slate-500 dark:text-slate-400 p-2 text-center pointer-events-none">
                       <Camera className="w-6 h-6 text-[#FF6B2C] animate-pulse" />
-                      <span className="text-[9px] font-mono text-slate-300">Camera Active</span>
+                      <span className="text-[9px] font-mono text-slate-700 dark:text-slate-300">Camera Active</span>
                     </div>
                   )}
                   {/* Subtle hover badge */}
