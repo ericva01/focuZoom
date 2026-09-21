@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { SecuritySection } from "@/components/landing/SecuritySection";
-import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import {
   ArrowRight,
@@ -356,9 +355,6 @@ export default function FeaturesPage() {
           <SecuritySection />
         </div>
 
-        <div className="content-auto">
-          <AnalyticsSection />
-        </div>
 
         {/* Final CTA */}
         <FinalCtaSection />

@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
-import { CollaborationShowcase } from "@/components/landing/CollaborationShowcase";
-import { MeetingExperience } from "@/components/landing/MeetingExperience";
-import { TeamWorkspaceSection } from "@/components/landing/TeamWorkspaceSection";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import { ArrowRight, Sparkles, Terminal, Palette, Headphones, Video, Rocket, CheckCircle2 } from "lucide-react";
 
@@ -161,19 +158,6 @@ export default function SolutionsPage() {
             </div>
           </div>
         </section>
-
-        {/* Supporting Showcases */}
-        <div className="content-auto">
-          <CollaborationShowcase />
-        </div>
-
-        <div className="content-auto">
-          <MeetingExperience />
-        </div>
-
-        <div className="content-auto">
-          <TeamWorkspaceSection />
-        </div>
 
         {/* Final CTA */}
         <FinalCtaSection />

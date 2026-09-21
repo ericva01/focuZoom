@@ -5,12 +5,7 @@ import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { CoreFeaturesSection } from "@/components/landing/CoreFeaturesSection";
-import { CollaborationShowcase } from "@/components/landing/CollaborationShowcase";
 import { RecordingWorkflow } from "@/components/landing/RecordingWorkflow";
-import { MeetingExperience } from "@/components/landing/MeetingExperience";
-import { TeamWorkspaceSection } from "@/components/landing/TeamWorkspaceSection";
-import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
-import { IntegrationsSection } from "@/components/landing/IntegrationsSection";
 import { SecuritySection } from "@/components/landing/SecuritySection";
 import { OpenSourcePillarsSection } from "@/components/landing/OpenSourcePillarsSection";
 import { FaqSection } from "@/components/landing/FaqSection";
@@ -25,7 +20,10 @@ export default function LandingPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isDesktop = isDesktopApp();
-      const isDesktopQuery = window.location.search.includes("desktop=true");
+      const isDesktopQuery =
+        window.location.search.includes("desktop=true") ||
+        window.location.search.includes("view=desktop") ||
+        window.location.search.includes("view");
       setIsDesktopMode(isDesktop || isDesktopQuery);
     }
   }, []);
@@ -48,58 +46,33 @@ export default function LandingPage() {
           <CoreFeaturesSection />
         </div>
 
-        {/* 4. Video Collaboration Showcase */}
-        <div className="content-auto">
-          <CollaborationShowcase />
-        </div>
-
-        {/* 5. Recording Workflow Pipeline */}
+        {/* 3. Recording Workflow Pipeline */}
         <div className="content-auto">
           <RecordingWorkflow />
         </div>
 
-        {/* 6. Meeting Experience Showcase */}
-        <div className="content-auto">
-          <MeetingExperience />
-        </div>
-
-        {/* 7. Team Workspace */}
-        <div className="content-auto">
-          <TeamWorkspaceSection />
-        </div>
-
-        {/* 8. Analytics */}
-        <div className="content-auto">
-          <AnalyticsSection />
-        </div>
-
-        {/* 9. Integrations */}
-        <div className="content-auto">
-          <IntegrationsSection />
-        </div>
-
-        {/* 10. Security */}
+        {/* 4. Security & Local-First */}
         <div className="content-auto">
           <SecuritySection />
         </div>
 
-        {/* 11. Open Source Pillars */}
+        {/* 5. 100% Free & Open Source Pillars */}
         <div className="content-auto">
           <OpenSourcePillarsSection />
         </div>
 
-        {/* 12. FAQ */}
+        {/* 6. FAQ */}
         <div className="content-auto">
           <FaqSection />
         </div>
 
-        {/* 13. Final CTA */}
+        {/* 7. Final CTA */}
         <div className="content-auto">
           <FinalCtaSection />
         </div>
       </main>
 
-      {/* 14. Footer */}
+      {/* 8. Footer */}
       <Footer />
     </div>
   );

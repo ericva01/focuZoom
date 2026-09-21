@@ -80,10 +80,10 @@ export function Navbar() {
           </button>
 
           <Link
-            href="/editor"
+            href="/desktop"
             className="inline-flex items-center gap-2 rounded-xl bg-[#FF6B2C] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-all duration-150 hover:bg-[#E85A1F] hover:shadow-[0_4px_14px_rgba(255,107,44,0.35)] active:scale-95"
           >
-            <span>Launch Studio</span>
+            <span>Launch App</span>
             <ArrowRight size={14} />
           </Link>
 
@@ -125,11 +125,11 @@ export function Navbar() {
 
               <div className="mt-auto space-y-2 pt-6">
                 <Link
-                  href="/editor"
+                  href="/desktop"
                   onClick={() => setOpen(false)}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF6B2C] py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#E85A1F]"
                 >
-                  <span>Get Started Free</span>
+                  <span>Launch App</span>
                   <ArrowRight size={16} />
                 </Link>
                 <button

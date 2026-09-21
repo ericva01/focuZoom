@@ -1255,9 +1255,9 @@ export default function EditorPage() {
 
       {/* Floating Active Recording HUD Overlay */}
       {screenRecorder.isRecording && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3.5 px-5 py-2.5 rounded-xl glass-panel-elevated border-rose-500/40 shadow-[0_0_35px_rgba(244,63,94,0.25)] animate-pulse">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3.5 px-5 py-2.5 rounded-xl glass-panel-elevated border-[#FF6B2C]/40 shadow-[0_0_35px_rgba(255,107,44,0.3)] animate-pulse">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF6B2C] animate-ping" />
             <span className="text-xs font-bold text-white tracking-wide uppercase">
               Screen Recording Active
             </span>
@@ -1265,7 +1265,7 @@ export default function EditorPage() {
 
           <div className="h-4 w-px bg-white/20" />
 
-          <div className="text-xs font-mono text-rose-400 font-bold">
+          <div className="text-xs font-mono text-[#FF8A4C] font-bold">
             {Math.floor(screenRecorder.recordingDuration / 60).toString().padStart(2, "0")}:
             {Math.floor(screenRecorder.recordingDuration % 60).toString().padStart(2, "0")}
           </div>
@@ -1273,7 +1273,7 @@ export default function EditorPage() {
           <div className="h-4 w-px bg-white/20" />
 
           <div className="text-xs text-slate-300 flex items-center gap-1.5">
-            <span className="text-rose-300 font-bold font-mono bg-rose-500/20 border border-rose-400/30 px-2 py-0.5 rounded-md text-[11px]">
+            <span className="text-[#FF8A4C] font-bold font-mono bg-[#FFF1E8]/15 border border-[#FF6B2C]/30 px-2 py-0.5 rounded-md text-[11px]">
               {screenRecorder.clickCount}
             </span>
             <span className="text-[11px] text-slate-400">
@@ -1285,7 +1285,7 @@ export default function EditorPage() {
 
           <button
             onClick={screenRecorder.stopRecording}
-            className="flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-md shadow-rose-600/30 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold shadow-md shadow-[#FF6B2C]/30 transition-all"
           >
             <span>Stop & Import</span>
           </button>
@@ -1294,13 +1294,13 @@ export default function EditorPage() {
 
       {/* Screen Recorder Error Notification */}
       {screenRecorder.error && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl glass-panel border-rose-500/50 text-rose-200 text-xs shadow-xl backdrop-blur-xl">
-          <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl glass-panel border-[#FF6B2C]/50 text-orange-200 text-xs shadow-xl backdrop-blur-xl">
+          <AlertCircle className="w-4 h-4 text-[#FF6B2C] flex-shrink-0" />
           <span>{screenRecorder.error}</span>
           <button
             type="button"
             onClick={screenRecorder.clearError}
-            className="text-rose-400 hover:text-white ml-2 p-0.5 rounded transition-colors cursor-pointer"
+            className="text-[#FF6B2C] hover:text-white ml-2 p-0.5 rounded transition-colors cursor-pointer"
             title="Dismiss error"
           >
             ✕
@@ -1343,7 +1343,7 @@ export default function EditorPage() {
         {/* Draggable Divider between Monitor and Inspector */}
         <div
           onMouseDown={handleStartDragDivider}
-          className="relative w-1.5 hover:w-2 bg-white/[0.06] hover:bg-rose-500/40 active:bg-rose-500/60 cursor-col-resize flex-shrink-0 transition-colors z-20 group flex items-center justify-center select-none"
+          className="relative w-1.5 hover:w-2 bg-white/[0.06] hover:bg-[#FF6B2C]/40 active:bg-[#FF6B2C]/60 cursor-col-resize flex-shrink-0 transition-colors z-20 group flex items-center justify-center select-none"
           title="Drag to resize Inspector panel"
         >
           {/* Collapse / Expand toggle button on divider */}
@@ -1356,7 +1356,7 @@ export default function EditorPage() {
             title={isInspectorCollapsed ? "Expand Inspector" : "Collapse Inspector"}
           >
             {isInspectorCollapsed ? (
-              <ChevronLeft className="w-3 h-3 text-rose-400" />
+              <ChevronLeft className="w-3 h-3 text-[#FF6B2C]" />
             ) : (
               <ChevronRight className="w-3 h-3 text-slate-400" />
             )}
@@ -1411,7 +1411,7 @@ export default function EditorPage() {
                       customX: 0.85,
                       customY: 0.82,
                       size: 180,
-                      borderColor: "#fb7185",
+                      borderColor: "#FF6B2C",
                       borderWidth: 3,
                       shadow: true,
                       mirror: true,

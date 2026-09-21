@@ -38,7 +38,11 @@ declare global {
 
 export function isTauriEnvironment(): boolean {
   if (typeof window === "undefined") return false;
-  return Boolean(window.__TAURI_INTERNALS__ || window.__TAURI__);
+  return Boolean(
+    window.__TAURI_INTERNALS__ ||
+    window.__TAURI__ ||
+    (window as unknown as { __TAURI_METADATA__?: unknown }).__TAURI_METADATA__
+  );
 }
 
 export function isElectronEnvironment(): boolean {
