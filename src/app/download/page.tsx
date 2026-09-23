@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   Download,
   Monitor,
@@ -284,6 +285,7 @@ function getPlatformIcon(platform: PlatformType) {
 }
 
 export default function DownloadPage() {
+  const { t, isKhmer, localePath } = useLanguage();
   const [releases, setReleases] = useState<GitHubRelease[]>(FALLBACK_RELEASES);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -1043,3 +1045,6 @@ export default function DownloadPage() {
     </div>
   );
 }
+
+export { DownloadPage as DownloadView };
+

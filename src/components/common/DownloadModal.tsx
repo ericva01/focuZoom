@@ -15,6 +15,8 @@ import {
   Code2,
 } from "lucide-react";
 
+import { useLanguage } from "@/context/LanguageContext";
+
 interface DownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,6 +27,7 @@ const GITHUB_REPO = "ericva01/focuZoom";
 const GITHUB_RELEASES_PAGE = `https://github.com/${GITHUB_REPO}/releases/latest`;
 
 export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
+  const { t } = useLanguage();
   const [userOS, setUserOS] = useState<"win" | "mac" | "linux">("win");
   const [activeDownloadOS, setActiveDownloadOS] = useState<"win" | "mac" | "linux">("win");
   const [downloadStarted, setDownloadStarted] = useState(false);
@@ -184,10 +187,10 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
           </div>
 
           <h3 className="text-2xl sm:text-3xl font-extrabold text-[#111318] tracking-tight">
-            Download FucuFlow Desktop
+            {t.download.modalTitle}
           </h3>
           <p className="text-[#667085] text-xs sm:text-sm mt-1.5 max-w-md mx-auto leading-relaxed">
-            Experience 100% offline recording, local hardware acceleration, and automated 3D camera zooms directly on your device.
+            {t.download.modalDesc}
           </p>
         </div>
 

@@ -1,28 +1,35 @@
 "use client";
 
 import { ShieldCheck, Lock, KeyRound, ServerOff, FileCheck, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function SecuritySection() {
+  const { t } = useLanguage();
+
   const securityItems = [
     {
+      id: "zero-cloud",
       icon: ServerOff,
-      title: "Local-First Architecture",
-      desc: "Video frames and audio buffers are processed entirely on your local machine using hardware-accelerated WebCodecs. Proprietary screen footage never touches third-party servers.",
+      title: t.security.pillars.p1.title,
+      desc: t.security.pillars.p1.desc,
     },
     {
+      id: "offline-capable",
       icon: Lock,
-      title: "End-to-End Encryption",
-      desc: "When sharing links with teammates, videos are encrypted in-transit with TLS 1.3 and at-rest using AES-256 with user-controlled customer-managed encryption keys (CMEK).",
+      title: t.security.pillars.p2.title,
+      desc: t.security.pillars.p2.desc,
     },
     {
+      id: "hardware-accelerated",
       icon: KeyRound,
-      title: "Enterprise SSO & SAML 2.0",
-      desc: "Seamlessly authenticate using Okta, Google Workspace, Azure Active Directory, or OneLogin with automated SCIM provisioning and de-provisioning.",
+      title: t.security.pillars.p3.title,
+      desc: t.security.pillars.p3.desc,
     },
     {
+      id: "transparent-auditable",
       icon: FileCheck,
-      title: "SOC-2 Type II & GDPR Compliant",
-      desc: "FucuFlow adheres to rigorous annual independent third-party audits verifying our data protection, operational security, and European privacy standards.",
+      title: t.security.pillars.p4.title,
+      desc: t.security.pillars.p4.desc,
     },
   ];
 
@@ -33,13 +40,13 @@ export function SecuritySection() {
         <div className="max-w-3xl mx-auto text-center mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-bold uppercase tracking-wider text-[#FF8A4C]">
             <ShieldCheck size={14} />
-            <span>Enterprise Hardened</span>
+            <span>{t.security.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Security and privacy built into the foundation.
+            {t.security.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Your proprietary codebase, design files, and client meetings deserve uncompromising protection.
+            {t.security.subtitle}
           </p>
         </div>
 
@@ -49,7 +56,7 @@ export function SecuritySection() {
             const Icon = item.icon;
             return (
               <div
-                key={item.title}
+                key={item.id}
                 className="p-8 rounded-2xl sm:rounded-3xl bg-[#0F1116] border border-white/10 shadow-sm hover:border-[#FF6B2C]/50 transition-all duration-200"
               >
                 <div className="w-12 h-12 rounded-xl bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-[#FF8A4C] flex items-center justify-center mb-6">

@@ -20,10 +20,12 @@ import {
   Maximize2,
 } from "lucide-react";
 import { DownloadModal } from "@/components/common/DownloadModal";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function HeroSection() {
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
+  const { t } = useLanguage();
 
   const containerRef = useRef<HTMLElement | null>(null);
   const pillRef = useRef<HTMLDivElement | null>(null);
@@ -125,9 +127,9 @@ export function HeroSection() {
             className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-1.5 text-xs font-medium text-[#111318] shadow-sm transition-all hover:border-[#FF6B2C]/40"
           >
             <span className="flex h-2 w-2 rounded-full bg-[#FF6B2C] animate-pulse" />
-            <span className="text-[#FF6B2C] font-semibold">New</span>
+            <span className="text-[#FF6B2C] font-semibold">FucuFlow</span>
             <span className="text-[#667085]">|</span>
-            <span>FucuFlow 2.0 Studio Overview</span>
+            <span>{t.hero.pill}</span>
             <ArrowRight size={13} className="text-[#667085]" />
           </Link>
         </div>
@@ -135,14 +137,14 @@ export function HeroSection() {
         {/* Hero Headline & Supporting Text */}
         <div className="mt-8 text-center max-w-4xl mx-auto">
           <h1 ref={headlineRef} className="text-4xl font-bold tracking-tight text-[#111318] sm:text-6xl sm:leading-[1.12] lg:text-7xl">
-            Everything you need to <br className="hidden sm:inline" />
+            {t.hero.titleMain} <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#111318] via-[#FF6B2C] to-[#E85A1F]">
-              communicate through video.
+              {t.hero.titleGradient}
             </span>
           </h1>
 
           <p ref={subtextRef} className="mt-6 text-base leading-7 text-[#667085] sm:text-xl sm:leading-8 max-w-2xl mx-auto">
-            Create, share, record, and collaborate through video with a simple workspace built for modern teams.
+            {t.hero.subtitle}
           </p>
 
           {/* Action Buttons */}
@@ -151,16 +153,16 @@ export function HeroSection() {
               href="/editor"
               className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#FF6B2C] px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[#E85A1F] hover:shadow-[0_8px_20px_rgba(255,107,44,0.3)] active:scale-95"
             >
-              <span>Get Started</span>
+              <span>{t.hero.launchStudio}</span>
               <ArrowRight size={17} />
             </Link>
 
             <Link
-              href="/desktop"
+              href="/download"
               className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-[#E5E7EB] bg-white px-7 py-3.5 text-sm font-semibold text-[#111318] shadow-sm transition-all duration-150 hover:bg-[#F8F9FB] hover:border-[#D1D5DB] active:scale-95"
             >
               <Play size={15} className="text-[#FF6B2C] fill-[#FF6B2C]" />
-              <span>Explore FucuFlow</span>
+              <span>{t.hero.downloadClient}</span>
             </Link>
           </div>
 
@@ -168,15 +170,15 @@ export function HeroSection() {
           <div ref={badgesRef} className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-[#667085]">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />
-              <span>100% Free &amp; Open Source</span>
+              <span>{t.hero.badges.free}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />
-              <span>MIT Licensed on GitHub</span>
+              <span>{t.hero.badges.privacy}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />
-              <span>100% Local User Storage &amp; Privacy</span>
+              <span>{t.hero.badges.export4k}</span>
             </div>
           </div>
         </div>

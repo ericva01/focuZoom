@@ -2,8 +2,11 @@
 
 import { Check, ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function OpenSourcePillarsSection() {
+  const { t } = useLanguage();
+
   const pillars = [
     {
       name: "Community Edition",
@@ -11,8 +14,8 @@ export function OpenSourcePillarsSection() {
       highlight: true,
       price: "$0",
       period: "forever free for everyone",
-      desc: "Full-featured studio for individual creators, engineers, and educators.",
-      cta: "Launch Studio Free",
+      desc: t.openSource.columns.col1.desc,
+      cta: t.hero.launchStudio,
       ctaLink: "/editor",
       features: [
         "Unlimited 4K 60 FPS recording",
@@ -29,7 +32,7 @@ export function OpenSourcePillarsSection() {
       highlight: false,
       price: "Free",
       period: "open source repository",
-      desc: "Inspect the code, self-host, or contribute features directly on GitHub.",
+      desc: t.openSource.columns.col3.desc,
       cta: "Star on GitHub",
       ctaLink: "https://github.com/ericva01/focuZoom",
       isExternal: true,
@@ -48,8 +51,8 @@ export function OpenSourcePillarsSection() {
       highlight: false,
       price: "100%",
       period: "local & private on your device",
-      desc: "Your recordings stay exclusively on your hardware. No cloud tracking.",
-      cta: "Download Desktop Client",
+      desc: t.openSource.columns.col2.desc,
+      cta: t.hero.downloadClient,
       ctaLink: "/desktop",
       features: [
         "Zero cloud uploads or server storage",
@@ -69,13 +72,13 @@ export function OpenSourcePillarsSection() {
         <div className="max-w-3xl mx-auto text-center mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-bold uppercase tracking-wider text-[#FF6B2C]">
             <Heart size={14} className="fill-[#FF6B2C]" />
-            <span>100% Free & Open Source</span>
+            <span>{t.openSource.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#111318]">
-            Free forever. Community driven. Stored locally.
+            {t.openSource.title}
           </h2>
           <p className="text-[#667085] text-base sm:text-lg leading-relaxed">
-            No subscription fees, no paywalls, and zero cloud lock-in. FucuFlow is built for creators and engineers who value privacy and open source freedom.
+            {t.openSource.subtitle}
           </p>
         </div>
 

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Mail, Check, Copy, MessageSquare, Bug, GitPullRequest } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function ContactInfo() {
   const [copied, setCopied] = useState(false);
+  const { t, isKhmer } = useLanguage();
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText("ericva014@gmail.com");
@@ -21,7 +23,7 @@ export function ContactInfo() {
           <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#FF6B2C] bg-[#FFF1E8] px-3 py-1 rounded-full border border-[#FF6B2C]/20">
             CONNECT // DIRECT
           </span>
-          <span className="text-xs font-mono text-[#667085]">24H RESPONSE</span>
+          <span className="text-xs font-mono text-[#667085]">{isKhmer ? "ឆ្លើយតបក្នុង ២៤ ម៉ោង" : "24H RESPONSE"}</span>
         </div>
 
         <div className="flex items-center gap-4 mb-6">
@@ -35,9 +37,11 @@ export function ContactInfo() {
             />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-[#111318]">FucuFlow Community</h3>
+            <h3 className="text-xl font-bold text-[#111318]">
+              {isKhmer ? "សហគមន៍ FucuFlow" : "FucuFlow Community"}
+            </h3>
             <p className="text-xs text-[#667085] leading-relaxed">
-              Open communication channel with Eric Va and contributors.
+              {isKhmer ? "បណ្តាញទំនាក់ទំនងបើកចំហជាមួយ Eric Va និងសមាជិកចូលរួម។" : "Open communication channel with Eric Va and contributors."}
             </p>
           </div>
         </div>
@@ -45,15 +49,15 @@ export function ContactInfo() {
         <div className="space-y-3 pt-4 border-t border-[#E5E7EB]">
           <div className="flex items-center gap-2.5 text-xs text-[#111318]">
             <MessageSquare size={15} className="text-[#FF6B2C] shrink-0" />
-            <span>Feature suggestions & UI feedback</span>
+            <span>{isKhmer ? "សំណើមុខងារថ្មី & មតិយោបល់ UI" : "Feature suggestions & UI feedback"}</span>
           </div>
           <div className="flex items-center gap-2.5 text-xs text-[#111318]">
             <Bug size={15} className="text-[#FF6B2C] shrink-0" />
-            <span>Bug triage & desktop bridge questions</span>
+            <span>{isKhmer ? "រាយការណ៍ Bug & សំណួរ Desktop Bridge" : "Bug triage & desktop bridge questions"}</span>
           </div>
           <div className="flex items-center gap-2.5 text-xs text-[#111318]">
             <GitPullRequest size={15} className="text-[#FF6B2C] shrink-0" />
-            <span>Open source pull request reviews</span>
+            <span>{isKhmer ? "ការត្រួតពិនិត្យ Open Source Pull Request" : "Open source pull request reviews"}</span>
           </div>
         </div>
       </div>
@@ -65,7 +69,9 @@ export function ContactInfo() {
             <Mail className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-[11px] text-[#667085] font-mono">Direct Developer Email</div>
+            <div className="text-[11px] text-[#667085] font-mono">
+              {t.contactPage?.info?.emailTitle || (isKhmer ? "អ៊ីមែលអ្នកអភិវឌ្ឍន៍ផ្ទាល់" : "Direct Developer Email")}
+            </div>
             <div className="text-sm font-semibold text-[#111318] font-mono">ericva014@gmail.com</div>
           </div>
         </div>
@@ -77,12 +83,12 @@ export function ContactInfo() {
           {copied ? (
             <>
               <Check className="w-3 h-3 text-[#FF6B2C]" />
-              <span>Copied</span>
+              <span>{isKhmer ? "បានចម្លង" : "Copied"}</span>
             </>
           ) : (
             <>
               <Copy className="w-3 h-3 text-[#667085]" />
-              <span>Copy</span>
+              <span>{isKhmer ? "ចម្លង" : "Copy"}</span>
             </>
           )}
         </button>
@@ -94,7 +100,9 @@ export function ContactInfo() {
           <MessageSquare className="w-5 h-5 text-[#FF8A4C]" />
           <div>
             <div className="text-xs font-bold text-white">GitHub Discussions</div>
-            <div className="text-[11px] text-slate-400">Join the public community debate</div>
+            <div className="text-[11px] text-slate-400">
+              {isKhmer ? "ចូលរួមការពិភាក្សាក្នុងសហគមន៍សាធារណៈ" : "Join the public community debate"}
+            </div>
           </div>
         </div>
         <a
@@ -103,7 +111,7 @@ export function ContactInfo() {
           rel="noreferrer"
           className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-[#FF6B2C] text-xs font-semibold text-white transition-all"
         >
-          Visit Forum
+          {isKhmer ? "ចូលរួមវេទិកា" : "Visit Forum"}
         </a>
       </div>
     </div>

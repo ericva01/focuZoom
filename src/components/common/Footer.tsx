@@ -4,10 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/common/Logo";
 import { Check, ArrowRight } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 
 export function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const { t, localePath } = useLanguage();
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,19 +28,19 @@ export function Footer() {
           
           {/* Col 1: Brand & Newsletter */}
           <div className="col-span-2 md:col-span-4 space-y-4">
-            <Link href="/" aria-label="FucuFlow home">
+            <Link href={localePath("/")} aria-label="FucuFlow home">
               <Logo size="md" theme="light" />
             </Link>
             <p className="text-xs text-[#667085] leading-relaxed max-w-sm">
-              The modern video collaboration workspace. Record, auto-zoom, polish, and communicate with high-impact clarity. 100% free and open source.
+              {t.footer.desc}
             </p>
 
             <div className="pt-2">
-              <p className="text-xs font-semibold text-[#111318] mb-2">Subscribe to product updates</p>
+              <p className="text-xs font-semibold text-[#111318] mb-2">{t.footer.subscribeTitle}</p>
               {subscribed ? (
                 <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium">
                   <Check size={14} className="text-emerald-600" />
-                  <span>You’re subscribed to updates!</span>
+                  <span>{t.footer.subscribedMsg}</span>
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="flex items-center gap-2 max-w-sm">
@@ -45,7 +48,7 @@ export function Footer() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your work email"
+                    placeholder={t.footer.subscribePlaceholder}
                     required
                     className="w-full rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] px-3.5 py-2 text-xs text-[#111318] placeholder-[#667085] focus:outline-none focus:border-[#FF6B2C] focus:bg-white transition-colors"
                   />
@@ -53,65 +56,66 @@ export function Footer() {
                     type="submit"
                     className="rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white px-4 py-2 text-xs font-semibold shrink-0 transition-colors shadow-xs active:scale-95 cursor-pointer"
                   >
-                    Join
+                    {t.footer.subscribeBtn}
                   </button>
                 </form>
               )}
             </div>
 
-            <div className="pt-1">
+            <div className="pt-1 flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>All studio systems operational</span>
+                <span>{t.footer.systemStatus}</span>
               </span>
+              <LanguageSwitcher variant="footer" />
             </div>
           </div>
 
           {/* Col 2: Product */}
           <div className="col-span-1 md:col-span-2 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">Product</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">{t.footer.colProduct}</p>
             <ul className="space-y-2 text-xs text-[#667085]">
-              <li><Link href="/product" className="hover:text-[#FF6B2C] transition-colors">Overview</Link></li>
-              <li><Link href="/features" className="hover:text-[#FF6B2C] transition-colors">Features</Link></li>
-              <li><Link href="/editor" className="hover:text-[#FF6B2C] transition-colors">Web Studio</Link></li>
-              <li><Link href="/desktop" className="hover:text-[#FF6B2C] transition-colors">Desktop App</Link></li>
-              <li><Link href="/open-source" className="hover:text-[#FF6B2C] transition-colors">Open Source (MIT)</Link></li>
-              <li><Link href="/download" className="hover:text-[#FF6B2C] transition-colors">Downloads &amp; Releases</Link></li>
+              <li><Link href={localePath("/product")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.overview}</Link></li>
+              <li><Link href={localePath("/features")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.features}</Link></li>
+              <li><Link href={localePath("/editor")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.webStudio}</Link></li>
+              <li><Link href={localePath("/desktop")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.desktopApp}</Link></li>
+              <li><Link href={localePath("/open-source")} className="hover:text-[#FF6B2C] transition-colors">{t.nav.openSource} (MIT)</Link></li>
+              <li><Link href={localePath("/download")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.downloads}</Link></li>
             </ul>
           </div>
 
           {/* Col 3: Solutions */}
           <div className="col-span-1 md:col-span-2 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">Solutions</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">{t.footer.colSolutions}</p>
             <ul className="space-y-2 text-xs text-[#667085]">
-              <li><Link href="/solutions#engineering" className="hover:text-[#FF6B2C] transition-colors">Engineering Demos</Link></li>
-              <li><Link href="/solutions#design" className="hover:text-[#FF6B2C] transition-colors">Design Critiques</Link></li>
-              <li><Link href="/solutions#success" className="hover:text-[#FF6B2C] transition-colors">Customer Success</Link></li>
-              <li><Link href="/solutions#standups" className="hover:text-[#FF6B2C] transition-colors">Async Standups</Link></li>
-              <li><Link href="/solutions#sales" className="hover:text-[#FF6B2C] transition-colors">Sales Outreach</Link></li>
+              <li><Link href={localePath("/solutions#engineering")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.solutionsList.engineering}</Link></li>
+              <li><Link href={localePath("/solutions#design")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.solutionsList.design}</Link></li>
+              <li><Link href={localePath("/solutions#success")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.solutionsList.success}</Link></li>
+              <li><Link href={localePath("/solutions#standups")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.solutionsList.standups}</Link></li>
+              <li><Link href={localePath("/solutions#sales")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.solutionsList.sales}</Link></li>
             </ul>
           </div>
 
           {/* Col 4: Resources */}
           <div className="col-span-1 md:col-span-2 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">Resources</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">{t.footer.colResources}</p>
             <ul className="space-y-2 text-xs text-[#667085]">
-              <li><Link href="/resources" className="hover:text-[#FF6B2C] transition-colors">Documentation</Link></li>
-              <li><Link href="/resources" className="hover:text-[#FF6B2C] transition-colors">Shortcuts</Link></li>
-              <li><Link href="/about" className="hover:text-[#FF6B2C] transition-colors">About FucuFlow</Link></li>
-              <li><Link href="/contact" className="hover:text-[#FF6B2C] transition-colors">Contact Us</Link></li>
+              <li><Link href={localePath("/resources")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.docs}</Link></li>
+              <li><Link href={localePath("/resources")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.shortcuts}</Link></li>
+              <li><Link href={localePath("/about")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.overview}</Link></li>
+              <li><Link href={localePath("/contact")} className="hover:text-[#FF6B2C] transition-colors">Contact</Link></li>
               <li><a href="https://github.com/ericva01/focuZoom" target="_blank" rel="noreferrer" className="hover:text-[#FF6B2C] transition-colors">GitHub Repository</a></li>
             </ul>
           </div>
 
           {/* Col 5: Trust & Community */}
           <div className="col-span-1 md:col-span-2 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">Trust &amp; Legal</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#111318]">{t.footer.colLegal}</p>
             <ul className="space-y-2 text-xs text-[#667085]">
-              <li><Link href="/open-source" className="hover:text-[#FF6B2C] transition-colors">MIT License</Link></li>
-              <li><Link href="/open-source" className="hover:text-[#FF6B2C] transition-colors">Privacy Architecture</Link></li>
-              <li><Link href="/contact" className="hover:text-[#FF6B2C] transition-colors">Report an Issue</Link></li>
-              <li><Link href="/contact" className="hover:text-[#FF6B2C] transition-colors">Security &amp; Audits</Link></li>
+              <li><Link href={localePath("/open-source")} className="hover:text-[#FF6B2C] transition-colors">MIT License</Link></li>
+              <li><Link href={localePath("/open-source")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.privacyPolicy}</Link></li>
+              <li><Link href={localePath("/contact")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.terms}</Link></li>
+              <li><Link href={localePath("/contact")} className="hover:text-[#FF6B2C] transition-colors">{t.footer.security}</Link></li>
               <li><a href="https://github.com/ericva01/focuZoom/releases" target="_blank" rel="noreferrer" className="hover:text-[#FF6B2C] transition-colors">Changelog</a></li>
             </ul>
           </div>
@@ -119,7 +123,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#667085]">
-          <p>© {new Date().getFullYear()} FucuFlow. Built by Eric Va &amp; Contributors. 100% Free &amp; Open Source.</p>
+          <p>© {new Date().getFullYear()} FucuFlow. Built by Eric Va &amp; Contributors. {t.footer.rights}</p>
           <div className="flex items-center gap-4">
             <a
               href="https://github.com/ericva01/focuZoom"

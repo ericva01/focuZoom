@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Minus, HelpCircle } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface FaqItem {
   question: string;
@@ -11,39 +12,9 @@ interface FaqItem {
 
 export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { t } = useLanguage();
 
-  const faqs: FaqItem[] = [
-    {
-      question: "How does FucuFlow achieve 60 FPS recording directly inside the browser?",
-      answer:
-        "FucuFlow uses the modern W3C WebCodecs and WebGL 2.0 API standards. Rather than relying on heavyweight server queues or slow canvas capture, your local graphics hardware handles hardware-accelerated encoding (H.264/AV1/VP9) in real time with near-zero CPU overhead.",
-      category: "Technology",
-    },
-    {
-      question: "Do my screen captures or webcam recordings get uploaded to any cloud server?",
-      answer:
-        "No. FucuFlow is built completely local-first. All recordings, focal zoom processing, and video exports take place strictly on your local device hardware. Your video files remain on your local disk.",
-      category: "Privacy",
-    },
-    {
-      question: "How does the Automated Camera Zoom feature work?",
-      answer:
-        "FucuFlow tracks cursor activity, click clustering, and window events across time. It calculates Catmull-Rom spline curves with critically damped spring physics to glide the virtual camera seamlessly into the area of user focus, completely eliminating jarring visual cuts.",
-      category: "Features",
-    },
-    {
-      question: "Can I collaborate on video reviews with team members who don't have an account?",
-      answer:
-        "Yes! Public or password-protected review links permit teammates, clients, and external stakeholders to leave time-coded comments, reactions, and annotations directly without forcing them to register an account.",
-      category: "Collaboration",
-    },
-    {
-      question: "Does FucuFlow support desktop apps for macOS, Windows, and Linux?",
-      answer:
-        "Yes, in addition to the zero-install web application, FucuFlow offers lightweight native desktop applications built on Tauri and Rust, providing system tray quick recording, global hotkeys, and multi-monitor capture.",
-      category: "Platforms",
-    },
-  ];
+  const faqs: FaqItem[] = t.faq.items;
 
   return (
     <section id="resources" className="py-20 lg:py-28 bg-white border-t border-[#E5E7EB] select-none">
@@ -52,13 +23,13 @@ export function FaqSection() {
         <div className="text-center mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-bold uppercase tracking-wider text-[#FF6B2C]">
             <HelpCircle size={14} />
-            <span>Got Questions?</span>
+            <span>{t.faq.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#111318]">
-            Frequently asked questions
+            {t.faq.title}
           </h2>
           <p className="text-[#667085] text-base sm:text-lg leading-relaxed">
-            Everything you need to know about the product, local processing, and team collaboration.
+            {t.faq.subtitle}
           </p>
         </div>
 

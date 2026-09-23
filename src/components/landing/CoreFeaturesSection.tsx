@@ -14,68 +14,71 @@ import {
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function CoreFeaturesSection() {
+  const { t } = useLanguage();
+
   const features = [
     {
-      badge: "Record",
-      title: "Capture high-quality video and meetings.",
-      description:
-        "High-definition 4K 60 FPS recording with automatic cursor zoom, noise-canceling mic isolation, and zero-latency client encoding.",
+      id: "record",
+      badge: t.features.cards.record.badge,
+      title: t.features.cards.record.title,
+      description: t.features.cards.record.desc,
       icon: Video,
       variant: "white",
-      highlight: "Auto-zoom & 60 FPS WebCodecs",
+      highlight: t.features.cards.record.highlight,
       link: "/editor",
     },
     {
-      badge: "Collaborate",
-      title: "Work together with your team in one workspace.",
-      description:
-        "Time-stamped comments, interactive video reviews, and live emoji reactions so remote teams stay aligned without back-and-forth emails.",
+      id: "collaborate",
+      badge: t.features.cards.collaborate.badge,
+      title: t.features.cards.collaborate.title,
+      description: t.features.cards.collaborate.desc,
       icon: Users,
       variant: "soft-orange",
-      highlight: "Time-coded comments & reactions",
+      highlight: t.features.cards.collaborate.highlight,
       link: "/desktop",
     },
     {
-      badge: "Share",
-      title: "Share videos quickly with your team or clients.",
-      description:
-        "Instant link generation with customizable permissions, expiring links, password protection, and one-click embeddable players.",
+      id: "share",
+      badge: t.features.cards.share.badge,
+      title: t.features.cards.share.title,
+      description: t.features.cards.share.desc,
       icon: Share2,
       variant: "white",
-      highlight: "Instant link & password control",
+      highlight: t.features.cards.share.highlight,
       link: "/editor",
     },
     {
-      badge: "Manage",
-      title: "Organize meetings, recordings, and content.",
-      description:
-        "Categorize recordings with smart tags, workspace folders, and automated transcription indexing for lightning-fast retrieval.",
+      id: "manage",
+      badge: t.features.cards.manage.badge,
+      title: t.features.cards.manage.title,
+      description: t.features.cards.manage.desc,
       icon: FolderKanban,
       variant: "dark",
-      highlight: "Smart folders & automated indexing",
+      highlight: t.features.cards.manage.highlight,
       link: "/desktop",
     },
     {
-      badge: "Analyze",
-      title: "Understand video engagement and activity.",
-      description:
-        "Track viewer retention curves, total watch time, drop-off percentages, and discover which segments your audience replayed most.",
-      icon: BarChart3,
-      variant: "white",
-      highlight: "Retention curves & viewer drop-off",
-      link: "/desktop",
-    },
-    {
-      badge: "Integrate",
-      title: "Connect FucuFlow with the tools your team already uses.",
-      description:
-        "Native two-way integrations with Slack, Notion, Jira, GitHub, and Figma to streamline daily asynchronous workflows.",
+      id: "canvas",
+      badge: t.features.cards.canvas.badge,
+      title: t.features.cards.canvas.title,
+      description: t.features.cards.canvas.desc,
       icon: Boxes,
-      variant: "soft-orange",
-      highlight: "Slack, Notion, Figma & Jira sync",
+      variant: "white",
+      highlight: t.features.cards.canvas.highlight,
       link: "/desktop",
+    },
+    {
+      id: "export",
+      badge: t.features.cards.export.badge,
+      title: t.features.cards.export.title,
+      description: t.features.cards.export.desc,
+      icon: BarChart3,
+      variant: "soft-orange",
+      highlight: t.features.cards.export.highlight,
+      link: "/editor",
     },
   ];
 
@@ -126,13 +129,13 @@ export function CoreFeaturesSection() {
         <div ref={headerRef} className="max-w-3xl mx-auto text-center mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-bold uppercase tracking-wider text-[#FF6B2C]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
-            <span>Modular Platform</span>
+            <span>{t.features.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#111318]">
-            Modular video architecture for modern teams.
+            {t.features.title}
           </h2>
           <p className="text-[#667085] text-base sm:text-lg leading-relaxed">
-            Everything you need to capture, organize, and collaborate through video in one structured ecosystem.
+            {t.features.subtitle}
           </p>
         </div>
 
@@ -144,7 +147,7 @@ export function CoreFeaturesSection() {
             if (item.variant === "dark") {
               return (
                 <div
-                  key={item.badge}
+                  key={item.id}
                   className="rounded-2xl sm:rounded-3xl p-7 bg-[#17191F] text-white border border-white/10 shadow-sm flex flex-col justify-between transition-all duration-200 hover:shadow-lg hover:-translate-y-1 group"
                 >
                   <div>
@@ -185,7 +188,7 @@ export function CoreFeaturesSection() {
             if (item.variant === "soft-orange") {
               return (
                 <div
-                  key={item.badge}
+                  key={item.id}
                   className="rounded-2xl sm:rounded-3xl p-7 bg-[#FFF1E8] border border-[#FF6B2C]/30 shadow-sm flex flex-col justify-between transition-all duration-200 hover:shadow-md hover:-translate-y-1 group"
                 >
                   <div>
@@ -226,7 +229,7 @@ export function CoreFeaturesSection() {
             // Default: White Card
             return (
               <div
-                key={item.badge}
+                key={item.id}
                 className="rounded-2xl sm:rounded-3xl p-7 bg-white border border-[#E5E7EB] shadow-sm flex flex-col justify-between transition-all duration-200 hover:shadow-md hover:-translate-y-1 hover:border-[#FF6B2C]/40 group"
               >
                 <div>
