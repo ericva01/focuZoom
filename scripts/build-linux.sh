@@ -2,12 +2,12 @@
 set -e
 
 # ==============================================================================
-# Glideo - Linux Build Script (.deb and .AppImage)
+# FucuFlow - Linux Build Script (.deb and .AppImage)
 # Can be run directly on Ubuntu/Debian, inside WSL2, or in a Docker container.
 # ==============================================================================
 
 echo "================================================="
-echo "  Glideo Linux Installer Build"
+echo "  FucuFlow Linux Installer Build"
 echo "================================================="
 
 # 1. Check & install system dependencies

@@ -47,7 +47,8 @@ export function ExportModal({
   const [exportFolder, setExportFolder] = useState<string | null>(null);
   const [isSelectingFolder, setIsSelectingFolder] = useState<boolean>(false);
   const [fileSize, setFileSize] = useState<string | null>(null);
-  const [bitrate, setBitrate] = useState<number>(8000000); // 8 Mbps
+  const initialBitrate = canvasRef.current && canvasRef.current.width >= 3000 ? 32000000 : canvasRef.current && canvasRef.current.width >= 2000 ? 18000000 : 10000000;
+  const [bitrate, setBitrate] = useState<number>(initialBitrate);
   const [exportFps, setExportFps] = useState<30 | 60>(60);
   const [remainingSec, setRemainingSec] = useState<number>(Math.ceil(duration));
 
@@ -491,7 +492,17 @@ export function ExportModal({
             <div className="space-y-2 glass-panel p-3.5 rounded-xl">
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Resolution</span>
-                <span className="text-white font-mono">1080p (60 FPS)</span>
+                <span className="text-white font-mono">
+                  {canvasRef.current
+                    ? `${canvasRef.current.width}x${canvasRef.current.height} (${
+                        canvasRef.current.width >= 3000
+                          ? "4K UHD"
+                          : canvasRef.current.width >= 2000
+                          ? "2K QHD"
+                          : "1080p FHD"
+                      })`
+                    : "4K UHD (3840x2160)"}
+                </span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Duration</span>
@@ -623,7 +634,7 @@ export function ExportModal({
                 <span>Estimated Export Duration: ~{Math.ceil(duration)}s</span>
               </div>
               <p className="text-[10px] text-slate-400 leading-relaxed">
-                Glideo simulates 3D camera dollies, motion blurs, cursor trails, and webcam bubbles in real time frame-by-frame. Export plays through the recording from 0s to {duration.toFixed(0)}s to render every effect.
+                FucuFlow simulates 3D camera dollies, motion blurs, cursor trails, and webcam bubbles in real time frame-by-frame. Export plays through the recording from 0s to {duration.toFixed(0)}s to render every effect.
               </p>
             </div>
 

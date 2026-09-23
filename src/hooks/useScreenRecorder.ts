@@ -475,7 +475,7 @@ export function useScreenRecorder({
             });
           }
         } catch (electronErr) {
-          console.warn("[Glideo] Native Electron desktop stream fallback to getDisplayMedia:", electronErr);
+          console.warn("[FucuFlow] Native Electron desktop stream fallback to getDisplayMedia:", electronErr);
         }
       }
 

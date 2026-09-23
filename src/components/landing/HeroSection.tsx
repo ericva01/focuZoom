@@ -13,7 +13,6 @@ import {
   Search,
   Users,
   Clock,
-  Sparkles,
   CheckCircle2,
   Layers,
   BarChart3,
@@ -128,7 +127,7 @@ export function HeroSection() {
             <span className="flex h-2 w-2 rounded-full bg-[#FF6B2C] animate-pulse" />
             <span className="text-[#FF6B2C] font-semibold">New</span>
             <span className="text-[#667085]">|</span>
-            <span>Glideo 2.0 Studio Overview</span>
+            <span>FucuFlow 2.0 Studio Overview</span>
             <ArrowRight size={13} className="text-[#667085]" />
           </Link>
         </div>
@@ -161,7 +160,7 @@ export function HeroSection() {
               className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-[#E5E7EB] bg-white px-7 py-3.5 text-sm font-semibold text-[#111318] shadow-sm transition-all duration-150 hover:bg-[#F8F9FB] hover:border-[#D1D5DB] active:scale-95"
             >
               <Play size={15} className="text-[#FF6B2C] fill-[#FF6B2C]" />
-              <span>Explore Glideo</span>
+              <span>Explore FucuFlow</span>
             </Link>
           </div>
 
@@ -169,7 +168,7 @@ export function HeroSection() {
           <div ref={badgesRef} className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-[#667085]">
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />
-              <span>100% Free & Open Source</span>
+              <span>100% Free &amp; Open Source</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />
@@ -177,12 +176,12 @@ export function HeroSection() {
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />
-              <span>100% Local User Storage & Privacy</span>
+              <span>100% Local User Storage &amp; Privacy</span>
             </div>
           </div>
         </div>
 
-        {/* Hero Visual: Polished Glideo Video Workspace / Dashboard Preview */}
+        {/* Hero Visual: Polished FucuFlow Video Workspace / Dashboard Preview */}
         <div ref={previewRef} className="mt-14 sm:mt-18 relative">
           {/* Subtle Outer Drop Shadow Card Frame */}
           <div className="relative rounded-2xl sm:rounded-3xl border border-[#E5E7EB] bg-white p-2 sm:p-3.5 shadow-[0_20px_50px_rgba(16,24,40,0.08)]">
@@ -196,9 +195,9 @@ export function HeroSection() {
                   <div className="flex items-center justify-between p-2 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB] mb-5">
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-6 h-6 rounded-lg bg-[#FF6B2C] text-white flex items-center justify-center font-bold text-xs">
-                        G
+                        F
                       </div>
-                      <span className="text-xs font-semibold text-[#111318] truncate">Glideo HQ</span>
+                      <span className="text-xs font-semibold text-[#111318] truncate">FucuFlow HQ</span>
                     </div>
                     <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#FFF1E8] text-[#FF6B2C]">Open Source</span>
                   </div>
@@ -321,7 +320,7 @@ export function HeroSection() {
                         <div className="flex items-center justify-between z-10">
                           <div className="flex items-center gap-2">
                             <span className="rounded-md bg-black/60 backdrop-blur-md px-2.5 py-1 text-[10px] font-medium text-white border border-white/10">
-                              Screen: Glideo Studio Timeline (60 FPS)
+                              Screen: FucuFlow Studio Timeline (60 FPS)
                             </span>
                           </div>
                           <span className="flex items-center gap-1.5 rounded-full bg-[#FF6B2C]/90 text-white px-2.5 py-0.5 text-[10px] font-semibold">
@@ -332,10 +331,9 @@ export function HeroSection() {
                         {/* Center Visual Mockup */}
                         <div className="text-center space-y-2 select-none z-10">
                           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white backdrop-blur-md">
-                            <Sparkles size={13} className="text-[#FF6B2C]" />
                             <span>Smooth Focal Auto-Zoom 2.4x applied</span>
                           </div>
-                          <p className="text-xs text-slate-400">Glideo Canvas Hardware Decode WebCodecs</p>
+                          <p className="text-xs text-slate-400">FucuFlow Canvas Hardware Decode WebCodecs</p>
                         </div>
 
                         {/* Bottom Video Controls Bar */}

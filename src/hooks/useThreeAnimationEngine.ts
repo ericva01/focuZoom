@@ -759,7 +759,7 @@ export function useThreeAnimationEngine(
       preserveDrawingBuffer: true,
       powerPreference: "high-performance",
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
     renderer.setSize(canvas.width, canvas.height, false);
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = 1.0;

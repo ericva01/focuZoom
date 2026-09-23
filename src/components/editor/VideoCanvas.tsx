@@ -12,7 +12,7 @@ import {
   Maximize,
   Minimize,
 } from "lucide-react";
-import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint, TimelineClip } from "@/types/editor";
+import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint, TimelineClip, getCanvasResolution } from "@/types/editor";
 import { useThreeAnimationEngine } from "@/hooks/useThreeAnimationEngine";
 import { clamp } from "@/utils/easing";
 
@@ -198,37 +198,20 @@ function VideoCanvasBase({
     clips
   );
 
-  // Set internal canvas resolution based on Aspect Ratio
+  // Set internal canvas resolution dynamically based on Aspect Ratio & Resolution Preset
+  const { width: targetWidth, height: targetHeight } = useMemo(() => {
+    return getCanvasResolution(aspectRatio, config.resolutionPreset || "4k");
+  }, [aspectRatio, config.resolutionPreset]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    let w = 1920;
-    let h = 1080;
-
-    switch (aspectRatio) {
-      case "9:16":
-        w = 1080;
-        h = 1920;
-        break;
-      case "4:3":
-        w = 1440;
-        h = 1080;
-        break;
-      case "1:1":
-        w = 1080;
-        h = 1080;
-        break;
-      case "16:9":
-      default:
-        w = 1920;
-        h = 1080;
-        break;
+    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
     }
-
-    canvas.width = w;
-    canvas.height = h;
-  }, [aspectRatio, canvasRef]);
+  }, [targetWidth, targetHeight, canvasRef]);
 
   // Handle clicking on the canvas to place a zoom point with precise video-frame mapping
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -343,9 +326,8 @@ function VideoCanvasBase({
       ? "4 / 3"
       : "1 / 1";
 
-  const defaultWidth =
-    aspectRatio === "9:16" ? 1080 : aspectRatio === "4:3" ? 1440 : aspectRatio === "1:1" ? 1080 : 1920;
-  const defaultHeight = aspectRatio === "9:16" ? 1920 : 1080;
+  const defaultWidth = targetWidth;
+  const defaultHeight = targetHeight;
 
   return (
     <div

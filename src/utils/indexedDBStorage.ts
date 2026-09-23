@@ -1,10 +1,11 @@
 import { SavedProject, saveProject as saveToLocalStorage, getSavedProjects, deleteProject as deleteFromLocalStorage } from "./projectStorage";
 
-const DB_NAME = "glideo_storage_db";
+const DB_NAME = "fucuflow_storage_db";
 const DB_VERSION = 1;
 const STORE_PROJECTS = "projects";
 const STORE_MEDIA = "media";
-const LAST_PROJECT_KEY = "glideo_last_active_project_id";
+const LAST_PROJECT_KEY = "fucuflow_last_active_project_id";
+const LEGACY_LAST_PROJECT_KEY = "glideo_last_active_project_id";
 
 export interface MediaRecord {
   id: string;
@@ -96,7 +97,7 @@ export async function saveProjectWithMedia(
     saveToLocalStorage(lightweightProject);
     setLastActiveProjectId(project.id);
   } catch (err) {
-    console.error("[Glideo DB] Error saving project to IndexedDB:", err);
+    console.error("[FucuFlow DB] Error saving project to IndexedDB:", err);
     saveToLocalStorage(projectToSave);
     setLastActiveProjectId(project.id);
   }
@@ -144,7 +145,7 @@ export async function loadProjectWithMedia(
       webcamBlob: media?.webcamBlob || null,
     };
   } catch (err) {
-    console.warn("[Glideo DB] Failed to read from IndexedDB, trying localStorage fallback:", err);
+    console.warn("[FucuFlow DB] Failed to read from IndexedDB, trying localStorage fallback:", err);
     const localList = getSavedProjects();
     const localProj = localList.find((p) => p.id === id);
     if (!localProj) return null;
@@ -172,7 +173,7 @@ export async function getAllProjectsFromDB(): Promise<SavedProject[]> {
       return projects.sort((a, b) => b.updatedAt - a.updatedAt);
     }
   } catch (err) {
-    console.warn("[Glideo DB] Failed to get all projects from DB:", err);
+    console.warn("[FucuFlow DB] Failed to get all projects from DB:", err);
   }
 
   return getSavedProjects();
@@ -190,19 +191,20 @@ export async function deleteProjectFromDB(id: string): Promise<void> {
     tx.objectStore(STORE_PROJECTS).delete(id);
     tx.objectStore(STORE_MEDIA).delete(id);
   } catch (err) {
-    console.warn("[Glideo DB] Failed to delete from IndexedDB:", err);
+    console.warn("[FucuFlow DB] Failed to delete from IndexedDB:", err);
   }
 
   deleteFromLocalStorage(id);
 
   if (getLastActiveProjectId() === id) {
     localStorage.removeItem(LAST_PROJECT_KEY);
+    localStorage.removeItem(LEGACY_LAST_PROJECT_KEY);
   }
 }
 
 export function getLastActiveProjectId(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(LAST_PROJECT_KEY);
+  return localStorage.getItem(LAST_PROJECT_KEY) || localStorage.getItem(LEGACY_LAST_PROJECT_KEY);
 }
 
 export function setLastActiveProjectId(id: string): void {

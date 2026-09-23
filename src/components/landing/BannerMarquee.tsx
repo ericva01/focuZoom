@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
+
 
 export function BannerMarquee() {
   const techLogos = [
@@ -30,7 +30,7 @@ export function BannerMarquee() {
         {/* Center Luminous Headline overlaying the 3D wave */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/60 border border-white/15 backdrop-blur-xl text-xs font-mono text-rose-300 mb-4 shadow-lg">
-            <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
             <span>UNCOMPROMISING PRECISION</span>
           </div>
           <h2 className="text-3xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)] max-w-5xl">

@@ -1,7 +1,7 @@
-# Glideo — Cinematic Screen Recording Post-Processing Studio
+# FucuFlow — Cinematic Screen Recording Post-Processing Studio
 
 <p align="center">
-  <img src="public/logo.png" alt="Glideo Logo" width="100" />
+  <img src="public/logo.png" alt="FucuFlow Logo" width="100" />
 </p>
 
 <p align="center">
@@ -42,8 +42,8 @@ Download the latest Windows installer from the [Releases Page](https://github.co
 
 | Format | Download |
 | :--- | :--- |
-| **Windows Setup (.exe)** | [Download Glideo Setup](https://github.com/ericva01/focuZoom/releases/latest) |
-| **Windows Installer (.msi)** | [Download Glideo MSI](https://github.com/ericva01/focuZoom/releases/latest) |
+| **Windows Setup (.exe)** | [Download FucuFlow Setup](https://github.com/ericva01/focuZoom/releases/latest) |
+| **Windows Installer (.msi)** | [Download FucuFlow MSI](https://github.com/ericva01/focuZoom/releases/latest) |
 
 ---
 

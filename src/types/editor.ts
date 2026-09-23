@@ -1,5 +1,7 @@
 export type AspectRatio = "16:9" | "9:16" | "4:3" | "1:1";
 
+export type ResolutionPreset = "4k" | "2k" | "1080p";
+
 export type EasingType = "cubic-out" | "spring" | "smooth-step" | "linear";
 
 export type BackgroundType = "gradient" | "solid" | "image" | "transparent";
@@ -105,6 +107,7 @@ export interface CanvasConfig {
 
   // General Playback & Canvas
   aspectRatio: AspectRatio;
+  resolutionPreset?: ResolutionPreset; // "4k" (3840x2160), "2k" (2560x1440), "1080p" (1920x1080)
   playbackSpeed: number;
 
   // Webcam Picture-in-Picture (PiP) Configuration
@@ -155,4 +158,52 @@ export interface TimelineClip {
 }
 
 export type TimelineTrackType = "keyframe" | "video" | "audio";
+
+export function getCanvasResolution(
+  aspectRatio: AspectRatio,
+  resolutionPreset: ResolutionPreset = "4k"
+): { width: number; height: number; label: string } {
+  switch (resolutionPreset) {
+    case "4k": {
+      switch (aspectRatio) {
+        case "9:16":
+          return { width: 2160, height: 3840, label: "4K UHD" };
+        case "4:3":
+          return { width: 2880, height: 2160, label: "4K UHD" };
+        case "1:1":
+          return { width: 2160, height: 2160, label: "4K UHD" };
+        case "16:9":
+        default:
+          return { width: 3840, height: 2160, label: "4K UHD" };
+      }
+    }
+    case "2k": {
+      switch (aspectRatio) {
+        case "9:16":
+          return { width: 1440, height: 2560, label: "2K QHD" };
+        case "4:3":
+          return { width: 1920, height: 1440, label: "2K QHD" };
+        case "1:1":
+          return { width: 1440, height: 1440, label: "2K QHD" };
+        case "16:9":
+        default:
+          return { width: 2560, height: 1440, label: "2K QHD" };
+      }
+    }
+    case "1080p":
+    default: {
+      switch (aspectRatio) {
+        case "9:16":
+          return { width: 1080, height: 1920, label: "1080p FHD" };
+        case "4:3":
+          return { width: 1440, height: 1080, label: "1080p FHD" };
+        case "1:1":
+          return { width: 1080, height: 1080, label: "1080p FHD" };
+        case "16:9":
+        default:
+          return { width: 1920, height: 1080, label: "1080p FHD" };
+      }
+    }
+  }
+}
 

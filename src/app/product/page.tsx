@@ -3,7 +3,7 @@ import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { RecordingWorkflow } from "@/components/landing/RecordingWorkflow";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
-import { ArrowRight, Focus, ShieldCheck, Sparkles, Sliders, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Focus, ShieldCheck, Sliders, CheckCircle2 } from "lucide-react";
 
 export const metadata = {
   title: "Product Overview — FucuFlow Studio",
@@ -21,7 +21,7 @@ export default function ProductPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-semibold text-[#FF6B2C] mb-6">
-                <Sparkles size={14} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                 <span>The Video Studio Reimagined</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111318] leading-[1.1]">

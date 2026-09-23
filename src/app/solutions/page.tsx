@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
-import { ArrowRight, Sparkles, Terminal, Palette, Headphones, Video, Rocket, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Terminal, Palette, Headphones, Video, Rocket, CheckCircle2 } from "lucide-react";
 
 export const metadata = {
   title: "Solutions — FucuFlow Studio",
@@ -83,14 +83,14 @@ export default function SolutionsPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-semibold text-[#FF6B2C] mb-6">
-                <Sparkles size={14} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                 <span>Use Cases & Solutions</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111318] leading-[1.1]">
                 Built for the ways modern <span className="text-[#FF6B2C]">teams</span> work.
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-[#667085] leading-relaxed">
-                Whether you are demonstrating code, reviewing a UI prototype, or recording an async team update, Glideo brings studio-quality visual focus to every recording.
+                Whether you are demonstrating code, reviewing a UI prototype, or recording an async team update, FucuFlow brings studio-quality visual focus to every recording.
               </p>
               <div className="mt-8 flex items-center gap-4">
                 <Link
@@ -135,11 +135,11 @@ export default function SolutionsPage() {
                     </div>
                     <div className="lg:col-span-5 bg-[#17191F] rounded-2xl p-6 text-white border border-white/10 shadow-lg">
                       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                        <span className="text-xs font-mono text-[#FF8A4C]">Glideo Workflow #{index + 1}</span>
+                        <span className="text-xs font-mono text-[#FF8A4C]">FucuFlow Workflow #{index + 1}</span>
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-slate-300">Offline & Fast</span>
                       </div>
                       <p className="text-sm font-medium leading-relaxed text-slate-200">
-                        &quot;Recording with Glideo takes 2 minutes and saves our team 30 minutes of synchronous meeting time every sprint.&quot;
+                        &quot;Recording with FucuFlow takes 2 minutes and saves our team 30 minutes of synchronous meeting time every sprint.&quot;
                       </p>
                       <div className="mt-6 flex items-center justify-between">
                         <Link

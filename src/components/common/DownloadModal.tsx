@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   Zap,
   ExternalLink,
-  Sparkles,
+  Code2,
 } from "lucide-react";
 
 interface DownloadModalProps {
@@ -346,7 +346,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             <span>GPU Accelerated</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-[#FF6B2C]" />
+            <Code2 className="w-4 h-4 text-[#FF6B2C]" />
             <span>MIT Open Source</span>
           </span>
         </div>

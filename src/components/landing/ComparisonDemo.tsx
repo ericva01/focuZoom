@@ -14,9 +14,7 @@ export function ComparisonDemo() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-14 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md text-xs font-medium text-[#FF8A4C]">
-            <svg className="w-3.5 h-3.5 text-[#FF6B2C] fill-current" viewBox="0 0 24 24">
-              <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-            </svg>
+            <SlidersHorizontal className="w-3.5 h-3.5 text-[#FF6B2C]" />
             <span>Visual Comparison</span>
           </div>
 
@@ -28,7 +26,7 @@ export function ComparisonDemo() {
           </h2>
 
           <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
-            Drag the slider to compare raw unedited screen captures against Glideo&apos;s auto-zoomed studio output.
+            Drag the slider to compare raw unedited screen captures against FucuFlow&apos;s auto-zoomed studio output.
           </p>
         </div>
 
@@ -43,7 +41,7 @@ export function ComparisonDemo() {
                   <span className="w-2.5 h-2.5 rounded-full bg-[#FF6B2C]/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
-                  <span className="text-xs font-mono text-slate-300 ml-2">Glideo (Zoomed & Framed)</span>
+                  <span className="text-xs font-mono text-slate-300 ml-2">FucuFlow (Zoomed & Framed)</span>
                 </div>
 
                 <div className="scale-125 transition-transform duration-300 space-y-2.5">
@@ -110,7 +108,7 @@ export function ComparisonDemo() {
 
             <div className="absolute top-4 right-4 z-10 pointer-events-none">
               <span className="px-3 py-1.5 rounded-full text-[11px] font-mono font-medium bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30 backdrop-blur-md shadow-[0_0_15px_rgba(255,107,44,0.3)]">
-                After: Glideo
+                After: FucuFlow
               </span>
             </div>
           </div>

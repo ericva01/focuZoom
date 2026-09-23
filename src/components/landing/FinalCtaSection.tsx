@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 export function FinalCtaSection() {
   return (
@@ -13,7 +13,6 @@ export function FinalCtaSection() {
 
           <div className="relative z-10 max-w-3xl mx-auto space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-bold uppercase tracking-wider text-[#FF8A4C]">
-              <Sparkles size={14} />
               <span>Start in 30 Seconds</span>
             </div>
 
@@ -22,7 +21,7 @@ export function FinalCtaSection() {
             </h2>
 
             <p className="text-slate-300 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-              Join thousands of creators, engineers, and modern product teams using Glideo to tell clearer video stories.
+              Join thousands of creators, engineers, and modern product teams using FucuFlow to tell clearer video stories.
             </p>
 
             <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
@@ -41,7 +40,6 @@ export function FinalCtaSection() {
                 className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 px-8 py-4 text-sm font-bold text-white transition-all active:scale-95"
               >
                 <span>Star on GitHub</span>
-                <span className="text-[#FF6B2C]">★</span>
               </a>
             </div>
 

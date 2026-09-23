@@ -12,7 +12,6 @@ import {
   BarChart3,
   Boxes,
   ArrowRight,
-  Sparkles,
   CheckCircle2,
 } from "lucide-react";
 
@@ -70,7 +69,7 @@ export function CoreFeaturesSection() {
     },
     {
       badge: "Integrate",
-      title: "Connect Glideo with the tools your team already uses.",
+      title: "Connect FucuFlow with the tools your team already uses.",
       description:
         "Native two-way integrations with Slack, Notion, Jira, GitHub, and Figma to streamline daily asynchronous workflows.",
       icon: Boxes,
@@ -126,7 +125,7 @@ export function CoreFeaturesSection() {
         {/* Section Header */}
         <div ref={headerRef} className="max-w-3xl mx-auto text-center mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-bold uppercase tracking-wider text-[#FF6B2C]">
-            <Sparkles size={14} />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
             <span>Modular Platform</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#111318]">

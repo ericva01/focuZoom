@@ -22,7 +22,7 @@ export function SecuritySection() {
     {
       icon: FileCheck,
       title: "SOC-2 Type II & GDPR Compliant",
-      desc: "Glideo adheres to rigorous annual independent third-party audits verifying our data protection, operational security, and European privacy standards.",
+      desc: "FucuFlow adheres to rigorous annual independent third-party audits verifying our data protection, operational security, and European privacy standards.",
     },
   ];
 

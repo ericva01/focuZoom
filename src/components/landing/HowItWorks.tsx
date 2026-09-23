@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, Focus, Download, ArrowRight } from "lucide-react";
+import { Upload, Focus, Download, ArrowRight, Cpu } from "lucide-react";
 import Link from "next/link";
 
 export function HowItWorks() {
@@ -36,9 +36,7 @@ export function HowItWorks() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md text-xs font-medium text-[#FF8A4C]">
-            <svg className="w-3.5 h-3.5 text-[#FF6B2C] fill-current" viewBox="0 0 24 24">
-              <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-            </svg>
+            <Cpu className="w-3.5 h-3.5 text-[#FF6B2C]" />
             <span>Pipeline Architecture</span>
           </div>
 

@@ -14,21 +14,21 @@ export function FaqSection() {
 
   const faqs: FaqItem[] = [
     {
-      question: "How does Glideo achieve 60 FPS recording directly inside the browser?",
+      question: "How does FucuFlow achieve 60 FPS recording directly inside the browser?",
       answer:
-        "Glideo uses the modern W3C WebCodecs and WebGL 2.0 API standards. Rather than relying on heavyweight server queues or slow canvas capture, your local graphics hardware handles hardware-accelerated encoding (H.264/AV1/VP9) in real time with near-zero CPU overhead.",
+        "FucuFlow uses the modern W3C WebCodecs and WebGL 2.0 API standards. Rather than relying on heavyweight server queues or slow canvas capture, your local graphics hardware handles hardware-accelerated encoding (H.264/AV1/VP9) in real time with near-zero CPU overhead.",
       category: "Technology",
     },
     {
       question: "Do my screen captures or webcam recordings get uploaded to any cloud server?",
       answer:
-        "No. Glideo is built completely local-first. All recordings, focal zoom processing, and video exports take place strictly on your local device hardware. Your video files remain on your local disk.",
+        "No. FucuFlow is built completely local-first. All recordings, focal zoom processing, and video exports take place strictly on your local device hardware. Your video files remain on your local disk.",
       category: "Privacy",
     },
     {
       question: "How does the Automated Camera Zoom feature work?",
       answer:
-        "Glideo tracks cursor activity, click clustering, and window events across time. It calculates Catmull-Rom spline curves with critically damped spring physics to glide the virtual camera seamlessly into the area of user focus, completely eliminating jarring visual cuts.",
+        "FucuFlow tracks cursor activity, click clustering, and window events across time. It calculates Catmull-Rom spline curves with critically damped spring physics to glide the virtual camera seamlessly into the area of user focus, completely eliminating jarring visual cuts.",
       category: "Features",
     },
     {
@@ -38,9 +38,9 @@ export function FaqSection() {
       category: "Collaboration",
     },
     {
-      question: "Does Glideo support desktop apps for macOS, Windows, and Linux?",
+      question: "Does FucuFlow support desktop apps for macOS, Windows, and Linux?",
       answer:
-        "Yes, in addition to the zero-install web application, Glideo offers lightweight native desktop applications built on Tauri and Rust, providing system tray quick recording, global hotkeys, and multi-monitor capture.",
+        "Yes, in addition to the zero-install web application, FucuFlow offers lightweight native desktop applications built on Tauri and Rust, providing system tray quick recording, global hotkeys, and multi-monitor capture.",
       category: "Platforms",
     },
   ];

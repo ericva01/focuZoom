@@ -11,7 +11,7 @@ import {
   Terminal,
   ShieldCheck,
   Zap,
-  Sparkles,
+  Code2,
   ExternalLink,
   ChevronDown,
   ChevronUp,
@@ -127,45 +127,45 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
   {
     id: 2,
     tag_name: "v0.1.3",
-    name: "Glideo v0.1.3",
+    name: "FucuFlow v0.1.3",
     published_at: "2026-09-21T03:50:48Z",
     prerelease: false,
     html_url: `https://github.com/${GITHUB_REPO}/releases/tag/v0.1.3`,
-    body: `### Glideo v0.1.3 Release
+    body: `### FucuFlow v0.1.3 Release
 - Cross-platform macOS universal build workflow
 - Improved screen recording framerate stability
 - Interactive canvas zoom handles`,
     assets: [
       {
         id: 201,
-        name: "Glideo_0.1.0_x64-setup.exe",
+        name: "FucuFlow_0.1.0_x64-setup.exe",
         size: 6495374,
         download_count: 1,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/Glideo_0.1.0_x64-setup.exe`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/FucuFlow_0.1.0_x64-setup.exe`,
         created_at: "2026-09-21T03:50:48Z",
       },
       {
         id: 202,
-        name: "Glideo_0.1.0_aarch64.dmg",
+        name: "FucuFlow_0.1.0_aarch64.dmg",
         size: 8758987,
         download_count: 0,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/Glideo_0.1.0_aarch64.dmg`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/FucuFlow_0.1.0_aarch64.dmg`,
         created_at: "2026-09-21T03:50:48Z",
       },
       {
         id: 203,
-        name: "Glideo_0.1.0_amd64.AppImage",
+        name: "FucuFlow_0.1.0_amd64.AppImage",
         size: 98171384,
         download_count: 0,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/Glideo_0.1.0_amd64.AppImage`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/FucuFlow_0.1.0_amd64.AppImage`,
         created_at: "2026-09-21T03:50:48Z",
       },
       {
         id: 204,
-        name: "Glideo_0.1.0_amd64.deb",
+        name: "FucuFlow_0.1.0_amd64.deb",
         size: 9245426,
         download_count: 0,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/Glideo_0.1.0_amd64.deb`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.3/FucuFlow_0.1.0_amd64.deb`,
         created_at: "2026-09-21T03:50:48Z",
       },
     ],
@@ -173,37 +173,37 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
   {
     id: 3,
     tag_name: "v0.1.2",
-    name: "Glideo v0.1.2",
+    name: "FucuFlow v0.1.2",
     published_at: "2026-09-19T02:14:23Z",
     prerelease: false,
     html_url: `https://github.com/${GITHUB_REPO}/releases/tag/v0.1.2`,
-    body: `### Glideo v0.1.2 Release
+    body: `### FucuFlow v0.1.2 Release
 - Enhanced camera choreography and spring dynamics
 - WebGL GPU canvas acceleration
 - Local file project export`,
     assets: [
       {
         id: 301,
-        name: "Glideo_0.1.0_x64-setup.exe",
+        name: "FucuFlow_0.1.0_x64-setup.exe",
         size: 7681841,
         download_count: 0,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.2/Glideo_0.1.0_x64-setup.exe`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.2/FucuFlow_0.1.0_x64-setup.exe`,
         created_at: "2026-09-19T02:14:23Z",
       },
       {
         id: 302,
-        name: "Glideo_0.1.0_aarch64.dmg",
+        name: "FucuFlow_0.1.0_aarch64.dmg",
         size: 10557052,
         download_count: 0,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.2/Glideo_0.1.0_aarch64.dmg`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.2/FucuFlow_0.1.0_aarch64.dmg`,
         created_at: "2026-09-19T02:14:23Z",
       },
       {
         id: 303,
-        name: "Glideo_0.1.0_amd64.AppImage",
+        name: "FucuFlow_0.1.0_amd64.AppImage",
         size: 98806264,
         download_count: 1,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.2/Glideo_0.1.0_amd64.AppImage`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.2/FucuFlow_0.1.0_amd64.AppImage`,
         created_at: "2026-09-19T02:14:23Z",
       },
     ],
@@ -211,7 +211,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
   {
     id: 4,
     tag_name: "v0.1.1",
-    name: "Glideo v0.1.0 - Initial Release",
+    name: "FucuFlow v0.1.0 - Initial Release",
     published_at: "2026-09-14T03:39:18Z",
     prerelease: false,
     html_url: `https://github.com/${GITHUB_REPO}/releases/tag/v0.1.1`,
@@ -223,18 +223,18 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
     assets: [
       {
         id: 401,
-        name: "Glideo_0.1.0_x64-setup.exe",
+        name: "FucuFlow_0.1.0_x64-setup.exe",
         size: 9953955,
         download_count: 6,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.1/Glideo_0.1.0_x64-setup.exe`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.1/FucuFlow_0.1.0_x64-setup.exe`,
         created_at: "2026-09-14T03:39:18Z",
       },
       {
         id: 402,
-        name: "Glideo_0.1.0_x64_en-US.msi",
+        name: "FucuFlow_0.1.0_x64_en-US.msi",
         size: 18857984,
         download_count: 0,
-        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.1/Glideo_0.1.0_x64_en-US.msi`,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.1/FucuFlow_0.1.0_x64_en-US.msi`,
         created_at: "2026-09-14T03:39:18Z",
       },
     ],
@@ -444,7 +444,7 @@ export default function DownloadPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-semibold text-[#FF6B2C] mb-5">
-                <Sparkles size={14} className="animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C] animate-pulse" />
                 <span>Latest Release: {latestRelease.tag_name}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                 <span>Production Ready</span>
@@ -657,7 +657,7 @@ export default function DownloadPage() {
 
               <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4.5 flex items-center gap-3.5 shadow-xs">
                 <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] text-[#FF6B2C] flex items-center justify-center shrink-0">
-                  <Sparkles size={20} />
+                  <Code2 size={20} />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-[#111318]">Open Source (MIT)</h4>

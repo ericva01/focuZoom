@@ -13,7 +13,7 @@ import {
   Maximize,
   Minimize,
 } from "lucide-react";
-import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint, TimelineClip } from "@/types/editor";
+import { ClickEvent, CanvasConfig, AspectRatio, CursorPoint, TimelineClip, getCanvasResolution, ResolutionPreset } from "@/types/editor";
 import { VideoCanvas } from "@/components/editor/VideoCanvas";
 import { Button } from "@/components/ui/Button";
 import { formatSMPTETimecode } from "./MultiTrackTimeline";
@@ -129,6 +129,14 @@ export function PreviewMonitor({
     { id: "4:3", label: "4:3 Classic" },
   ];
 
+  const resolutionPresets: { id: ResolutionPreset; label: string; desc: string }[] = [
+    { id: "4k", label: "4K UHD", desc: "Ultra Crisp (3840x2160)" },
+    { id: "2k", label: "2K QHD", desc: "High Definition (2560x1440)" },
+    { id: "1080p", label: "1080p FHD", desc: "Full HD (1920x1080)" },
+  ];
+
+  const currentResolution = getCanvasResolution(config.aspectRatio, config.resolutionPreset || "4k");
+
   return (
     <div
       ref={monitorRef}
@@ -138,31 +146,53 @@ export function PreviewMonitor({
     >
       {/* 1. Monitor Top Control Bar */}
       <div className="h-10 px-4 border-b border-slate-200 dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.02] flex items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
-        {/* Left: Aspect Ratio Selector */}
-        <div className="flex items-center gap-1 bg-slate-200/70 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-glass-inner">
-          <Ratio className="w-3.5 h-3.5 text-[#FF6B2C] ml-1 mr-0.5" />
-          {aspectRatios.map((ar) => (
-            <button
-              key={ar.id}
-              type="button"
-              onClick={() => onChangeConfig({ aspectRatio: ar.id })}
-              className={`px-2 py-0.5 rounded-lg text-[11px] font-mono transition-all ${
-                config.aspectRatio === ar.id
-                  ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
-                  : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-              }`}
-            >
-              {ar.id}
-            </button>
-          ))}
+        {/* Left: Aspect Ratio & Resolution Selectors */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 bg-slate-200/70 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-glass-inner">
+            <Ratio className="w-3.5 h-3.5 text-[#FF6B2C] ml-1 mr-0.5" />
+            {aspectRatios.map((ar) => (
+              <button
+                key={ar.id}
+                type="button"
+                onClick={() => onChangeConfig({ aspectRatio: ar.id })}
+                className={`px-2 py-0.5 rounded-lg text-[11px] font-mono transition-all ${
+                  config.aspectRatio === ar.id
+                    ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
+                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                {ar.id}
+              </button>
+            ))}
+          </div>
+
+          <div className="hidden md:flex items-center gap-1 bg-slate-200/70 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-glass-inner">
+            <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 px-1">RES:</span>
+            {resolutionPresets.map((rp) => (
+              <button
+                key={rp.id}
+                type="button"
+                onClick={() => onChangeConfig({ resolutionPreset: rp.id })}
+                title={`${rp.desc} preview resolution (${rp.label})`}
+                className={`px-2 py-0.5 rounded-lg text-[11px] font-mono uppercase transition-all ${
+                  (config.resolutionPreset || "4k") === rp.id
+                    ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
+                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                {rp.id}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Center: Stage Status Badge */}
         <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-white/[0.03] px-3 py-1 rounded-xl border border-slate-200 dark:border-white/[0.08]">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
           <span className="text-slate-800 dark:text-white font-medium">Stage Monitor</span>
           <span className="text-slate-400 dark:text-slate-500">·</span>
-          <span>{config.aspectRatio === "9:16" ? "1080x1920" : "1920x1080"} 60 FPS</span>
+          <span className="text-[#FF8A4C] font-bold">{currentResolution.label}</span>
+          <span>({currentResolution.width}x{currentResolution.height}) 60 FPS</span>
         </div>
 
         {/* Right: Add Keyframe Mode Toggle & Fullscreen Button */}

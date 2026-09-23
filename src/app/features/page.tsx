@@ -5,7 +5,6 @@ import { SecuritySection } from "@/components/landing/SecuritySection";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
 import {
   ArrowRight,
-  Sparkles,
   Focus,
   Layers,
   Sliders,
@@ -32,7 +31,7 @@ const deepDives = [
     id: "auto-zoom",
     badge: "Camera Intelligence",
     title: "Focal Auto-Zoom with Catmull-Rom Spline Easing",
-    description: "Never lose your viewer's focus. Glideo logs mouse coordinates during screen recording and automatically creates smooth, cinematic camera dollies right to where action happens.",
+    description: "Never lose your viewer's focus. FucuFlow logs mouse coordinates during screen recording and automatically creates smooth, cinematic camera dollies right to where action happens.",
     highlights: [
       "Dynamic focal center calculation targeting user inputs",
       "Burst click grouping prevents rapid jarring cuts",
@@ -146,14 +145,14 @@ export default function FeaturesPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-semibold text-[#FF6B2C] mb-6">
-                <Sparkles size={14} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                 <span>Feature Deep Dive</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111318] leading-[1.1]">
                 Powerful features designed for <span className="text-[#FF6B2C]">clarity</span>.
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-[#667085] leading-relaxed">
-                Every tool in Glideo is crafted to elevate standard screen recordings into compelling, high-retention product demonstrations, engineering reviews, and team walkthroughs.
+                Every tool in FucuFlow is crafted to elevate standard screen recordings into compelling, high-retention product demonstrations, engineering reviews, and team walkthroughs.
               </p>
               <div className="mt-8 flex items-center gap-4">
                 <Link
@@ -302,7 +301,7 @@ export default function FeaturesPage() {
                   )}
 
                   <div className="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-white/10">
-                    <span>Glideo Studio Pro Engine</span>
+                    <span>FucuFlow Studio Pro Engine</span>
                     <span className="text-[#FF8A4C]">100% Free & Open Source</span>
                   </div>
                 </div>
@@ -319,7 +318,7 @@ export default function FeaturesPage() {
                 Every studio capability included.
               </h2>
               <p className="mt-3 text-sm text-[#667085]">
-                Glideo includes everything needed to record, polish, and export pro videos without subscriptions.
+                FucuFlow includes everything needed to record, polish, and export pro videos without subscriptions.
               </p>
             </div>
 

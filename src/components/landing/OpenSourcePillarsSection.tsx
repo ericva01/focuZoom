@@ -75,7 +75,7 @@ export function OpenSourcePillarsSection() {
             Free forever. Community driven. Stored locally.
           </h2>
           <p className="text-[#667085] text-base sm:text-lg leading-relaxed">
-            No subscription fees, no paywalls, and zero cloud lock-in. Glideo is built for creators and engineers who value privacy and open source freedom.
+            No subscription fees, no paywalls, and zero cloud lock-in. FucuFlow is built for creators and engineers who value privacy and open source freedom.
           </p>
         </div>
 

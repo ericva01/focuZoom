@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import confetti from "canvas-confetti";
-import { CheckCircle2, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 
 export function ContactForm() {
   const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ export function ContactForm() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          _subject: `[Glideo Contact] ${formData.subject} - ${formData.name}`,
+          _subject: `[FucuFlow Contact] ${formData.subject} - ${formData.name}`,
           message: formData.message,
         }),
       });
@@ -66,7 +66,7 @@ export function ContactForm() {
     <div className="rounded-3xl p-8 sm:p-10 bg-white border border-[#E5E7EB] shadow-xs">
       <div className="mb-6 space-y-2">
         <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider text-[#FF6B2C] uppercase bg-[#FFF1E8] px-3 py-1 rounded-full border border-[#FF6B2C]/20">
-          <Sparkles size={13} />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
           <span>INQUIRIES & FEEDBACK</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111318] tracking-tight">

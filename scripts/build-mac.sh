@@ -2,12 +2,12 @@
 set -e
 
 # ==============================================================================
-# Glideo - macOS Build Script (.dmg and .app)
+# FucuFlow - macOS Build Script (.dmg and .app)
 # Run on macOS (Apple Silicon or Intel).
 # ==============================================================================
 
 echo "================================================="
-echo "  Glideo macOS Installer Build (.dmg)"
+echo "  FucuFlow macOS Installer Build (.dmg)"
 echo "================================================="
 
 # 1. Check Xcode Command Line Tools

@@ -3,7 +3,7 @@ import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
-import { BookOpen, HardDrive, Keyboard, ArrowRight, ExternalLink, Sparkles, MessageSquare } from "lucide-react";
+import { BookOpen, HardDrive, Keyboard, ArrowRight, ExternalLink, MessageSquare } from "lucide-react";
 
 export const metadata = {
   title: "Resources & Documentation — FucuFlow Studio",
@@ -34,11 +34,11 @@ export default function ResourcesPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-semibold text-[#FF6B2C] mb-6">
-                <Sparkles size={14} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                 <span>Documentation & Guides</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111318] leading-[1.1]">
-                Everything you need to master <span className="text-[#FF6B2C]">Glideo</span>.
+                Everything you need to master <span className="text-[#FF6B2C]">FucuFlow</span>.
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-[#667085] leading-relaxed">
                 Explore guides, reference keyboard shortcuts, understand local storage handling, and get answers to common questions.
@@ -88,7 +88,7 @@ export default function ResourcesPage() {
                 </div>
                 <h3 className="text-base font-bold text-[#111318] mb-2">Local Storage Architecture</h3>
                 <p className="text-xs text-[#667085] leading-relaxed mb-4">
-                  Understand how Glideo stores project data offline in IndexedDB and your local filesystem without uploading video buffers to cloud servers.
+                  Understand how FucuFlow stores project data offline in IndexedDB and your local filesystem without uploading video buffers to cloud servers.
                 </p>
                 <Link href="/open-source" className="inline-flex items-center gap-1 text-xs font-bold text-[#FF6B2C] hover:underline">
                   Read open source architecture <ArrowRight size={12} />
@@ -123,7 +123,7 @@ export default function ResourcesPage() {
                 Studio Keyboard Shortcuts
               </h2>
               <p className="mt-2 text-sm text-[#667085]">
-                Glideo is built for speed. Use these standard timeline shortcuts to edit at pro speed without touching the mouse.
+                FucuFlow is built for speed. Use these standard timeline shortcuts to edit at pro speed without touching the mouse.
               </p>
             </div>
 

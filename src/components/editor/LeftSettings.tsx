@@ -349,6 +349,43 @@ function LeftSettingsBase({
               </p>
             </div>
 
+            {/* Screen Resolution & Quality Selector */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-xs font-semibold text-white block">Screen Render Resolution</label>
+                  <p className="text-[10px] text-slate-400 mt-0.5">High-DPI canvas supersampling for crisp text</p>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
+                  {(config.resolutionPreset || "4k").toUpperCase()}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: "4k" as const, name: "4K UHD", desc: "3840×2160 Ultra" },
+                  { id: "2k" as const, name: "2K QHD", desc: "2560×1440 Crisp" },
+                  { id: "1080p" as const, name: "1080p", desc: "1920×1080 Std" },
+                ].map((res) => {
+                  const isSelected = (config.resolutionPreset || "4k") === res.id;
+                  return (
+                    <button
+                      key={res.id}
+                      type="button"
+                      onClick={() => onChangeConfig({ resolutionPreset: res.id })}
+                      className={`p-2 rounded-xl text-center border transition-all ${
+                        isSelected
+                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm font-bold"
+                          : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      <div className="text-xs font-semibold">{res.name}</div>
+                      <div className="text-[9px] text-slate-400 mt-0.5">{res.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Conditional On-Click Only Animation Status Card */}
             <div className="p-4 rounded-xl glass-panel space-y-2">
               <div className="flex items-center justify-between">

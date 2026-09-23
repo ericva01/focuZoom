@@ -127,7 +127,7 @@ export async function generateSampleScreenRecording(): Promise<{
         ctx.fillStyle = "#8b949e";
         ctx.font = "13px -apple-system, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("Glideo — StudioEngine.tsx — 1280x720", width / 2, 25);
+        ctx.fillText("FucuFlow — StudioEngine.tsx — 1280x720", width / 2, 25);
 
         // Top right Action Button: "Run Build" (Click target at x: 0.85, y: 0.12 => ~1088, 86)
         const isRunHovered = t > 1.8 && t < 3.2;
@@ -190,7 +190,7 @@ export async function generateSampleScreenRecording(): Promise<{
         ctx.fillRect(220, 76, width - 220, height - 260);
 
         const codeLines = [
-          { text: "import { CinematicCamera, Easing } from '@glideo/core';", color: "#c084fc" },
+          { text: "import { CinematicCamera, Easing } from '@fucuflow/core';", color: "#c084fc" },
           { text: "import { interpolatePanZoom } from '@/utils/easing';", color: "#c084fc" },
           { text: "", color: "" },
           { text: "export async function renderCinematicFrame(timestamp: number) {", color: "#60a5fa" },
@@ -291,7 +291,7 @@ export async function generateSampleScreenRecording(): Promise<{
 
         // Terminal text lines
         const termLines = [
-          "$ npm run build:glideo",
+          "$ npm run build:fucuflow",
           "✓ Bundled in 142ms (client-side WebCodecs)",
           "✓ Auto-zoom keyframes detected: 3 points",
           t > 3 ? "✓ Camera pan interpolation: 60 FPS verified" : "  Compiling...",

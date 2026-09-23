@@ -15,7 +15,6 @@ import {
   Trash2,
   ChevronRight,
   ShieldCheck,
-  Sparkles,
   Settings,
   Cpu,
   Save,
@@ -43,7 +42,7 @@ export function DesktopAppDashboard() {
 
   const [theme, setTheme] = useState<ThemeMode>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("glideo_theme") as ThemeMode | null;
+      const saved = (localStorage.getItem("fucuflow_theme") || localStorage.getItem("glideo_theme")) as ThemeMode | null;
       return saved || "dark";
     }
     return "dark";
@@ -53,14 +52,16 @@ export function DesktopAppDashboard() {
 
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("glideo_autosave_enabled") !== "false";
+      const saved = localStorage.getItem("fucuflow_autosave_enabled") ?? localStorage.getItem("glideo_autosave_enabled");
+      return saved !== "false";
     }
     return true;
   });
 
   const [autoSaveInterval, setAutoSaveInterval] = useState<number>(() => {
     if (typeof window !== "undefined") {
-      return parseInt(localStorage.getItem("glideo_autosave_interval") || "5", 10);
+      const saved = localStorage.getItem("fucuflow_autosave_interval") || localStorage.getItem("glideo_autosave_interval");
+      return parseInt(saved || "5", 10);
     }
     return 5;
   });
@@ -92,21 +93,21 @@ export function DesktopAppDashboard() {
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
     if (typeof window !== "undefined") {
-      localStorage.setItem("glideo_theme", newTheme);
+      localStorage.setItem("fucuflow_theme", newTheme);
     }
   };
 
   const handleToggleAutoSave = (enabled: boolean) => {
     setAutoSaveEnabled(enabled);
     if (typeof window !== "undefined") {
-      localStorage.setItem("glideo_autosave_enabled", enabled ? "true" : "false");
+      localStorage.setItem("fucuflow_autosave_enabled", enabled ? "true" : "false");
     }
   };
 
   const handleChangeAutoSaveInterval = (interval: number) => {
     setAutoSaveInterval(interval);
     if (typeof window !== "undefined") {
-      localStorage.setItem("glideo_autosave_interval", interval.toString());
+      localStorage.setItem("fucuflow_autosave_interval", interval.toString());
     }
   };
 
@@ -167,7 +168,7 @@ export function DesktopAppDashboard() {
     // Fallback: standard file picker
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "video/mp4,video/webm,video/quicktime,.glideo";
+    input.accept = "video/mp4,video/webm,video/quicktime,.fucuflow,.glideo";
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
@@ -210,16 +211,16 @@ export function DesktopAppDashboard() {
   return (
     <div className={`flex h-screen w-screen font-sans select-none overflow-hidden ${isLight ? "bg-[#F8F9FB] text-slate-900" : "bg-[#060913] text-[#F8FAFC]"}`}>
       {/* ========================================================================= */}
-      {/* 1. LEFT NAVIGATION SIDEBAR (Glideo Obsidian & Orange Brand)              */}
+      {/* 1. LEFT NAVIGATION SIDEBAR (FucuFlow Obsidian & Orange Brand)              */}
       {/* ========================================================================= */}
       <aside className={`w-60 flex-shrink-0 flex flex-col justify-between p-4 z-20 ${isLight ? "bg-white border-r border-slate-200" : "bg-[#080D1A] border-r border-white/[0.08]"}`}>
         <div className="space-y-6">
-          {/* Glideo Workspace Header */}
+          {/* FucuFlow Workspace Header */}
           <div className="flex items-center gap-3 px-1.5 py-1.5 transition-all cursor-pointer group select-none">
             <div className="relative w-8 h-8 flex-shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/icon.png"
-                alt="Glideo"
+                alt="FucuFlow"
                 width={32}
                 height={32}
                 className="w-full h-full object-contain"
@@ -228,7 +229,7 @@ export function DesktopAppDashboard() {
             </div>
             <div className="flex flex-col min-w-0">
               <span className={`text-xs font-bold uppercase tracking-wider truncate ${isLight ? "text-slate-900" : "text-white"}`}>
-                GLIDEO
+                FUCUFLOW
               </span>
               <span className="text-[10px] text-[#FF6B2C] font-mono font-semibold">Desktop Edition</span>
             </div>
@@ -505,14 +506,14 @@ export function DesktopAppDashboard() {
 
                   <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-mono text-white flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C] animate-pulse" />
-                    <span>Glideo 3D Dolly Engine</span>
+                    <span>FucuFlow 3D Dolly Engine</span>
                   </div>
                 </div>
 
                 {/* Right Headline & Description & Button */}
                 <div className="flex-1 max-w-xl text-left space-y-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF1E8]/10 border border-[#FF6B2C]/30 text-[#FF8A4C] text-xs font-mono font-bold">
-                    <Sparkles className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                     <span>Native Desktop Studio</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
-import { ArrowRight, Sparkles, Code2, Heart, Terminal, Lock, CheckCircle2, Cpu } from "lucide-react";
+import { ArrowRight, Code2, Heart, Terminal, Lock, CheckCircle2, Cpu } from "lucide-react";
 
 export const metadata = {
   title: "Open Source — FucuFlow Studio",
@@ -20,7 +20,7 @@ export default function OpenSourcePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF1E8] border border-[#FF6B2C]/20 text-xs font-semibold text-[#FF6B2C] mb-6">
-                <Sparkles size={14} />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
                 <span>MIT Licensed Software</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111318] leading-[1.1]">
@@ -39,7 +39,7 @@ export default function OpenSourcePage() {
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
                   </svg>
-                  <span>Star on GitHub</span>
+                  <span>View on GitHub</span>
                   <span className="px-1.5 py-0.5 rounded bg-white/20 text-[10px] font-mono">MIT</span>
                 </a>
                 <Link
@@ -64,7 +64,7 @@ export default function OpenSourcePage() {
                 </div>
                 <h3 className="text-base font-bold text-[#111318] mb-2">Permissive MIT License</h3>
                 <p className="text-xs text-[#667085] leading-relaxed">
-                  Use Glideo for personal, educational, commercial, or team projects with zero licensing restrictions.
+                  Use FucuFlow for personal, educational, commercial, or team projects with zero licensing restrictions.
                 </p>
               </div>
 
@@ -94,7 +94,7 @@ export default function OpenSourcePage() {
                 </div>
                 <h3 className="text-base font-bold text-[#111318] mb-2">Self-Hostable</h3>
                 <p className="text-xs text-[#667085] leading-relaxed">
-                  Run Glideo entirely offline on your internal network, air-gapped machine, or deploy your own private web instance.
+                  Run FucuFlow entirely offline on your internal network, air-gapped machine, or deploy your own private web instance.
                 </p>
               </div>
             </div>
@@ -114,7 +114,7 @@ export default function OpenSourcePage() {
                   Clone and run locally in seconds.
                 </h2>
                 <p className="text-sm text-[#667085] leading-relaxed">
-                  Glideo is built with standard web technologies. No complex docker containers or database setups required. Just clone, install, and run.
+                  FucuFlow is built with standard web technologies. No complex docker containers or database setups required. Just clone, install, and run.
                 </p>
                 <div className="space-y-3 text-xs text-[#111318]">
                   <div className="flex items-center gap-2 font-medium">

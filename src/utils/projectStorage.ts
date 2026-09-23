@@ -18,13 +18,14 @@ export interface SavedProject {
   localFilePath?: string;
 }
 
-const STORAGE_KEY = "glideo_saved_projects";
+const STORAGE_KEY = "fucuflow_saved_projects";
+const LEGACY_STORAGE_KEY = "glideo_saved_projects";
 
 export function getSavedProjects(): SavedProject[] {
   if (typeof window === "undefined") return [];
 
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) {
       return [];
     }

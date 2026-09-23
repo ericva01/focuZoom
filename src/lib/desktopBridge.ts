@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Unified Desktop Bridge for Glideo
+ * Unified Desktop Bridge for FucuFlow
  * Seamlessly interfaces with both Tauri v2 and Electron desktop environments,
  * while providing graceful fallbacks for web browsers.
  */
@@ -127,7 +127,7 @@ export const desktopBridge = {
   },
 
   /**
-   * Native OS dialog to save .glideo project configuration
+   * Native OS dialog to save .fucuflow project configuration
    */
   async saveProjectDialog(options: { defaultPath?: string; data: string }): Promise<SaveDialogResult> {
     if (isTauriEnvironment()) {
@@ -136,11 +136,11 @@ export const desktopBridge = {
         const { writeTextFile } = await import("@tauri-apps/plugin-fs");
 
         const targetPath = await save({
-          defaultPath: options.defaultPath || "project.glideo",
+          defaultPath: options.defaultPath || "project.fucuflow",
           filters: [
             {
-              name: "Glideo Project (*.glideo)",
-              extensions: ["glideo"],
+              name: "FucuFlow Project (*.fucuflow)",
+              extensions: ["fucuflow", "glideo"],
             },
           ],
         });
@@ -167,7 +167,7 @@ export const desktopBridge = {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = options.defaultPath || "project.glideo";
+      a.download = options.defaultPath || "project.fucuflow";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -277,11 +277,11 @@ export const desktopBridge = {
           // If destination is a folder, append file name
           if (!targetPath.endsWith(".webm") && !targetPath.endsWith(".mp4")) {
             const sep = targetPath.includes("/") ? "/" : "\\";
-            targetPath = `${targetPath}${targetPath.endsWith(sep) ? "" : sep}${defaultName || "Glideo-Export.webm"}`;
+            targetPath = `${targetPath}${targetPath.endsWith(sep) ? "" : sep}${defaultName || "FucuFlow-Export.webm"}`;
           }
         } else {
           const selectedPath = await save({
-            defaultPath: defaultName || "Glideo-Export.webm",
+            defaultPath: defaultName || "FucuFlow-Export.webm",
             filters: [
               {
                 name: "WebM Video (*.webm)",
@@ -329,7 +329,7 @@ export const desktopBridge = {
     if (extWin?.showSaveFilePicker) {
       try {
         const handle = await extWin.showSaveFilePicker({
-          suggestedName: defaultName || "Glideo-Export.webm",
+          suggestedName: defaultName || "FucuFlow-Export.webm",
           types: [
             {
               description: "WebM Video (*.webm)",
@@ -355,7 +355,7 @@ export const desktopBridge = {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = defaultName || "Glideo-Export.webm";
+      a.download = defaultName || "FucuFlow-Export.webm";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

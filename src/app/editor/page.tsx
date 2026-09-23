@@ -96,6 +96,7 @@ export default function EditorPage() {
     rippleColor: "#FF6B2C",
 
     aspectRatio: "16:9",
+    resolutionPreset: "4k",
     playbackSpeed: 1.0,
 
     // Webcam Picture-in-Picture (PiP) Configuration
@@ -301,7 +302,7 @@ export default function EditorPage() {
       setVideoSrc(sample.blobUrl);
       setEvents(sample.defaultEvents);
       setMetadata({
-        name: "glideo-demo-recording.webm",
+        name: "fucuflow-demo-recording.webm",
         duration: sample.duration,
         width: 1280,
         height: 720,
@@ -456,7 +457,7 @@ export default function EditorPage() {
   // Auto-Save Configuration (default 5s interval)
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("glideo_autosave_enabled");
+      const saved = localStorage.getItem("fucuflow_autosave_enabled") ?? localStorage.getItem("glideo_autosave_enabled");
       return saved !== null ? saved === "true" : true;
     }
     return true;
@@ -464,7 +465,7 @@ export default function EditorPage() {
 
   const [autoSaveInterval, setAutoSaveInterval] = useState<number>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("glideo_autosave_interval");
+      const saved = localStorage.getItem("fucuflow_autosave_interval") || localStorage.getItem("glideo_autosave_interval");
       return saved ? parseInt(saved, 10) || 5 : 5;
     }
     return 5;
@@ -476,7 +477,7 @@ export default function EditorPage() {
   // Theme Mode (dark, light, system)
   const [theme, setTheme] = useState<ThemeMode>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("glideo_theme") as ThemeMode | null;
+      const saved = (localStorage.getItem("fucuflow_theme") || localStorage.getItem("glideo_theme")) as ThemeMode | null;
       return saved || "dark";
     }
     return "dark";
@@ -508,7 +509,7 @@ export default function EditorPage() {
   const handleThemeChange = (newTheme: ThemeMode) => {
     setTheme(newTheme);
     if (typeof window !== "undefined") {
-      localStorage.setItem("glideo_theme", newTheme);
+      localStorage.setItem("fucuflow_theme", newTheme);
     }
   };
 
@@ -603,7 +604,7 @@ export default function EditorPage() {
             return;
           }
         } catch (err) {
-          console.warn("[Glideo] Error loading project from IndexedDB:", err);
+          console.warn("[FucuFlow] Error loading project from IndexedDB:", err);
         }
       }
 
@@ -674,10 +675,10 @@ export default function EditorPage() {
         }
 
         if (typeof window !== "undefined" && window.electronAPI) {
-          console.log("[Glideo] Project successfully saved to workspace:", projectData.name);
+          console.log("[FucuFlow] Project successfully saved to workspace:", projectData.name);
         }
       } catch (err) {
-        console.error("[Glideo] Failed to save project:", err);
+        console.error("[FucuFlow] Failed to save project:", err);
       }
     },
     [clips, config, events, metadata?.duration, metadata?.name, projectName]
@@ -704,14 +705,14 @@ export default function EditorPage() {
   const handleToggleAutoSave = (enabled: boolean) => {
     setAutoSaveEnabled(enabled);
     if (typeof window !== "undefined") {
-      localStorage.setItem("glideo_autosave_enabled", enabled ? "true" : "false");
+      localStorage.setItem("fucuflow_autosave_enabled", enabled ? "true" : "false");
     }
   };
 
   const handleChangeAutoSaveInterval = (interval: number) => {
     setAutoSaveInterval(interval);
     if (typeof window !== "undefined") {
-      localStorage.setItem("glideo_autosave_interval", interval.toString());
+      localStorage.setItem("fucuflow_autosave_interval", interval.toString());
     }
   };
 

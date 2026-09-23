@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Mail, Check, Copy, Sparkles, MessageSquare, Bug, GitPullRequest } from "lucide-react";
+import { Mail, Check, Copy, MessageSquare, Bug, GitPullRequest } from "lucide-react";
 
 export function ContactInfo() {
   const [copied, setCopied] = useState(false);
@@ -28,14 +28,14 @@ export function ContactInfo() {
           <div className="relative w-16 h-16 rounded-2xl bg-white shadow-sm border border-[#E5E7EB] p-2 flex items-center justify-center shrink-0">
             <Image
               src="/icon.png"
-              alt="Glideo Icon"
+              alt="FucuFlow Icon"
               width={48}
               height={48}
               className="object-contain drop-shadow-[0_4px_10px_rgba(255,107,44,0.2)]"
             />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-[#111318]">Glideo Community</h3>
+            <h3 className="text-xl font-bold text-[#111318]">FucuFlow Community</h3>
             <p className="text-xs text-[#667085] leading-relaxed">
               Open communication channel with Eric Va and contributors.
             </p>
@@ -44,7 +44,7 @@ export function ContactInfo() {
 
         <div className="space-y-3 pt-4 border-t border-[#E5E7EB]">
           <div className="flex items-center gap-2.5 text-xs text-[#111318]">
-            <Sparkles size={15} className="text-[#FF6B2C] shrink-0" />
+            <MessageSquare size={15} className="text-[#FF6B2C] shrink-0" />
             <span>Feature suggestions & UI feedback</span>
           </div>
           <div className="flex items-center gap-2.5 text-xs text-[#111318]">
