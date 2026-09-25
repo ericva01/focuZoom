@@ -156,11 +156,9 @@ export function FeaturesView() {
               return (
                 <div
                   key={item.id}
-                  className={`rounded-3xl border border-[#E5E7EB] bg-white p-8 sm:p-12 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-10 items-center ${
-                    index % 2 === 1 ? "lg:grid-flow-dense" : ""
-                  }`}
+                  className="rounded-3xl border border-[#E5E7EB] bg-white p-8 sm:p-12 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"
                 >
-                  <div className={`lg:col-span-6 space-y-5 ${index % 2 === 1 ? "lg:col-start-7" : ""}`}>
+                  <div className={`space-y-5 ${index % 2 === 1 ? "lg:order-2" : "lg:order-1"}`}>
                     <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#FF6B2C] bg-[#FFF1E8] px-3 py-1 rounded-full border border-[#FF6B2C]/20">
                       {item.badge}
                     </span>
@@ -191,8 +189,8 @@ export function FeaturesView() {
 
                   {/* Mockup Card */}
                   <div
-                    className={`lg:col-span-6 rounded-2xl bg-[#17191F] border border-white/10 p-6 text-white shadow-xl min-h-[280px] flex flex-col justify-between ${
-                      index % 2 === 1 ? "lg:col-start-1" : ""
+                    className={`rounded-2xl bg-[#17191F] border border-white/10 p-6 text-white shadow-xl min-h-[280px] flex flex-col justify-between ${
+                      index % 2 === 1 ? "lg:order-1" : "lg:order-2"
                     }`}
                   >
                     <div className="flex items-center justify-between border-b border-white/10 pb-3">
@@ -207,15 +205,15 @@ export function FeaturesView() {
 
                     {mockType === "zoom" && (
                       <div className="py-8 space-y-4">
-                        <div className="p-4 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <Focus className="text-[#FF8A4C] w-5 h-5" />
-                            <div>
-                              <p className="text-xs font-bold text-white">Target: Submit Button (x: 480, y: 320)</p>
-                              <p className="text-[10px] text-slate-400 font-mono">Dolly Zoom: 2.5x | Ease: Catmull-Rom</p>
+                        <div className="p-4 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <Focus className="text-[#FF8A4C] w-5 h-5 shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-white truncate">Target: Submit Button (x: 480, y: 320)</p>
+                              <p className="text-[10px] text-slate-400 font-mono truncate">Dolly Zoom: 2.5x | Ease: Catmull-Rom</p>
                             </div>
                           </div>
-                          <span className="text-xs font-mono font-bold text-[#FF8A4C]">0.60s span</span>
+                          <span className="text-xs font-mono font-bold text-[#FF8A4C] shrink-0">0.60s span</span>
                         </div>
                         <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
                           <div className="h-full bg-gradient-to-r from-[#FF7A3D] to-[#FF6B2C] w-3/4 rounded-full" />
@@ -225,13 +223,13 @@ export function FeaturesView() {
 
                     {mockType === "timeline" && (
                       <div className="py-6 space-y-3 font-mono text-xs">
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600/20 border border-blue-400/30 text-blue-300">
-                          <Focus size={14} />
-                          <span>TRACK 2: Auto Zoom (3 Keyframes Active)</span>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600/20 border border-blue-400/30 text-blue-300 min-w-0">
+                          <Focus size={14} className="shrink-0" />
+                          <span className="truncate">TRACK 2: Auto Zoom (3 Keyframes Active)</span>
                         </div>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600/20 border border-indigo-400/30 text-indigo-300">
-                          <Volume2 size={14} />
-                          <span>TRACK 3: Audio (48 kHz Stereo Waveform)</span>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600/20 border border-indigo-400/30 text-indigo-300 min-w-0">
+                          <Volume2 size={14} className="shrink-0" />
+                          <span className="truncate">TRACK 3: Audio (48 kHz Stereo Waveform)</span>
                         </div>
                         <div className="flex items-center justify-between text-[10px] text-slate-400 pt-2 border-t border-white/10">
                           <span>Speed: 1.0x (30 FPS)</span>

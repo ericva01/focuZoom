@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://fucuflow.app"),
+  metadataBase: new URL("https://fucuflow.ericva.site"),
   title: {
     default: "FucuFlow — Cinematic Screen Recording & Focal Auto-Zoom Studio",
-    template: "%s | FucuFlow",
+    template: "%s | FucuFlow Studio",
   },
   description:
     "Transform standard screen recordings into cinematic product videos with automatic click-to-zoom, smooth camera easing, 3D canvas tilt, and studio backgrounds. 100% private, local-first, free & open-source.",
@@ -14,7 +14,8 @@ export const metadata: Metadata = {
     "focuflow",
     "screen recording studio",
     "auto zoom video editor",
-    "focal zoom",
+    "focal auto zoom",
+    "catmull-rom spline camera",
     "screen studio alternative",
     "focusee alternative",
     "cinematic screen recorder",
@@ -26,10 +27,12 @@ export const metadata: Metadata = {
     "desktop screen recorder",
     "windows screen recorder",
     "mac screen recorder",
+    "local-first video editor",
   ],
   authors: [{ name: "Eric Va", url: "https://github.com/ericva01" }],
   creator: "Eric Va",
-  publisher: "FucuFlow",
+  publisher: "FucuFlow Studio",
+  category: "technology",
   robots: {
     index: true,
     follow: true,
@@ -52,7 +55,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://fucuflow.app",
+    alternateLocale: ["km_KH"],
+    url: "https://fucuflow.ericva.site",
     siteName: "FucuFlow Studio",
     title: "FucuFlow — Cinematic Screen Recording & Focal Auto-Zoom Studio",
     description:
@@ -75,8 +79,46 @@ export const metadata: Metadata = {
     creator: "@ericva",
   },
   alternates: {
-    canonical: "https://fucuflow.app",
+    canonical: "https://fucuflow.ericva.site",
+    languages: {
+      en: "https://fucuflow.ericva.site/en",
+      km: "https://fucuflow.ericva.site/kh",
+      "x-default": "https://fucuflow.ericva.site",
+    },
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "FucuFlow Studio",
+      "operatingSystem": "Windows, macOS, Web",
+      "applicationCategory": "MultimediaApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+      },
+      "description":
+        "Cinematic screen recording studio with focal auto-zoom, Catmull-Rom spline curves, 3D canvas tilt, multi-track timeline, and 100% private offline storage.",
+      "url": "https://fucuflow.ericva.site",
+      "image": "https://fucuflow.ericva.site/logo.png",
+      "author": {
+        "@type": "Person",
+        "name": "Eric Va",
+        "url": "https://github.com/ericva01",
+      },
+    },
+    {
+      "@type": "Organization",
+      "name": "FucuFlow",
+      "url": "https://fucuflow.ericva.site",
+      "logo": "https://fucuflow.ericva.site/logo.png",
+      "sameAs": ["https://github.com/ericva01/focuZoom"],
+    },
+  ],
 };
 
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -88,6 +130,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="km" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="bg-dark-950 text-gray-100 min-h-screen antialiased selection:bg-[#FFF1E8] selection:text-[#FF6B2C]">
         <LanguageProvider>
           {children}
