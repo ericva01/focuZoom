@@ -4,11 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://fucuflow.ericva.site"),
   title: {
-    default: "FucuFlow — Cinematic Screen Recording & Focal Auto-Zoom Studio",
+    default: "FucuFlow — Cinematic Screen Recording and Auto-Zoom",
     template: "%s | FucuFlow Studio",
   },
   description:
-    "Transform standard screen recordings into cinematic product videos with automatic click-to-zoom, smooth camera easing, 3D canvas tilt, and studio backgrounds. 100% private, local-first, free & open-source.",
+    "Transform screen recordings into cinematic product demos with automatic click-to-zoom, 3D canvas tilt, and smooth motion. Local-first and open source.",
   keywords: [
     "fucuflow",
     "focuflow",
@@ -58,24 +58,25 @@ export const metadata: Metadata = {
     alternateLocale: ["km_KH"],
     url: "https://fucuflow.ericva.site",
     siteName: "FucuFlow Studio",
-    title: "FucuFlow — Cinematic Screen Recording & Focal Auto-Zoom Studio",
+    title: "FucuFlow — Cinematic Screen Recording and Auto-Zoom",
     description:
-      "100% Free & Open Source local video recording and focal zoom editor. Create stunning software demos and product walkthroughs effortlessly.",
+      "Create cinematic product demos with automatic zoom, 3D camera angles, and smooth motion. 100% free and open source.",
     images: [
       {
-        url: "/logo.png",
-        width: 1024,
-        height: 1024,
-        alt: "FucuFlow Orange Logo",
+        url: "https://fucuflow.ericva.site/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "FucuFlow — Cinematic Screen Recording and Auto-Zoom",
+        type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FucuFlow — Cinematic Screen Recording & Focal Auto-Zoom Studio",
+    title: "FucuFlow — Cinematic Screen Recording and Auto-Zoom",
     description:
-      "Turn ordinary screen recordings into cinematic product demos with automatic zoom, 3D camera angles, and smooth motion.",
-    images: ["/logo.png"],
+      "Create cinematic product demos with automatic zoom, 3D camera angles, and smooth motion. 100% free and open source.",
+    images: ["https://fucuflow.ericva.site/og-image.png"],
     creator: "@ericva",
   },
   alternates: {
@@ -104,7 +105,7 @@ const jsonLd = {
       "description":
         "Cinematic screen recording studio with focal auto-zoom, Catmull-Rom spline curves, 3D canvas tilt, multi-track timeline, and 100% private offline storage.",
       "url": "https://fucuflow.ericva.site",
-      "image": "https://fucuflow.ericva.site/logo.png",
+      "image": "https://fucuflow.ericva.site/og-image.png",
       "author": {
         "@type": "Person",
         "name": "Eric Va",

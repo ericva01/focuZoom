@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 export const runtime = "nodejs";
-export const alt = "FucuFlow Studio — Cinematic Screen Recording & Focal Auto-Zoom";
+export const alt = "FucuFlow — Cinematic Screen Recording and Auto-Zoom";
 export const size = {
   width: 1200,
   height: 630,

@@ -1,7 +1,7 @@
 import { SolutionsView } from "@/views/SolutionsView";
 
 export const metadata = {
-  title: "Solutions — FucuFlow Studio",
+  title: "Solutions",
   description: "Explore FucuFlow solutions for software engineering demos, product design critiques, customer success, async standups, and sales outreach.",
 };
 
