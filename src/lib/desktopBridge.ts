@@ -51,7 +51,16 @@ export function isElectronEnvironment(): boolean {
 }
 
 export function isDesktopApp(): boolean {
-  return isTauriEnvironment() || isElectronEnvironment();
+  if (typeof window === "undefined") return false;
+  if (isTauriEnvironment() || isElectronEnvironment()) return true;
+  try {
+    if (sessionStorage.getItem("fucuflow_is_desktop") === "true") return true;
+    if (window.location.pathname.startsWith("/desktop")) {
+      sessionStorage.setItem("fucuflow_is_desktop", "true");
+      return true;
+    }
+  } catch {}
+  return false;
 }
 
 // -----------------------------------------------------------------------------

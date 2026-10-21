@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
+html.is-desktop-app,
+body.is-desktop-app {
   overscroll-behavior: none;
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;

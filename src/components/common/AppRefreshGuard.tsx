@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { isDesktopApp } from "@/lib/desktopBridge";
 import { ShieldAlert } from "lucide-react";
 
 export function AppRefreshGuard() {
@@ -20,6 +21,18 @@ export function AppRefreshGuard() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Only apply refresh prevention in the Desktop App (Tauri / Electron / desktop view)
+    // The public website is completely free to refresh normally.
+    const isDesktop = isDesktopApp();
+    if (!isDesktop) {
+      return;
+    }
+
+    document.documentElement.classList.add("is-desktop-app");
+    document.body.classList.add("is-desktop-app");
+
     // 1. Intercept all reload and navigation shortcut keys at the CAPTURE phase
     const handleKeyDownCapture = (e: KeyboardEvent) => {
       const key = e.key;
@@ -97,7 +110,7 @@ export function AppRefreshGuard() {
       }
     };
 
-    // 4. BeforeUnload confirmation: protect against any unexpected reload or window close
+    // 4. BeforeUnload confirmation: protect against any unexpected reload or window close in desktop app
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
@@ -111,6 +124,8 @@ export function AppRefreshGuard() {
     window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
+      document.documentElement.classList.remove("is-desktop-app");
+      document.body.classList.remove("is-desktop-app");
       window.removeEventListener("keydown", handleKeyDownCapture, { capture: true });
       window.removeEventListener("dragover", handleDragOver);
       window.removeEventListener("drop", handleDrop);
@@ -134,8 +149,8 @@ export function AppRefreshGuard() {
         <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
         <span>
           {isKhmer
-            ? "ការ Refresh ត្រូវបានបិទ ដើម្បីការពារកុំឱ្យបាត់បង់ការងារ និងវីដេអូរបស់អ្នក"
-            : "Page refresh is disabled to protect your project and media."}
+            ? "ការ Refresh ត្រូវបានបិទនៅក្នុងកម្មវិធី Desktop ដើម្បីការពារកុំឱ្យបាត់បង់ការងារ និងវីដេអូរបស់អ្នក"
+            : "Page refresh is disabled in the desktop app to protect your project and media."}
         </span>
       </div>
     </div>
