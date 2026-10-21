@@ -31,7 +31,8 @@
 - 🎯 **Intelligent Click & Zoom Keyframing:** Auto-detects clicks or lets you visually set focal points on the multi-track timeline.
 - 🫧 **Webcam Picture-in-Picture (PiP):** Floating facecam bubble with Circle, Rounded Square, and Square framing, border accents, and live audio VU meter.
 - ⚡ **Local & Offline Rendering:** Render directly on your device with hardware-accelerated VP9/VP8 WebM encoding.
-- 📁 **Custom Export Destination:** Choose your desired folder on any local drive before or after rendering.
+- 📁 **Custom Local Save Destination:** Choose your desired folder on any local drive before or after rendering with native file pickers.
+- ☁️ **Personal Google Drive Cloud Save:** Connect your personal Google Drive in 1-click (OAuth2) to automatically upload rendered videos and backup projects directly to a dedicated `FucuFlow Studio Videos` folder with instant shareable links.
 
 ---
 

@@ -30,6 +30,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AspectRatio } from "@/types/editor";
 import { desktopBridge } from "@/lib/desktopBridge";
 import { ThemeMode } from "@/components/editor/EditorSettingsModal";
+import { GoogleDriveModal, GoogleDriveIcon } from "@/components/editor/GoogleDriveModal";
+import { googleDriveService } from "@/lib/googleDriveService";
 
 type DashboardTab = "overview" | "videos" | "settings";
 
@@ -65,6 +67,9 @@ export function DesktopAppDashboard() {
     }
     return 5;
   });
+
+  const [isGDriveModalOpen, setIsGDriveModalOpen] = useState<boolean>(false);
+  const [gdriveStatus, setGdriveStatus] = useState(() => googleDriveService.getDriveStatus());
 
   // Apply theme class to document element and compute effective theme
   useEffect(() => {
@@ -932,13 +937,49 @@ export function DesktopAppDashboard() {
                 </div>
               </div>
 
-              {/* Setting Section 4: About & Open Source */}
+              {/* Setting Section 4: Personal Google Drive Cloud Save */}
+              <div className={`p-6 rounded-3xl border space-y-4 transition-all ${
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-white/[0.06] border border-slate-200 dark:border-white/10 flex items-center justify-center shadow-xs">
+                      <GoogleDriveIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className={`text-sm font-bold flex items-center gap-2 ${isLight ? "text-slate-900" : "text-white"}`}>
+                        <span>Personal Google Drive</span>
+                        {gdriveStatus.isConnected && (
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            Connected
+                          </span>
+                        )}
+                      </h3>
+                      <p className={`text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                        {gdriveStatus.isConnected && gdriveStatus.user?.email
+                          ? `Connected as ${gdriveStatus.user.email} (Folder: FucuFlow Studio Videos)`
+                          : "Save rendered videos and backed-up projects directly to Google Drive."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsGDriveModalOpen(true)}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                  >
+                    {gdriveStatus.isConnected ? "Manage Account" : "Connect Drive"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Setting Section 5: About & Open Source */}
               <div className={`p-6 rounded-3xl border space-y-3 shadow-xs ${
                 isLight ? "bg-white border-slate-200" : "bg-[#080D1A] border-white/[0.08]"
               }`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>FucuFlow Studio Desktop v0.1.4</h3>
+                    <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>FucuFlow Studio Desktop v0.1.6</h3>
                     <p className={`text-xs mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>Created by Eric Va • Permissive MIT License</p>
                   </div>
                   <a
@@ -960,6 +1001,18 @@ export function DesktopAppDashboard() {
           )}
         </div>
       </main>
+
+      {/* Google Drive Connection Modal */}
+      <GoogleDriveModal
+        isOpen={isGDriveModalOpen}
+        onClose={() => {
+          setIsGDriveModalOpen(false);
+          setGdriveStatus(googleDriveService.getDriveStatus());
+        }}
+        onConnected={() => {
+          setGdriveStatus(googleDriveService.getDriveStatus());
+        }}
+      />
     </div>
   );
 }

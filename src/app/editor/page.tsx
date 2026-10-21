@@ -28,6 +28,8 @@ import {
   deleteProjectFromDB,
 } from "@/utils/indexedDBStorage";
 import { EditorSettingsModal, ThemeMode } from "@/components/editor/EditorSettingsModal";
+import { GoogleDriveModal } from "@/components/editor/GoogleDriveModal";
+import { googleDriveService } from "@/lib/googleDriveService";
 import { desktopBridge } from "@/lib/desktopBridge";
 
 export default function EditorPage() {
@@ -485,6 +487,15 @@ export default function EditorPage() {
   const [effectiveTheme, setEffectiveTheme] = useState<"dark" | "light">("dark");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isGoogleDriveModalOpen, setIsGoogleDriveModalOpen] = useState<boolean>(false);
+  const [isGDriveConnected, setIsGDriveConnected] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const gStatus = googleDriveService.getDriveStatus();
+      setIsGDriveConnected(gStatus.isConnected);
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -684,6 +695,48 @@ export default function EditorPage() {
     },
     [clips, config, events, metadata?.duration, metadata?.name, projectName]
   );
+
+  // Backup active project JSON to user's Google Drive
+  const handleBackupProjectToGoogleDrive = useCallback(async () => {
+    let thumbnail: string | undefined = undefined;
+    if (canvasRef.current) {
+      try {
+        thumbnail = canvasRef.current.toDataURL("image/jpeg", 0.6);
+      } catch (err) {
+        console.warn("Could not capture thumbnail:", err);
+      }
+    }
+
+    const currentId = projectIdRef.current || `proj-${Date.now()}`;
+    const calcDuration = clips.reduce(
+      (max, c) => Math.max(max, c.endTimeline),
+      metadata?.duration || 10
+    );
+
+    const projectData: SavedProject = {
+      id: currentId,
+      name: projectName,
+      createdAt: createdAtRef.current,
+      updatedAt: Date.now(),
+      duration: Math.round(calcDuration * 10) / 10,
+      aspectRatio: config.aspectRatio,
+      clipCount: clips.length,
+      keyframeCount: events.length,
+      thumbnail,
+      videoFileName: metadata?.name || "recording.mp4",
+      config,
+      clips,
+      events,
+    };
+
+    const projectJson = JSON.stringify(projectData, null, 2);
+    const fileName = `${projectName.toLowerCase().replace(/\s+/g, "-")}-backup.fucuflow`;
+
+    await googleDriveService.uploadProjectToGoogleDrive({
+      projectJson,
+      fileName,
+    });
+  }, [clips, config, events, metadata?.duration, metadata?.name, projectName]);
 
   // Mark dirty when user modifies clips, events, config, or project name
   useEffect(() => {
@@ -1247,6 +1300,8 @@ export default function EditorPage() {
         onOpenExport={() => setIsExportOpen(true)}
         onSaveProject={handleSaveProject}
         isSavedFeedback={isSavedFeedback}
+        onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
+        isGoogleDriveConnected={isGDriveConnected}
         isReady={Boolean(videoSrc && metadata)}
         isElectron={isElectron}
         onNativeOpenVideo={handleNativeOpenVideo}
@@ -1585,11 +1640,22 @@ export default function EditorPage() {
         autoSaveInterval={autoSaveInterval}
         onChangeAutoSaveInterval={handleChangeAutoSaveInterval}
         onSaveNow={() => handleSaveProject(false)}
+        onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
         onClearCache={() => {
           if (projectIdRef.current) {
             deleteProjectFromDB(projectIdRef.current);
           }
         }}
+      />
+
+      {/* 7. Personal Google Drive Integration Modal */}
+      <GoogleDriveModal
+        isOpen={isGoogleDriveModalOpen}
+        onClose={() => setIsGoogleDriveModalOpen(false)}
+        onConnected={() => {
+          setIsGDriveConnected(true);
+        }}
+        onBackupProject={handleBackupProjectToGoogleDrive}
       />
     </div>
   );

@@ -26,8 +26,8 @@ import {
   Moon,
 } from "lucide-react";
 import { AspectRatio } from "@/types/editor";
-
 import { Button } from "@/components/ui/Button";
+import { GoogleDriveIcon } from "@/components/editor/GoogleDriveModal";
 
 interface EditorHeaderProps {
   projectName: string;
@@ -38,6 +38,8 @@ interface EditorHeaderProps {
   onOpenExport: () => void;
   onSaveProject?: () => void;
   isSavedFeedback?: boolean;
+  onOpenGoogleDrive?: () => void;
+  isGoogleDriveConnected?: boolean;
   isReady: boolean;
   // Electron Desktop props
   isElectron?: boolean;
@@ -82,6 +84,8 @@ function EditorHeaderBase({
   onOpenExport,
   onSaveProject,
   isSavedFeedback = false,
+  onOpenGoogleDrive,
+  isGoogleDriveConnected = false,
   isReady,
   isElectron = false,
   onNativeOpenVideo,
@@ -379,6 +383,26 @@ function EditorHeaderBase({
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400/90 font-mono hidden xl:inline animate-in fade-in">
                 {autoSaveStatus}
               </span>
+            )}
+
+            {onOpenGoogleDrive && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onOpenGoogleDrive}
+                title={
+                  isGoogleDriveConnected
+                    ? "Google Drive Connected — Click to backup project & view files"
+                    : "Connect personal Google Drive to save video & backup projects"
+                }
+                leftIcon={<GoogleDriveIcon className="w-3.5 h-3.5" />}
+                className="hidden sm:inline-flex items-center gap-1.5"
+              >
+                <span>Drive</span>
+                {isGoogleDriveConnected && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                )}
+              </Button>
             )}
           </div>
         )}

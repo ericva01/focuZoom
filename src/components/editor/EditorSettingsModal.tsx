@@ -12,9 +12,12 @@ import {
   Trash2,
   Check,
   ShieldCheck,
+  Cloud,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { getStorageUsage } from "@/utils/indexedDBStorage";
+import { googleDriveService } from "@/lib/googleDriveService";
+import { GoogleDriveIcon } from "@/components/editor/GoogleDriveModal";
 
 export type ThemeMode = "dark" | "light" | "system";
 
@@ -29,6 +32,7 @@ interface EditorSettingsModalProps {
   onChangeAutoSaveInterval: (interval: number) => void;
   onSaveNow?: () => void;
   onClearCache?: () => void;
+  onOpenGoogleDrive?: () => void;
 }
 
 export function EditorSettingsModal({
@@ -42,16 +46,19 @@ export function EditorSettingsModal({
   onChangeAutoSaveInterval,
   onSaveNow,
   onClearCache,
+  onOpenGoogleDrive,
 }: EditorSettingsModalProps) {
   const [storageInfo, setStorageInfo] = useState<{ usedMB: number; quotaMB: number }>({
     usedMB: 0,
     quotaMB: 0,
   });
   const [clearedFeedback, setClearedFeedback] = useState<boolean>(false);
+  const [gdriveStatus, setGdriveStatus] = useState(googleDriveService.getDriveStatus());
 
   useEffect(() => {
     if (isOpen) {
       getStorageUsage().then(setStorageInfo);
+      setGdriveStatus(googleDriveService.getDriveStatus());
     }
   }, [isOpen]);
 
@@ -240,6 +247,48 @@ export function EditorSettingsModal({
                   <span>{clearedFeedback ? "Cleared!" : "Clear Cache"}</span>
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* 4. Personal Google Drive Integration */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <GoogleDriveIcon className="w-5 h-5 shrink-0" />
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <span>Personal Google Drive</span>
+                    {gdriveStatus.isConnected ? (
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                        Connected
+                      </span>
+                    ) : (
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400">
+                        Cloud Sync
+                      </span>
+                    )}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    {gdriveStatus.isConnected && gdriveStatus.user?.email
+                      ? `Connected as ${gdriveStatus.user.email} (Folder: FucuFlow Studio Videos)`
+                      : "Save rendered videos and project backups straight to your Google Drive account."}
+                  </p>
+                </div>
+              </div>
+
+              {onOpenGoogleDrive && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    onClose();
+                    onOpenGoogleDrive();
+                  }}
+                  className="text-xs font-bold shrink-0 ml-2"
+                >
+                  {gdriveStatus.isConnected ? "Manage" : "Connect"}
+                </Button>
+              )}
             </div>
           </div>
         </div>

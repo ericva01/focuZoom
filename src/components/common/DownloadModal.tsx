@@ -26,7 +26,7 @@ interface DownloadModalProps {
   onClose: () => void;
 }
 
-const DEFAULT_TAG = "v0.1.4";
+const DEFAULT_TAG = "v0.1.6";
 const GITHUB_REPO = "ericva01/focuZoom";
 const GITHUB_RELEASES_PAGE = `https://github.com/${GITHUB_REPO}/releases/latest`;
 
