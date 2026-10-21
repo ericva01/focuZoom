@@ -1,5 +1,6 @@
 import OpenGraphImage, { size as ogSize, contentType as ogContentType, alt as ogAlt } from "./opengraph-image";
 
+export const dynamic = "force-static";
 export const runtime = "nodejs";
 export const size = ogSize;
 export const contentType = ogContentType;

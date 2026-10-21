@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = "force-static";
 export const runtime = "nodejs";
 export const alt = "FucuFlow — Cinematic Screen Recording and Auto-Zoom";
 export const size = {
