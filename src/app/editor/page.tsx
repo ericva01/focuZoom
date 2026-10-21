@@ -482,27 +482,28 @@ export default function EditorPage() {
     }
     return "dark";
   });
+  const [effectiveTheme, setEffectiveTheme] = useState<"dark" | "light">("dark");
 
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const root = document.documentElement;
+    let current: "dark" | "light" = "dark";
     if (theme === "light") {
+      current = "light";
+    } else if (theme === "dark") {
+      current = "dark";
+    } else {
+      current = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    setEffectiveTheme(current);
+    if (current === "light") {
       root.classList.add("light");
       root.classList.remove("dark");
-    } else if (theme === "dark") {
+    } else {
       root.classList.add("dark");
       root.classList.remove("light");
-    } else {
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (isDark) {
-        root.classList.add("dark");
-        root.classList.remove("light");
-      } else {
-        root.classList.add("light");
-        root.classList.remove("dark");
-      }
     }
   }, [theme]);
 
@@ -514,7 +515,7 @@ export default function EditorPage() {
   };
 
   const handleToggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light";
+    const next = effectiveTheme === "light" ? "dark" : "light";
     handleThemeChange(next);
   };
 
@@ -1230,7 +1231,7 @@ export default function EditorPage() {
   return (
     <div
       className={`flex flex-col h-screen w-screen transition-colors duration-200 ${
-        theme === "light" ? "bg-[#F1F5F9] text-slate-800" : "bg-[#090D16] text-slate-100"
+        effectiveTheme === "light" ? "bg-[#F1F5F9] text-slate-800" : "bg-[#090D16] text-slate-100"
       } overflow-hidden font-sans select-none relative`}
     >
       {/* Subtle atmospheric ambient glow */}

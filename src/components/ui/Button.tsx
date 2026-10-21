@@ -18,13 +18,13 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     "bg-[#FF6B2C] hover:bg-[#E85A1F] text-white border-[#FF7A3D]/50 shadow-sm shadow-[#FF6B2C]/25 active:bg-[#E85A1F]",
   secondary:
-    "bg-white/[0.06] hover:bg-white/[0.12] text-slate-100 hover:text-white border-white/12 hover:border-white/25 shadow-glass-sm active:bg-white/[0.16]",
+    "bg-slate-100 hover:bg-slate-200 text-slate-800 hover:text-slate-900 border-slate-300 shadow-xs active:bg-slate-300 dark:bg-white/[0.08] dark:hover:bg-white/[0.14] dark:text-slate-100 dark:hover:text-white dark:border-white/15 dark:shadow-glass-sm dark:active:bg-white/[0.18]",
   ghost:
-    "bg-transparent hover:bg-white/[0.08] text-slate-300 hover:text-white border-transparent hover:border-white/10 active:bg-white/[0.12]",
+    "bg-transparent hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-transparent hover:border-slate-200 active:bg-slate-200 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/[0.08] dark:active:bg-white/[0.12]",
   danger:
-    "bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 hover:text-white border-rose-500/40 shadow-glass-sm active:bg-rose-600/60",
+    "bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200 active:bg-rose-200 dark:bg-rose-600/30 dark:hover:bg-rose-600/50 dark:text-rose-200 dark:hover:text-white dark:border-rose-500/40 dark:shadow-glass-sm dark:active:bg-rose-600/60",
   active:
-    "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm hover:bg-[#FF6B2C]/30",
+    "bg-[#FFF1E8] text-[#FF6B2C] border-[#FF6B2C]/40 shadow-xs hover:bg-[#FFE6D7] font-semibold dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] dark:border-[#FF6B2C]/40 dark:shadow-glass-sm dark:hover:bg-[#FF6B2C]/30",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

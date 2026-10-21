@@ -266,48 +266,48 @@ body {
 /* Light Theme Glassmorphism Overrides */
 .light .glass-panel,
 :root.light .glass-panel {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.06), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   color: #0F172A;
 }
 
 .light .glass-panel-subtle,
 :root.light .glass-panel-subtle {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04);
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
   color: #0F172A;
 }
 
 .light .glass-panel-elevated,
 :root.light .glass-panel-elevated {
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.08), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.04);
   color: #0F172A;
 }
 
 .light .glass-panel-interactive,
 :root.light .glass-panel-interactive {
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
   color: #0F172A;
 }
 
 .light .glass-panel-interactive:hover,
 :root.light .glass-panel-interactive:hover {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(0, 0, 0, 0.16);
-  box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+  box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.08);
   color: #0F172A;
 }
 
 .light .glass-input,
 :root.light .glass-input {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
   color: #0F172A;
   box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
@@ -320,9 +320,10 @@ body {
 
 .light .glass-badge,
 :root.light .glass-badge {
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  color: #334155;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+  font-weight: 600;
 }
 
 .light .bg-grid-pattern,

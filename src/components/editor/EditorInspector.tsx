@@ -395,7 +395,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-xs font-semibold text-white block">Screen Render Resolution</label>
+                  <label className="text-xs font-semibold text-slate-800 dark:text-white block">Screen Render Resolution</label>
                   <p className="text-[10px] text-slate-400 mt-0.5">High-DPI canvas supersampling for razor sharp text</p>
                 </div>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
@@ -417,7 +417,7 @@ function EditorInspectorBase({
                       className={`p-2 rounded-xl text-center border transition-all ${
                         isSelected
                           ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm font-bold"
-                          : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                       }`}
                     >
                       <div className="text-xs font-semibold">{res.name}</div>
@@ -430,7 +430,7 @@ function EditorInspectorBase({
 
             {/* 3D Perspective Preset */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
-              <label className="text-xs font-semibold text-white block">3D Stage Orientation</label>
+              <label className="text-xs font-semibold text-slate-800 dark:text-white block">3D Stage Orientation</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { id: "simple-smooth" as ScreenAnglePreset, name: "Simple Smooth", desc: "Smooth Zoom In & Out (Zero Tilt)" },
@@ -448,10 +448,10 @@ function EditorInspectorBase({
                     } ${
                       config.screenAnglePreset === preset.id
                         ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
-                        : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                     }`}
                   >
-                    <div className="text-xs font-semibold text-white">{preset.name}</div>
+                    <div className="text-xs font-semibold text-slate-800 dark:text-white">{preset.name}</div>
                     <div className="text-[10px] text-slate-400">{preset.desc}</div>
                   </button>
                 ))}
@@ -461,7 +461,7 @@ function EditorInspectorBase({
             {/* DYNAMIC PADDING / INSET SLIDER (0px to 120px) */}
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-semibold text-white">Stage Inset (Padding)</label>
+                <label className="text-xs font-semibold text-slate-800 dark:text-white">Stage Inset (Padding)</label>
                 <div className="flex items-center gap-1 font-mono text-xs text-[#FF6B2C] font-bold">
                   <span>{config.padding}</span>
                   <span className="text-slate-400">px</span>
@@ -475,7 +475,7 @@ function EditorInspectorBase({
                 step="2"
                 value={config.padding}
                 onChange={(e) => onChangeConfig({ padding: parseInt(e.target.value) })}
-                className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
               />
 
               <div className="grid grid-cols-5 gap-1.5 pt-1">
@@ -487,7 +487,7 @@ function EditorInspectorBase({
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.padding === pad
                         ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30"
-                        : "bg-white/[0.04] text-slate-400 hover:text-white"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/70 dark:bg-white/[0.04] dark:text-slate-400 dark:border-transparent dark:hover:text-white"
                     }`}
                   >
                     {pad}px
@@ -499,7 +499,7 @@ function EditorInspectorBase({
             {/* CORNER RADIUS (0px to 64px) */}
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-semibold text-white">Corner Curvature</label>
+                <label className="text-xs font-semibold text-slate-800 dark:text-white">Corner Curvature</label>
                 <div className="flex items-center gap-1 font-mono text-xs text-[#FF6B2C] font-bold">
                   <span>{config.cornerRadius}</span>
                   <span className="text-slate-400">px</span>
@@ -513,7 +513,7 @@ function EditorInspectorBase({
                 step="2"
                 value={config.cornerRadius}
                 onChange={(e) => onChangeConfig({ cornerRadius: parseInt(e.target.value) })}
-                className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
               />
 
               <div className="grid grid-cols-5 gap-1.5 pt-1">
@@ -525,7 +525,7 @@ function EditorInspectorBase({
                     className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
                       config.cornerRadius === rad
                         ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30"
-                        : "bg-white/[0.04] text-slate-400 hover:text-white"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/70 dark:bg-white/[0.04] dark:text-slate-400 dark:border-transparent dark:hover:text-white"
                     }`}
                   >
                     {rad}px
@@ -573,7 +573,7 @@ function EditorInspectorBase({
                           : "border-white/15 opacity-80 hover:opacity-100"
                       }`}
                     >
-                      <span className="text-[10px] font-semibold text-white drop-shadow">
+                      <span className="text-[10px] font-semibold text-slate-800 dark:text-white drop-shadow">
                         {g.name}
                       </span>
                       {config.backgroundPreset === g.id && (
@@ -640,7 +640,7 @@ function EditorInspectorBase({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Focus className="w-4 h-4 text-[#FF6B2C]" />
-                <span className="text-xs font-semibold text-white">Zoom Keyframes</span>
+                <span className="text-xs font-semibold text-slate-800 dark:text-white">Zoom Keyframes</span>
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30">
                   {events.length}
                 </span>
@@ -663,7 +663,7 @@ function EditorInspectorBase({
                     <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-400/40">
                       Selected Zoom
                     </span>
-                    <span className="text-xs font-bold text-white">
+                    <span className="text-xs font-bold text-slate-800 dark:text-white">
                       Zoom {selectedEvent.zoom || 2}X
                     </span>
                   </div>
@@ -737,7 +737,7 @@ function EditorInspectorBase({
                               : "bg-white/[0.03] text-slate-400 border-white/10 hover:bg-white/[0.06] hover:text-white"
                           }`}
                         >
-                          <div className="text-[11px] font-medium text-white">{preset.name}</div>
+                          <div className="text-[11px] font-medium text-slate-800 dark:text-white">{preset.name}</div>
                           <div className="text-[9px] text-slate-400">{preset.desc}</div>
                         </button>
                       );
@@ -768,7 +768,7 @@ function EditorInspectorBase({
                         className={`py-1 rounded-lg text-[10px] font-medium border transition-all ${
                           Math.abs(selectedEvent.x - pos.x) < 0.08 && Math.abs(selectedEvent.y - pos.y) < 0.08
                             ? "bg-blue-600 text-white border-blue-400 font-bold shadow-sm"
-                            : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                            : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                         }`}
                       >
                         {pos.name}
@@ -791,7 +791,7 @@ function EditorInspectorBase({
                       onChange={(e) =>
                         onUpdateEvent(selectedEvent.id, { x: parseFloat(e.target.value) })
                       }
-                      className="w-full accent-blue-400 cursor-pointer h-1 bg-white/10 rounded"
+                      className="w-full accent-blue-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                     />
                   </div>
 
@@ -810,7 +810,7 @@ function EditorInspectorBase({
                       onChange={(e) =>
                         onUpdateEvent(selectedEvent.id, { y: parseFloat(e.target.value) })
                       }
-                      className="w-full accent-blue-400 cursor-pointer h-1 bg-white/10 rounded"
+                      className="w-full accent-blue-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                     />
                   </div>
                 </div>
@@ -832,7 +832,7 @@ function EditorInspectorBase({
                     onChange={(e) =>
                       onUpdateEvent(selectedEvent.id, { holdDuration: parseFloat(e.target.value) })
                     }
-                    className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/10 rounded"
+                    className="w-full accent-emerald-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                   />
                 </div>
               </div>
@@ -897,7 +897,7 @@ function EditorInspectorBase({
                     step="0.05"
                     value={config.zoomDuration ?? 0.6}
                     onChange={(e) => onChangeConfig({ zoomDuration: parseFloat(e.target.value) })}
-                    className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                    className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                   />
                 </div>
 
@@ -914,7 +914,7 @@ function EditorInspectorBase({
                     step="0.1"
                     value={config.zoomHoldDuration ?? 1.4}
                     onChange={(e) => onChangeConfig({ zoomHoldDuration: parseFloat(e.target.value) })}
-                    className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/10 rounded"
+                    className="w-full accent-emerald-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                   />
                 </div>
 
@@ -931,7 +931,7 @@ function EditorInspectorBase({
                     step="0.05"
                     value={config.zoomOutDuration ?? 0.6}
                     onChange={(e) => onChangeConfig({ zoomOutDuration: parseFloat(e.target.value) })}
-                    className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                    className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                   />
                 </div>
               </div>
@@ -1053,7 +1053,7 @@ function EditorInspectorBase({
                               onUpdateEvent(ev.id, { timestamp: val });
                               onSeek?.(val);
                             }}
-                            className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                            className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                             title="Drag to smoothly scrub and move video time in real-time"
                           />
                         </div>
@@ -1111,7 +1111,7 @@ function EditorInspectorBase({
                             onChange={(e) => {
                               onUpdateEvent(ev.id, { zoomInDuration: parseFloat(e.target.value) });
                             }}
-                            className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                            className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                           />
                         </div>
 
@@ -1131,7 +1131,7 @@ function EditorInspectorBase({
                             onChange={(e) => {
                               onUpdateEvent(ev.id, { holdDuration: parseFloat(e.target.value) });
                             }}
-                            className="w-full accent-emerald-400 cursor-pointer h-1 bg-white/10 rounded"
+                            className="w-full accent-emerald-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                           />
                         </div>
 
@@ -1151,7 +1151,7 @@ function EditorInspectorBase({
                             onChange={(e) => {
                               onUpdateEvent(ev.id, { zoomOutDuration: parseFloat(e.target.value) });
                             }}
-                            className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                            className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
                           />
                         </div>
 
@@ -1197,7 +1197,7 @@ function EditorInspectorBase({
             {/* Screen Recording Controls */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-white">Screen Capture Hub</span>
+                <span className="text-xs font-semibold text-slate-800 dark:text-white">Screen Capture Hub</span>
                 {isRecording && (
                   <span className="flex items-center gap-1 text-[#FF6B2C] font-mono text-[11px] font-bold animate-pulse">
                     <span className="w-2 h-2 rounded-full bg-[#FF6B2C]" />
@@ -1245,7 +1245,7 @@ function EditorInspectorBase({
 
             {/* Load Sample Demo Video */}
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
-              <span className="text-xs font-semibold text-white block">Sample Content</span>
+              <span className="text-xs font-semibold text-slate-800 dark:text-white block">Sample Content</span>
               <Button
                 variant="secondary"
                 size="md"
@@ -1260,7 +1260,7 @@ function EditorInspectorBase({
 
             {/* Upload Custom Video */}
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
-              <span className="text-xs font-semibold text-white block">Upload Video</span>
+              <span className="text-xs font-semibold text-slate-800 dark:text-white block">Upload Video</span>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -1285,19 +1285,19 @@ function EditorInspectorBase({
             {/* Video Metadata Card */}
             {metadata && (
               <div className="glass-panel p-4 rounded-xl space-y-2 text-xs">
-                <span className="text-xs font-semibold text-white block">Source Metadata</span>
-                <div className="space-y-1 font-mono text-[11px] text-slate-300">
+                <span className="text-xs font-semibold text-slate-800 dark:text-white block">Source Metadata</span>
+                <div className="space-y-1 font-mono text-[11px] text-slate-700 dark:text-slate-300">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">File:</span>
-                    <span className="text-white truncate max-w-[160px]">{metadata.name}</span>
+                    <span className="text-slate-500 dark:text-slate-400">File:</span>
+                    <span className="text-slate-900 dark:text-white font-medium truncate max-w-[160px]">{metadata.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Dimensions:</span>
-                    <span>{metadata.width} x {metadata.height}</span>
+                    <span className="text-slate-500 dark:text-slate-400">Dimensions:</span>
+                    <span className="text-slate-900 dark:text-slate-200">{metadata.width} x {metadata.height}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Duration:</span>
-                    <span>{metadata.duration.toFixed(1)}s</span>
+                    <span className="text-slate-500 dark:text-slate-400">Duration:</span>
+                    <span className="text-slate-900 dark:text-slate-200">{metadata.duration.toFixed(1)}s</span>
                   </div>
                 </div>
               </div>
@@ -1328,7 +1328,7 @@ function EditorInspectorBase({
                     )}
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-white block">Custom Cursor Overlay</span>
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white block">Custom Cursor Overlay</span>
                     <span className="text-[10px] text-slate-400">
                       {config.showCursor ? "Visible across preview & export render" : "Hidden across preview & export render"}
                     </span>
@@ -1354,7 +1354,7 @@ function EditorInspectorBase({
 
             <div className={`space-y-4 transition-opacity ${config.showCursor ? "opacity-100" : "opacity-60 pointer-events-none"}`}>
             <div className="glass-panel p-4 rounded-xl space-y-3">
-              <label className="text-xs font-semibold text-white block">Cursor Pointer Style</label>
+              <label className="text-xs font-semibold text-slate-800 dark:text-white block">Cursor Pointer Style</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { id: "macos-arrow" as CursorStyle, label: "macOS Arrow" },
@@ -1369,10 +1369,10 @@ function EditorInspectorBase({
                     className={`p-2.5 rounded-xl text-left border transition-all ${
                       config.cursorStyle === cur.id
                         ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
-                        : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                     }`}
                   >
-                    <span className="text-xs font-semibold text-white">{cur.label}</span>
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white">{cur.label}</span>
                   </button>
                 ))}
               </div>
@@ -1381,7 +1381,7 @@ function EditorInspectorBase({
             {/* Cursor Size */}
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center text-xs">
-                <label className="font-semibold text-white">Cursor Size</label>
+                <label className="font-semibold text-slate-800 dark:text-white">Cursor Size</label>
                 <span className="font-mono text-[#FF6B2C] font-bold">{config.cursorSize}px</span>
               </div>
               <input
@@ -1390,14 +1390,14 @@ function EditorInspectorBase({
                 max="36"
                 value={config.cursorSize}
                 onChange={(e) => onChangeConfig({ cursorSize: parseInt(e.target.value) })}
-                className="w-full accent-sky-400 cursor-pointer h-1 bg-white/10 rounded"
+                className="w-full accent-sky-400 cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
               />
             </div>
 
             {/* Click Ripple Wave Toggle */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-white">Click Wave Ripples</span>
+                <span className="text-xs font-semibold text-slate-800 dark:text-white">Click Wave Ripples</span>
                 <button
                   type="button"
                   onClick={() => onChangeConfig({ showRipple: !config.showRipple })}
@@ -1427,7 +1427,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xs font-semibold text-white">Record Webcam Face</h3>
+                  <h3 className="text-xs font-semibold text-slate-800 dark:text-white">Record Webcam Face</h3>
                   <p className="text-[11px] text-slate-400">
                     Captures your webcam alongside the screen and overlays a floating bubble.
                   </p>
@@ -1490,7 +1490,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-semibold text-white">Import Webcam Video File</h4>
+                  <h4 className="text-xs font-semibold text-slate-800 dark:text-white">Import Webcam Video File</h4>
                   <p className="text-[11px] text-slate-400">
                     Attach a recorded webcam video (MP4/WebM) to overlay as PiP on this project.
                   </p>
@@ -1580,7 +1580,7 @@ function EditorInspectorBase({
             {/* Camera Device Selector */}
             {availableCameras.length > 0 && (
               <div className="glass-panel p-4 rounded-xl space-y-2.5">
-                <label className="text-xs font-semibold text-white block">Camera Device</label>
+                <label className="text-xs font-semibold text-slate-800 dark:text-white block">Camera Device</label>
                 <select
                   value={selectedCameraId || config.webcamConfig?.deviceId || ""}
                   onChange={(e) => {
@@ -1617,7 +1617,7 @@ function EditorInspectorBase({
 
             {/* Shape Selector */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
-              <label className="text-xs font-semibold text-white block">PiP Shape</label>
+              <label className="text-xs font-semibold text-slate-800 dark:text-white block">PiP Shape</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: "circle" as WebcamShape, label: "Circle (Bubble)" },
@@ -1651,7 +1651,7 @@ function EditorInspectorBase({
                       className={`p-2.5 rounded-xl text-center border transition-all ${
                         currentShape === sh.id
                           ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
-                          : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                       }`}
                     >
                       <span className="text-xs font-semibold">{sh.label}</span>
@@ -1663,7 +1663,7 @@ function EditorInspectorBase({
 
             {/* Position Corner Presets */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
-              <label className="text-xs font-semibold text-white block">Corner Preset</label>
+              <label className="text-xs font-semibold text-slate-800 dark:text-white block">Corner Preset</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { id: "bottom-right" as WebcamPosition, label: "Bottom Right", x: 0.85, y: 0.82 },
@@ -1700,7 +1700,7 @@ function EditorInspectorBase({
                       className={`p-2 rounded-xl text-center border transition-all text-xs font-medium ${
                         currentPos === pos.id
                           ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 font-semibold"
-                          : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                       }`}
                     >
                       {pos.label}
@@ -1716,7 +1716,7 @@ function EditorInspectorBase({
             {/* Size Slider */}
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center text-xs">
-                <label className="font-semibold text-white">Bubble Size</label>
+                <label className="font-semibold text-slate-800 dark:text-white">Bubble Size</label>
                 <span className="font-mono text-[#FF6B2C] font-bold">
                   {config.webcamConfig?.size || 180}px
                 </span>
@@ -1745,7 +1745,7 @@ function EditorInspectorBase({
                     },
                   })
                 }
-                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-white/10 rounded"
+                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
               />
             </div>
 
@@ -1753,7 +1753,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-white block">Mirror Video</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-white block">Mirror Video</span>
                   <span className="text-[11px] text-slate-400">Flips video horizontally (natural mirror look)</span>
                 </div>
                 <button
@@ -1791,7 +1791,7 @@ function EditorInspectorBase({
 
               <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
                 <div>
-                  <span className="text-xs font-semibold text-white block">Cinematic Shadow</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-white block">Cinematic Shadow</span>
                   <span className="text-[11px] text-slate-400">Deep ambient shadow behind bubble</span>
                 </div>
                 <button
@@ -1831,7 +1831,7 @@ function EditorInspectorBase({
             {/* Border Width & Color */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex justify-between items-center text-xs">
-                <label className="font-semibold text-white">Border Width</label>
+                <label className="font-semibold text-slate-800 dark:text-white">Border Width</label>
                 <span className="font-mono text-[#FF6B2C] font-bold">
                   {config.webcamConfig?.borderWidth ?? 3}px
                 </span>
@@ -1860,11 +1860,11 @@ function EditorInspectorBase({
                     },
                   })
                 }
-                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-white/10 rounded"
+                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
               />
 
               <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between">
-                <label className="text-xs font-semibold text-white">Border Color</label>
+                <label className="text-xs font-semibold text-slate-800 dark:text-white">Border Color</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"

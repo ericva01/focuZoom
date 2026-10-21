@@ -168,7 +168,7 @@ function EditorHeaderBase({
                 onBlur={() => setIsEditingTitle(false)}
                 onKeyDown={(e) => e.key === "Enter" && setIsEditingTitle(false)}
                 autoFocus
-                className="glass-input text-slate-900 dark:text-white text-xs font-semibold px-2.5 py-1 rounded-lg outline-none w-48"
+                className="bg-white dark:bg-black/50 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white text-xs font-semibold px-2.5 py-1 rounded-lg outline-none w-48 shadow-xs focus:border-[#FF6B2C]"
               />
             ) : (
               <button
@@ -195,8 +195,8 @@ function EditorHeaderBase({
             onClick={() => onAspectRatioChange(ratio.value)}
             className={`px-3 py-1 rounded-lg font-medium transition-all duration-200 ${
               aspectRatio === ratio.value
-                ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-semibold border border-[#FF6B2C]/40 shadow-glass-sm"
-                : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.05]"
+                ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-xs"
+                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-white/[0.05]"
             }`}
           >
             {ratio.label}
@@ -240,19 +240,19 @@ function EditorHeaderBase({
             }
             className={
               enableWebcam
-                ? "border-emerald-400/40 text-emerald-200 bg-emerald-500/15 shadow-glass-sm"
+                ? "border-emerald-500/40 text-emerald-700 bg-emerald-50 shadow-xs dark:border-emerald-400/40 dark:text-emerald-200 dark:bg-emerald-500/15 dark:shadow-glass-sm font-semibold"
                 : hasWebcamRecorded
-                ? "border-white/10 text-slate-300 hover:text-white"
-                : "border-white/10 text-slate-400 hover:text-white"
+                ? "border-slate-300 text-slate-700 hover:text-slate-900 dark:border-white/10 dark:text-slate-300 dark:hover:text-white"
+                : "border-slate-300 text-slate-600 hover:text-slate-900 dark:border-white/10 dark:text-slate-400 dark:hover:text-white"
             }
-            leftIcon={<Camera className={`w-3.5 h-3.5 ${enableWebcam ? "text-emerald-400" : "text-slate-400"}`} />}
+            leftIcon={<Camera className={`w-3.5 h-3.5 ${enableWebcam ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"}`} />}
           >
             <span className="hidden sm:inline">Webcam</span>
             <span
               className={`text-[9px] font-mono px-1.5 py-0.5 rounded ml-1 font-bold ${
                 enableWebcam
-                  ? "bg-emerald-400/20 text-emerald-300 border border-emerald-400/30"
-                  : "bg-white/[0.08] text-slate-400"
+                  ? "bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 dark:bg-emerald-400/20 dark:text-emerald-300 dark:border-emerald-400/30"
+                  : "bg-slate-200 text-slate-600 dark:bg-white/[0.08] dark:text-slate-400"
               }`}
             >
               {enableWebcam ? "REVIEW" : "OFF"}
@@ -297,12 +297,12 @@ function EditorHeaderBase({
             title={showCursor ? "Hide Simulated Cursor Overlay" : "Show Simulated Cursor Overlay"}
             className={
               showCursor
-                ? "border-[#FF6B2C]/40 text-[#FF8A4C] bg-[#FF6B2C]/15 shadow-glass-sm"
-                : "border-white/10 text-slate-400 hover:text-white"
+                ? "border-[#FF6B2C]/40 text-[#FF6B2C] bg-[#FFF1E8] shadow-xs font-semibold dark:text-[#FF8A4C] dark:bg-[#FF6B2C]/15 dark:shadow-glass-sm"
+                : "border-slate-300 text-slate-600 hover:text-slate-900 dark:border-white/10 dark:text-slate-400 dark:hover:text-white"
             }
             leftIcon={
               showCursor ? (
-                <MousePointer className="w-3.5 h-3.5 text-[#FF8A4C]" />
+                <MousePointer className="w-3.5 h-3.5 text-[#FF6B2C] dark:text-[#FF8A4C]" />
               ) : (
                 <EyeOff className="w-3.5 h-3.5 text-slate-500" />
               )
@@ -312,8 +312,8 @@ function EditorHeaderBase({
             <span
               className={`text-[9px] font-mono px-1.5 py-0.5 rounded ml-1 font-bold ${
                 showCursor
-                  ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30"
-                  : "bg-white/[0.08] text-slate-400"
+                  ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30"
+                  : "bg-slate-200 text-slate-600 dark:bg-white/[0.08] dark:text-slate-400"
               }`}
             >
               {showCursor ? "ON" : "OFF"}

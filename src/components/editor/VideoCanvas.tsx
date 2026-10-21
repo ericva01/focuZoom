@@ -350,13 +350,13 @@ function VideoCanvasBase({
       {/* Empty Timeline Stage Overlay when video clip has been deleted */}
       {clips !== undefined && clips.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 p-4 animate-in fade-in duration-200">
-          <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-white/90 dark:bg-[#090D16]/85 border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-glass-lg max-w-sm text-center">
-            <div className="w-12 h-12 rounded-xl bg-[#FF6B2C]/10 border border-[#FF6B2C]/20 flex items-center justify-center text-[#FF6B2C]">
+          <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-white/95 dark:bg-[#090D16]/90 border border-slate-300 dark:border-white/15 backdrop-blur-xl shadow-xl max-w-sm text-center">
+            <div className="w-12 h-12 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/10 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF6B2C]">
               <Film className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-800 dark:text-white">Timeline is Empty</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-sm font-bold text-slate-900 dark:text-white">Timeline is Empty</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                 The video clip was deleted from the timeline. Record screen or import video to continue editing.
               </p>
             </div>
@@ -366,7 +366,7 @@ function VideoCanvasBase({
 
       {/* Right-Click Moving Banner Overlay */}
       {isRightClickDragging && (
-        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-[#FF6B2C]/60 bg-[#17191F]/95 text-white font-bold text-xs shadow-glass-md animate-pulse">
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#17191F]/95 border border-[#FF6B2C]/60 text-white font-bold text-xs shadow-lg backdrop-blur-xl animate-pulse">
           <Crosshair className="w-4 h-4 text-[#FF8A4C] animate-spin" />
           <span>Moving Focus Point: ({Math.round((hoverCoords?.x ?? 0.5) * 100)}%, {Math.round((hoverCoords?.y ?? 0.5) * 100)}%) · Release to save</span>
         </div>
@@ -374,7 +374,7 @@ function VideoCanvasBase({
 
       {/* Mode Banner Overlay */}
       {isAddMode && !isRightClickDragging && (
-        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl glass-panel-elevated border-[#FF6B2C]/40 text-white font-bold text-xs shadow-glass-md animate-pulse">
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#17191F]/95 border border-[#FF6B2C]/50 text-white font-bold text-xs shadow-lg backdrop-blur-xl animate-pulse">
           <Crosshair className="w-4 h-4 text-[#FF6B2C]" />
           <span>3D Focal Target Mode: Click on any element on the 3D screen to set a camera dolly target!</span>
         </div>
@@ -382,7 +382,7 @@ function VideoCanvasBase({
 
       {/* Just Added Confirmation Toast */}
       {justAddedToast && (
-        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl glass-panel-elevated border-[#FF6B2C]/50 text-white font-semibold text-xs shadow-glass-md animate-in fade-in zoom-in duration-200">
+        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#17191F]/95 border border-[#FF6B2C]/50 text-white font-semibold text-xs shadow-lg backdrop-blur-xl animate-in fade-in zoom-in duration-200">
           <Check className="w-4 h-4 text-[#FF6B2C]" />
           <span>3D Target set at ({Math.round(justAddedToast.x * 100)}%, {Math.round(justAddedToast.y * 100)}%)!</span>
         </div>
@@ -391,7 +391,7 @@ function VideoCanvasBase({
       {/* Canvas Wrapper - Centered Bounding Box */}
       <div
         onContextMenu={(e) => e.preventDefault()}
-        className={`relative flex items-center justify-center max-h-full max-w-full rounded-2xl overflow-hidden shadow-glass-lg border border-slate-300 dark:border-white/[0.12] group ${
+        className={`relative flex items-center justify-center max-h-full max-w-full rounded-2xl overflow-hidden shadow-[0_12px_45px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] border-2 border-slate-300 dark:border-white/[0.14] group ${
           config.backgroundType === "transparent"
             ? "bg-slate-200 dark:bg-[#090D16] [background-image:linear-gradient(45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(-45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgba(0,0,0,0.05)_75%),linear-gradient(-45deg,transparent_75%,rgba(0,0,0,0.05)_75%)] [background-size:20px_20px] [background-position:0_0,0_10px,10px_-10px,-10px_0px]"
             : "bg-transparent"
@@ -433,7 +433,7 @@ function VideoCanvasBase({
               onToggleFullscreen();
             }}
             title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
-            className="absolute top-4 right-4 z-30 p-2 rounded-xl glass-panel text-slate-300 hover:text-white shadow-glass-md backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10"
+            className="absolute top-4 right-4 z-30 p-2 rounded-xl bg-black/60 border border-white/20 text-slate-200 hover:text-white shadow-lg backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
           >
             {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
           </button>
@@ -442,7 +442,7 @@ function VideoCanvasBase({
         {/* Center Hover Play/Pause Overlay indicator when not in Add mode */}
         {!isAddMode && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-14 h-14 rounded-2xl glass-panel-elevated text-white flex items-center justify-center shadow-glass-lg scale-95 group-hover:scale-100 transition-transform backdrop-blur-xl">
+            <div className="w-14 h-14 rounded-2xl bg-black/60 border border-white/20 text-white flex items-center justify-center shadow-xl scale-95 group-hover:scale-100 transition-transform backdrop-blur-xl">
               {isPlaying ? (
                 <Pause className="w-6 h-6" />
               ) : (
@@ -453,9 +453,9 @@ function VideoCanvasBase({
         )}
 
         {/* Live 3D Camera Zoom Indicator HUD Badge */}
-        <div className="absolute bottom-4 left-4 z-20 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl glass-panel text-xs shadow-glass-md backdrop-blur-xl">
-          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-[#FF6B2C] animate-pulse" : "text-slate-400"}`} />
-          <span className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider hidden sm:inline">
+        <div className="absolute bottom-4 left-4 z-20 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/75 border border-white/15 text-xs shadow-lg backdrop-blur-xl text-white">
+          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-[#FF8A4C] animate-pulse" : "text-slate-400"}`} />
+          <span className="text-[10px] text-slate-300 font-mono font-bold uppercase tracking-wider hidden sm:inline">
             3D Studio
           </span>
           <span className="font-mono text-white font-bold">

@@ -597,7 +597,7 @@ function MultiTrackTimelineBase({
   return (
     <div className="h-72 border-t border-slate-200 dark:border-white/[0.1] bg-white/95 dark:bg-[#090D16]/95 backdrop-blur-2xl flex flex-col select-none relative z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
       {/* 1. Dedicated CapCut-Style Editing Toolbar */}
-      <div className="h-11 px-4 border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] flex items-center justify-between gap-2 text-xs">
+      <div className="h-11 px-4 border-b border-slate-300 dark:border-white/[0.08] bg-white/95 dark:bg-white/[0.02] flex items-center justify-between gap-2 text-xs">
         {/* Left: Trim & Cut Action Controls */}
         <div className="flex items-center gap-1">
           {/* Split / Cut Button */}
@@ -606,7 +606,7 @@ function MultiTrackTimelineBase({
             onClick={handleTriggerSplit}
             disabled={!activeClipUnderPlayhead}
             title="Split Clip at Playhead (S)"
-            className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-[#FF6B2C]/15 text-slate-700 hover:text-[#FF8A4C] border border-slate-200 hover:border-[#FF6B2C]/40 dark:bg-white/[0.06] dark:hover:bg-[#FF6B2C]/20 dark:text-slate-200 dark:border-white/10 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#FFF1E8] text-slate-800 hover:text-[#FF6B2C] border border-slate-300 hover:border-[#FF6B2C]/40 dark:bg-white/[0.06] dark:hover:bg-[#FF6B2C]/20 dark:text-slate-200 dark:border-white/10 font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-xs"
           >
             <Scissors className="w-3.5 h-3.5 text-[#FF6B2C]" />
             <span className="text-xs font-semibold">Split</span>
@@ -618,7 +618,7 @@ function MultiTrackTimelineBase({
             onClick={handleTriggerDelete}
             disabled={!activeSelectedClip}
             title="Delete Selected Clip (Del)"
-            className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-[#FF6B2C]/15 text-slate-700 hover:text-[#FF8A4C] border border-slate-200 hover:border-[#FF6B2C]/40 dark:bg-white/[0.06] dark:hover:bg-[#FF6B2C]/20 dark:text-slate-200 dark:border-white/10 font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-800 hover:text-rose-600 border border-slate-300 hover:border-rose-300 dark:bg-white/[0.06] dark:hover:bg-[#FF6B2C]/20 dark:text-slate-200 dark:border-white/10 font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-xs"
           >
             <Trash2 className="w-3.5 h-3.5 text-[#FF6B2C]" />
             <span className="text-xs">Delete</span>
@@ -630,7 +630,7 @@ function MultiTrackTimelineBase({
             onClick={handleTriggerRippleDelete}
             disabled={!activeSelectedClip}
             title="Ripple Delete: Close gap and shift subsequent clips (Shift+Del)"
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-amber-500/15 text-slate-700 hover:text-amber-600 border border-slate-200 hover:border-amber-400/40 dark:bg-white/[0.06] dark:hover:bg-amber-500/20 dark:text-slate-200 dark:border-white/10 font-medium transition-all disabled:opacity-40 disabled:pointer-events-none shadow-glass-sm"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white hover:bg-amber-50 text-slate-800 hover:text-amber-700 border border-slate-300 hover:border-amber-300 dark:bg-white/[0.06] dark:hover:bg-amber-500/20 dark:text-slate-200 dark:border-white/10 font-semibold transition-all disabled:opacity-40 disabled:pointer-events-none shadow-xs"
           >
             <Combine className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
             <span className="text-xs">Ripple Delete</span>
@@ -643,7 +643,7 @@ function MultiTrackTimelineBase({
             type="button"
             onClick={onAddKeyframeAtCurrentTime}
             title="Add 3D Dolly Zoom Target at Playhead (K)"
-            className="px-2.5 py-1.5 rounded-lg bg-[#FF6B2C]/10 hover:bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30 font-medium flex items-center gap-1.5 transition-all shadow-glass-sm"
+            className="px-2.5 py-1.5 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE6D7] text-[#FF6B2C] border border-[#FF6B2C]/40 font-bold dark:bg-[#FF6B2C]/15 dark:hover:bg-[#FF6B2C]/25 dark:text-[#FF8A4C] dark:border-[#FF6B2C]/40 shadow-xs flex items-center gap-1.5 transition-all"
           >
             <Focus className="w-3.5 h-3.5" />
             <span className="text-xs">Add Zoom Keyframe</span>
@@ -787,17 +787,17 @@ function MultiTrackTimelineBase({
         className="flex-1 overflow-x-auto overflow-y-auto flex flex-col relative"
       >
         {/* Timecode Ruler Bar */}
-        <div className="sticky top-0 z-20 flex h-7 border-b border-slate-200 dark:border-white/[0.08] bg-slate-100/95 dark:bg-[#090D16]/90 backdrop-blur-md">
+        <div className="sticky top-0 z-20 flex h-7 border-b border-slate-300 dark:border-white/[0.08] bg-slate-200/90 dark:bg-[#090D16]/90 backdrop-blur-md">
           {/* Header left placeholder */}
-          <div className="w-36 flex-shrink-0 border-r border-slate-200 dark:border-white/[0.08] bg-slate-200/80 dark:bg-black/40 px-3 flex items-center justify-between text-[11px] font-mono text-slate-600 dark:text-slate-400">
+          <div className="w-36 flex-shrink-0 border-r border-slate-300 dark:border-white/[0.08] bg-slate-200 dark:bg-black/50 px-3 flex items-center justify-between text-[11px] font-mono text-slate-800 dark:text-slate-300 font-bold">
             <span>TRACKS</span>
-            <span className="text-[10px] text-[#FF6B2C] dark:text-[#FF8A4C]/80">30 FPS</span>
+            <span className="text-[10px] text-[#FF6B2C] dark:text-[#FF8A4C] font-semibold">30 FPS</span>
           </div>
 
           {/* Timecode Ruler Canvas */}
           <div
             onMouseDown={handleStartScrubbing}
-            className="flex-1 relative cursor-pointer h-full"
+            className="flex-1 relative cursor-pointer h-full bg-slate-100/90 dark:bg-transparent"
             style={{ width: `${timelineContentWidth}px`, minWidth: "100%" }}
           >
             {rulerTicks.map((tickSec) => {
@@ -810,10 +810,10 @@ function MultiTrackTimelineBase({
                   style={{ left: `${leftPx}px` }}
                 >
                   <div
-                    className={`w-px bg-slate-300 dark:bg-white/[0.15] ${isMajor ? "h-3" : "h-1.5 mt-2"}`}
+                    className={`w-px ${isMajor ? "bg-slate-400 dark:bg-white/[0.25] h-3" : "bg-slate-300 dark:bg-white/[0.12] h-1.5 mt-2"}`}
                   />
                   {isMajor && (
-                    <span className="absolute top-1 left-1.5 text-[9px] font-mono text-slate-500 dark:text-slate-400 select-none">
+                    <span className="absolute top-1 left-1.5 text-[9px] font-mono font-semibold text-slate-700 dark:text-slate-300 select-none">
                       {formatSMPTETimecode(tickSec).substring(3, 8)}
                     </span>
                   )}
@@ -874,25 +874,25 @@ function MultiTrackTimelineBase({
           {/* ============================================================ */}
           {/* TRACK 1: Main Video Clips Track */}
           {/* ============================================================ */}
-          <div className="h-16 flex border-b border-slate-200 dark:border-white/[0.06] bg-slate-50/70 dark:bg-black/30 relative">
+          <div className="h-16 flex border-b border-slate-300 dark:border-white/[0.06] bg-slate-100/60 dark:bg-black/30 relative">
             {/* Track Header */}
-            <div className="w-36 flex-shrink-0 border-r border-slate-200 dark:border-white/[0.08] bg-slate-100 dark:bg-black/40 px-3 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 sticky left-0 z-10">
-              <div className="flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200">
-                <Video className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
+            <div className="w-36 flex-shrink-0 border-r border-slate-300 dark:border-white/[0.08] bg-slate-200/90 dark:bg-black/40 px-3 flex items-center justify-between text-xs text-slate-800 dark:text-slate-300 sticky left-0 z-10 shadow-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-slate-200">
+                <Video className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span className="text-[11px]">Video 1</span>
               </div>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setIsVideoHidden(!isVideoHidden)}
-                  className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
+                  className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 >
                   {isVideoHidden ? <EyeOff className="w-3 h-3 text-red-500" /> : <Eye className="w-3 h-3" />}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsVideoTrackLocked(!isVideoTrackLocked)}
-                  className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
+                  className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 >
                   {isVideoTrackLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                 </button>
@@ -999,10 +999,10 @@ function MultiTrackTimelineBase({
           {/* ============================================================ */}
           {/* TRACK 2: Action / Auto Zoom Capsule Bar Track */}
           {/* ============================================================ */}
-          <div className="h-12 flex border-b border-slate-200 dark:border-white/[0.06] bg-slate-100/50 dark:bg-black/20 hover:bg-slate-200/40 dark:hover:bg-white/[0.01] transition-colors relative group">
+          <div className="h-12 flex border-b border-slate-300 dark:border-white/[0.06] bg-slate-50 dark:bg-black/20 hover:bg-slate-100/70 dark:hover:bg-white/[0.01] transition-colors relative group">
             {/* Track Header */}
-            <div className="w-36 flex-shrink-0 border-r border-slate-200 dark:border-white/[0.08] bg-slate-100 dark:bg-black/40 px-3 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 sticky left-0 z-10">
-              <div className="flex items-center gap-1.5 font-medium text-blue-600 dark:text-blue-400">
+            <div className="w-36 flex-shrink-0 border-r border-slate-300 dark:border-white/[0.08] bg-slate-200/90 dark:bg-black/40 px-3 flex items-center justify-between text-xs text-slate-800 dark:text-slate-300 sticky left-0 z-10 shadow-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
                 <Focus className="w-3.5 h-3.5" />
                 <span className="text-[11px]">Auto Zoom</span>
               </div>
@@ -1013,7 +1013,7 @@ function MultiTrackTimelineBase({
                     e.stopPropagation();
                     onAddKeyframeAtCurrentTime();
                   }}
-                  className="px-1.5 py-0.5 rounded bg-blue-500/15 hover:bg-blue-500/25 text-blue-600 dark:text-blue-300 text-[10px] font-medium border border-blue-400/30 flex items-center gap-1 transition-colors"
+                  className="px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:hover:bg-blue-500/25 dark:text-blue-300 text-[10px] font-semibold border border-blue-300 dark:border-blue-400/30 flex items-center gap-1 transition-colors shadow-xs"
                   title="Add Zoom Effect at playhead"
                 >
                   <Plus className="w-2.5 h-2.5" />
@@ -1318,10 +1318,10 @@ function MultiTrackTimelineBase({
           {/* ============================================================ */}
           {/* TRACK 3: Audio Track with Waveform Visuals */}
           {/* ============================================================ */}
-          <div className="h-14 flex border-b border-slate-200 dark:border-white/[0.06] bg-slate-50/70 dark:bg-black/20 relative">
+          <div className="h-14 flex border-b border-slate-300 dark:border-white/[0.06] bg-slate-100/60 dark:bg-black/20 relative">
             {/* Track Header */}
-            <div className="w-36 flex-shrink-0 border-r border-slate-200 dark:border-white/[0.08] bg-slate-100 dark:bg-black/40 px-3 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 sticky left-0 z-10">
-              <div className="flex items-center gap-1.5 font-medium text-indigo-600 dark:text-indigo-300">
+            <div className="w-36 flex-shrink-0 border-r border-slate-300 dark:border-white/[0.08] bg-slate-200/90 dark:bg-black/40 px-3 flex items-center justify-between text-xs text-slate-800 dark:text-slate-300 sticky left-0 z-10 shadow-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-indigo-600 dark:text-indigo-300">
                 <Mic className="w-3.5 h-3.5" />
                 <span className="text-[11px]">Audio 1</span>
               </div>
@@ -1329,7 +1329,7 @@ function MultiTrackTimelineBase({
                 <button
                   type="button"
                   onClick={() => setIsAudioMuted(!isAudioMuted)}
-                  className="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-300"
+                  className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 >
                   {isAudioMuted ? <VolumeX className="w-3 h-3 text-red-500" /> : <Volume2 className="w-3 h-3" />}
                 </button>

@@ -244,10 +244,10 @@ export function DesktopAppDashboard() {
                 activeTab === "overview"
                   ? isLight
                     ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
-                    : "bg-white/[0.08] text-white font-semibold border border-white/10 shadow-inner"
+                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
                   : isLight
                   ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                  : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
               <LayoutGrid className={`w-4 h-4 ${activeTab === "overview" ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
@@ -261,10 +261,10 @@ export function DesktopAppDashboard() {
                 activeTab === "videos"
                   ? isLight
                     ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
-                    : "bg-white/[0.08] text-white font-semibold border border-white/10 shadow-inner"
+                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
                   : isLight
                   ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                  : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -275,7 +275,7 @@ export function DesktopAppDashboard() {
                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${
                   isLight
                     ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30"
-                    : "bg-[#FFF1E8]/15 text-[#FF8A4C] border border-[#FF6B2C]/30"
+                    : "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30"
                 }`}>
                   {savedProjects.length}
                 </span>
@@ -289,10 +289,10 @@ export function DesktopAppDashboard() {
                 activeTab === "settings"
                   ? isLight
                     ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
-                    : "bg-white/[0.08] text-white font-semibold border border-white/10 shadow-inner"
+                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
                   : isLight
                   ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                  : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
               <Settings className={`w-4 h-4 ${activeTab === "settings" ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
@@ -777,11 +777,11 @@ export function DesktopAppDashboard() {
               </div>
 
               {/* Setting Section 1: Appearance / Theme */}
-              <div className={`p-6 rounded-3xl border space-y-4 shadow-xs ${
-                isLight ? "bg-white border-slate-200" : "bg-[#080D1A] border-white/[0.08]"
+              <div className={`p-6 rounded-3xl border space-y-5 transition-all ${
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#FFF1E8]/30 text-[#FF6B2C] border border-[#FF6B2C]/20 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
                     <Moon className="w-5 h-5" />
                   </div>
                   <div>
@@ -790,52 +790,88 @@ export function DesktopAppDashboard() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
                   {[
-                    { id: "dark" as const, label: "Dark Obsidian", icon: Moon },
-                    { id: "light" as const, label: "Clean Light", icon: Sun },
-                    { id: "system" as const, label: "System Auto", icon: Monitor },
-                  ].map(({ id, label, icon: Icon }) => (
-                    <button
-                      key={id}
-                      onClick={() => handleThemeChange(id)}
-                      className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all cursor-pointer ${
-                        theme === id
-                          ? isLight
-                            ? "bg-[#FFF1E8] border-2 border-[#FF6B2C] text-[#FF6B2C] font-bold"
-                            : "bg-[#FFF1E8]/10 border-2 border-[#FF6B2C] text-white font-bold"
-                          : isLight
-                          ? "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300"
-                          : "bg-[#060913] border-white/10 text-slate-400 hover:text-white hover:border-white/20"
-                      }`}
-                    >
-                      <Icon className={`w-5 h-5 ${theme === id ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
-                      <span className="text-xs font-bold">{label}</span>
-                    </button>
-                  ))}
+                    { id: "dark" as const, label: "Dark Obsidian", desc: "Deep cinematic studio", icon: Moon },
+                    { id: "light" as const, label: "Clean Light", desc: "High-clarity daytime", icon: Sun },
+                    { id: "system" as const, label: "System Auto", desc: "Matches OS preference", icon: Monitor },
+                  ].map(({ id, label, desc, icon: Icon }) => {
+                    const isSelected = theme === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => handleThemeChange(id)}
+                        className={`relative p-4 rounded-2xl border text-left flex flex-col justify-between gap-3 transition-all cursor-pointer group ${
+                          isSelected
+                            ? isLight
+                              ? "bg-[#FFF1E8] border-2 border-[#FF6B2C] shadow-sm text-slate-900"
+                              : "bg-[#FF6B2C]/10 border-2 border-[#FF6B2C] shadow-[0_0_20px_rgba(255,107,44,0.15)] text-white"
+                            : isLight
+                            ? "bg-slate-50 hover:bg-slate-100/80 border-slate-200 text-slate-700 hover:text-slate-900"
+                            : "bg-[#070B16] hover:bg-[#0E1426] border-white/10 text-slate-300 hover:text-white"
+                        }`}
+                      >
+                        {/* Top Icon & Active Indicator */}
+                        <div className="flex items-center justify-between">
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                            isSelected
+                              ? "bg-[#FF6B2C] text-white"
+                              : isLight
+                              ? "bg-slate-200/80 text-slate-600 group-hover:text-slate-900"
+                              : "bg-white/10 text-slate-400 group-hover:text-white"
+                          }`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          {isSelected && (
+                            <span className="w-5 h-5 rounded-full bg-[#FF6B2C] text-white flex items-center justify-center text-[11px] font-bold shadow-xs">
+                              ✓
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Title & Description */}
+                        <div>
+                          <div className="text-xs font-bold leading-tight">{label}</div>
+                          <div className={`text-[10px] mt-0.5 ${isSelected ? (isLight ? "text-slate-600" : "text-slate-300") : (isLight ? "text-slate-500" : "text-slate-400")}`}>
+                            {desc}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Setting Section 2: Auto-Save Engine */}
-              <div className={`p-6 rounded-3xl border space-y-4 shadow-xs ${
-                isLight ? "bg-white border-slate-200" : "bg-[#080D1A] border-white/[0.08]"
+              <div className={`p-6 rounded-3xl border space-y-4 transition-all ${
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#FFF1E8]/30 text-[#FF6B2C] border border-[#FF6B2C]/20 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
                       <Save className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>Periodic Auto-Save</h3>
-                      <p className={`text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}>Automatically save timeline edits to local storage.</p>
+                      <p className={`text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}>Automatically checkpoint timeline edits to local storage.</p>
                     </div>
                   </div>
-                  <input
-                    type="checkbox"
-                    checked={autoSaveEnabled}
-                    onChange={(e) => handleToggleAutoSave(e.target.checked)}
-                    className="w-5 h-5 accent-[#FF6B2C] rounded cursor-pointer"
-                  />
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={autoSaveEnabled}
+                    onClick={() => handleToggleAutoSave(!autoSaveEnabled)}
+                    className={`w-12 h-6.5 rounded-full transition-colors relative flex items-center px-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF6B2C]/50 ${
+                      autoSaveEnabled ? "bg-[#FF6B2C]" : isLight ? "bg-slate-300" : "bg-white/20"
+                    }`}
+                  >
+                    <div
+                      className={`w-4.5 h-4.5 rounded-full bg-white transition-transform shadow-md ${
+                        autoSaveEnabled ? "translate-x-5.5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
                 </div>
 
                 {autoSaveEnabled && (
@@ -844,10 +880,10 @@ export function DesktopAppDashboard() {
                     <select
                       value={autoSaveInterval}
                       onChange={(e) => handleChangeAutoSaveInterval(Number(e.target.value))}
-                      className={`border rounded-xl px-3 py-1.5 text-xs outline-none focus:border-[#FF6B2C] ${
+                      className={`border rounded-xl px-3 py-1.5 text-xs outline-none focus:border-[#FF6B2C] font-medium cursor-pointer ${
                         isLight
-                          ? "bg-slate-50 border-slate-200 text-slate-900"
-                          : "bg-[#0B1020] border-white/10 text-white"
+                          ? "bg-slate-50 border-slate-300 text-slate-900"
+                          : "bg-[#070B16] border-white/15 text-white"
                       }`}
                     >
                       <option value={3}>Every 3 seconds</option>
@@ -860,11 +896,11 @@ export function DesktopAppDashboard() {
               </div>
 
               {/* Setting Section 3: Hardware Acceleration & Local Storage */}
-              <div className={`p-6 rounded-3xl border space-y-4 shadow-xs ${
-                isLight ? "bg-white border-slate-200" : "bg-[#080D1A] border-white/[0.08]"
+              <div className={`p-6 rounded-3xl border space-y-4 transition-all ${
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#FFF1E8]/30 text-[#FF6B2C] border border-[#FF6B2C]/20 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
                     <Cpu className="w-5 h-5" />
                   </div>
                   <div>
@@ -874,21 +910,23 @@ export function DesktopAppDashboard() {
                 </div>
 
                 <div className="pt-2 space-y-2.5 text-xs">
-                  <div className={`flex items-center justify-between p-3 rounded-xl border ${
-                    isLight ? "bg-slate-50 border-slate-200" : "bg-white/[0.02] border-white/[0.06]"
+                  <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
+                    isLight ? "bg-slate-50/80 border-slate-200" : "bg-white/[0.03] border-white/[0.08]"
                   }`}>
-                    <span className={isLight ? "text-slate-700 font-medium" : "text-slate-300"}>GPU Decode / Encode Pipeline</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-mono font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Active (Direct3D / Vulkan)
+                    <span className={isLight ? "text-slate-700 font-semibold" : "text-slate-300 font-medium"}>GPU Decode / Encode Pipeline</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-mono text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Active (Direct3D / Vulkan / Metal)</span>
                     </span>
                   </div>
 
-                  <div className={`flex items-center justify-between p-3 rounded-xl border ${
-                    isLight ? "bg-slate-50 border-slate-200" : "bg-white/[0.02] border-white/[0.06]"
+                  <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
+                    isLight ? "bg-slate-50/80 border-slate-200" : "bg-white/[0.03] border-white/[0.08]"
                   }`}>
-                    <span className={isLight ? "text-slate-700 font-medium" : "text-slate-300"}>Privacy Status</span>
-                    <span className="text-[#FF6B2C] font-mono font-bold flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5" /> 100% Local (Zero Cloud)
+                    <span className={isLight ? "text-slate-700 font-semibold" : "text-slate-300 font-medium"}>Privacy Status</span>
+                    <span className="text-[#FF6B2C] dark:text-[#FF8A4C] font-mono text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FF6B2C]/10 border border-[#FF6B2C]/20">
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                      <span>100% Local (Zero Cloud)</span>
                     </span>
                   </div>
                 </div>

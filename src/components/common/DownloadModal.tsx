@@ -13,6 +13,10 @@ import {
   Zap,
   ExternalLink,
   Code2,
+  Copy,
+  Check,
+  AlertCircle,
+  Cpu,
 } from "lucide-react";
 
 import { useLanguage } from "@/context/LanguageContext";
@@ -30,26 +34,41 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
   const { t } = useLanguage();
   const [userOS, setUserOS] = useState<"win" | "mac" | "linux">("win");
   const [activeDownloadOS, setActiveDownloadOS] = useState<"win" | "mac" | "linux">("win");
+  const [macArch, setMacArch] = useState<"arm" | "intel">("arm");
+  const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [downloadStarted, setDownloadStarted] = useState(false);
   const [releaseTag, setReleaseTag] = useState<string>(DEFAULT_TAG);
   const [downloadUrls, setDownloadUrls] = useState<{
     win: { url: string; filename: string };
-    mac: { url: string; filename: string };
+    macArm: { url: string; filename: string };
+    macIntel: { url: string; filename: string };
     linux: { url: string; filename: string };
   }>({
     win: {
       url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_x64-setup.exe`,
       filename: "FucuFlow_0.1.4_x64-setup.exe",
     },
-    mac: {
+    macArm: {
       url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_aarch64.dmg`,
       filename: "FucuFlow_0.1.4_aarch64.dmg",
+    },
+    macIntel: {
+      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_x64.dmg`,
+      filename: "FucuFlow_0.1.4_x64.dmg",
     },
     linux: {
       url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_amd64.AppImage`,
       filename: "FucuFlow_0.1.4_amd64.AppImage",
     },
   });
+
+  const handleCopy = (cmd: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(cmd);
+      setCopiedCmd(cmd);
+      setTimeout(() => setCopiedCmd(null), 2500);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -84,7 +103,9 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
         const assets: Array<{ name: string; browser_download_url: string }> = data.assets || [];
         const winAsset = assets.find((a) => a.name.endsWith(".exe") || a.name.endsWith(".msi"));
-        const macAsset = assets.find((a) => a.name.endsWith(".dmg") || a.name.endsWith(".app.tar.gz"));
+        const macArmAsset = assets.find((a) => a.name.includes("aarch64") && a.name.endsWith(".dmg"));
+        const macIntelAsset = assets.find((a) => (a.name.includes("x64") || a.name.includes("x86_64")) && a.name.endsWith(".dmg"));
+        const macFallbackAsset = assets.find((a) => a.name.endsWith(".dmg"));
         const linuxAsset = assets.find((a) => a.name.endsWith(".AppImage") || a.name.endsWith(".deb"));
 
         setDownloadUrls({
@@ -92,9 +113,13 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             url: winAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_x64-setup.exe`,
             filename: winAsset?.name || `FucuFlow_${tag.replace(/^v/, "")}_x64-setup.exe`,
           },
-          mac: {
-            url: macAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_aarch64.dmg`,
-            filename: macAsset?.name || `FucuFlow_${tag.replace(/^v/, "")}_aarch64.dmg`,
+          macArm: {
+            url: macArmAsset?.browser_download_url || macFallbackAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_aarch64.dmg`,
+            filename: macArmAsset?.name || macFallbackAsset?.name || `FucuFlow_${tag.replace(/^v/, "")}_aarch64.dmg`,
+          },
+          macIntel: {
+            url: macIntelAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_x64.dmg`,
+            filename: macIntelAsset?.name || `FucuFlow_${tag.replace(/^v/, "")}_x64.dmg`,
           },
           linux: {
             url: linuxAsset?.browser_download_url || `https://github.com/${GITHUB_REPO}/releases/download/${tag}/FucuFlow_${tag.replace(/^v/, "")}_amd64.AppImage`,
@@ -125,7 +150,12 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
 
   const handleDownload = (os: "win" | "mac" | "linux") => {
     setActiveDownloadOS(os);
-    const target = downloadUrls[os];
+    let target = downloadUrls.win;
+    if (os === "mac") {
+      target = macArch === "arm" ? downloadUrls.macArm : downloadUrls.macIntel;
+    } else if (os === "linux") {
+      target = downloadUrls.linux;
+    }
 
     const link = document.createElement("a");
     link.href = target.url;
@@ -208,7 +238,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
                     <>Run <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">{downloadUrls.win.filename}</code> once finished to install.</>
                   )}
                   {activeDownloadOS === "mac" && (
-                    <>Open <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">{downloadUrls.mac.filename}</code> and drag FucuFlow to Applications.</>
+                    <>Open <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">{(macArch === "arm" ? downloadUrls.macArm : downloadUrls.macIntel).filename}</code> and drag FucuFlow to Applications.</>
                   )}
                   {activeDownloadOS === "linux" && (
                     <>Run in terminal: <code className="text-[#111318] font-bold font-mono bg-white px-1.5 py-0.5 rounded border border-[#E5E7EB]">chmod +x FucuFlow*.AppImage && ./FucuFlow*.AppImage</code></>
@@ -224,6 +254,74 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             >
               GitHub
             </a>
+          </div>
+        )}
+
+        {/* Mac Architecture Selector & Gatekeeper Fix (Shown for Mac users) */}
+        {(userOS === "mac" || activeDownloadOS === "mac") && (
+          <div className="mb-4 space-y-2.5">
+            <div className="p-3 rounded-2xl bg-[#F8F9FB] border border-[#E5E7EB]">
+              <div className="flex items-center justify-between text-xs font-bold text-[#111318] mb-2">
+                <span className="flex items-center gap-1.5">
+                  <Cpu className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  Mac Processor Architecture
+                </span>
+                <span className="text-[10px] font-normal text-[#667085]">Apple menu  &gt; About This Mac</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMacArch("arm")}
+                  className={`p-2.5 rounded-xl text-left transition-all cursor-pointer flex flex-col ${
+                    macArch === "arm"
+                      ? "bg-[#FFF1E8] border-2 border-[#FF6B2C] text-[#111318] shadow-2xs"
+                      : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318]"
+                  }`}
+                >
+                  <span className="text-[11px] font-bold text-[#FF6B2C]">Apple Silicon (M1–M4)</span>
+                  <span className="text-[10px] text-[#667085]">M1, M2, M3, M4, Pro, Max</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMacArch("intel")}
+                  className={`p-2.5 rounded-xl text-left transition-all cursor-pointer flex flex-col ${
+                    macArch === "intel"
+                      ? "bg-[#FFF1E8] border-2 border-[#FF6B2C] text-[#111318] shadow-2xs"
+                      : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318]"
+                  }`}
+                >
+                  <span className="text-[11px] font-bold text-[#111318]">Intel Core</span>
+                  <span className="text-[10px] text-[#667085]">i5, i7, i9 (2020 &amp; earlier)</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold text-amber-950">
+                      macOS &ldquo;Damaged / Unidentified&rdquo; Warning?
+                    </p>
+                    <p className="text-[11px] text-amber-900 mt-0.5 leading-relaxed">
+                      If blocked by Gatekeeper, open Terminal and run:
+                    </p>
+                    <code className="inline-block mt-1 px-2 py-0.5 rounded bg-white border border-amber-200 font-mono text-[10.5px] text-amber-950 font-bold select-all">
+                      xattr -cr /Applications/FucuFlow.app
+                    </code>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCopy("xattr -cr /Applications/FucuFlow.app")}
+                  className="px-2.5 py-1.5 rounded-lg bg-[#FF6B2C] hover:bg-[#E85A1F] text-white font-bold text-[11px] flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs transition-colors"
+                >
+                  {copiedCmd === "xattr -cr /Applications/FucuFlow.app" ? <Check size={12} /> : <Copy size={12} />}
+                  <span>{copiedCmd === "xattr -cr /Applications/FucuFlow.app" ? "Copied" : "Copy"}</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -247,7 +345,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
                   {userOS === "win"
                     ? "Download for Windows (.exe)"
                     : userOS === "mac"
-                    ? "Download for macOS (.dmg)"
+                    ? `Download for macOS (${macArch === "arm" ? "Apple Silicon" : "Intel"})`
                     : "Download for Linux (.AppImage)"}
                 </div>
               </div>
@@ -307,7 +405,7 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             >
               <Apple className={`w-5 h-5 ${activeDownloadOS === "mac" ? "text-[#FF6B2C]" : "text-[#667085]"}`} />
               <span className="text-xs font-bold">macOS</span>
-              <span className="text-[10px] font-mono text-[#667085]">.dmg (Universal)</span>
+              <span className="text-[10px] font-mono text-[#667085]">.dmg ({macArch === "arm" ? "Silicon" : "Intel"})</span>
             </button>
 
             {/* Linux */}

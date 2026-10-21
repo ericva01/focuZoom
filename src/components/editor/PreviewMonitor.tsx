@@ -141,14 +141,14 @@ export function PreviewMonitor({
     <div
       ref={monitorRef}
       className={`h-full flex flex-col select-none overflow-hidden relative transition-colors duration-200 ${
-        isFullscreen ? "fixed inset-0 z-50 bg-[#06080F]" : "bg-slate-100/70 dark:bg-[#090D16]/50"
+        isFullscreen ? "fixed inset-0 z-50 bg-[#06080F]" : "bg-slate-200/60 dark:bg-[#080B14]"
       }`}
     >
       {/* 1. Monitor Top Control Bar */}
-      <div className="h-10 px-4 border-b border-slate-200 dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.02] flex items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
+      <div className="h-10 px-4 border-b border-slate-200 dark:border-white/[0.08] bg-white/90 dark:bg-white/[0.02] flex items-center justify-between gap-2 text-xs flex-shrink-0 z-20">
         {/* Left: Aspect Ratio & Resolution Selectors */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-slate-200/70 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-glass-inner">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-xs">
             <Ratio className="w-3.5 h-3.5 text-[#FF6B2C] ml-1 mr-0.5" />
             {aspectRatios.map((ar) => (
               <button
@@ -157,8 +157,8 @@ export function PreviewMonitor({
                 onClick={() => onChangeConfig({ aspectRatio: ar.id })}
                 className={`px-2 py-0.5 rounded-lg text-[11px] font-mono transition-all ${
                   config.aspectRatio === ar.id
-                    ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
-                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
                 {ar.id}
@@ -166,7 +166,7 @@ export function PreviewMonitor({
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-1 bg-slate-200/70 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-glass-inner">
+          <div className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-xs">
             <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 px-1">RES:</span>
             {resolutionPresets.map((rp) => (
               <button
@@ -176,8 +176,8 @@ export function PreviewMonitor({
                 title={`${rp.desc} preview resolution (${rp.label})`}
                 className={`px-2 py-0.5 rounded-lg text-[11px] font-mono uppercase transition-all ${
                   (config.resolutionPreset || "4k") === rp.id
-                    ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
-                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
                 {rp.id}
@@ -187,12 +187,12 @@ export function PreviewMonitor({
         </div>
 
         {/* Center: Stage Status Badge */}
-        <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-white/[0.03] px-3 py-1 rounded-xl border border-slate-200 dark:border-white/[0.08]">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-          <span className="text-slate-800 dark:text-white font-medium">Stage Monitor</span>
+        <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-slate-600 dark:text-slate-400 bg-white dark:bg-white/[0.04] px-3 py-1 rounded-xl border border-slate-300 dark:border-white/[0.08] shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-slate-900 dark:text-white font-medium">Stage Monitor</span>
           <span className="text-slate-400 dark:text-slate-500">·</span>
-          <span className="text-[#FF8A4C] font-bold">{currentResolution.label}</span>
-          <span>({currentResolution.width}x{currentResolution.height}) 60 FPS</span>
+          <span className="text-[#FF6B2C] dark:text-[#FF8A4C] font-bold">{currentResolution.label}</span>
+          <span className="text-slate-600 dark:text-slate-400">({currentResolution.width}x{currentResolution.height}) 60 FPS</span>
         </div>
 
         {/* Right: Add Keyframe Mode Toggle & Fullscreen Button */}
@@ -213,7 +213,7 @@ export function PreviewMonitor({
             className={`p-1.5 rounded-xl border transition-all ${
               isFullscreen
                 ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] border-[#FF6B2C]/30"
-                : "text-slate-500 hover:text-slate-900 border-slate-200 bg-white/70 hover:bg-white dark:text-slate-400 dark:hover:text-white dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
+                : "text-slate-600 hover:text-slate-900 border-slate-300 bg-white hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
             }`}
           >
             {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
@@ -222,7 +222,7 @@ export function PreviewMonitor({
       </div>
 
       {/* 2. Main Video Canvas Viewport */}
-      <div className="flex-1 min-h-0 w-full relative overflow-hidden flex items-center justify-center p-2 sm:p-3">
+      <div className="flex-1 min-h-0 w-full relative overflow-hidden flex items-center justify-center p-3 sm:p-5 bg-slate-200/60 dark:bg-[#070A12] transition-colors duration-200">
         <VideoCanvas
           videoRef={videoRef}
           canvasRef={canvasRef}

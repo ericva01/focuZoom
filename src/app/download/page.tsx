@@ -25,6 +25,8 @@ import {
   AlertCircle,
   HelpCircle,
   Layers,
+  Copy,
+  Check,
 } from "lucide-react";
 
 interface ReleaseAsset {
@@ -295,6 +297,15 @@ export default function DownloadPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedChangelogs, setExpandedChangelogs] = useState<Record<string, boolean>>({});
   const [activeInstructionTab, setActiveInstructionTab] = useState<PlatformType>("win");
+  const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
+
+  const handleCopy = (cmd: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(cmd);
+      setCopiedCmd(cmd);
+      setTimeout(() => setCopiedCmd(null), 2500);
+    }
+  };
 
   // Detect Client Operating System
   useEffect(() => {
@@ -510,30 +521,35 @@ export default function DownloadPage() {
 
                     {/* macOS Architecture toggle */}
                     {userOS === "mac" && (
-                      <div className="mt-4 flex items-center gap-2">
-                        <span className="text-xs text-[#667085] font-medium">Processor:</span>
-                        <button
-                          type="button"
-                          onClick={() => setMacArch("arm")}
-                          className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition-all ${
-                            macArch === "arm"
-                              ? "bg-[#FF6B2C] text-white"
-                              : "bg-[#F8F9FB] text-[#667085] hover:text-[#111318] border border-[#E5E7EB]"
-                          }`}
-                        >
-                          Apple Silicon (M1/M2/M3/M4)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setMacArch("intel")}
-                          className={`px-2.5 py-1 text-xs rounded-lg font-semibold transition-all ${
-                            macArch === "intel"
-                              ? "bg-[#FF6B2C] text-white"
-                              : "bg-[#F8F9FB] text-[#667085] hover:text-[#111318] border border-[#E5E7EB]"
-                          }`}
-                        >
-                          Intel Mac (x64)
-                        </button>
+                      <div className="mt-4 flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-[#667085] font-semibold">Mac Processor:</span>
+                          <button
+                            type="button"
+                            onClick={() => setMacArch("arm")}
+                            className={`px-3 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer ${
+                              macArch === "arm"
+                                ? "bg-[#FF6B2C] text-white shadow-xs"
+                                : "bg-[#F8F9FB] text-[#667085] hover:text-[#111318] border border-[#E5E7EB]"
+                            }`}
+                          >
+                            Apple Silicon (M1/M2/M3/M4)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setMacArch("intel")}
+                            className={`px-3 py-1.5 text-xs rounded-xl font-bold transition-all cursor-pointer ${
+                              macArch === "intel"
+                                ? "bg-[#FF6B2C] text-white shadow-xs"
+                                : "bg-[#F8F9FB] text-[#667085] hover:text-[#111318] border border-[#E5E7EB]"
+                            }`}
+                          >
+                            Intel Mac (x64)
+                          </button>
+                        </div>
+                        <span className="text-[11px] text-[#667085]">
+                          Check: Apple menu  → <em>About This Mac</em> → Chip/Processor
+                        </span>
                       </div>
                     )}
                   </div>
@@ -561,6 +577,40 @@ export default function DownloadPage() {
                     )}
                   </div>
                 </div>
+
+                {/* macOS Gatekeeper Helper Alert (Shown when downloading for Mac) */}
+                {userOS === "mac" && (
+                  <div className="mt-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-950 text-xs">
+                    <div className="flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-bold text-slate-900">
+                          macOS Gatekeeper Note & Quick Solution:
+                        </p>
+                        <p className="text-[11px] text-slate-700 mt-1 leading-relaxed">
+                          Because FucuFlow is open-source community software, macOS may flag it with <em>&ldquo;FucuFlow is damaged and can&apos;t be opened&rdquo;</em> or <em>&ldquo;Unidentified developer&rdquo;</em>.
+                          After dragging FucuFlow to <strong>/Applications</strong>, run this 1-second fix in Terminal:
+                        </p>
+                        <div className="mt-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                          <code className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 font-mono text-[11px] font-bold text-slate-900 flex-1 select-all shadow-xs">
+                            xattr -cr /Applications/FucuFlow.app
+                          </code>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy("xattr -cr /Applications/FucuFlow.app")}
+                            className="px-3 py-1.5 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors shrink-0"
+                          >
+                            {copiedCmd === "xattr -cr /Applications/FucuFlow.app" ? <Check size={13} /> : <Copy size={13} />}
+                            <span>{copiedCmd === "xattr -cr /Applications/FucuFlow.app" ? "Copied!" : "Copy Fix Command"}</span>
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-2">
+                          Or via System Settings:  → System Settings → Privacy & Security → scroll down to Security → click <strong>&ldquo;Open Anyway&rdquo;</strong>.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* OS Switcher Buttons */}
                 <div className="mt-6 pt-5 border-t border-[#E5E7EB] flex flex-wrap items-center justify-between gap-3">
@@ -1003,16 +1053,61 @@ export default function DownloadPage() {
                 )}
 
                 {activeInstructionTab === "mac" && (
-                  <div className="space-y-3">
-                    <p className="font-semibold text-[#111318]">
-                      Opening on macOS (&ldquo;FucuFlow cannot be opened because Apple cannot check it for malicious software&rdquo;):
-                    </p>
-                    <ol className="list-decimal pl-5 space-y-1.5">
-                      <li>Open the <code>.dmg</code> and drag <strong>FucuFlow</strong> to your <code>/Applications</code> folder.</li>
-                      <li>Right-click (or Control-click) the FucuFlow icon in Applications and select <strong>Open</strong>.</li>
-                      <li>In the dialog that appears, click <strong>Open</strong> to confirm.</li>
-                      <li>Or run terminal command: <code>xattr -cr /Applications/FucuFlow.app</code> to permanently clear quarantine flags.</li>
-                    </ol>
+                  <div className="space-y-4">
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 text-xs leading-relaxed">
+                      <p className="font-bold text-amber-950 flex items-center gap-1.5 mb-1">
+                        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                        Why does macOS say &ldquo;FucuFlow is damaged&rdquo; or block it?
+                      </p>
+                      FucuFlow is a free, 100% open-source application and is not yet signed with a paid Apple Developer certificate ($99/year). macOS Gatekeeper flags all unsigned third-party binaries as quarantined. You can unlock it in 5 seconds using either method below:
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="font-bold text-[#111318] text-xs">
+                        Step 1: Install to Applications
+                      </p>
+                      <p className="text-xs text-[#475467]">
+                        Open the downloaded <code>.dmg</code> file and drag the <strong>FucuFlow</strong> icon into your <code>/Applications</code> folder.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2.5 p-3.5 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB]">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="font-bold text-xs text-[#111318]">
+                          Method A (Fastest): Run Terminal Command
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy("xattr -cr /Applications/FucuFlow.app")}
+                          className="px-2.5 py-1 rounded-lg bg-[#FF6B2C] hover:bg-[#E85A1F] text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        >
+                          {copiedCmd === "xattr -cr /Applications/FucuFlow.app" ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{copiedCmd === "xattr -cr /Applications/FucuFlow.app" ? "Copied!" : "Copy Command"}</span>
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-[#475467]">
+                        Open Terminal (press <kbd className="px-1 py-0.5 rounded bg-white border border-[#CBD5E1] text-[10px] font-mono">Cmd + Space</kbd>, type <em>Terminal</em>, press Enter) and paste:
+                      </p>
+                      <code className="block p-2 rounded-lg bg-white border border-[#CBD5E1] font-mono text-[11px] text-[#111318] select-all">
+                        xattr -cr /Applications/FucuFlow.app
+                      </code>
+                      <p className="text-[11px] text-[#667085]">
+                        This removes the quarantine flag so FucuFlow opens instantly without any warnings.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 p-3.5 rounded-xl bg-[#F8F9FB] border border-[#E5E7EB]">
+                      <span className="font-bold text-xs text-[#111318] block">
+                        Method B: macOS System Settings (Sequoia 15 &amp; Sonoma 14)
+                      </span>
+                      <ol className="list-decimal pl-5 space-y-1 text-[11px] text-[#475467]">
+                        <li>Try opening <strong>FucuFlow</strong> from your Applications folder once. Click <strong>Done</strong> on the warning dialog.</li>
+                        <li>Open <strong>System Settings</strong> (Apple menu  &rarr; System Settings).</li>
+                        <li>Click <strong>Privacy &amp; Security</strong> in the sidebar.</li>
+                        <li>Scroll down to the <strong>Security</strong> section. You will see: <em>&ldquo;FucuFlow was blocked from use because it is not from an identified developer&rdquo;</em>.</li>
+                        <li>Click the <strong>&ldquo;Open Anyway&rdquo;</strong> button, enter your Mac administrator password, and click <strong>Open</strong>.</li>
+                      </ol>
+                    </div>
                   </div>
                 )}
 

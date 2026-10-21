@@ -84,28 +84,28 @@ export function EditorSettingsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md p-3 sm:p-4 md:p-6 flex min-h-screen items-center justify-center animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-md p-3 sm:p-4 md:p-6 flex min-h-screen items-center justify-center animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg my-auto rounded-3xl bg-[#090D18]/95 border border-white/15 p-6 shadow-2xl backdrop-blur-2xl text-slate-100 max-h-[calc(100vh-2rem)] overflow-y-auto"
+        className="relative w-full max-w-lg my-auto rounded-3xl bg-white dark:bg-[#090D18] border border-slate-200 dark:border-white/15 p-6 shadow-2xl backdrop-blur-2xl text-slate-800 dark:text-slate-100 max-h-[calc(100vh-2rem)] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF6B2C]">
+            <div className="w-8 h-8 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF6B2C]">
               <Save className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Editor Settings</h3>
-              <p className="text-xs text-slate-400">Appearance, auto-save & local user storage</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Editor Settings</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Appearance, auto-save & local user storage</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -114,7 +114,7 @@ export function EditorSettingsModal({
         <div className="py-5 space-y-6">
           {/* 1. Theme Selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2.5">
+            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2.5">
               Theme & Appearance
             </label>
             <div className="grid grid-cols-3 gap-2.5">
@@ -123,8 +123,8 @@ export function EditorSettingsModal({
                 onClick={() => onThemeChange("dark")}
                 className={`p-3 rounded-2xl border text-left flex flex-col items-center gap-2 transition-all ${
                   theme === "dark"
-                    ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-white shadow-glass-sm"
-                    : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                    ? "bg-[#FFF1E8]/10 dark:bg-[#FF6B2C]/20 border-[#FF6B2C] text-[#FF6B2C] dark:text-white font-bold shadow-xs"
+                    : "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600 dark:bg-white/[0.03] dark:border-white/10 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.06]"
                 }`}
               >
                 <Moon className={`w-5 h-5 ${theme === "dark" ? "text-[#FF6B2C]" : ""}`} />
@@ -136,11 +136,11 @@ export function EditorSettingsModal({
                 onClick={() => onThemeChange("light")}
                 className={`p-3 rounded-2xl border text-left flex flex-col items-center gap-2 transition-all ${
                   theme === "light"
-                    ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-white shadow-glass-sm"
-                    : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                    ? "bg-[#FFF1E8] border-[#FF6B2C] text-[#FF6B2C] font-bold shadow-xs"
+                    : "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600 dark:bg-white/[0.03] dark:border-white/10 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.06]"
                 }`}
               >
-                <Sun className={`w-5 h-5 ${theme === "light" ? "text-amber-400" : ""}`} />
+                <Sun className={`w-5 h-5 ${theme === "light" ? "text-amber-500" : ""}`} />
                 <span className="text-xs font-bold">Light Mode</span>
               </button>
 
@@ -149,8 +149,8 @@ export function EditorSettingsModal({
                 onClick={() => onThemeChange("system")}
                 className={`p-3 rounded-2xl border text-left flex flex-col items-center gap-2 transition-all ${
                   theme === "system"
-                    ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-white shadow-glass-sm"
-                    : "bg-white/[0.03] border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                    ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/20 border-[#FF6B2C] text-[#FF6B2C] dark:text-white font-bold shadow-xs"
+                    : "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600 dark:bg-white/[0.03] dark:border-white/10 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.06]"
                 }`}
               >
                 <Laptop className={`w-5 h-5 ${theme === "system" ? "text-[#FF6B2C]" : ""}`} />
@@ -160,20 +160,20 @@ export function EditorSettingsModal({
           </div>
 
           {/* 2. Auto-Save Configuration */}
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3.5">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-[#FF6B2C]" />
                 <div>
-                  <h4 className="text-xs font-bold text-white">Auto-Save</h4>
-                  <p className="text-[11px] text-slate-400">Save timeline & zoom keyframes automatically</p>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">Auto-Save</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Save timeline & zoom keyframes automatically</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => onToggleAutoSave(!autoSaveEnabled)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  autoSaveEnabled ? "bg-[#FF6B2C]" : "bg-white/20"
+                  autoSaveEnabled ? "bg-[#FF6B2C]" : "bg-slate-300 dark:bg-white/20"
                 }`}
               >
                 <span
@@ -185,8 +185,8 @@ export function EditorSettingsModal({
             </div>
 
             {autoSaveEnabled && (
-              <div className="pt-2 border-t border-white/[0.08] space-y-2">
-                <label className="block text-[11px] font-semibold text-slate-400">Auto-Save Interval</label>
+              <div className="pt-2 border-t border-slate-200 dark:border-white/[0.08] space-y-2">
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Auto-Save Interval</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {intervals.map((item) => (
                     <button
@@ -195,8 +195,8 @@ export function EditorSettingsModal({
                       onClick={() => onChangeAutoSaveInterval(item.value)}
                       className={`p-2.5 rounded-xl border text-left text-xs transition-all ${
                         autoSaveInterval === item.value
-                          ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/50 text-[#FF8A4C] font-bold"
-                          : "bg-black/30 border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.04]"
+                          ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/20 border-[#FF6B2C] text-[#FF6B2C] dark:text-[#FF8A4C] font-bold shadow-xs"
+                          : "bg-white dark:bg-black/30 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -212,29 +212,29 @@ export function EditorSettingsModal({
           </div>
 
           {/* 3. Persistent Local User Storage (IndexedDB) */}
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3">
             <div className="flex items-center gap-2.5">
-              <HardDrive className="w-4 h-4 text-emerald-400" />
+              <HardDrive className="w-4 h-4 text-emerald-500" />
               <div>
-                <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                   <span>Local User Storage</span>
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                     Active (IndexedDB)
                   </span>
                 </h4>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   Video blobs and timeline keyframes are preserved on your local drive with zero cloud upload.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-white/[0.08] text-[11px] text-slate-400 font-mono">
+            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/[0.08] text-[11px] text-slate-500 dark:text-slate-400 font-mono">
               <span>Disk usage: ~{storageInfo.usedMB} MB</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-white/10 text-slate-400 hover:text-[#FF8A4C] hover:border-[#FF6B2C]/30 transition-all text-xs"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-[#FF6B2C] hover:border-[#FF6B2C]/30 transition-all text-xs"
                 >
                   <Trash2 className="w-3 h-3" />
                   <span>{clearedFeedback ? "Cleared!" : "Clear Cache"}</span>
@@ -245,9 +245,9 @@ export function EditorSettingsModal({
         </div>
 
         {/* Footer */}
-        <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
             <span>Changes persist automatically</span>
           </div>
           <div className="flex items-center gap-2">
