@@ -123,6 +123,7 @@ const jsonLd = {
 };
 
 import { LanguageProvider } from "@/context/LanguageContext";
+import { AppRefreshGuard } from "@/components/common/AppRefreshGuard";
 
 export default function RootLayout({
   children,
@@ -139,6 +140,7 @@ export default function RootLayout({
       </head>
       <body className="bg-dark-950 text-gray-100 min-h-screen antialiased selection:bg-[#FFF1E8] selection:text-[#FF6B2C]">
         <LanguageProvider>
+          <AppRefreshGuard />
           {children}
         </LanguageProvider>
       </body>

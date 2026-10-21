@@ -1128,6 +1128,7 @@ function LeftSettingsBase({
             </div>
 
             <div
+              data-dropzone="true"
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
