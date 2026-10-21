@@ -357,7 +357,7 @@ function LeftSettingsBase({
                   <p className="text-[10px] text-slate-400 mt-0.5">High-DPI canvas supersampling for crisp text</p>
                 </div>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
-                  {(config.resolutionPreset || "4k").toUpperCase()}
+                  {(config.resolutionPreset || "1080p").toUpperCase()}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2">
@@ -366,7 +366,7 @@ function LeftSettingsBase({
                   { id: "2k" as const, name: "2K QHD", desc: "2560×1440 Crisp" },
                   { id: "1080p" as const, name: "1080p", desc: "1920×1080 Std" },
                 ].map((res) => {
-                  const isSelected = (config.resolutionPreset || "4k") === res.id;
+                  const isSelected = (config.resolutionPreset || "1080p") === res.id;
                   return (
                     <button
                       key={res.id}

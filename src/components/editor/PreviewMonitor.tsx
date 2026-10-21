@@ -135,7 +135,7 @@ export function PreviewMonitor({
     { id: "1080p", label: "1080p FHD", desc: "Full HD (1920x1080)" },
   ];
 
-  const currentResolution = getCanvasResolution(config.aspectRatio, config.resolutionPreset || "4k");
+  const currentResolution = getCanvasResolution(config.aspectRatio, config.resolutionPreset || "1080p");
 
   return (
     <div
@@ -175,7 +175,7 @@ export function PreviewMonitor({
                 onClick={() => onChangeConfig({ resolutionPreset: rp.id })}
                 title={`${rp.desc} preview resolution (${rp.label})`}
                 className={`px-2 py-0.5 rounded-lg text-[11px] font-mono uppercase transition-all ${
-                  (config.resolutionPreset || "4k") === rp.id
+                  (config.resolutionPreset || "1080p") === rp.id
                     ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-xs"
                     : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 }`}

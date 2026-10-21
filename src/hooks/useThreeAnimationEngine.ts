@@ -288,7 +288,7 @@ export function useThreeAnimationEngine(
   const haloMatRef = useRef<THREE.MeshBasicMaterial | null>(null);
   const cursorSpriteRef = useRef<THREE.Sprite | null>(null);
   const cursorMatRef = useRef<THREE.SpriteMaterial | null>(null);
-  const screenMatRef = useRef<THREE.MeshPhysicalMaterial | null>(null);
+  const screenMatRef = useRef<THREE.MeshStandardMaterial | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
@@ -705,12 +705,9 @@ export function useThreeAnimationEngine(
     cursorSprite.center.set(cursorInfo.anchorU, cursorInfo.anchorV);
   }, []);
 
-  // Synchronize screen material clearcoat reflections and ripple color
+  // Synchronize screen material reflections and ripple color
   const updateMaterials = useCallback((cfg: CanvasConfig) => {
     if (screenMatRef.current) {
-      const reflectionStrength = (cfg.glassReflectionIntensity ?? 0.85) * 0.35;
-      screenMatRef.current.clearcoat = 0.2 * reflectionStrength;
-      screenMatRef.current.reflectivity = 0.15 * reflectionStrength;
       screenMatRef.current.needsUpdate = true;
     }
     if (haloMatRef.current) {
@@ -756,10 +753,12 @@ export function useThreeAnimationEngine(
       canvas,
       alpha: true,
       antialias: true,
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: false,
       powerPreference: "high-performance",
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.5));
+    // Canvas dimensions are already in target physical pixels from getCanvasResolution.
+    // Keeping pixelRatio at 1 prevents multiplying by devicePixelRatio into 7680x4320.
+    renderer.setPixelRatio(1);
     renderer.setSize(canvas.width, canvas.height, false);
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = 1.0;
@@ -863,15 +862,11 @@ export function useThreeAnimationEngine(
       videoTexture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
     } catch {}
 
-    // Pure Screen Material with 1:1 original color reproduction and zero milky glare
-    const reflectionStrength = (config.glassReflectionIntensity ?? 0.85) * 0.35;
-    const screenMat = new THREE.MeshPhysicalMaterial({
+    // High-performance screen material with 1:1 color fidelity and ultra-smooth frame rate
+    const screenMat = new THREE.MeshStandardMaterial({
       map: videoTexture,
-      roughness: 0.04,
+      roughness: 0.1,
       metalness: 0.0,
-      clearcoat: 0.2 * reflectionStrength,
-      clearcoatRoughness: 0.04,
-      reflectivity: 0.15 * reflectionStrength,
       transparent: true,
     });
 
@@ -992,11 +987,14 @@ export function useThreeAnimationEngine(
       clock.getDelta();
       const t = clock.getElapsedTime();
 
-      // Frame-accurate playhead time directly locked to timeline time or active video frame
-      const effectiveTime =
-        timelineTimeRef.current !== undefined
+      // Frame-accurate playhead time: directly locked to hardware video decoder during playback
+      // for 100% glitch-free 60fps tracking, or timeline time when paused / scrubbing
+      const isVideoPlaying = !video.paused && !video.ended;
+      const effectiveTime = isVideoPlaying
+        ? video.currentTime
+        : (timelineTimeRef.current !== undefined
           ? timelineTimeRef.current
-          : video.currentTime;
+          : video.currentTime);
       smoothedTimeRef.current = effectiveTime;
 
       // Dynamically sync WebGL buffer size, camera frustum, and aspect ratio on every frame

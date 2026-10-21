@@ -98,7 +98,7 @@ export default function EditorPage() {
     rippleColor: "#FF6B2C",
 
     aspectRatio: "16:9",
-    resolutionPreset: "4k",
+    resolutionPreset: "1080p",
     playbackSpeed: 1.0,
 
     // Webcam Picture-in-Picture (PiP) Configuration

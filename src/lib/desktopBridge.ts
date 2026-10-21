@@ -39,9 +39,13 @@ declare global {
 export function isTauriEnvironment(): boolean {
   if (typeof window === "undefined") return false;
   return Boolean(
+    (window as unknown as { isTauri?: boolean }).isTauri ||
+    (window as unknown as { __IS_DESKTOP_APP__?: boolean }).__IS_DESKTOP_APP__ ||
     window.__TAURI_INTERNALS__ ||
     window.__TAURI__ ||
-    (window as unknown as { __TAURI_METADATA__?: unknown }).__TAURI_METADATA__
+    (window as unknown as { __TAURI_METADATA__?: unknown }).__TAURI_METADATA__ ||
+    (window as unknown as { __TAURI_POST_MESSAGE__?: unknown }).__TAURI_POST_MESSAGE__ ||
+    (window as unknown as { rpc?: unknown }).rpc
   );
 }
 
@@ -54,8 +58,10 @@ export function isDesktopApp(): boolean {
   if (typeof window === "undefined") return false;
   if (isTauriEnvironment() || isElectronEnvironment()) return true;
   try {
+    if (localStorage.getItem("fucuflow_is_desktop") === "true") return true;
     if (sessionStorage.getItem("fucuflow_is_desktop") === "true") return true;
     if (window.location.pathname.startsWith("/desktop")) {
+      localStorage.setItem("fucuflow_is_desktop", "true");
       sessionStorage.setItem("fucuflow_is_desktop", "true");
       return true;
     }

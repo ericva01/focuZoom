@@ -437,10 +437,14 @@ function MultiTrackTimelineBase({
           setDraggingKeyframeState((prev) =>
             prev ? { ...prev, currentDeltaSec: deltaTime } : null
           );
+          const candidateTime = Math.max(0, draggingKeyframeState.initialTimestamp + deltaTime);
+          onSeek(candidateTime);
         } else if (draggingKeyframeState.mode === "trim-end") {
           setDraggingKeyframeState((prev) =>
             prev ? { ...prev, currentDurationDeltaSec: deltaTime } : null
           );
+          const candidateTime = Math.max(0, draggingKeyframeState.initialTimestamp + draggingKeyframeState.initialHoldDuration + deltaTime);
+          onSeek(candidateTime);
         }
       }
     };
@@ -523,14 +527,10 @@ function MultiTrackTimelineBase({
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("pointermove", handleMouseMove);
-    window.addEventListener("pointerup", handleMouseUp);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("pointermove", handleMouseMove);
-      window.removeEventListener("pointerup", handleMouseUp);
     };
   }, [
     isScrubbing,

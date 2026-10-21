@@ -63,15 +63,6 @@ export function useVideoPlayback(
   const rafSeekIdRef = useRef<number | null>(null);
 
   const applySeekToVideo = useCallback((video: HTMLVideoElement, targetTime: number) => {
-    const fastSeekVideo = video as HTMLVideoElement & { fastSeek?: (time: number) => void };
-    if (typeof fastSeekVideo.fastSeek === "function") {
-      try {
-        fastSeekVideo.fastSeek(targetTime);
-        return;
-      } catch {
-        // Fallback to setting currentTime
-      }
-    }
     try {
       video.currentTime = targetTime;
     } catch {
@@ -101,10 +92,8 @@ export function useVideoPlayback(
             rafSeekIdRef.current = null;
             if (videoRef.current && pendingSeekRef.current !== null) {
               const destTime = pendingSeekRef.current;
-              if (!videoRef.current.seeking) {
-                applySeekToVideo(videoRef.current, destTime);
-                pendingSeekRef.current = null;
-              }
+              pendingSeekRef.current = null;
+              applySeekToVideo(videoRef.current, destTime);
             }
           });
         }

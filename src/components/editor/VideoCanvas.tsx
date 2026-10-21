@@ -198,9 +198,9 @@ function VideoCanvasBase({
     clips
   );
 
-  // Set internal canvas resolution dynamically based on Aspect Ratio & Resolution Preset
+  // Set internal canvas resolution dynamically based on Aspect Ratio & Resolution Preset (default 1080p for smooth 60fps)
   const { width: targetWidth, height: targetHeight } = useMemo(() => {
-    return getCanvasResolution(aspectRatio, config.resolutionPreset || "4k");
+    return getCanvasResolution(aspectRatio, config.resolutionPreset || "1080p");
   }, [aspectRatio, config.resolutionPreset]);
 
   useEffect(() => {
