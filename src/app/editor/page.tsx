@@ -91,6 +91,7 @@ export default function EditorPage() {
 
     // Cursor & FX
     showCursor: true,
+    hideDeviceCursor: true,
     cursorStyle: "macos-arrow",
     cursorColor: "#FF6B2C",
     cursorSize: 22,
@@ -216,6 +217,7 @@ export default function EditorPage() {
   const screenRecorder = useScreenRecorder({
     enableWebcam,
     webcamDeviceId: selectedCameraId,
+    hideDeviceCursor: config.hideDeviceCursor !== false,
     onImportRecording: ({ blobUrl, metadata: recMeta, events: recEvents, webcamBlobUrl, videoBlob, webcamBlob }) => {
       if (videoBlob) videoBlobRef.current = videoBlob;
       if (webcamBlob) webcamBlobRef.current = webcamBlob;
@@ -1310,6 +1312,8 @@ export default function EditorPage() {
         clickCount={screenRecorder.clickCount}
         onStartRecording={screenRecorder.startRecording}
         onStopRecording={screenRecorder.stopRecording}
+        hideDeviceCursor={config.hideDeviceCursor !== false}
+        onToggleHideDeviceCursor={() => handleUpdateConfig({ hideDeviceCursor: config.hideDeviceCursor === false ? true : false })}
         showCursor={config.showCursor}
         onToggleCursor={() => handleUpdateConfig({ showCursor: !config.showCursor })}
         enableWebcam={enableWebcam}
@@ -1641,6 +1645,8 @@ export default function EditorPage() {
         onChangeAutoSaveInterval={handleChangeAutoSaveInterval}
         onSaveNow={() => handleSaveProject(false)}
         onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
+        hideDeviceCursor={config.hideDeviceCursor !== false}
+        onToggleHideDeviceCursor={(val) => handleUpdateConfig({ hideDeviceCursor: val })}
         onClearCache={() => {
           if (projectIdRef.current) {
             deleteProjectFromDB(projectIdRef.current);

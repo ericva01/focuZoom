@@ -64,9 +64,17 @@ export function useVideoPlayback(
 
   const applySeekToVideo = useCallback((video: HTMLVideoElement, targetTime: number) => {
     try {
-      video.currentTime = targetTime;
+      if ("fastSeek" in video && typeof (video as unknown as { fastSeek: (t: number) => void }).fastSeek === "function") {
+        (video as unknown as { fastSeek: (t: number) => void }).fastSeek(targetTime);
+      } else {
+        video.currentTime = targetTime;
+      }
     } catch {
-      // Ignore if decoder is busy
+      try {
+        video.currentTime = targetTime;
+      } catch {
+        // Ignore if decoder is busy
+      }
     }
   }, []);
 
@@ -85,15 +93,18 @@ export function useVideoPlayback(
         // Immediately update React time state for zero-latency UI response
         setCurrentTime(clamped);
 
-        // Throttle hardware video decoder calls to 60fps using requestAnimationFrame
+        // Throttle hardware video decoder calls to 60fps without overwhelming decoder
         pendingSeekRef.current = clamped;
         if (rafSeekIdRef.current === null) {
           rafSeekIdRef.current = requestAnimationFrame(() => {
             rafSeekIdRef.current = null;
-            if (videoRef.current && pendingSeekRef.current !== null) {
-              const destTime = pendingSeekRef.current;
-              pendingSeekRef.current = null;
-              applySeekToVideo(videoRef.current, destTime);
+            const curVid = videoRef.current;
+            if (curVid && pendingSeekRef.current !== null) {
+              if (!curVid.seeking) {
+                const destTime = pendingSeekRef.current;
+                pendingSeekRef.current = null;
+                applySeekToVideo(curVid, destTime);
+              }
             }
           });
         }

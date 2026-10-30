@@ -13,6 +13,7 @@ import {
   Check,
   ShieldCheck,
   Cloud,
+  MousePointer,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { getStorageUsage } from "@/utils/indexedDBStorage";
@@ -33,6 +34,8 @@ interface EditorSettingsModalProps {
   onSaveNow?: () => void;
   onClearCache?: () => void;
   onOpenGoogleDrive?: () => void;
+  hideDeviceCursor?: boolean;
+  onToggleHideDeviceCursor?: (enabled: boolean) => void;
 }
 
 export function EditorSettingsModal({
@@ -47,6 +50,8 @@ export function EditorSettingsModal({
   onSaveNow,
   onClearCache,
   onOpenGoogleDrive,
+  hideDeviceCursor = true,
+  onToggleHideDeviceCursor,
 }: EditorSettingsModalProps) {
   const [storageInfo, setStorageInfo] = useState<{ usedMB: number; quotaMB: number }>({
     usedMB: 0,
@@ -165,6 +170,43 @@ export function EditorSettingsModal({
               </button>
             </div>
           </div>
+
+          {/* Screen Recording Options */}
+          {onToggleHideDeviceCursor && (
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <MousePointer className="w-4 h-4 text-[#FF6B2C]" />
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <span>Hide Device Cursor During Recording</span>
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30">
+                        Recommended
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Hides your physical mouse pointer from the recorded video so only FucuFlow&apos;s smooth 3D cursor overlay is shown.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onToggleHideDeviceCursor(!hideDeviceCursor)}
+                  className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 shrink-0 ${
+                    hideDeviceCursor ? "bg-[#FF6B2C]" : "bg-slate-300 dark:bg-white/20"
+                  }`}
+                  title={hideDeviceCursor ? "Disable: record real cursor" : "Enable: hide real cursor"}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white transition-transform shadow-md ${
+                      hideDeviceCursor ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 2. Auto-Save Configuration */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3.5">

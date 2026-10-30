@@ -1322,6 +1322,19 @@ function LeftSettingsBase({
                   className="w-4 h-4 accent-sky-400 cursor-pointer rounded"
                 />
               </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                <div>
+                  <div className="text-xs font-medium text-slate-200">Hide Real Cursor When Recording</div>
+                  <div className="text-[10px] text-slate-400">Prevents capturing physical mouse pointer</div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.hideDeviceCursor !== false}
+                  onChange={(e) => onChangeConfig({ hideDeviceCursor: e.target.checked })}
+                  className="w-4 h-4 accent-sky-400 cursor-pointer rounded"
+                />
+              </div>
             </div>
           </div>
         )}

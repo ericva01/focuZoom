@@ -19,6 +19,7 @@ export interface UseScreenRecorderOptions {
   defaultZoomScale?: number;
   enableWebcam?: boolean;
   webcamDeviceId?: string | null;
+  hideDeviceCursor?: boolean;
 }
 
 /**
@@ -65,6 +66,7 @@ export function useScreenRecorder({
   defaultZoomScale = 2.2,
   enableWebcam = false,
   webcamDeviceId = null,
+  hideDeviceCursor = true,
 }: UseScreenRecorderOptions) {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingDuration, setRecordingDuration] = useState<number>(0);
@@ -85,6 +87,7 @@ export function useScreenRecorder({
   const webcamChunksRef = useRef<Blob[]>([]);
   const enableWebcamRef = useRef<boolean>(enableWebcam);
   const webcamDeviceIdRef = useRef<string | null | undefined>(webcamDeviceId);
+  const hideDeviceCursorRef = useRef<boolean>(hideDeviceCursor);
 
   useEffect(() => {
     enableWebcamRef.current = enableWebcam;
@@ -93,6 +96,10 @@ export function useScreenRecorder({
   useEffect(() => {
     webcamDeviceIdRef.current = webcamDeviceId;
   }, [webcamDeviceId]);
+
+  useEffect(() => {
+    hideDeviceCursorRef.current = hideDeviceCursor;
+  }, [hideDeviceCursor]);
 
   const startTimeRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -435,12 +442,17 @@ export function useScreenRecorder({
   }, [onImportRecording, defaultZoomScale]);
 
   // Start recording handler
-  const startRecording = useCallback(async (options?: { enableWebcam?: boolean }): Promise<boolean> => {
+  const startRecording = useCallback(async (options?: { enableWebcam?: boolean; hideDeviceCursor?: boolean }): Promise<boolean> => {
     setError(null);
     const shouldRecordWebcam =
       options?.enableWebcam !== undefined
         ? options.enableWebcam
         : (enableWebcamRef.current ?? enableWebcam);
+    const shouldHideDeviceCursor =
+      options?.hideDeviceCursor !== undefined
+        ? options.hideDeviceCursor
+        : hideDeviceCursorRef.current;
+    const cursorConstraint = shouldHideDeviceCursor ? "never" : "always";
     recordedClicksRef.current = [];
     recordedTrailRef.current = [];
     chunksRef.current = [];
@@ -494,18 +506,32 @@ export function useScreenRecorder({
               width: { ideal: 3840, max: 3840 },
               height: { ideal: 2160, max: 2160 },
               frameRate: { ideal: 60, max: 60 },
-            },
+              cursor: cursorConstraint,
+            } as MediaTrackConstraints,
             audio: true,
-          });
+          } as DisplayMediaStreamOptions);
         } catch {
-          stream = await navigator.mediaDevices.getDisplayMedia({
-            video: {
-              width: { ideal: 3840, max: 3840 },
-              height: { ideal: 2160, max: 2160 },
-              frameRate: { ideal: 60, max: 60 },
-            },
-            audio: false,
-          });
+          try {
+            stream = await navigator.mediaDevices.getDisplayMedia({
+              video: {
+                width: { ideal: 3840, max: 3840 },
+                height: { ideal: 2160, max: 2160 },
+                frameRate: { ideal: 60, max: 60 },
+                cursor: cursorConstraint,
+              } as MediaTrackConstraints,
+              audio: false,
+            } as DisplayMediaStreamOptions);
+          } catch {
+            // Ultimate fallback without cursor constraint for compatibility with older browsers
+            stream = await navigator.mediaDevices.getDisplayMedia({
+              video: {
+                width: { ideal: 3840, max: 3840 },
+                height: { ideal: 2160, max: 2160 },
+                frameRate: { ideal: 60, max: 60 },
+              },
+              audio: false,
+            });
+          }
         }
       }
 

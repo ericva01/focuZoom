@@ -99,6 +99,7 @@ export interface CanvasConfig {
 
   // Cursor & Halos
   showCursor: boolean; // Master toggle to show/hide custom cursor overlay
+  hideDeviceCursor?: boolean; // When recording, hide device physical cursor ("never") so only FucuFlow 3D cursor shows
   cursorStyle: CursorStyle;
   cursorColor: string;
   cursorSize: number;

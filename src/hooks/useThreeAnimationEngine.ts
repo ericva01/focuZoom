@@ -288,11 +288,12 @@ export function useThreeAnimationEngine(
   const haloMatRef = useRef<THREE.MeshBasicMaterial | null>(null);
   const cursorSpriteRef = useRef<THREE.Sprite | null>(null);
   const cursorMatRef = useRef<THREE.SpriteMaterial | null>(null);
-  const screenMatRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  const screenMatRef = useRef<THREE.MeshBasicMaterial | THREE.MeshStandardMaterial | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
   const lastUploadedVideoTimeRef = useRef<number>(-1);
+  const hasVideoLoadedRef = useRef<boolean>(false);
 
   // Mutable refs for zero-overhead dynamic updates without tearing down WebGL
   const configRef = useRef(config);
@@ -760,7 +761,8 @@ export function useThreeAnimationEngine(
     // Keeping pixelRatio at 1 prevents multiplying by devicePixelRatio into 7680x4320.
     renderer.setPixelRatio(1);
     renderer.setSize(canvas.width, canvas.height, false);
-    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
     renderer.toneMappingExposure = 1.0;
 
     // 2. Scene & Perspective Camera
@@ -862,11 +864,9 @@ export function useThreeAnimationEngine(
       videoTexture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
     } catch {}
 
-    // High-performance screen material with 1:1 color fidelity and ultra-smooth frame rate
-    const screenMat = new THREE.MeshStandardMaterial({
+    // High-performance screen material with 1:1 true-to-life color fidelity (self-luminous screen uninhibited by 3D light falloff)
+    const screenMat = new THREE.MeshBasicMaterial({
       map: videoTexture,
-      roughness: 0.1,
-      metalness: 0.0,
       transparent: true,
     });
 
@@ -1022,21 +1022,24 @@ export function useThreeAnimationEngine(
         }
       }
 
-      // Update Video Texture strictly when video is actively ready (readyState >= 2) AND clip is active on timeline
-      const isVideoReady =
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        hasVideoLoadedRef.current = true;
+      }
+
+      // The screen mesh remains visible whenever a clip is active and video is loaded.
+      // Crucial: Never hide the screen mesh during timeline scrubbing/seeking just because readyState drops to 1!
+      const shouldShowScreen =
         isClipActive &&
-        video.readyState >= 2 &&
-        video.videoWidth > 0 &&
-        video.videoHeight > 0;
+        (hasVideoLoadedRef.current || (video.videoWidth > 0 && video.videoHeight > 0));
 
       let screenW = 2.4;
       let screenH = 1.35;
 
-      if (isVideoReady) {
-        // Upload to GPU when playing, scrubbing, or on initial load / state change (lastUploadedVideoTimeRef.current === -1)
+      if (shouldShowScreen) {
+        // Upload to GPU when video has data (readyState >= 2) and video is playing, time changed, or upon seek/load
         const isPlaying = !video.paused && !video.ended;
         const timeChanged = Math.abs(video.currentTime - lastUploadedVideoTimeRef.current) > 0.0005;
-        if (isPlaying || timeChanged || lastUploadedVideoTimeRef.current === -1) {
+        if (video.readyState >= 2 && (isPlaying || timeChanged || lastUploadedVideoTimeRef.current === -1)) {
           videoTexture.needsUpdate = true;
           lastUploadedVideoTimeRef.current = video.currentTime;
         }
@@ -1045,7 +1048,9 @@ export function useThreeAnimationEngine(
         if (shadowMesh) shadowMesh.visible = true;
 
         // Dynamic aspect ratio scaling to match recorded laptop video frame
-        const videoRatio = video.videoWidth / video.videoHeight;
+        const vW = video.videoWidth || 1920;
+        const vH = video.videoHeight || 1080;
+        const videoRatio = vW / vH;
         if (videoRatio >= 1.0) {
           screenW = 2.4;
           screenH = 2.4 / videoRatio;
@@ -1060,7 +1065,7 @@ export function useThreeAnimationEngine(
         if (bezelMesh) bezelMesh.scale.set(scaleX, scaleY, 1);
         if (shadowMesh) shadowMesh.scale.set(scaleX, scaleY, 1);
       } else {
-        // When video is not ready or clip is deleted, keep screen completely hidden
+        // When video has never loaded or clip is deleted / in an empty timeline gap, keep screen hidden
         screenMesh.visible = false;
         if (bezelMesh) bezelMesh.visible = false;
         if (shadowMesh) shadowMesh.visible = false;

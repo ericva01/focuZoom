@@ -1,0 +1,19 @@
+services:
+  # Render Static Site (Recommended: 100% Free, Global CDN, No Cold Starts)
+  - type: web
+    name: fucuflow
+    runtime: static
+    buildCommand: npm install && npm run build:web
+    staticPublishPath: ./out
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: NEXT_EXPORT
+        value: "true"
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /_next/static/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable

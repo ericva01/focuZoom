@@ -1352,6 +1352,46 @@ function EditorInspectorBase({
               </div>
             </div>
 
+            {/* Hide Real Device Cursor in Screen Recording */}
+            <div className="glass-panel p-4 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
+                      config.hideDeviceCursor !== false
+                        ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-[#FF8A4C] shadow-glass-sm"
+                        : "bg-white/[0.04] border-white/10 text-slate-500"
+                    }`}
+                  >
+                    <MousePointer className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white block">Hide Real Cursor in Recording</span>
+                    <span className="text-[10px] text-slate-400">
+                      {config.hideDeviceCursor !== false
+                        ? "Real device cursor hidden; only 3D cursor recorded"
+                        : "Real device cursor captured into video frames"}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onChangeConfig({ hideDeviceCursor: config.hideDeviceCursor === false ? true : false })}
+                  className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
+                    config.hideDeviceCursor !== false ? "bg-[#FF6B2C] shadow-[0_0_12px_rgba(255,107,44,0.5)]" : "bg-white/15"
+                  }`}
+                  title={config.hideDeviceCursor !== false ? "Disable hiding real cursor" : "Hide real cursor when recording"}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white transition-transform shadow-md ${
+                      config.hideDeviceCursor !== false ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
             <div className={`space-y-4 transition-opacity ${config.showCursor ? "opacity-100" : "opacity-60 pointer-events-none"}`}>
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <label className="text-xs font-semibold text-slate-800 dark:text-white block">Cursor Pointer Style</label>

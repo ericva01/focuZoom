@@ -5,7 +5,7 @@
   "description": "Cross-Platform Video Editing Workspace with Dynamic 3D Camera Animations",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cross-env NEXT_EXPORT=true next build",
     "build:web": "cross-env NEXT_EXPORT=true next build",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",

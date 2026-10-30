@@ -50,6 +50,8 @@ interface EditorHeaderProps {
   clickCount?: number;
   onStartRecording?: () => void;
   onStopRecording?: () => void;
+  hideDeviceCursor?: boolean;
+  onToggleHideDeviceCursor?: () => void;
   // Cursor Overlay Toggle
   showCursor?: boolean;
   onToggleCursor?: () => void;
@@ -94,6 +96,8 @@ function EditorHeaderBase({
   clickCount = 0,
   onStartRecording,
   onStopRecording,
+  hideDeviceCursor = true,
+  onToggleHideDeviceCursor,
   showCursor = true,
   onToggleCursor,
   enableWebcam = false,
@@ -289,6 +293,37 @@ function EditorHeaderBase({
             leftIcon={<span className="w-2 h-2 rounded-full bg-[#FF6B2C] animate-pulse" />}
           >
             Record Screen
+          </Button>
+        )}
+
+        {/* Hide Device Cursor Option for Recording */}
+        {onToggleHideDeviceCursor && !isRecording && (
+          <Button
+            variant={hideDeviceCursor ? "secondary" : "ghost"}
+            size="sm"
+            onClick={onToggleHideDeviceCursor}
+            title={
+              hideDeviceCursor
+                ? "Hide Real Device Cursor during screen recording (Recommended: prevents double cursors)"
+                : "Record Real Device Cursor during screen recording"
+            }
+            className={`text-xs ${
+              hideDeviceCursor
+                ? "border-[#FF6B2C]/40 text-[#FF6B2C] bg-[#FFF1E8] shadow-xs font-semibold dark:text-[#FF8A4C] dark:bg-[#FF6B2C]/15"
+                : "border-slate-300 text-slate-500 hover:text-slate-800 dark:border-white/10 dark:text-slate-400"
+            }`}
+          >
+            <span className="hidden xl:inline">Hide Real Cursor:</span>
+            <span className="xl:hidden">Real Cursor:</span>
+            <span
+              className={`text-[9px] font-mono px-1.5 py-0.5 rounded ml-1 font-bold ${
+                hideDeviceCursor
+                  ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30"
+                  : "bg-slate-200 text-slate-600 dark:bg-white/[0.08] dark:text-slate-400"
+              }`}
+            >
+              {hideDeviceCursor ? "HIDDEN" : "RECORDED"}
+            </span>
           </Button>
         )}
 
