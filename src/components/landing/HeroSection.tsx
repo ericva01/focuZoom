@@ -14,7 +14,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export function HeroSection() {
   const [downloadOpen, setDownloadOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
 
   const containerRef = useRef<HTMLElement | null>(null);
   const pillRef = useRef<HTMLDivElement | null>(null);
@@ -86,7 +86,7 @@ export function HeroSection() {
         {/* Top Announcement Pill */}
         <div ref={pillRef} className="flex justify-center">
           <Link
-            href="/product"
+            href={localePath("/product")}
             className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-1.5 text-xs font-medium text-[#111318] shadow-sm transition-all hover:border-[#FF6B2C]/40"
           >
             <span className="flex h-2 w-2 rounded-full bg-[#FF6B2C] animate-pulse" />
@@ -113,20 +113,21 @@ export function HeroSection() {
           {/* Action Buttons */}
           <div ref={actionsRef} className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/editor"
+              href={localePath("/editor")}
               className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#FF6B2C] px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-[#E85A1F] hover:shadow-[0_8px_20px_rgba(255,107,44,0.3)] active:scale-95"
             >
               <span>{t.hero.launchStudio}</span>
               <ArrowRight size={17} />
             </Link>
 
-            <Link
-              href="/download"
-              className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-[#E5E7EB] bg-white px-7 py-3.5 text-sm font-semibold text-[#111318] shadow-sm transition-all duration-150 hover:bg-[#F8F9FB] hover:border-[#D1D5DB] active:scale-95"
+            <button
+              type="button"
+              onClick={() => setDownloadOpen(true)}
+              className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-[#E5E7EB] bg-white px-7 py-3.5 text-sm font-semibold text-[#111318] shadow-sm transition-all duration-150 hover:bg-[#F8F9FB] hover:border-[#D1D5DB] active:scale-95 cursor-pointer"
             >
               <Play size={15} className="text-[#FF6B2C] fill-[#FF6B2C]" />
               <span>{t.hero.downloadClient}</span>
-            </Link>
+            </button>
           </div>
 
           {/* Micro social proof under CTA */}

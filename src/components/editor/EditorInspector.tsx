@@ -18,6 +18,7 @@ import {
   EyeOff,
   Camera,
   Ungroup,
+  Sun,
 } from "lucide-react";
 import {
   CanvasConfig,
@@ -391,6 +392,98 @@ function EditorInspectorBase({
         {/* ============================================================ */}
         {activeTab === "canvas" && (
           <div className="space-y-4">
+            {/* VIDEO BRIGHTNESS & COLOR ADJUSTMENT */}
+            <div className="glass-panel p-4 rounded-xl space-y-3.5 border-l-2 border-l-[#FF6B2C]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <Sun className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                    <label className="text-xs font-semibold text-slate-800 dark:text-white block">
+                      Video Brightness &amp; Clarity
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    Fix dark or low-contrast screen recordings with real-time hardware boost
+                  </p>
+                </div>
+                {((config.videoBrightness ?? 1.0) !== 1.0 || (config.videoContrast ?? 1.0) !== 1.0) && (
+                  <button
+                    type="button"
+                    onClick={() => onChangeConfig({ videoBrightness: 1.0, videoContrast: 1.0 })}
+                    className="text-[10px] text-[#FF6B2C] hover:underline font-mono"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+
+              {/* Quick Presets */}
+              <div className="grid grid-cols-4 gap-1.5">
+                {[
+                  { name: "Normal", b: 1.0, c: 1.0 },
+                  { name: "Auto +15%", b: 1.15, c: 1.05 },
+                  { name: "Bright +30%", b: 1.3, c: 1.1 },
+                  { name: "High Pop", b: 1.45, c: 1.2 },
+                ].map((preset) => {
+                  const isCurrent =
+                    Math.abs((config.videoBrightness ?? 1.0) - preset.b) < 0.05 &&
+                    Math.abs((config.videoContrast ?? 1.0) - preset.c) < 0.05;
+                  return (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => onChangeConfig({ videoBrightness: preset.b, videoContrast: preset.c })}
+                      className={`px-2 py-1 text-[10px] rounded-lg border font-semibold transition-all ${
+                        isCurrent
+                          ? "bg-[#FF6B2C] text-white border-[#FF6B2C] shadow-xs"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/[0.05] dark:text-slate-300 dark:border-white/10"
+                      }`}
+                    >
+                      {preset.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Brightness Slider */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-700 dark:text-slate-300 text-[11px] font-medium">Brightness</span>
+                  <span className="font-mono text-[#FF6B2C] font-bold text-[11px]">
+                    {Math.round((config.videoBrightness ?? 1.0) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.0"
+                  step="0.05"
+                  value={config.videoBrightness ?? 1.0}
+                  onChange={(e) => onChangeConfig({ videoBrightness: parseFloat(e.target.value) })}
+                  className="w-full accent-[#FF6B2C] cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
+                />
+              </div>
+
+              {/* Contrast Slider */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-700 dark:text-slate-300 text-[11px] font-medium">Contrast</span>
+                  <span className="font-mono text-[#FF6B2C] font-bold text-[11px]">
+                    {Math.round((config.videoContrast ?? 1.0) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.0"
+                  step="0.05"
+                  value={config.videoContrast ?? 1.0}
+                  onChange={(e) => onChangeConfig({ videoContrast: parseFloat(e.target.value) })}
+                  className="w-full accent-[#FF6B2C] cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
+                />
+              </div>
+            </div>
+
             {/* Screen Resolution & Crisp Quality Selector */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">

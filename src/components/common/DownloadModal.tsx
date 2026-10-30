@@ -31,12 +31,13 @@ const GITHUB_REPO = "ericva01/focuZoom";
 const GITHUB_RELEASES_PAGE = `https://github.com/${GITHUB_REPO}/releases/latest`;
 
 export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
-  const { t } = useLanguage();
+  const { t, localePath } = useLanguage();
   const [userOS, setUserOS] = useState<"win" | "mac" | "linux">("win");
   const [activeDownloadOS, setActiveDownloadOS] = useState<"win" | "mac" | "linux">("win");
   const [macArch, setMacArch] = useState<"arm" | "intel">("arm");
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [downloadStarted, setDownloadStarted] = useState(false);
+  const [showCliOption, setShowCliOption] = useState(false);
   const [releaseTag, setReleaseTag] = useState<string>(DEFAULT_TAG);
   const [downloadUrls, setDownloadUrls] = useState<{
     win: { url: string; filename: string };
@@ -45,20 +46,20 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
     linux: { url: string; filename: string };
   }>({
     win: {
-      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_x64-setup.exe`,
-      filename: "FucuFlow_0.1.4_x64-setup.exe",
+      url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_x64-setup.exe`,
+      filename: "FucuFlow_0.1.6_x64-setup.exe",
     },
     macArm: {
-      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_aarch64.dmg`,
-      filename: "FucuFlow_0.1.4_aarch64.dmg",
+      url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_aarch64.dmg`,
+      filename: "FucuFlow_0.1.6_aarch64.dmg",
     },
     macIntel: {
-      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_x64.dmg`,
-      filename: "FucuFlow_0.1.4_x64.dmg",
+      url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_x64.dmg`,
+      filename: "FucuFlow_0.1.6_x64.dmg",
     },
     linux: {
-      url: `https://github.com/${GITHUB_REPO}/releases/download/${DEFAULT_TAG}/FucuFlow_0.1.4_amd64.AppImage`,
-      filename: "FucuFlow_0.1.4_amd64.AppImage",
+      url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.AppImage`,
+      filename: "FucuFlow_0.1.6_amd64.AppImage",
     },
   });
 
@@ -157,14 +158,18 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
       target = downloadUrls.linux;
     }
 
-    const link = document.createElement("a");
-    link.href = target.url;
-    link.setAttribute("download", target.filename);
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const link = document.createElement("a");
+      link.href = target.url;
+      link.setAttribute("download", target.filename);
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      window.open(target.url, "_blank", "noopener,noreferrer");
+    }
     setDownloadStarted(true);
   };
 
@@ -423,10 +428,64 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
             </button>
           </div>
 
+          {/* Quick Command-line install toggle */}
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={() => setShowCliOption((prev) => !prev)}
+              className="w-full py-2 px-3 rounded-xl border border-dashed border-[#E5E7EB] hover:border-[#FF6B2C]/40 text-xs text-[#667085] hover:text-[#111318] flex items-center justify-between transition-colors bg-[#F8F9FB]/60"
+            >
+              <span className="flex items-center gap-1.5 font-semibold">
+                <Terminal size={13} className="text-[#FF6B2C]" />
+                <span>Install via Terminal / Command Line</span>
+              </span>
+              <span className="font-mono text-[10px] font-bold text-[#FF6B2C]">
+                {showCliOption ? "Hide ▲" : "Show command ▼"}
+              </span>
+            </button>
+
+            {showCliOption && (
+              <div className="mt-2 p-3 rounded-2xl bg-[#0C0F17] text-white space-y-2 border border-slate-800 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-mono text-slate-400">
+                    {activeDownloadOS === "win"
+                      ? "PowerShell (Silent Download & Run):"
+                      : activeDownloadOS === "mac"
+                      ? "Terminal (Download, Mount & Unquarantine):"
+                      : "Terminal (Universal AppImage):"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cmd =
+                        activeDownloadOS === "win"
+                          ? `powershell -ExecutionPolicy Bypass -Command "iwr -useb 'https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64-setup.exe' -OutFile '$env:TEMP\\FucuFlow-setup.exe'; Start-Process '$env:TEMP\\FucuFlow-setup.exe' -Wait"`
+                          : activeDownloadOS === "mac"
+                          ? `curl -L -o /tmp/FucuFlow.dmg https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_${macArch === "arm" ? "aarch64" : "x64"}.dmg && hdiutil attach /tmp/FucuFlow.dmg -nobrowse && cp -R /Volumes/FucuFlow*/FucuFlow.app /Applications/ && hdiutil detach /Volumes/FucuFlow* && xattr -cr /Applications/FucuFlow.app && open /Applications/FucuFlow.app`
+                          : `curl -LO https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.AppImage && chmod +x FucuFlow_0.1.6_amd64.AppImage && ./FucuFlow_0.1.6_amd64.AppImage`;
+                      handleCopy(cmd);
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-[#FF6B2C] hover:bg-[#E85A1F] text-white font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    {copiedCmd ? <Check size={11} /> : <Copy size={11} />}
+                    <span>{copiedCmd ? "Copied" : "Copy"}</span>
+                  </button>
+                </div>
+                <code className="block p-2 rounded-lg bg-black/60 font-mono text-[10px] text-slate-200 overflow-x-auto select-all leading-relaxed border border-white/10">
+                  {activeDownloadOS === "win"
+                    ? `powershell -ExecutionPolicy Bypass -Command "iwr -useb 'https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64-setup.exe' -OutFile '$env:TEMP\\FucuFlow-setup.exe'; Start-Process '$env:TEMP\\FucuFlow-setup.exe' -Wait"`
+                    : activeDownloadOS === "mac"
+                    ? `curl -L -o /tmp/FucuFlow.dmg https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_${macArch === "arm" ? "aarch64" : "x64"}.dmg && hdiutil attach /tmp/FucuFlow.dmg -nobrowse && cp -R /Volumes/FucuFlow*/FucuFlow.app /Applications/ && hdiutil detach /Volumes/FucuFlow* && xattr -cr /Applications/FucuFlow.app && open /Applications/FucuFlow.app`
+                    : `curl -LO https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.AppImage && chmod +x FucuFlow_0.1.6_amd64.AppImage && ./FucuFlow_0.1.6_amd64.AppImage`}
+                </code>
+              </div>
+            )}
+          </div>
+
           {/* Link to all releases page */}
           <div className="mt-3.5 text-center">
             <Link
-              href="/download"
+              href={localePath("/download")}
               onClick={onClose}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6B2C] hover:text-[#E85A1F] transition-colors"
             >

@@ -23,12 +23,18 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
     const stripped = pathname.replace(/^\/(en|kh|km)(\/|$)/, "/");
     let nextUrl = "";
     if (stripped === "/" || stripped === "") {
-      nextUrl = targetPrefix;
+      nextUrl = `${targetPrefix}/`;
     } else {
-      nextUrl = `${targetPrefix}${stripped.startsWith("/") ? stripped : `/${stripped}`}`;
+      const normalized = stripped.startsWith("/") ? stripped : `/${stripped}`;
+      const withSlash = normalized.endsWith("/") ? normalized : `${normalized}/`;
+      nextUrl = `${targetPrefix}${withSlash}`;
     }
 
-    router.push(nextUrl);
+    try {
+      router.push(nextUrl);
+    } catch {
+      window.location.href = nextUrl;
+    }
   };
 
   const isEn = locale === "en";

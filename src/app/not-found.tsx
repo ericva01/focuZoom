@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 
 export default function NotFound() {
+  const { localePath } = useLanguage();
   const [coords, setCoords] = useState({ x: 404, y: 404 });
 
   useEffect(() => {
@@ -100,7 +102,7 @@ export default function NotFound() {
           {/* Primary Action Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <Link
-              href="/"
+              href={localePath("/")}
               className="inline-flex items-center gap-2 rounded-xl bg-[#111318] hover:bg-[#22252e] text-white px-6 py-3.5 text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
             >
               <Home size={15} />
@@ -108,7 +110,7 @@ export default function NotFound() {
             </Link>
 
             <Link
-              href="/editor"
+              href={localePath("/editor")}
               className="inline-flex items-center gap-2 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white px-6 py-3.5 text-xs font-bold transition-all shadow-sm hover:shadow-[0_6px_20px_rgba(255,107,44,0.3)] active:scale-95 cursor-pointer"
             >
               <Video size={15} />
@@ -134,7 +136,7 @@ export default function NotFound() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
               <Link
-                href="/features"
+                href={localePath("/features")}
                 className="p-3 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#FF6B2C]/40 transition-colors shadow-2xs group"
               >
                 <div className="text-xs font-bold text-[#111318] group-hover:text-[#FF6B2C] transition-colors flex items-center justify-between">
@@ -145,7 +147,7 @@ export default function NotFound() {
               </Link>
 
               <Link
-                href="/download"
+                href={localePath("/download")}
                 className="p-3 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#FF6B2C]/40 transition-colors shadow-2xs group"
               >
                 <div className="text-xs font-bold text-[#111318] group-hover:text-[#FF6B2C] transition-colors flex items-center justify-between">
@@ -156,7 +158,7 @@ export default function NotFound() {
               </Link>
 
               <Link
-                href="/resources"
+                href={localePath("/resources")}
                 className="p-3 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#FF6B2C]/40 transition-colors shadow-2xs group"
               >
                 <div className="text-xs font-bold text-[#111318] group-hover:text-[#FF6B2C] transition-colors flex items-center justify-between">
@@ -167,7 +169,7 @@ export default function NotFound() {
               </Link>
 
               <Link
-                href="/about"
+                href={localePath("/about")}
                 className="p-3 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#FF6B2C]/40 transition-colors shadow-2xs group"
               >
                 <div className="text-xs font-bold text-[#111318] group-hover:text-[#FF6B2C] transition-colors flex items-center justify-between">

@@ -294,6 +294,8 @@ export function useThreeAnimationEngine(
   const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
   const lastUploadedVideoTimeRef = useRef<number>(-1);
   const hasVideoLoadedRef = useRef<boolean>(false);
+  const brightnessUniformRef = useRef<{ value: number }>({ value: 1.0 });
+  const contrastUniformRef = useRef<{ value: number }>({ value: 1.0 });
 
   // Mutable refs for zero-overhead dynamic updates without tearing down WebGL
   const configRef = useRef(config);
@@ -864,11 +866,38 @@ export function useThreeAnimationEngine(
       videoTexture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
     } catch {}
 
-    // High-performance screen material with 1:1 true-to-life color fidelity (self-luminous screen uninhibited by 3D light falloff)
+    // High-performance screen material with 1:1 true-to-life color fidelity and user brightness/contrast adjustments
+    const brightnessUniform = brightnessUniformRef.current;
+    const contrastUniform = contrastUniformRef.current;
+    brightnessUniform.value = config.videoBrightness ?? 1.0;
+    contrastUniform.value = config.videoContrast ?? 1.0;
+
     const screenMat = new THREE.MeshBasicMaterial({
       map: videoTexture,
       transparent: true,
     });
+
+    screenMat.onBeforeCompile = (shader) => {
+      shader.uniforms.uVideoBrightness = brightnessUniform;
+      shader.uniforms.uVideoContrast = contrastUniform;
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <common>",
+        `#include <common>
+        uniform float uVideoBrightness;
+        uniform float uVideoContrast;
+        `
+      );
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <map_fragment>",
+        `#include <map_fragment>
+        diffuseColor.rgb *= uVideoBrightness;
+        diffuseColor.rgb = (diffuseColor.rgb - 0.5) * uVideoContrast + 0.5;
+        diffuseColor.rgb = clamp(diffuseColor.rgb, 0.0, 1.0);
+        `
+      );
+    };
 
     const screenMesh = new THREE.Mesh(screenGeo, screenMat);
     screenMesh.visible = false; // Hidden until video is verified readyState >= 2
@@ -1009,28 +1038,30 @@ export function useThreeAnimationEngine(
         renderer.setSize(canvas.width, canvas.height, false);
       }
 
+      // Dynamically update user video brightness and contrast uniforms in real-time
+      brightnessUniformRef.current.value = configRef.current.videoBrightness ?? 1.0;
+      contrastUniformRef.current.value = configRef.current.videoContrast ?? 1.0;
+
       // Check whether a video clip is actively present on the timeline at the current playhead
       const curClips = clipsRef.current;
       let isClipActive = hasActiveClipRef.current;
-      if (curClips !== undefined) {
-        if (curClips.length === 0) {
-          isClipActive = false;
-        } else {
-          isClipActive = curClips.some(
-            (c) => effectiveTime >= c.startTimeline && effectiveTime <= c.endTimeline
-          );
-        }
+      if (curClips !== undefined && curClips.length > 0) {
+        isClipActive = curClips.some(
+          (c) => effectiveTime >= c.startTimeline && effectiveTime <= c.endTimeline
+        );
+      } else {
+        // When clips are not explicitly trimming, keep active for imported / newly recorded media
+        isClipActive = true;
       }
 
       if (video.videoWidth > 0 && video.videoHeight > 0) {
         hasVideoLoadedRef.current = true;
       }
 
-      // The screen mesh remains visible whenever a clip is active and video is loaded.
-      // Crucial: Never hide the screen mesh during timeline scrubbing/seeking just because readyState drops to 1!
+      // The screen mesh remains visible whenever video data is loaded or available
       const shouldShowScreen =
         isClipActive &&
-        (hasVideoLoadedRef.current || (video.videoWidth > 0 && video.videoHeight > 0));
+        (hasVideoLoadedRef.current || (video.videoWidth > 0 && video.videoHeight > 0) || video.readyState >= 1);
 
       let screenW = 2.4;
       let screenH = 1.35;

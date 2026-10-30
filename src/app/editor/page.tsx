@@ -101,6 +101,8 @@ export default function EditorPage() {
     aspectRatio: "16:9",
     resolutionPreset: "1080p",
     playbackSpeed: 1.0,
+    videoBrightness: 1.0,
+    videoContrast: 1.0,
 
     // Webcam Picture-in-Picture (PiP) Configuration
     webcamConfig: {

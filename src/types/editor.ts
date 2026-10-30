@@ -111,6 +111,10 @@ export interface CanvasConfig {
   resolutionPreset?: ResolutionPreset; // "4k" (3840x2160), "2k" (2560x1440), "1080p" (1920x1080)
   playbackSpeed: number;
 
+  // Video Color & Brightness Adjustment
+  videoBrightness?: number; // 0.5 to 2.0 (default 1.0)
+  videoContrast?: number; // 0.5 to 2.0 (default 1.0)
+
   // Webcam Picture-in-Picture (PiP) Configuration
   webcamConfig?: WebcamConfig;
 }

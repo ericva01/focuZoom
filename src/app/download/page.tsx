@@ -57,6 +57,77 @@ const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache
 const FALLBACK_RELEASES: GitHubRelease[] = [
   {
     id: 1,
+    tag_name: "v0.1.6",
+    name: "FucuFlow v0.1.6",
+    published_at: "2026-09-21T18:00:00Z",
+    prerelease: false,
+    html_url: `https://github.com/${GITHUB_REPO}/releases/tag/v0.1.6`,
+    body: `### FucuFlow v0.1.6 Release
+- High-performance desktop screen recorder and automated zoom editor
+- Fixed mesh background rendering and instant playhead seeking
+- Added cursor visibility toggle to hide real device cursor
+- Native builds for Windows 10/11, macOS Apple Silicon & Intel, and Linux`,
+    assets: [
+      {
+        id: 201,
+        name: "FucuFlow_0.1.6_x64-setup.exe",
+        size: 7063071,
+        download_count: 120,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_x64-setup.exe`,
+        created_at: "2026-09-21T18:00:00Z",
+      },
+      {
+        id: 202,
+        name: "FucuFlow_0.1.6_x64_en-US.msi",
+        size: 8470528,
+        download_count: 45,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_x64_en-US.msi`,
+        created_at: "2026-09-21T18:00:00Z",
+      },
+      {
+        id: 203,
+        name: "FucuFlow_0.1.6_aarch64.dmg",
+        size: 9349790,
+        download_count: 85,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_aarch64.dmg`,
+        created_at: "2026-09-21T18:00:00Z",
+      },
+      {
+        id: 204,
+        name: "FucuFlow_0.1.6_x64.dmg",
+        size: 9437417,
+        download_count: 40,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_x64.dmg`,
+        created_at: "2026-09-21T18:00:00Z",
+      },
+      {
+        id: 205,
+        name: "FucuFlow_0.1.6_amd64.AppImage",
+        size: 98740728,
+        download_count: 65,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.AppImage`,
+        created_at: "2026-09-21T18:00:00Z",
+      },
+      {
+        id: 206,
+        name: "FucuFlow_0.1.6_amd64.deb",
+        size: 9806768,
+        download_count: 30,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.deb`,
+        created_at: "2026-09-21T18:00:00Z",
+      },
+      {
+        id: 207,
+        name: "FucuFlow-0.1.6-1.x86_64.rpm",
+        size: 9808158,
+        download_count: 15,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.1.6/FucuFlow-0.1.6-1.x86_64.rpm`,
+        created_at: "2026-09-21T18:00:00Z",
+      },
+    ],
+  },
+  {
+    id: 2,
     tag_name: "v0.1.4",
     name: "FucuFlow v0.1.4",
     published_at: "2026-09-21T08:11:29Z",
@@ -297,6 +368,7 @@ export default function DownloadPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedChangelogs, setExpandedChangelogs] = useState<Record<string, boolean>>({});
   const [activeInstructionTab, setActiveInstructionTab] = useState<PlatformType>("win");
+  const [activeCliTab, setActiveCliTab] = useState<PlatformType>("win");
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 
   const handleCopy = (cmd: string) => {
@@ -314,12 +386,15 @@ export default function DownloadPage() {
       if (ua.includes("mac")) {
         setUserOS("mac");
         setActiveInstructionTab("mac");
+        setActiveCliTab("mac");
       } else if (ua.includes("linux")) {
         setUserOS("linux");
         setActiveInstructionTab("linux");
+        setActiveCliTab("linux");
       } else {
         setUserOS("win");
         setActiveInstructionTab("win");
+        setActiveCliTab("win");
       }
     }
   }, []);
@@ -464,12 +539,21 @@ export default function DownloadPage() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111318] leading-[1.15]">
-                Download <span className="text-[#FF6B2C]">FucuFlow</span> Studio
+                {isKhmer ? (
+                  <>
+                    ទាញយក <span className="text-[#FF6B2C]">FucuFlow</span> Studio
+                  </>
+                ) : (
+                  <>
+                    Download <span className="text-[#FF6B2C]">FucuFlow</span> Studio
+                  </>
+                )}
               </h1>
 
               <p className="mt-4 text-base sm:text-lg text-[#667085] leading-relaxed max-w-2xl mx-auto">
-                High-performance desktop screen recorder and automated zoom editor.
-                100% offline, GPU accelerated, and free open-source software for Windows, macOS, and Linux.
+                {isKhmer
+                  ? "កម្មវិធីថតអេក្រង់កុំព្យូទ័រល្បឿនលឿន និងកម្មវិធីកាត់តពង្រីក (Zoom) ស្វ័យប្រវត្តិ។ ដំណើរការក្រៅបណ្តាញ 100% ជំនួយដោយ GPU និងឥតគិតថ្លៃ Open Source សម្រាប់ Windows, macOS, និង Linux។"
+                  : "High-performance desktop screen recorder and automated zoom editor. 100% offline, GPU accelerated, and free open-source software for Windows, macOS, and Linux."}
               </p>
             </div>
 
@@ -559,20 +643,27 @@ export default function DownloadPage() {
                     {recommendedAsset ? (
                       <a
                         href={recommendedAsset.browser_download_url}
-                        className="inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-2xl bg-[#FF6B2C] px-8 py-4 text-base font-bold text-white shadow-md hover:bg-[#E85A1F] hover:shadow-[0_6px_20px_rgba(255,107,44,0.35)] transition-all active:scale-[0.98]"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download={recommendedAsset.name}
+                        className="inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-2xl bg-[#FF6B2C] px-8 py-4 text-base font-bold text-white shadow-md hover:bg-[#E85A1F] hover:shadow-[0_6px_20px_rgba(255,107,44,0.35)] transition-all active:scale-[0.98] cursor-pointer"
                       >
                         <Download size={20} className="animate-bounce" />
-                        <span>Download for {userOS === "win" ? "Windows" : userOS === "mac" ? "macOS" : "Linux"}</span>
+                        <span>
+                          {isKhmer
+                            ? `ទាញយកសម្រាប់ ${userOS === "win" ? "Windows" : userOS === "mac" ? "macOS" : "Linux"}`
+                            : `Download for ${userOS === "win" ? "Windows" : userOS === "mac" ? "macOS" : "Linux"}`}
+                        </span>
                       </a>
                     ) : (
                       <a
                         href={latestRelease.html_url}
                         target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-[#FF6B2C] px-8 py-4 text-base font-bold text-white shadow-md hover:bg-[#E85A1F] transition-all"
+                        rel="noopener noreferrer"
+                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-[#FF6B2C] px-8 py-4 text-base font-bold text-white shadow-md hover:bg-[#E85A1F] transition-all cursor-pointer"
                       >
                         <Download size={20} />
-                        <span>View Release Assets</span>
+                        <span>{isKhmer ? "មើលឯកសារដំឡើងទាំងអស់" : "View Release Assets"}</span>
                       </a>
                     )}
                   </div>
@@ -671,7 +762,10 @@ export default function DownloadPage() {
                     <a
                       key={asset.id}
                       href={asset.browser_download_url}
-                      className="hover:text-[#FF6B2C] underline decoration-dotted transition-colors font-mono"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download={asset.name}
+                      className="hover:text-[#FF6B2C] underline decoration-dotted transition-colors font-mono cursor-pointer"
                     >
                       {asset.name} ({formatBytes(asset.size)})
                     </a>
@@ -715,6 +809,225 @@ export default function DownloadPage() {
                   <h4 className="text-xs font-bold text-[#111318]">Open Source (MIT)</h4>
                   <p className="text-[11px] text-[#667085] mt-0.5">Free forever. Auditable code on GitHub.</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Instant Terminal / Command-line Installation Card */}
+            <div className="mt-12 max-w-4xl mx-auto rounded-3xl border border-[#E5E7EB] bg-gradient-to-b from-white to-[#F8F9FB] p-6 sm:p-8 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E5E7EB]">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111318] text-white text-[11px] font-mono font-bold mb-2 shadow-xs">
+                    <Terminal size={13} className="text-[#FF6B2C]" />
+                    <span>CLI &amp; SCRIPTABLE INSTALL</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#111318] tracking-tight">
+                    {isKhmer ? "ដំឡើងតាមរយៈ Terminal / Command Line" : "Install with One Command Line"}
+                  </h3>
+                  <p className="text-xs text-[#667085] mt-1">
+                    {isKhmer
+                      ? "ដំឡើងស្វ័យប្រវត្តិតាមរយៈ Command Line សម្រាប់ Windows, macOS, និង Linux ដោយមិនបាច់ចុចទាញយកផ្ទាល់។"
+                      : "Paste directly into your terminal or PowerShell for instant unattended installation."}
+                  </p>
+                </div>
+
+                {/* OS Switcher Buttons */}
+                <div className="flex items-center gap-1.5 bg-[#F1F3F7] p-1 rounded-2xl border border-[#E5E7EB] self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => setActiveCliTab("win")}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeCliTab === "win"
+                        ? "bg-white text-[#111318] shadow-xs"
+                        : "text-[#667085] hover:text-[#111318]"
+                    }`}
+                  >
+                    <Monitor size={14} className={activeCliTab === "win" ? "text-blue-500" : ""} />
+                    <span>Windows</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveCliTab("mac")}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeCliTab === "mac"
+                        ? "bg-white text-[#111318] shadow-xs"
+                        : "text-[#667085] hover:text-[#111318]"
+                    }`}
+                  >
+                    <Apple size={14} className={activeCliTab === "mac" ? "text-slate-800" : ""} />
+                    <span>macOS</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveCliTab("linux")}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeCliTab === "linux"
+                        ? "bg-white text-[#111318] shadow-xs"
+                        : "text-[#667085] hover:text-[#111318]"
+                    }`}
+                  >
+                    <Terminal size={14} className={activeCliTab === "linux" ? "text-emerald-600" : ""} />
+                    <span>Linux</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Tab Contents */}
+              <div className="mt-6 space-y-4">
+                {activeCliTab === "win" && (
+                  <div className="space-y-4">
+                    {/* Method 1: PowerShell One-Liner */}
+                    <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs">
+                      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                        <span className="text-xs font-bold text-[#111318]">
+                          1. Windows PowerShell (Recommended Auto-Install):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCopy(
+                              `powershell -ExecutionPolicy Bypass -Command "iwr -useb 'https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64-setup.exe' -OutFile '$env:TEMP\\FucuFlow-setup.exe'; Start-Process '$env:TEMP\\FucuFlow-setup.exe' -Wait"`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE5D6] text-[#FF6B2C] font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors border border-[#FF6B2C]/20"
+                        >
+                          {copiedCmd?.includes("FucuFlow_0.1.6_x64-setup.exe") ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{copiedCmd?.includes("FucuFlow_0.1.6_x64-setup.exe") ? "Copied!" : "Copy Command"}</span>
+                        </button>
+                      </div>
+                      <pre className="p-3 rounded-xl bg-[#0C0F17] text-[#E2E8F0] font-mono text-[11px] overflow-x-auto leading-relaxed border border-slate-800 select-all">
+                        <code>powershell -ExecutionPolicy Bypass -Command &quot;iwr -useb &apos;https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64-setup.exe&apos; -OutFile &apos;$env:TEMP\FucuFlow-setup.exe&apos;; Start-Process &apos;$env:TEMP\FucuFlow-setup.exe&apos; -Wait&quot;</code>
+                      </pre>
+                    </div>
+
+                    {/* Method 2: MSI Enterprise Silent Install */}
+                    <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs">
+                      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                        <span className="text-xs font-bold text-[#111318]">
+                          2. Windows MSI Package (Silent / Enterprise Install):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCopy(
+                              `msiexec /i "https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64_en-US.msi" /qn`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE5D6] text-[#FF6B2C] font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors border border-[#FF6B2C]/20"
+                        >
+                          {copiedCmd?.includes(".msi") ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{copiedCmd?.includes(".msi") ? "Copied!" : "Copy MSI Command"}</span>
+                        </button>
+                      </div>
+                      <pre className="p-3 rounded-xl bg-[#0C0F17] text-[#E2E8F0] font-mono text-[11px] overflow-x-auto leading-relaxed border border-slate-800 select-all">
+                        <code>msiexec /i &quot;https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64_en-US.msi&quot; /qn</code>
+                      </pre>
+                    </div>
+                  </div>
+                )}
+
+                {activeCliTab === "mac" && (
+                  <div className="space-y-4">
+                    {/* Apple Silicon */}
+                    <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs">
+                      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                        <span className="text-xs font-bold text-[#111318]">
+                          Apple Silicon (M1/M2/M3/M4) — Download, Install &amp; Auto-Authorize:
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCopy(
+                              `curl -L -o /tmp/FucuFlow.dmg https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_aarch64.dmg && hdiutil attach /tmp/FucuFlow.dmg -nobrowse && cp -R /Volumes/FucuFlow*/FucuFlow.app /Applications/ && hdiutil detach /Volumes/FucuFlow* && xattr -cr /Applications/FucuFlow.app && open /Applications/FucuFlow.app`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE5D6] text-[#FF6B2C] font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors border border-[#FF6B2C]/20"
+                        >
+                          {copiedCmd?.includes("aarch64") ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{copiedCmd?.includes("aarch64") ? "Copied!" : "Copy Command"}</span>
+                        </button>
+                      </div>
+                      <pre className="p-3 rounded-xl bg-[#0C0F17] text-[#E2E8F0] font-mono text-[11px] overflow-x-auto leading-relaxed border border-slate-800 select-all">
+                        <code>curl -L -o /tmp/FucuFlow.dmg https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_aarch64.dmg &amp;&amp; hdiutil attach /tmp/FucuFlow.dmg -nobrowse &amp;&amp; cp -R /Volumes/FucuFlow*/FucuFlow.app /Applications/ &amp;&amp; hdiutil detach /Volumes/FucuFlow* &amp;&amp; xattr -cr /Applications/FucuFlow.app &amp;&amp; open /Applications/FucuFlow.app</code>
+                      </pre>
+                    </div>
+
+                    {/* Intel Mac */}
+                    <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs">
+                      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                        <span className="text-xs font-bold text-[#111318]">
+                          Intel Mac (x64) — Download, Install &amp; Auto-Authorize:
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCopy(
+                              `curl -L -o /tmp/FucuFlow.dmg https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64.dmg && hdiutil attach /tmp/FucuFlow.dmg -nobrowse && cp -R /Volumes/FucuFlow*/FucuFlow.app /Applications/ && hdiutil detach /Volumes/FucuFlow* && xattr -cr /Applications/FucuFlow.app && open /Applications/FucuFlow.app`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE5D6] text-[#FF6B2C] font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors border border-[#FF6B2C]/20"
+                        >
+                          {copiedCmd?.includes("0.1.6_x64.dmg") ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{copiedCmd?.includes("0.1.6_x64.dmg") ? "Copied!" : "Copy Command"}</span>
+                        </button>
+                      </div>
+                      <pre className="p-3 rounded-xl bg-[#0C0F17] text-[#E2E8F0] font-mono text-[11px] overflow-x-auto leading-relaxed border border-slate-800 select-all">
+                        <code>curl -L -o /tmp/FucuFlow.dmg https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_x64.dmg &amp;&amp; hdiutil attach /tmp/FucuFlow.dmg -nobrowse &amp;&amp; cp -R /Volumes/FucuFlow*/FucuFlow.app /Applications/ &amp;&amp; hdiutil detach /Volumes/FucuFlow* &amp;&amp; xattr -cr /Applications/FucuFlow.app &amp;&amp; open /Applications/FucuFlow.app</code>
+                      </pre>
+                    </div>
+                  </div>
+                )}
+
+                {activeCliTab === "linux" && (
+                  <div className="space-y-4">
+                    {/* AppImage Universal */}
+                    <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs">
+                      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                        <span className="text-xs font-bold text-[#111318]">
+                          Universal Linux AppImage (Download &amp; Run):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCopy(
+                              `curl -LO https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.AppImage && chmod +x FucuFlow_0.1.6_amd64.AppImage && ./FucuFlow_0.1.6_amd64.AppImage`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE5D6] text-[#FF6B2C] font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors border border-[#FF6B2C]/20"
+                        >
+                          {copiedCmd?.includes("AppImage") ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{copiedCmd?.includes("AppImage") ? "Copied!" : "Copy Command"}</span>
+                        </button>
+                      </div>
+                      <pre className="p-3 rounded-xl bg-[#0C0F17] text-[#E2E8F0] font-mono text-[11px] overflow-x-auto leading-relaxed border border-slate-800 select-all">
+                        <code>curl -LO https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.AppImage &amp;&amp; chmod +x FucuFlow_0.1.6_amd64.AppImage &amp;&amp; ./FucuFlow_0.1.6_amd64.AppImage</code>
+                      </pre>
+                    </div>
+
+                    {/* Debian / Ubuntu */}
+                    <div className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs">
+                      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                        <span className="text-xs font-bold text-[#111318]">
+                          Debian / Ubuntu (.deb package):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCopy(
+                              `curl -LO https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.deb && sudo dpkg -i FucuFlow_0.1.6_amd64.deb || sudo apt-get install -f`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE5D6] text-[#FF6B2C] font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors border border-[#FF6B2C]/20"
+                        >
+                          {copiedCmd?.includes(".deb") ? <Check size={12} /> : <Copy size={12} />}
+                          <span>{copiedCmd?.includes(".deb") ? "Copied!" : "Copy Command"}</span>
+                        </button>
+                      </div>
+                      <pre className="p-3 rounded-xl bg-[#0C0F17] text-[#E2E8F0] font-mono text-[11px] overflow-x-auto leading-relaxed border border-slate-800 select-all">
+                        <code>curl -LO https://github.com/ericva01/focuZoom/releases/download/v0.1.6/FucuFlow_0.1.6_amd64.deb &amp;&amp; sudo dpkg -i FucuFlow_0.1.6_amd64.deb || sudo apt-get install -f</code>
+                      </pre>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -969,6 +1282,9 @@ export default function DownloadPage() {
 
                                 <a
                                   href={asset.browser_download_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download={asset.name}
                                   className="inline-flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-[#F8F9FB] hover:bg-[#FFF1E8] border border-[#E5E7EB] hover:border-[#FF6B2C]/30 text-xs font-bold text-[#111318] hover:text-[#FF6B2C] transition-all cursor-pointer"
                                 >
                                   <Download size={13} />

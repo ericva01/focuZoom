@@ -78,7 +78,7 @@ export function Navbar() {
 
           <Link
             href={localePath("/download")}
-            className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors lg:inline-flex cursor-pointer shadow-xs active:scale-95"
+            className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
           >
             <Download size={14} className="text-[#FF6B2C]" />
             <span>{t.nav.download}</span>

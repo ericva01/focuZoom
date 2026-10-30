@@ -81,10 +81,12 @@ export function LanguageProvider({
         if (!isDesktopQuery) {
           const prefix = preferred === "en" ? "/en" : "/kh";
           const cleanPath = pathname || "/";
-          const target =
-            cleanPath === "/"
-              ? prefix
-              : `${prefix}${cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`}`;
+          let target = `${prefix}/`;
+          if (cleanPath !== "/" && cleanPath !== "") {
+            const normalized = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+            const withSlash = normalized.endsWith("/") ? normalized : `${normalized}/`;
+            target = `${prefix}${withSlash}`;
+          }
           router.replace(target);
         }
       }
@@ -105,14 +107,29 @@ export function LanguageProvider({
   };
 
   const localePath = (rawPath: string): string => {
-    const clean = rawPath.startsWith("/") ? rawPath : `/${rawPath}`;
-    // Strip any existing locale prefix
-    const stripped = clean.replace(/^\/(en|kh|km)(\/|$)/, "/");
-    const activePrefix = locale === "en" ? "/en" : "/kh";
-    if (stripped === "/" || stripped === "") {
-      return activePrefix;
+    if (!rawPath || rawPath === "/" || rawPath === "") {
+      return locale === "en" ? "/en/" : "/kh/";
     }
-    return `${activePrefix}${stripped.startsWith("/") ? stripped : `/${stripped}`}`;
+    const [pathPart, ...hashParts] = rawPath.split("#");
+    const hash = hashParts.length > 0 ? `#${hashParts.join("#")}` : "";
+
+    const [cleanPath, ...queryParts] = pathPart.split("?");
+    const query = queryParts.length > 0 ? `?${queryParts.join("?")}` : "";
+
+    const formatted = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    const stripped = formatted.replace(/^\/(en|kh|km)(\/|$)/, "/");
+    const activePrefix = locale === "en" ? "/en" : "/kh";
+
+    let basePath = "";
+    if (stripped === "/" || stripped === "") {
+      basePath = `${activePrefix}/`;
+    } else {
+      const normalized = stripped.startsWith("/") ? stripped : `/${stripped}`;
+      const withSlash = normalized.endsWith("/") ? normalized : `${normalized}/`;
+      basePath = `${activePrefix}${withSlash}`;
+    }
+
+    return `${basePath}${query}${hash}`;
   };
 
   const activeKey: Locale = locale === "en" ? "en" : "kh";
