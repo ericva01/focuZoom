@@ -19,6 +19,14 @@ import {
   Camera,
   Ungroup,
   Sun,
+  Moon,
+  Laptop,
+  Ratio,
+  FolderOpen,
+  Settings,
+  HardDrive,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import {
   CanvasConfig,
@@ -30,10 +38,13 @@ import {
   ScreenAnglePreset,
   WebcamShape,
   WebcamPosition,
+  AspectRatio,
 } from "@/types/editor";
 import { Button } from "@/components/ui/Button";
 import { formatSMPTETimecode } from "./MultiTrackTimeline";
 import { VideoColorAdjustments } from "./VideoColorAdjustments";
+import { GoogleDriveIcon } from "./GoogleDriveModal";
+import { ThemeMode } from "./EditorSettingsModal";
 
 interface EditorInspectorProps {
   config: CanvasConfig;
@@ -70,9 +81,26 @@ interface EditorInspectorProps {
   selectedCameraId?: string | null;
   onSelectCameraId?: (id: string) => void;
   onUploadWebcamFile?: (file: File) => void;
+  // Controls moved from Header to Sidebar
+  onTakeSnapshot?: () => void;
+  onOpenGoogleDrive?: () => void;
+  isGoogleDriveConnected?: boolean;
+  isElectron?: boolean;
+  onNativeOpenVideo?: () => void;
+  theme?: ThemeMode;
+  onThemeChange?: (theme: ThemeMode) => void;
+  autoSaveEnabled?: boolean;
+  onToggleAutoSave?: (enabled: boolean) => void;
+  autoSaveInterval?: number;
+  onChangeAutoSaveInterval?: (interval: number) => void;
+  onOpenSettings?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }
 
-type InspectorTab = "clip" | "canvas" | "keyframes" | "media" | "cursor" | "webcam";
+type InspectorTab = "clip" | "canvas" | "keyframes" | "webcam" | "cursor" | "media" | "settings";
 
 function EditorInspectorBase({
   config,
@@ -109,6 +137,22 @@ function EditorInspectorBase({
   selectedCameraId,
   onSelectCameraId,
   onUploadWebcamFile,
+  onTakeSnapshot,
+  onOpenGoogleDrive,
+  isGoogleDriveConnected = false,
+  isElectron = false,
+  onNativeOpenVideo,
+  theme = "dark",
+  onThemeChange,
+  autoSaveEnabled = true,
+  onToggleAutoSave,
+  autoSaveInterval = 5,
+  onChangeAutoSaveInterval,
+  onOpenSettings,
+  canUndo = false,
+  canRedo = false,
+  onUndo,
+  onRedo,
 }: EditorInspectorProps) {
   const [activeTab, setActiveTab] = useState<InspectorTab>("canvas");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -237,14 +281,29 @@ function EditorInspectorBase({
         <button
           type="button"
           onClick={() => setActiveTab("media")}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
+          className={`flex-1 py-1.5 px-1 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
             activeTab === "media"
               ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
               : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
           }`}
+          title="Media & Screen Recordings"
         >
-          <Upload className="w-3.5 h-3.5" />
+          <Upload className="w-3.5 h-3.5 shrink-0" />
           <span className="hidden sm:inline">Media</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("settings")}
+          className={`flex-1 py-1.5 px-1 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
+            activeTab === "settings"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
+          }`}
+          title="Settings (Theme, Auto-Save & Storage)"
+        >
+          <Settings className="w-3.5 h-3.5 shrink-0" />
+          <span className="hidden sm:inline">Config</span>
         </button>
       </div>
 
@@ -301,6 +360,38 @@ function EditorInspectorBase({
                     </div>
                   </div>
                 </div>
+
+                {/* Edit History (Undo / Redo) */}
+                {(onUndo || onRedo) && (
+                  <div className="glass-panel p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold text-slate-800 dark:text-white block">Edit History</span>
+                      <span className="text-[10px] text-slate-400">Ctrl+Z / Ctrl+Y</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={onUndo}
+                        disabled={!canUndo}
+                        title="Undo (Ctrl+Z)"
+                        leftIcon={<Undo2 className="w-3.5 h-3.5" />}
+                      >
+                        Undo
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={onRedo}
+                        disabled={!canRedo}
+                        title="Redo (Ctrl+Y)"
+                        leftIcon={<Redo2 className="w-3.5 h-3.5" />}
+                      >
+                        Redo
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Quick Edit Actions */}
                 <div className="glass-panel p-4 rounded-xl space-y-3">
@@ -396,6 +487,64 @@ function EditorInspectorBase({
         {/* ============================================================ */}
         {activeTab === "canvas" && (
           <div className="space-y-4">
+            {/* CANVAS ASPECT RATIO (Moved from Header) */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Ratio className="w-4 h-4 text-[#FF6B2C]" />
+                  <span className="text-xs font-semibold text-slate-800 dark:text-white">Canvas Aspect Ratio</span>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
+                  {config.aspectRatio || "16:9"}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-1.5">
+                {[
+                  { value: "16:9" as AspectRatio, label: "16:9", desc: "Landscape" },
+                  { value: "9:16" as AspectRatio, label: "9:16", desc: "Vertical" },
+                  { value: "4:3" as AspectRatio, label: "4:3", desc: "Classic" },
+                  { value: "1:1" as AspectRatio, label: "1:1", desc: "Square" },
+                ].map((ratio) => {
+                  const isSelected = (config.aspectRatio || "16:9") === ratio.value;
+                  return (
+                    <button
+                      key={ratio.value}
+                      type="button"
+                      onClick={() => onChangeConfig({ aspectRatio: ratio.value })}
+                      className={`py-2 px-1 rounded-xl text-center border transition-all ${
+                        isSelected
+                          ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] border-[#FF6B2C]/50 shadow-glass-sm font-bold"
+                          : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      <div className="text-xs font-semibold">{ratio.label}</div>
+                      <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{ratio.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* CANVAS SNAPSHOT QUICK ACTION (Moved from Header) */}
+            {onTakeSnapshot && (
+              <div className="glass-panel p-3.5 rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-white block">Snapshot Frame</span>
+                  <span className="text-[10px] text-slate-400">Save current canvas frame as PNG</span>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={onTakeSnapshot}
+                  disabled={!metadata}
+                  leftIcon={<Camera className="w-3.5 h-3.5 text-[#FF8A4C]" />}
+                  title="Save current canvas frame as high-res PNG"
+                >
+                  Snapshot
+                </Button>
+              </div>
+            )}
+
             {/* VIDEO COLOR, BRIGHTNESS & WHITE BALANCE */}
             <VideoColorAdjustments config={config} onChangeConfig={onChangeConfig} />
 
@@ -1290,6 +1439,71 @@ function EditorInspectorBase({
               </Button>
             </div>
 
+            {/* Desktop Open File (Electron) */}
+            {isElectron && onNativeOpenVideo && (
+              <div className="glass-panel p-4 rounded-xl space-y-2.5">
+                <span className="text-xs font-semibold text-slate-800 dark:text-white block">Desktop Video File</span>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  className="w-full text-xs"
+                  onClick={onNativeOpenVideo}
+                  leftIcon={<FolderOpen className="w-3.5 h-3.5 text-[#FF8A4C]" />}
+                >
+                  Open Video from Computer (Ctrl+O)
+                </Button>
+              </div>
+            )}
+
+            {/* Google Drive Integration */}
+            {onOpenGoogleDrive && (
+              <div className="glass-panel p-4 rounded-xl space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <GoogleDriveIcon className="w-4 h-4 shrink-0" />
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white">Google Drive Backup</span>
+                  </div>
+                  {isGoogleDriveConnected ? (
+                    <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-500 font-bold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Connected
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-slate-400">Offline</span>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Backup your project files and rendered videos directly into Google Drive.
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={onOpenGoogleDrive}
+                  leftIcon={<GoogleDriveIcon className="w-3.5 h-3.5" />}
+                >
+                  {isGoogleDriveConnected ? "Open Google Drive Manager" : "Connect Google Drive"}
+                </Button>
+              </div>
+            )}
+
+            {/* Frame Snapshot */}
+            {onTakeSnapshot && (
+              <div className="glass-panel p-4 rounded-xl space-y-2.5">
+                <span className="text-xs font-semibold text-slate-800 dark:text-white block">Frame Snapshot</span>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={onTakeSnapshot}
+                  disabled={!metadata}
+                  leftIcon={<Camera className="w-3.5 h-3.5 text-[#FF8A4C]" />}
+                >
+                  Export Current Frame (PNG)
+                </Button>
+              </div>
+            )}
+
             {/* Video Metadata Card */}
             {metadata && (
               <div className="glass-panel p-4 rounded-xl space-y-2 text-xs">
@@ -1946,6 +2160,167 @@ function EditorInspectorBase({
             </div>
           </div>
         )}
+
+        {/* ============================================================ */}
+        {/* TAB 7: SETTINGS & APPEARANCE (Moved from Header) */}
+        {/* ============================================================ */}
+        {activeTab === "settings" && (
+          <div className="space-y-4">
+            {/* 1. Theme & Appearance (Light / Dark Mode Selection) */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-800 dark:text-white block">
+                  Theme & Appearance
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded capitalize bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
+                  {theme || "dark"} mode
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Switch between Dark, Light, or System appearance modes.
+              </p>
+
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => onThemeChange?.("dark")}
+                  className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1.5 transition-all ${
+                    theme === "dark"
+                      ? "bg-[#FFF1E8]/10 dark:bg-[#FF6B2C]/20 border-[#FF6B2C] text-[#FF6B2C] dark:text-white font-bold shadow-xs"
+                      : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.03] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
+                  }`}
+                >
+                  <Moon className={`w-4 h-4 ${theme === "dark" ? "text-[#FF6B2C]" : ""}`} />
+                  <span className="text-xs font-semibold">Dark</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onThemeChange?.("light")}
+                  className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1.5 transition-all ${
+                    theme === "light"
+                      ? "bg-[#FFF1E8] border-[#FF6B2C] text-[#FF6B2C] font-bold shadow-xs"
+                      : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.03] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
+                  }`}
+                >
+                  <Sun className={`w-4 h-4 ${theme === "light" ? "text-amber-500" : ""}`} />
+                  <span className="text-xs font-semibold">Light</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onThemeChange?.("system")}
+                  className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1.5 transition-all ${
+                    theme === "system"
+                      ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/20 border-[#FF6B2C] text-[#FF6B2C] dark:text-white font-bold shadow-xs"
+                      : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.03] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
+                  }`}
+                >
+                  <Laptop className={`w-4 h-4 ${theme === "system" ? "text-[#FF6B2C]" : ""}`} />
+                  <span className="text-xs font-semibold">System</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 2. Auto-Save Configuration */}
+            <div className="glass-panel p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-[#FF6B2C]" />
+                  <div>
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white block">Auto-Save</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Save timeline & keyframes periodically</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onToggleAutoSave?.(!autoSaveEnabled)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    autoSaveEnabled ? "bg-[#FF6B2C]" : "bg-slate-300 dark:bg-white/20"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                      autoSaveEnabled ? "translate-x-4.5" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {autoSaveEnabled && (
+                <div className="pt-2 border-t border-slate-200 dark:border-white/[0.08] space-y-2">
+                  <label className="text-[11px] font-medium text-slate-600 dark:text-slate-400 block">Interval</label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[5, 10, 30, 60].map((sec) => (
+                      <button
+                        key={sec}
+                        type="button"
+                        onClick={() => onChangeAutoSaveInterval?.(sec)}
+                        className={`py-1.5 rounded-lg text-xs font-mono transition-all ${
+                          autoSaveInterval === sec
+                            ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/20 border border-[#FF6B2C] text-[#FF6B2C] dark:text-[#FF8A4C] font-bold"
+                            : "bg-slate-100 dark:bg-white/[0.03] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10"
+                        }`}
+                      >
+                        {sec}s
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Google Drive Cloud Sync */}
+            {onOpenGoogleDrive && (
+              <div className="glass-panel p-4 rounded-xl space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <GoogleDriveIcon className="w-4 h-4 shrink-0" />
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white">Google Drive</span>
+                  </div>
+                  {isGoogleDriveConnected ? (
+                    <span className="text-[10px] font-mono text-emerald-500 font-bold">Connected</span>
+                  ) : (
+                    <span className="text-[10px] text-slate-400">Offline</span>
+                  )}
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={onOpenGoogleDrive}
+                  leftIcon={<GoogleDriveIcon className="w-3.5 h-3.5" />}
+                >
+                  {isGoogleDriveConnected ? "Open Google Drive Manager" : "Connect Google Drive"}
+                </Button>
+              </div>
+            )}
+
+            {/* 4. Full Settings Dialog Trigger */}
+            {onOpenSettings && (
+              <div className="glass-panel p-4 rounded-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-[#FF6B2C]" />
+                    <div>
+                      <span className="text-xs font-semibold text-slate-800 dark:text-white block">Advanced Settings</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">Storage, cache & recording options</span>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={onOpenSettings}
+                  leftIcon={<Settings className="w-3.5 h-3.5" />}
+                >
+                  Open Full Settings Dialog
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1966,6 +2341,12 @@ export const EditorInspector = memo(EditorInspectorBase, (prev, next) => {
   if (prev.selectedCameraId !== next.selectedCameraId) return false;
   if (prev.availableCameras !== next.availableCameras) return false;
   if (prev.onUploadWebcamFile !== next.onUploadWebcamFile) return false;
+  if (prev.theme !== next.theme) return false;
+  if (prev.autoSaveEnabled !== next.autoSaveEnabled) return false;
+  if (prev.autoSaveInterval !== next.autoSaveInterval) return false;
+  if (prev.isGoogleDriveConnected !== next.isGoogleDriveConnected) return false;
+  if (prev.canUndo !== next.canUndo) return false;
+  if (prev.canRedo !== next.canRedo) return false;
   // Throttle playhead time to 4Hz (every 0.25s) to eliminate 93% of Virtual DOM tree reconciliations
   if (Math.floor(prev.currentTime * 4) !== Math.floor(next.currentTime * 4)) return false;
   return true;

@@ -1301,40 +1301,16 @@ export default function EditorPage() {
       <EditorHeader
         projectName={projectName}
         onProjectNameChange={setProjectName}
-        aspectRatio={config.aspectRatio}
-        onAspectRatioChange={(ratio) => handleUpdateConfig({ aspectRatio: ratio })}
-        onTakeSnapshot={handleTakeSnapshot}
         onOpenExport={() => setIsExportOpen(true)}
         onSaveProject={handleSaveProject}
         isSavedFeedback={isSavedFeedback}
-        onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
-        isGoogleDriveConnected={isGDriveConnected}
         isReady={Boolean(videoSrc && metadata)}
         isElectron={isElectron}
-        onNativeOpenVideo={handleNativeOpenVideo}
         isRecording={screenRecorder.isRecording}
         recordingDuration={screenRecorder.recordingDuration}
         clickCount={screenRecorder.clickCount}
         onStartRecording={screenRecorder.startRecording}
         onStopRecording={screenRecorder.stopRecording}
-        hideDeviceCursor={config.hideDeviceCursor !== false}
-        onToggleHideDeviceCursor={() => handleUpdateConfig({ hideDeviceCursor: config.hideDeviceCursor === false ? true : false })}
-        showCursor={config.showCursor}
-        onToggleCursor={() => handleUpdateConfig({ showCursor: !config.showCursor })}
-        enableWebcam={enableWebcam}
-        onToggleWebcam={() => setIsWebcamReviewOpen(true)}
-        onOpenWebcamReview={() => setIsWebcamReviewOpen(true)}
-        hasWebcamRecorded={Boolean(metadata?.webcamUrl || config.webcamConfig?.url)}
-        isRightCollapsed={isInspectorCollapsed}
-        onToggleRightCollapse={() => setIsInspectorCollapsed((prev) => !prev)}
-        canUndo={history.length > 0}
-        canRedo={future.length > 0}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        autoSaveStatus={autoSaveStatus}
       />
 
       {/* Floating Active Recording HUD Overlay */}
@@ -1508,6 +1484,22 @@ export default function EditorPage() {
               onSelectCameraId={setSelectedCameraId}
               onOpenWebcamReview={() => setIsWebcamReviewOpen(true)}
               onUploadWebcamFile={handleUploadWebcamFile}
+              onTakeSnapshot={handleTakeSnapshot}
+              onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
+              isGoogleDriveConnected={isGDriveConnected}
+              isElectron={isElectron}
+              onNativeOpenVideo={handleNativeOpenVideo}
+              theme={theme}
+              onThemeChange={handleThemeChange}
+              autoSaveEnabled={autoSaveEnabled}
+              onToggleAutoSave={handleToggleAutoSave}
+              autoSaveInterval={autoSaveInterval}
+              onChangeAutoSaveInterval={handleChangeAutoSaveInterval}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              canUndo={history.length > 0}
+              canRedo={future.length > 0}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
             />
           </div>
         </div>

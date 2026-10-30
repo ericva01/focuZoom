@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Cloud,
   MousePointer,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { getStorageUsage } from "@/utils/indexedDBStorage";
@@ -107,7 +108,7 @@ export function EditorSettingsModal({
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF6B2C]">
-              <Save className="w-4 h-4" />
+              <Settings className="w-4 h-4" />
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Editor Settings</h3>
