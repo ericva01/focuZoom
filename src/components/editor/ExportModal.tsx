@@ -122,6 +122,26 @@ export function ExportModal({
   }, [videoRef]);
 
   useEffect(() => {
+    if (isOpen) {
+      const gStatus = googleDriveService.getDriveStatus();
+      setIsGDriveConnected(gStatus.isConnected);
+      setGdriveUserEmail(gStatus.user?.email || null);
+      setGDriveResult(null);
+      setGDriveError(null);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen && !isExporting) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, isExporting, onClose]);
+
+  useEffect(() => {
     return () => {
       if (isExportingRef.current) {
         cancelExport();
@@ -483,16 +503,6 @@ export function ExportModal({
     if (!savedFilePath) return;
     await desktopBridge.showInFolder(savedFilePath);
   };
-
-  useEffect(() => {
-    if (isOpen) {
-      const gStatus = googleDriveService.getDriveStatus();
-      setIsGDriveConnected(gStatus.isConnected);
-      setGdriveUserEmail(gStatus.user?.email || null);
-      setGDriveResult(null);
-      setGDriveError(null);
-    }
-  }, [isOpen]);
 
   const handleUploadToGoogleDrive = async () => {
     if (!exportedBlob && !exportedUrl) return;
