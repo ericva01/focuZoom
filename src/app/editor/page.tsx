@@ -103,6 +103,9 @@ export default function EditorPage() {
     playbackSpeed: 1.0,
     videoBrightness: 1.0,
     videoContrast: 1.0,
+    videoSaturation: 1.0,
+    videoTemperature: 0.0,
+    videoTint: 0.0,
 
     // Webcam Picture-in-Picture (PiP) Configuration
     webcamConfig: {

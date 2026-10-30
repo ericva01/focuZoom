@@ -1,12 +1,12 @@
 {
   "name": "fucuflow",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Eric Va",
   "description": "Cross-Platform Video Editing Workspace with Dynamic 3D Camera Animations",
   "scripts": {
     "dev": "next dev",
     "build": "cross-env NEXT_EXPORT=true next build",
-    "build:web": "cross-env NEXT_EXPORT=true next build",
+    "build:web": "node scripts/generate-installer-graphics.mjs && cross-env NEXT_EXPORT=true next build",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "npm run build:web && tauri build",

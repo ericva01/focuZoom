@@ -28,6 +28,7 @@ import {
   ScreenAnglePreset,
   FramingStyle,
 } from "@/types/editor";
+import { VideoColorAdjustments } from "./VideoColorAdjustments";
 
 interface LeftSettingsProps {
   config: CanvasConfig;
@@ -1168,88 +1169,8 @@ function LeftSettingsBase({
               </button>
             </div>
 
-            {/* Video Brightness & Clarity Control */}
-            <div className="p-4 rounded-xl glass-panel space-y-3 border-l-2 border-l-[#FF6B2C]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <Sun className="w-3.5 h-3.5 text-[#FF6B2C]" />
-                  <span className="font-bold text-white text-xs">Video Brightness &amp; Clarity</span>
-                </div>
-                {((config.videoBrightness ?? 1.0) !== 1.0 || (config.videoContrast ?? 1.0) !== 1.0) && (
-                  <button
-                    type="button"
-                    onClick={() => onChangeConfig({ videoBrightness: 1.0, videoContrast: 1.0 })}
-                    className="text-[10px] text-[#FF6B2C] hover:underline font-mono"
-                  >
-                    Reset
-                  </button>
-                )}
-              </div>
-
-              {/* Quick Presets */}
-              <div className="grid grid-cols-4 gap-1.5">
-                {[
-                  { name: "Normal", b: 1.0, c: 1.0 },
-                  { name: "+15%", b: 1.15, c: 1.05 },
-                  { name: "+30%", b: 1.3, c: 1.1 },
-                  { name: "+45%", b: 1.45, c: 1.2 },
-                ].map((preset) => {
-                  const isCurrent =
-                    Math.abs((config.videoBrightness ?? 1.0) - preset.b) < 0.05 &&
-                    Math.abs((config.videoContrast ?? 1.0) - preset.c) < 0.05;
-                  return (
-                    <button
-                      key={preset.name}
-                      type="button"
-                      onClick={() => onChangeConfig({ videoBrightness: preset.b, videoContrast: preset.c })}
-                      className={`px-1.5 py-1 text-[10px] rounded-lg border font-semibold transition-all ${
-                        isCurrent
-                          ? "bg-[#FF6B2C] text-white border-[#FF6B2C] shadow-xs"
-                          : "bg-white/[0.05] text-slate-300 border-white/10 hover:bg-white/[0.08]"
-                      }`}
-                    >
-                      {preset.name}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-300 text-[11px]">Brightness</span>
-                  <span className="font-mono text-[#FF6B2C] font-bold text-[11px]">
-                    {Math.round((config.videoBrightness ?? 1.0) * 100)}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="2.0"
-                  step="0.05"
-                  value={config.videoBrightness ?? 1.0}
-                  onChange={(e) => onChangeConfig({ videoBrightness: parseFloat(e.target.value) })}
-                  className="w-full accent-[#FF6B2C] cursor-pointer h-1.5 bg-white/10 rounded"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-300 text-[11px]">Contrast</span>
-                  <span className="font-mono text-[#FF6B2C] font-bold text-[11px]">
-                    {Math.round((config.videoContrast ?? 1.0) * 100)}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="2.0"
-                  step="0.05"
-                  value={config.videoContrast ?? 1.0}
-                  onChange={(e) => onChangeConfig({ videoContrast: parseFloat(e.target.value) })}
-                  className="w-full accent-[#FF6B2C] cursor-pointer h-1.5 bg-white/10 rounded"
-                />
-              </div>
-            </div>
+            {/* Video Color, Brightness & White Balance Control */}
+            <VideoColorAdjustments config={config} onChangeConfig={onChangeConfig} />
 
             {metadata && (
               <div className="p-4 rounded-xl glass-panel space-y-2 mt-4">

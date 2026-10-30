@@ -296,6 +296,9 @@ export function useThreeAnimationEngine(
   const hasVideoLoadedRef = useRef<boolean>(false);
   const brightnessUniformRef = useRef<{ value: number }>({ value: 1.0 });
   const contrastUniformRef = useRef<{ value: number }>({ value: 1.0 });
+  const saturationUniformRef = useRef<{ value: number }>({ value: 1.0 });
+  const temperatureUniformRef = useRef<{ value: number }>({ value: 0.0 });
+  const tintUniformRef = useRef<{ value: number }>({ value: 0.0 });
 
   // Mutable refs for zero-overhead dynamic updates without tearing down WebGL
   const configRef = useRef(config);
@@ -866,11 +869,18 @@ export function useThreeAnimationEngine(
       videoTexture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
     } catch {}
 
-    // High-performance screen material with 1:1 true-to-life color fidelity and user brightness/contrast adjustments
+    // High-performance screen material with 1:1 true-to-life color fidelity and user brightness, contrast, saturation & white balance adjustments
     const brightnessUniform = brightnessUniformRef.current;
     const contrastUniform = contrastUniformRef.current;
+    const saturationUniform = saturationUniformRef.current;
+    const temperatureUniform = temperatureUniformRef.current;
+    const tintUniform = tintUniformRef.current;
+
     brightnessUniform.value = config.videoBrightness ?? 1.0;
     contrastUniform.value = config.videoContrast ?? 1.0;
+    saturationUniform.value = config.videoSaturation ?? 1.0;
+    temperatureUniform.value = config.videoTemperature ?? 0.0;
+    tintUniform.value = config.videoTint ?? 0.0;
 
     const screenMat = new THREE.MeshBasicMaterial({
       map: videoTexture,
@@ -880,21 +890,41 @@ export function useThreeAnimationEngine(
     screenMat.onBeforeCompile = (shader) => {
       shader.uniforms.uVideoBrightness = brightnessUniform;
       shader.uniforms.uVideoContrast = contrastUniform;
+      shader.uniforms.uVideoSaturation = saturationUniform;
+      shader.uniforms.uVideoTemperature = temperatureUniform;
+      shader.uniforms.uVideoTint = tintUniform;
 
       shader.fragmentShader = shader.fragmentShader.replace(
         "#include <common>",
         `#include <common>
         uniform float uVideoBrightness;
         uniform float uVideoContrast;
+        uniform float uVideoSaturation;
+        uniform float uVideoTemperature;
+        uniform float uVideoTint;
         `
       );
 
       shader.fragmentShader = shader.fragmentShader.replace(
         "#include <map_fragment>",
         `#include <map_fragment>
-        diffuseColor.rgb *= uVideoBrightness;
-        diffuseColor.rgb = (diffuseColor.rgb - 0.5) * uVideoContrast + 0.5;
-        diffuseColor.rgb = clamp(diffuseColor.rgb, 0.0, 1.0);
+        // 1. Exposure / Brightness Boost
+        vec3 c = diffuseColor.rgb * uVideoBrightness;
+
+        // 2. Contrast adjustment around middle gray (0.5)
+        c = (c - vec3(0.5)) * uVideoContrast + vec3(0.5);
+
+        // 3. Color Saturation / Vibrance
+        float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+        c = mix(vec3(lum), c, uVideoSaturation);
+
+        // 4. White Balance: Temperature (Amber warm > 0 vs Cool blue < 0)
+        c += vec3(0.18, 0.05, -0.18) * uVideoTemperature;
+
+        // 5. White Balance: Tint (Green < 0 vs Magenta > 0)
+        c += vec3(0.12, -0.15, 0.12) * uVideoTint;
+
+        diffuseColor.rgb = clamp(c, 0.0, 1.0);
         `
       );
     };
@@ -1038,9 +1068,12 @@ export function useThreeAnimationEngine(
         renderer.setSize(canvas.width, canvas.height, false);
       }
 
-      // Dynamically update user video brightness and contrast uniforms in real-time
+      // Dynamically update user video color, brightness, contrast & white balance uniforms in real-time
       brightnessUniformRef.current.value = configRef.current.videoBrightness ?? 1.0;
       contrastUniformRef.current.value = configRef.current.videoContrast ?? 1.0;
+      saturationUniformRef.current.value = configRef.current.videoSaturation ?? 1.0;
+      temperatureUniformRef.current.value = configRef.current.videoTemperature ?? 0.0;
+      tintUniformRef.current.value = configRef.current.videoTint ?? 0.0;
 
       // Check whether a video clip is actively present on the timeline at the current playhead
       const curClips = clipsRef.current;
