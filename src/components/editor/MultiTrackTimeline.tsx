@@ -29,6 +29,7 @@ import {
   Camera,
   Ungroup,
   Group,
+  Layers,
 } from "lucide-react";
 import { ClickEvent, TimelineClip } from "@/types/editor";
 
@@ -250,6 +251,44 @@ function MultiTrackTimelineBase({
     currentDeltaSec: number;
     currentDurationDeltaSec: number;
   } | null>(null);
+
+  // Right-click Context Menu State
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    type: "event" | "track-zoom" | "clip" | "general";
+    targetEvent?: ClickEvent | null;
+    targetClip?: TimelineClip | null;
+  } | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  const closeContextMenu = useCallback(() => {
+    setContextMenu(null);
+  }, []);
+
+  // Close context menu on outside click or Escape key
+  useEffect(() => {
+    if (!contextMenu) return;
+
+    const handleWindowMouseDown = (e: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        closeContextMenu();
+      }
+    };
+
+    const handleWindowKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeContextMenu();
+      }
+    };
+
+    window.addEventListener("mousedown", handleWindowMouseDown);
+    window.addEventListener("keydown", handleWindowKeyDown);
+    return () => {
+      window.removeEventListener("mousedown", handleWindowMouseDown);
+      window.removeEventListener("keydown", handleWindowKeyDown);
+    };
+  }, [contextMenu, closeContextMenu]);
 
   const clipsMaxEnd = clips.reduce((max, c) => Math.max(max, c.endTimeline), 0);
   const totalTimelineDuration = Math.max(
@@ -483,6 +522,13 @@ function MultiTrackTimelineBase({
             .map((ev) => ev.id);
 
           onSelectMultiple(matchedClips, matchedEvents);
+        } else if (dragDist <= 6) {
+          // Right-click click without dragging -> open general context menu
+          setContextMenu({
+            x: e.clientX,
+            y: e.clientY,
+            type: "general",
+          });
         }
         setMarqueeSelection(null);
       }
@@ -914,7 +960,7 @@ function MultiTrackTimelineBase({
                   <div
                     key={clip.id}
                     onMouseDown={(e) => {
-                      if (e.button !== 0 && e.button !== 2) return;
+                      if (e.button !== 0) return;
                       e.stopPropagation();
                       onSelectClip(clip.id);
                       onCommitHistory?.();
@@ -926,7 +972,20 @@ function MultiTrackTimelineBase({
                         startX: e.clientX,
                       });
                     }}
-                    onContextMenu={(e) => e.preventDefault()}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!selectedClipIds.includes(clip.id)) {
+                        onSelectClip(clip.id);
+                        onSelectMultiple?.([clip.id], []);
+                      }
+                      setContextMenu({
+                        x: e.clientX,
+                        y: e.clientY,
+                        type: "clip",
+                        targetClip: clip,
+                      });
+                    }}
                     style={{
                       left: `${clipStartPx}px`,
                       width: `${clipWidthPx}px`,
@@ -1019,59 +1078,6 @@ function MultiTrackTimelineBase({
                   <Plus className="w-2.5 h-2.5" />
                   <span>Add</span>
                 </button>
-
-                {/* Ungroup button: when active selected event has multiple targets */}
-                {selectedEventId && (() => {
-                  const activeEv = events.find((e) => e.id === selectedEventId);
-                  if (activeEv && activeEv.targets && activeEv.targets.length > 1 && onUngroupEvent) {
-                    return (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onUngroupEvent(activeEv.id);
-                        }}
-                        className="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 text-[10px] font-bold border border-amber-400/40 flex items-center gap-1 transition-colors shadow-sm"
-                        title={`Ungroup into ${activeEv.targets.length} discrete zoom keyframes`}
-                      >
-                        <Ungroup className="w-2.5 h-2.5" />
-                        <span>Ungroup ({activeEv.targets.length})</span>
-                      </button>
-                    );
-                  }
-                  return null;
-                })()}
-
-                {/* Group Selected button: when 2 or more events are selected */}
-                {selectedEventIds.length > 1 && onGroupSelectedEvents && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onGroupSelectedEvents(selectedEventIds);
-                    }}
-                    className="px-1.5 py-0.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-600 dark:text-indigo-200 text-[10px] font-bold border border-indigo-400/40 flex items-center gap-1 transition-colors shadow-sm"
-                    title={`Group ${selectedEventIds.length} selected zoom keyframes into 1 section`}
-                  >
-                    <Group className="w-2.5 h-2.5" />
-                    <span>Group ({selectedEventIds.length})</span>
-                  </button>
-                )}
-
-                {onMergeNearbyClicks && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onMergeNearbyClicks();
-                    }}
-                    className="px-1.5 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 text-[10px] font-medium border border-indigo-400/30 flex items-center gap-1 transition-colors"
-                    title="Auto-group rapid burst clicks (< 0.8s) into smooth continuous sections"
-                  >
-                    <Combine className="w-2.5 h-2.5" />
-                    <span>Auto Group</span>
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={() => setIsKeyframeTrackLocked(!isKeyframeTrackLocked)}
@@ -1085,6 +1091,16 @@ function MultiTrackTimelineBase({
             {/* Track Lane */}
             <div
               onMouseDown={handleStartScrubbing}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setContextMenu({
+                  x: e.clientX,
+                  y: e.clientY,
+                  type: "track-zoom",
+                  targetEvent: selectedEventId ? events.find((ev) => ev.id === selectedEventId) || null : null,
+                });
+              }}
               className="flex-1 relative cursor-pointer overflow-hidden"
             >
               {events.map((ev) => {
@@ -1131,7 +1147,20 @@ function MultiTrackTimelineBase({
                         onSeek(effectiveTimestamp);
                       }
                     }}
-                    onContextMenu={(e) => e.preventDefault()}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!selectedEventIds.includes(ev.id)) {
+                        onSelectEvent(ev);
+                        onSelectMultiple?.([], [ev.id]);
+                      }
+                      setContextMenu({
+                        x: e.clientX,
+                        y: e.clientY,
+                        type: "event",
+                        targetEvent: ev,
+                      });
+                    }}
                     style={{
                       left: `${leftPx}px`,
                       width: `${widthPx}px`,
@@ -1181,7 +1210,7 @@ function MultiTrackTimelineBase({
                     <div
                       onMouseDown={(e) => {
                         if (isKeyframeTrackLocked) return;
-                        if (e.button !== 0 && e.button !== 2) return;
+                        if (e.button !== 0) return;
                         e.stopPropagation();
                         onSelectEvent(ev);
                         setDraggingKeyframeState({
@@ -1351,7 +1380,7 @@ function MultiTrackTimelineBase({
                   <div
                     key={`audio-${clip.id}`}
                     onMouseDown={(e) => {
-                      if (e.button !== 0 && e.button !== 2) return;
+                      if (e.button !== 0) return;
                       e.stopPropagation();
                       onSelectClip(clip.id);
                       onCommitHistory?.();
@@ -1363,7 +1392,20 @@ function MultiTrackTimelineBase({
                         startX: e.clientX,
                       });
                     }}
-                    onContextMenu={(e) => e.preventDefault()}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!selectedClipIds.includes(clip.id)) {
+                        onSelectClip(clip.id);
+                        onSelectMultiple?.([clip.id], []);
+                      }
+                      setContextMenu({
+                        x: e.clientX,
+                        y: e.clientY,
+                        type: "clip",
+                        targetClip: clip,
+                      });
+                    }}
                     style={{
                       left: `${clipStartPx}px`,
                       width: `${clipWidthPx}px`,
@@ -1504,6 +1546,263 @@ function MultiTrackTimelineBase({
             </div>
           )}
         </div>
+        {/* Right-Click Floating Context Menu */}
+        {contextMenu && (
+          <div
+            ref={contextMenuRef}
+            style={{
+              position: "fixed",
+              left: `${Math.max(10, Math.min(contextMenu.x, (typeof window !== "undefined" ? window.innerWidth : 1200) - 260))}px`,
+              top: `${Math.max(10, Math.min(contextMenu.y, (typeof window !== "undefined" ? window.innerHeight : 800) - 340))}px`,
+            }}
+            className="z-[999] min-w-[240px] rounded-xl bg-white/95 dark:bg-[#0c101b]/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.4)] p-1.5 flex flex-col text-xs text-slate-700 dark:text-slate-200 select-none animate-in fade-in zoom-in-95 duration-100"
+            onClick={(e) => e.stopPropagation()}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            {/* Header / Category hint */}
+            <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] mb-1">
+              <span>
+                {contextMenu.type === "clip"
+                  ? "Video Clip Actions"
+                  : contextMenu.type === "event" || contextMenu.type === "track-zoom"
+                  ? "Animation Actions"
+                  : "Timeline Actions"}
+              </span>
+              {selectedEventIds.length > 0 && (
+                <span className="text-[10px] text-indigo-400 font-mono font-medium">
+                  {selectedEventIds.length} selected
+                </span>
+              )}
+            </div>
+
+            {/* Group Selected Animations */}
+            <button
+              type="button"
+              disabled={selectedEventIds.length < 2 || !onGroupSelectedEvents}
+              onClick={() => {
+                if (selectedEventIds.length >= 2 && onGroupSelectedEvents) {
+                  onGroupSelectedEvents(selectedEventIds);
+                }
+                closeContextMenu();
+              }}
+              className={`px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors ${
+                selectedEventIds.length >= 2 && onGroupSelectedEvents
+                  ? "hover:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 font-medium cursor-pointer"
+                  : "opacity-40 cursor-not-allowed"
+              }`}
+              title={
+                selectedEventIds.length >= 2
+                  ? `Group ${selectedEventIds.length} selected animations into 1 continuous section`
+                  : "Select 2 or more animations to group them"
+              }
+            >
+              <div className="flex items-center gap-2">
+                <Group className="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
+                <span className="font-medium">
+                  Group Selected {selectedEventIds.length > 1 ? `(${selectedEventIds.length})` : ""}
+                </span>
+              </div>
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                Ctrl+G
+              </kbd>
+            </button>
+
+            {/* Ungroup Section */}
+            {(() => {
+              const candidateEv =
+                (contextMenu.targetEvent && contextMenu.targetEvent.targets && contextMenu.targetEvent.targets.length > 1
+                  ? contextMenu.targetEvent
+                  : null) ||
+                (selectedEventId
+                  ? events.find((e) => e.id === selectedEventId && e.targets && e.targets.length > 1)
+                  : null) ||
+                events.find((e) => selectedEventIds.includes(e.id) && e.targets && e.targets.length > 1);
+
+              const canUngroup = Boolean(candidateEv && onUngroupEvent);
+              const targetCount = candidateEv?.targets?.length || 0;
+
+              return (
+                <button
+                  type="button"
+                  disabled={!canUngroup}
+                  onClick={() => {
+                    if (candidateEv && onUngroupEvent) {
+                      onUngroupEvent(candidateEv.id);
+                    }
+                    closeContextMenu();
+                  }}
+                  className={`px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors ${
+                    canUngroup
+                      ? "hover:bg-amber-500/15 text-amber-600 dark:text-amber-300 font-medium cursor-pointer"
+                      : "opacity-40 cursor-not-allowed"
+                  }`}
+                  title={
+                    canUngroup
+                      ? `Ungroup section into ${targetCount} discrete keyframes`
+                      : "Target section must be a grouped animation"
+                  }
+                >
+                  <div className="flex items-center gap-2">
+                    <Ungroup className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                    <span className="font-medium">
+                      Ungroup Section {targetCount > 1 ? `(${targetCount})` : ""}
+                    </span>
+                  </div>
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                    Ctrl+Shift+G
+                  </kbd>
+                </button>
+              );
+            })()}
+
+            {/* Select All Animations */}
+            <button
+              type="button"
+              disabled={events.length === 0}
+              onClick={() => {
+                if (onSelectMultiple && events.length > 0) {
+                  onSelectMultiple(selectedClipIds, events.map((e) => e.id));
+                }
+                closeContextMenu();
+              }}
+              className={`px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors ${
+                events.length > 0
+                  ? "hover:bg-blue-500/15 text-blue-600 dark:text-blue-300 cursor-pointer"
+                  : "opacity-40 cursor-not-allowed"
+              }`}
+              title={`Select all ${events.length} animations across timeline`}
+            >
+              <div className="flex items-center gap-2">
+                <Layers className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                <span>Select All Animations ({events.length})</span>
+              </div>
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                Ctrl+A
+              </kbd>
+            </button>
+
+            {/* Auto Group Nearby (< 0.8s) */}
+            {onMergeNearbyClicks && (
+              <button
+                type="button"
+                disabled={events.length < 2}
+                onClick={() => {
+                  onMergeNearbyClicks();
+                  closeContextMenu();
+                }}
+                className={`px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors ${
+                  events.length >= 2
+                    ? "hover:bg-indigo-500/15 text-indigo-600 dark:text-indigo-300 cursor-pointer"
+                    : "opacity-40 cursor-not-allowed"
+                }`}
+                title="Auto-group rapid burst clicks (< 0.8s) into smooth continuous sections"
+              >
+                <div className="flex items-center gap-2">
+                  <Combine className="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
+                  <span>Auto Group Nearby (&lt; 0.8s)</span>
+                </div>
+              </button>
+            )}
+
+            {/* Divider */}
+            <div className="h-px bg-slate-200 dark:bg-white/[0.08] my-1" />
+
+            {/* Add Keyframe at Playhead */}
+            <button
+              type="button"
+              onClick={() => {
+                onAddKeyframeAtCurrentTime();
+                closeContextMenu();
+              }}
+              className="px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left hover:bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 cursor-pointer transition-colors"
+              title="Add a zoom keyframe at playhead position"
+            >
+              <div className="flex items-center gap-2">
+                <Plus className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                <span>Add Keyframe at Playhead</span>
+              </div>
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                K
+              </kbd>
+            </button>
+
+            {/* Video Clip Actions (if clip context) */}
+            {contextMenu.type === "clip" && contextMenu.targetClip && (
+              <>
+                <div className="h-px bg-slate-200 dark:bg-white/[0.08] my-1" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (contextMenu.targetClip) {
+                      onSplitClip(contextMenu.targetClip.id, currentTime);
+                    }
+                    closeContextMenu();
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left hover:bg-purple-500/15 text-purple-600 dark:text-purple-300 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Scissors className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />
+                    <span>Split Clip at Playhead</span>
+                  </div>
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                    S
+                  </kbd>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (contextMenu.targetClip) {
+                      onDeleteClip(contextMenu.targetClip.id);
+                    }
+                    closeContextMenu();
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left hover:bg-red-500/15 text-red-600 dark:text-red-400 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Trash2 className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                    <span>Delete Clip</span>
+                  </div>
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                    Del
+                  </kbd>
+                </button>
+              </>
+            )}
+
+            {/* Delete Animation(s) Action */}
+            {(contextMenu.type === "event" || selectedEventIds.length > 0 || (selectedEventId && events.some((e) => e.id === selectedEventId))) && (
+              <>
+                <div className="h-px bg-slate-200 dark:bg-white/[0.08] my-1" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedEventIds.length > 1 && onDeleteMultiple) {
+                      onDeleteMultiple(selectedClipIds, selectedEventIds);
+                    } else if (contextMenu.targetEvent && onDeleteEvent) {
+                      onDeleteEvent(contextMenu.targetEvent.id);
+                    } else if (selectedEventId && onDeleteEvent) {
+                      onDeleteEvent(selectedEventId);
+                    }
+                    closeContextMenu();
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg flex items-center justify-between text-left hover:bg-red-500/15 text-red-600 dark:text-red-400 cursor-pointer transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Trash2 className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                    <span>
+                      {selectedEventIds.length > 1
+                        ? `Delete Selected Animations (${selectedEventIds.length})`
+                        : "Delete Animation"}
+                    </span>
+                  </div>
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                    Del
+                  </kbd>
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

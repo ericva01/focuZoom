@@ -1230,6 +1230,27 @@ export default function EditorPage() {
       } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || e.code === "KeyY")) {
         e.preventDefault();
         handleRedo();
+      } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "a" || e.code === "KeyA")) {
+        e.preventDefault();
+        handleSelectMultiple(selectedClipIds, events.map((ev) => ev.id));
+      } else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "g" || e.code === "KeyG")) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          if (selectedEventId) {
+            handleUngroupEvent(selectedEventId);
+          } else if (selectedEventIds.length > 0) {
+            const groupedEv = events.find(
+              (ev) => selectedEventIds.includes(ev.id) && ev.targets && ev.targets.length > 1
+            );
+            if (groupedEv) {
+              handleUngroupEvent(groupedEv.id);
+            }
+          }
+        } else {
+          if (selectedEventIds.length > 1) {
+            handleGroupSelectedEvents(selectedEventIds);
+          }
+        }
       } else if (e.key === "Escape") {
         setIsAddMode(false);
       }
@@ -1240,6 +1261,7 @@ export default function EditorPage() {
   }, [
     playback,
     clips,
+    events,
     selectedClipId,
     selectedEventId,
     selectedClipIds,
@@ -1252,6 +1274,9 @@ export default function EditorPage() {
     handleUndo,
     handleRedo,
     handleAddCurrentTimeEvent,
+    handleSelectMultiple,
+    handleGroupSelectedEvents,
+    handleUngroupEvent,
   ]);
 
   // Global mousemove and mouseup listeners for resizable inspector divider
