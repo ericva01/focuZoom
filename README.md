@@ -117,4 +117,5 @@ npx tauri build
 ---
 
 ## 📄 License
-Created by Eric Va. All rights reserved.
+This project is open-source and licensed under the [MIT License](LICENSE).
+Copyright (c) 2026 Eric Va.
