@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { DownloadModal } from "@/components/common/DownloadModal";
 import { useLanguage } from "@/context/LanguageContext";
+import { HeroThreeVisualizer } from "@/components/landing/HeroThreeVisualizer";
 
 export function HeroSection() {
   const [downloadOpen, setDownloadOpen] = useState(false);
@@ -22,6 +23,7 @@ export function HeroSection() {
   const subtextRef = useRef<HTMLParagraphElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
   const badgesRef = useRef<HTMLDivElement | null>(null);
+  const visualizerRef = useRef<HTMLDivElement | null>(null);
 
   useGSAP(
     () => {
@@ -70,16 +72,25 @@ export function HeroSection() {
           "-=0.3"
         );
       }
+
+      if (visualizerRef.current) {
+        tl.fromTo(
+          visualizerRef.current,
+          { y: 40, opacity: 0, scale: 0.98 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "power2.out", clearProps: "all" },
+          "-=0.2"
+        );
+      }
     },
     { scope: containerRef }
   );
 
   return (
     <section ref={containerRef} className="relative overflow-hidden bg-[#F8F9FB] pb-16 pt-12 text-[#111318] sm:pb-24 sm:pt-20 lg:pb-28">
-      {/* Subtle background radial glow in soft orange */}
+      {/* Subtle crisp gradient background accent */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#FFF1E8]/70 via-[#FFF1E8]/20 to-transparent blur-3xl opacity-80"
+        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-[#FFF1E8] via-[#FFF8F3] to-transparent opacity-70"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -145,6 +156,11 @@ export function HeroSection() {
               <span>{t.hero.badges.export4k}</span>
             </div>
           </div>
+        </div>
+
+        {/* 3D Interactive Three.js Studio Visualizer */}
+        <div ref={visualizerRef} className="mt-10">
+          <HeroThreeVisualizer />
         </div>
       </div>
 

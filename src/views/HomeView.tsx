@@ -5,6 +5,7 @@ import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { CoreFeaturesSection } from "@/components/landing/CoreFeaturesSection";
+import { ThreeCameraPlayground } from "@/components/landing/ThreeCameraPlayground";
 import { RecordingWorkflow } from "@/components/landing/RecordingWorkflow";
 import { SecuritySection } from "@/components/landing/SecuritySection";
 import { OpenSourcePillarsSection } from "@/components/landing/OpenSourcePillarsSection";
@@ -43,6 +44,11 @@ export function HomeView() {
         {/* 2. Core Features Modular Grid */}
         <div className="content-auto">
           <CoreFeaturesSection />
+        </div>
+
+        {/* 2.5 Live Three.js 3D Camera Playground */}
+        <div className="content-auto">
+          <ThreeCameraPlayground />
         </div>
 
         {/* 3. Recording Workflow Pipeline */}
