@@ -24,9 +24,10 @@ import {
   CheckCircle2,
   ExternalLink,
   ArrowRight,
+  LogIn,
 } from "lucide-react";
 import { getSavedProjects, deleteProject, saveProject, SavedProject } from "@/utils/projectStorage";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SignInButton, Show, UserButton } from "@clerk/react";
 import { AspectRatio } from "@/types/editor";
 import { desktopBridge } from "@/lib/desktopBridge";
 import { ThemeMode } from "@/components/editor/EditorSettingsModal";
@@ -37,6 +38,7 @@ type DashboardTab = "overview" | "videos" | "settings";
 
 export function DesktopAppDashboard() {
   const router = useRouter();
+  const hasClerkKey = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [savedProjects, setSavedProjects] = useState<SavedProject[]>([]);
@@ -387,16 +389,31 @@ export function DesktopAppDashboard() {
               <span>Settings</span>
             </button>
 
-            {/* User Profile Avatar */}
-            <div
-              title="Creator: Eric Va"
-              className={`flex items-center gap-2.5 pl-3 border-l ${isLight ? "border-slate-200" : "border-white/10"}`}
-            >
-              <Avatar className="h-8 w-8 ring-1 ring-[#FF6B2C]/40 bg-[#0E1526]">
-                <AvatarImage src="/avatar.jpg" alt="Eric Va" />
-                <AvatarFallback className="bg-[#0E1526] text-xs font-bold text-white">EV</AvatarFallback>
-              </Avatar>
-            </div>
+            {/* User Profile / Login Button */}
+            {hasClerkKey && (
+              <div
+                className={`flex items-center gap-2.5 pl-3 border-l ${isLight ? "border-slate-200" : "border-white/10"}`}
+              >
+                <Show when="signed-out">
+                  <SignInButton mode="modal">
+                    <button
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 ${
+                        isLight
+                          ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700"
+                          : "bg-white/[0.06] hover:bg-white/[0.12] border-white/15 text-slate-200 hover:text-white"
+                      }`}
+                      title="Login"
+                    >
+                      <LogIn className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                      <span>Login</span>
+                    </button>
+                  </SignInButton>
+                </Show>
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
+              </div>
+            )}
           </div>
         </header>
 
