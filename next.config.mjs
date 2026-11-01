@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
-// Default to static HTML export (generates the "out" directory) for Render, Tauri, and static web hosts.
-// Only disabled if explicitly set to NEXT_EXPORT=false
-const isNotExport = process.env.NEXT_EXPORT === "false";
+// Static HTML export (generates the "out" directory) for Render, Tauri, and static web hosts.
+// Only enabled during production builds when NEXT_EXPORT is set or not explicitly false.
+const isDev = process.env.NODE_ENV === "development";
+const isExport = !isDev && process.env.NEXT_EXPORT !== "false";
 
 const nextConfig = {
-  ...(!isNotExport && {
+  ...(isExport && {
     output: "export",
     trailingSlash: true,
     images: { unoptimized: true },

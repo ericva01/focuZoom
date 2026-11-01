@@ -1,6 +1,6 @@
 {
   "name": "fucuflow",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "license": "MIT",
   "author": "Eric Va",
   "description": "Cross-Platform Video Editing Workspace with Dynamic 3D Camera Animations",
@@ -15,6 +15,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.9.23",
     "@gsap/react": "^2.1.2",
     "@radix-ui/react-avatar": "^1.2.6",
     "@radix-ui/react-dialog": "^1.1.23",

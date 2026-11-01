@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -139,10 +140,12 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-dark-950 text-gray-100 min-h-screen antialiased selection:bg-[#FFF1E8] selection:text-[#FF6B2C]">
-        <LanguageProvider>
+        <ClerkProvider>
+          <LanguageProvider>
           <AppRefreshGuard />
           {children}
-        </LanguageProvider>
+          </LanguageProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

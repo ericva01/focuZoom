@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Download, Menu } from "lucide-react";
+import { ArrowRight, Download, Menu, LogIn, UserPlus } from "lucide-react";
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import { Logo } from "@/components/common/Logo";
 import { DownloadModal } from "@/components/common/DownloadModal";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
@@ -61,20 +62,35 @@ export function Navbar() {
         <div className="flex items-center gap-2.5">
           <LanguageSwitcher variant="navbar" />
 
-          <a
-            href="https://github.com/ericva01/focuZoom"
-            target="_blank"
-            rel="noreferrer"
-            className="hidden items-center gap-2 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors md:inline-flex"
-          >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-            </svg>
-            <span>GitHub</span>
-            <span className="px-1.5 py-0.5 rounded bg-[#FFF1E8] text-[#FF6B2C] text-[10px] font-bold">
-              {t.nav.githubBadge}
-            </span>
-          </a>
+          <Suspense fallback={null}>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button
+                  aria-label="Sign In"
+                  title="Sign In"
+                  className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+                >
+                  <LogIn size={14} className="text-[#667085]" />
+                  <span>Sign In</span>
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button
+                  aria-label="Sign Up"
+                  title="Sign Up"
+                  className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+                >
+                  <UserPlus size={14} className="text-[#FF6B2C]" />
+                  <span>Sign Up</span>
+                </button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <div className="flex items-center gap-2">
+                <UserButton />
+              </div>
+            </Show>
+          </Suspense>
 
           <Link
             href={localePath("/download")}
@@ -131,6 +147,41 @@ export function Navbar() {
                 >
                   {t.nav.loginWorkspace}
                 </Link>
+
+                <div className="pt-2 border-t border-[#E5E7EB] mt-2">
+                  <Suspense fallback={null}>
+                    <Show when="signed-out">
+                      <div className="flex flex-col gap-2">
+                        <SignInButton mode="modal">
+                          <button
+                            onClick={() => setOpen(false)}
+                            aria-label="Sign In"
+                            className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
+                          >
+                            <LogIn size={15} className="text-[#667085]" />
+                            <span>Sign In</span>
+                          </button>
+                        </SignInButton>
+                        <SignUpButton mode="modal">
+                          <button
+                            onClick={() => setOpen(false)}
+                            aria-label="Sign Up"
+                            className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
+                          >
+                            <UserPlus size={15} className="text-[#FF6B2C]" />
+                            <span>Sign Up</span>
+                          </button>
+                        </SignUpButton>
+                      </div>
+                    </Show>
+                    <Show when="signed-in">
+                      <div className="px-4 py-2 flex items-center gap-3">
+                        <UserButton />
+                        <span className="text-sm font-medium text-[#111318]">Account</span>
+                      </div>
+                    </Show>
+                  </Suspense>
+                </div>
               </nav>
 
               <div className="mt-auto space-y-2 pt-6">

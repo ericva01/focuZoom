@@ -2,7 +2,8 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
-import { Globe } from "lucide-react";
+import { Globe, Check } from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Locale } from "@/lib/i18n/translations";
 
 interface LanguageSwitcherProps {
@@ -103,33 +104,54 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
     );
   }
 
-  // Navbar default
+  // Navbar default: Icon-only button with dropdown menu
   return (
-    <div className={`inline-flex items-center gap-0.5 rounded-xl border border-[#E5E7EB] bg-[#F8F9FB] p-0.5 ${className}`}>
-      <button
-        onClick={() => handleSwitch("kh")}
-        aria-label="ជ្រើសរើសភាសាខ្មែរ"
-        className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-          isKh
-            ? "bg-[#FF6B2C] text-white shadow-xs"
-            : "text-[#667085] hover:text-[#111318]"
-        }`}
-      >
-        <span>🇰🇭</span>
-        <span>ខ្មែរ</span>
-      </button>
-      <button
-        onClick={() => handleSwitch("en")}
-        aria-label="Switch to English"
-        className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-          isEn
-            ? "bg-white text-[#111318] shadow-xs"
-            : "text-[#667085] hover:text-[#111318]"
-        }`}
-      >
-        <span>🇺🇸</span>
-        <span>EN</span>
-      </button>
-    </div>
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          aria-label="Language / ភាសា"
+          className={`p-2 rounded-xl border border-[#E5E7EB] bg-white hover:bg-[#F8F9FB] text-[#667085] hover:text-[#111318] transition-colors inline-flex items-center justify-center cursor-pointer shadow-xs active:scale-95 ${className}`}
+          title="Language / ភាសា"
+        >
+          <Globe size={16} />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="end"
+          sideOffset={8}
+          className="z-50 min-w-[140px] overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-1 text-[#111318] shadow-lg animate-in fade-in-0 zoom-in-95"
+        >
+          <DropdownMenu.Item
+            onClick={() => handleSwitch("kh")}
+            className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors outline-none ${
+              isKh
+                ? "bg-[#FFF1E8] text-[#FF6B2C]"
+                : "text-[#667085] hover:bg-[#F8F9FB] hover:text-[#111318]"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <span>🇰🇭</span>
+              <span>ខ្មែរ</span>
+            </span>
+            {isKh && <Check size={14} className="text-[#FF6B2C]" />}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onClick={() => handleSwitch("en")}
+            className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors outline-none ${
+              isEn
+                ? "bg-[#FFF1E8] text-[#FF6B2C]"
+                : "text-[#667085] hover:bg-[#F8F9FB] hover:text-[#111318]"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <span>🇺🇸</span>
+              <span>English</span>
+            </span>
+            {isEn && <Check size={14} className="text-[#FF6B2C]" />}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }
