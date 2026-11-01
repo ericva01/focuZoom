@@ -30,7 +30,7 @@ import {
   Download,
 } from "lucide-react";
 import { getSavedProjects, deleteProject, saveProject, SavedProject } from "@/utils/projectStorage";
-import { SignInButton, Show, UserButton } from "@clerk/react";
+import { SignInButton, Show, UserButton, ClerkLoaded, ClerkLoading, ClerkFailed } from "@clerk/react";
 import { AspectRatio } from "@/types/editor";
 import { desktopBridge } from "@/lib/desktopBridge";
 import { ThemeMode } from "@/components/editor/EditorSettingsModal";
@@ -44,7 +44,6 @@ type DashboardTab = "overview" | "videos" | "settings";
 
 export function DesktopAppDashboard() {
   const router = useRouter();
-  const hasClerkKey = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [savedProjects, setSavedProjects] = useState<SavedProject[]>([]);
@@ -420,13 +419,49 @@ export function DesktopAppDashboard() {
             </button>
 
             {/* User Profile / Login Button */}
-            {hasClerkKey && (
-              <div
-                className={`flex items-center gap-2.5 pl-3 border-l ${isLight ? "border-slate-200" : "border-white/10"}`}
-              >
+            <div
+              className={`flex items-center gap-2.5 pl-3 border-l ${isLight ? "border-slate-200" : "border-white/10"}`}
+            >
+              <ClerkLoading>
+                <button
+                  type="button"
+                  onClick={() => router.push("/sign-in")}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 ${
+                    isLight
+                      ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700"
+                      : "bg-white/[0.06] hover:bg-white/[0.12] border-white/15 text-slate-200 hover:text-white"
+                  }`}
+                  title="Login"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <span>Login</span>
+                </button>
+              </ClerkLoading>
+
+              <ClerkFailed>
+                <button
+                  type="button"
+                  onClick={() => router.push("/sign-in")}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 ${
+                    isLight
+                      ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700"
+                      : "bg-white/[0.06] hover:bg-white/[0.12] border-white/15 text-slate-200 hover:text-white"
+                  }`}
+                  title="Login"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <span>Login</span>
+                </button>
+              </ClerkFailed>
+
+              <ClerkLoaded>
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
                 <Show when="signed-out">
                   <SignInButton mode="modal">
                     <button
+                      type="button"
                       className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 ${
                         isLight
                           ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700"
@@ -439,11 +474,8 @@ export function DesktopAppDashboard() {
                     </button>
                   </SignInButton>
                 </Show>
-                <Show when="signed-in">
-                  <UserButton />
-                </Show>
-              </div>
-            )}
+              </ClerkLoaded>
+            </div>
           </div>
         </header>
 

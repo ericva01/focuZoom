@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Download, Menu, LogIn, UserPlus } from "lucide-react";
-import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/react";
+import { SignInButton, SignUpButton, Show, UserButton, ClerkLoaded, ClerkLoading, ClerkFailed } from "@clerk/react";
 import { Logo } from "@/components/common/Logo";
 import { DownloadModal } from "@/components/common/DownloadModal";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
@@ -16,7 +16,6 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
   const { t, localePath } = useLanguage();
-  const hasClerkKey = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
   const navLinks = [
     { label: t.nav.product, href: localePath("/product") },
@@ -63,37 +62,75 @@ export function Navbar() {
         <div className="flex items-center gap-2.5">
           <LanguageSwitcher variant="navbar" />
 
-          {hasClerkKey && (
-            <Suspense fallback={null}>
-              <Show when="signed-out">
-                <SignInButton mode="modal">
-                  <button
-                    aria-label="Sign In"
-                    title="Sign In"
-                    className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-                  >
-                    <LogIn size={14} className="text-[#667085]" />
-                    <span>Sign In</span>
-                  </button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <button
-                    aria-label="Sign Up"
-                    title="Sign Up"
-                    className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-                  >
-                    <UserPlus size={14} className="text-[#FF6B2C]" />
-                    <span>Sign Up</span>
-                  </button>
-                </SignUpButton>
-              </Show>
-              <Show when="signed-in">
-                <div className="flex items-center gap-2">
-                  <UserButton />
-                </div>
-              </Show>
-            </Suspense>
-          )}
+          <ClerkLoading>
+            <Link
+              href={localePath("/sign-in")}
+              aria-label="Sign In"
+              title="Sign In"
+              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+            >
+              <LogIn size={14} className="text-[#667085]" />
+              <span>Sign In</span>
+            </Link>
+            <Link
+              href={localePath("/sign-up")}
+              aria-label="Sign Up"
+              title="Sign Up"
+              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+            >
+              <UserPlus size={14} className="text-[#FF6B2C]" />
+              <span>Sign Up</span>
+            </Link>
+          </ClerkLoading>
+          <ClerkFailed>
+            <Link
+              href={localePath("/sign-in")}
+              aria-label="Sign In"
+              title="Sign In"
+              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+            >
+              <LogIn size={14} className="text-[#667085]" />
+              <span>Sign In</span>
+            </Link>
+            <Link
+              href={localePath("/sign-up")}
+              aria-label="Sign Up"
+              title="Sign Up"
+              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+            >
+              <UserPlus size={14} className="text-[#FF6B2C]" />
+              <span>Sign Up</span>
+            </Link>
+          </ClerkFailed>
+          <ClerkLoaded>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button
+                  aria-label="Sign In"
+                  title="Sign In"
+                  className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+                >
+                  <LogIn size={14} className="text-[#667085]" />
+                  <span>Sign In</span>
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button
+                  aria-label="Sign Up"
+                  title="Sign Up"
+                  className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
+                >
+                  <UserPlus size={14} className="text-[#FF6B2C]" />
+                  <span>Sign Up</span>
+                </button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <div className="flex items-center gap-2">
+                <UserButton />
+              </div>
+            </Show>
+          </ClerkLoaded>
 
           <Link
             href={localePath("/download")}
@@ -151,42 +188,84 @@ export function Navbar() {
                   {t.nav.loginWorkspace}
                 </Link>
 
-                {hasClerkKey && (
-                  <div className="pt-2 border-t border-[#E5E7EB] mt-2">
-                    <Suspense fallback={null}>
-                      <Show when="signed-out">
-                        <div className="flex flex-col gap-2">
-                          <SignInButton mode="modal">
-                            <button
-                              onClick={() => setOpen(false)}
-                              aria-label="Sign In"
-                              className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
-                            >
-                              <LogIn size={15} className="text-[#667085]" />
-                              <span>Sign In</span>
-                            </button>
-                          </SignInButton>
-                          <SignUpButton mode="modal">
-                            <button
-                              onClick={() => setOpen(false)}
-                              aria-label="Sign Up"
-                              className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
-                            >
-                              <UserPlus size={15} className="text-[#FF6B2C]" />
-                              <span>Sign Up</span>
-                            </button>
-                          </SignUpButton>
-                        </div>
-                      </Show>
-                      <Show when="signed-in">
-                        <div className="px-4 py-2 flex items-center gap-3">
-                          <UserButton />
-                          <span className="text-sm font-medium text-[#111318]">Account</span>
-                        </div>
-                      </Show>
-                    </Suspense>
-                  </div>
-                )}
+                <div className="pt-2 border-t border-[#E5E7EB] mt-2">
+                  <ClerkLoading>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={localePath("/sign-in")}
+                        onClick={() => setOpen(false)}
+                        aria-label="Sign In"
+                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
+                      >
+                        <LogIn size={15} className="text-[#667085]" />
+                        <span>Sign In</span>
+                      </Link>
+                      <Link
+                        href={localePath("/sign-up")}
+                        onClick={() => setOpen(false)}
+                        aria-label="Sign Up"
+                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
+                      >
+                        <UserPlus size={15} className="text-[#FF6B2C]" />
+                        <span>Sign Up</span>
+                      </Link>
+                    </div>
+                  </ClerkLoading>
+                  <ClerkFailed>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={localePath("/sign-in")}
+                        onClick={() => setOpen(false)}
+                        aria-label="Sign In"
+                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
+                      >
+                        <LogIn size={15} className="text-[#667085]" />
+                        <span>Sign In</span>
+                      </Link>
+                      <Link
+                        href={localePath("/sign-up")}
+                        onClick={() => setOpen(false)}
+                        aria-label="Sign Up"
+                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
+                      >
+                        <UserPlus size={15} className="text-[#FF6B2C]" />
+                        <span>Sign Up</span>
+                      </Link>
+                    </div>
+                  </ClerkFailed>
+                  <ClerkLoaded>
+                    <Show when="signed-out">
+                      <div className="flex flex-col gap-2">
+                        <SignInButton mode="modal">
+                          <button
+                            onClick={() => setOpen(false)}
+                            aria-label="Sign In"
+                            className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
+                          >
+                            <LogIn size={15} className="text-[#667085]" />
+                            <span>Sign In</span>
+                          </button>
+                        </SignInButton>
+                        <SignUpButton mode="modal">
+                          <button
+                            onClick={() => setOpen(false)}
+                            aria-label="Sign Up"
+                            className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
+                          >
+                            <UserPlus size={15} className="text-[#FF6B2C]" />
+                            <span>Sign Up</span>
+                          </button>
+                        </SignUpButton>
+                      </div>
+                    </Show>
+                    <Show when="signed-in">
+                      <div className="px-4 py-2 flex items-center gap-3">
+                        <UserButton />
+                        <span className="text-sm font-medium text-[#111318]">Account</span>
+                      </div>
+                    </Show>
+                  </ClerkLoaded>
+                </div>
               </nav>
 
               <div className="mt-auto space-y-2 pt-6">
