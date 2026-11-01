@@ -77,6 +77,7 @@ jobs:
         uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
         with:
           tagName: ${{ github.event.inputs.tag || github.ref_name }}
           releaseName: 'FucuFlow ${{ github.event.inputs.tag || github.ref_name }}'
