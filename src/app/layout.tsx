@@ -1,4 +1,3 @@
-import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -125,6 +124,7 @@ const jsonLd = {
 
 import { LanguageProvider } from "@/context/LanguageContext";
 import { AppRefreshGuard } from "@/components/common/AppRefreshGuard";
+import { ClerkClientProvider } from "@/components/common/ClerkClientProvider";
 
 export default function RootLayout({
   children,
@@ -140,12 +140,12 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-dark-950 text-gray-100 min-h-screen antialiased selection:bg-[#FFF1E8] selection:text-[#FF6B2C]">
-        <ClerkProvider>
+        <ClerkClientProvider>
           <LanguageProvider>
           <AppRefreshGuard />
           {children}
           </LanguageProvider>
-        </ClerkProvider>
+        </ClerkClientProvider>
       </body>
     </html>
   );

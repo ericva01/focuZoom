@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Download, Menu, LogIn, UserPlus } from "lucide-react";
-import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/react";
 import { Logo } from "@/components/common/Logo";
 import { DownloadModal } from "@/components/common/DownloadModal";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
