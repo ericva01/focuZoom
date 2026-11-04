@@ -1492,11 +1492,62 @@ export function useThreeAnimationEngine(
       screenGroup.position.y = currentFloatY;
 
       // 5. 3D Cursor & Animated Luminous Halo Rings (Rock-solid transformed alignment)
-      if (activeEvent && zoomProgress > 0.02) {
-        const evX = (activeTargetX - 0.5) * screenW;
-        const evY = -(activeTargetY - 0.5) * screenH;
+      const haloDuration = 0.85;
+      let activeHaloTarget: { x: number; y: number; timestamp: number } | null = null;
+      let activeDelta = 999;
 
-        cursorSprite.visible = curConfig.showCursor !== false;
+      // Check all events and their sequential targets for active clicks
+      for (const ev of events) {
+        const delta = effectiveTime - ev.timestamp;
+        if (delta >= 0 && delta < haloDuration && delta < activeDelta) {
+          activeDelta = delta;
+          activeHaloTarget = ev;
+        }
+        if (ev.targets) {
+          for (const tgt of ev.targets) {
+            const tDelta = effectiveTime - tgt.timestamp;
+            if (tDelta >= 0 && tDelta < haloDuration && tDelta < activeDelta) {
+              activeDelta = tDelta;
+              activeHaloTarget = tgt;
+            }
+          }
+        }
+      }
+
+      // Render Click Ripple Wave
+      if (activeHaloTarget && curConfig.showRipple !== false) {
+        const prog = activeDelta / haloDuration;
+        const fade = 1.0 - prog;
+        const hX = (activeHaloTarget.x - 0.5) * screenW;
+        const hY = -(activeHaloTarget.y - 0.5) * screenH;
+
+        haloMesh.visible = true;
+        haloMesh.position.set(hX, hY, 0.015);
+        haloMesh.scale.set(1 + prog * 4.5, 1 + prog * 4.5, 1);
+        haloMat.opacity = fade * 0.85;
+      } else {
+        haloMesh.visible = false;
+      }
+
+      // Render 3D Custom Cursor Sprite
+      if (curConfig.showCursor !== false) {
+        let cursorX = activeTargetX;
+        let cursorY = activeTargetY;
+
+        // If no active zoom event, fallback to trajectory or active click target
+        if (!activeEvent && curCursorTrail && curCursorTrail.length > 0) {
+          const pt = sampleTrajectoryFromPoints(effectiveTime, curCursorTrail);
+          cursorX = pt.x;
+          cursorY = pt.y;
+        } else if (!activeEvent && activeHaloTarget) {
+          cursorX = activeHaloTarget.x;
+          cursorY = activeHaloTarget.y;
+        }
+
+        const evX = (cursorX - 0.5) * screenW;
+        const evY = -(cursorY - 0.5) * screenH;
+
+        cursorSprite.visible = true;
         cursorSprite.position.set(evX, evY, 0.022);
 
         // Maintain sharp, natural cursor scale during camera dolly zoom
@@ -1504,37 +1555,8 @@ export function useThreeAnimationEngine(
         const distFactor = Math.pow(smoothStateRef.current.camZ / baseZ, 0.65);
         const dynamicScale = baseCursorScale * distFactor;
         cursorSprite.scale.set(dynamicScale, dynamicScale, 1);
-
-        // Click Ripple Wave calculation across all sequential click targets
-        const haloDuration = 0.85;
-        let activeHaloTarget: ClickTarget | null = null;
-        let activeDelta = 999;
-
-        const checkTargets = activeTargets.length > 0 ? activeTargets : [activeEvent];
-        for (const tgt of checkTargets) {
-          const delta = effectiveTime - tgt.timestamp;
-          if (delta >= 0 && delta < haloDuration && delta < activeDelta) {
-            activeDelta = delta;
-            activeHaloTarget = tgt;
-          }
-        }
-
-        if (activeHaloTarget && curConfig.showRipple) {
-          const prog = activeDelta / haloDuration;
-          const fade = 1.0 - prog;
-          const hX = (activeHaloTarget.x - 0.5) * screenW;
-          const hY = -(activeHaloTarget.y - 0.5) * screenH;
-
-          haloMesh.visible = true;
-          haloMesh.position.set(hX, hY, 0.015);
-          haloMesh.scale.set(1 + prog * 4.5, 1 + prog * 4.5, 1);
-          haloMat.opacity = fade * 0.85;
-        } else {
-          haloMesh.visible = false;
-        }
       } else {
         cursorSprite.visible = false;
-        haloMesh.visible = false;
       }
 
       // 6. Render the 3D Scene

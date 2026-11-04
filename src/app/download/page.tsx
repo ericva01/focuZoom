@@ -344,14 +344,38 @@ function getAssetPlatform(filename: string): PlatformType {
   return "other";
 }
 
+export function WindowsIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 88 88" fill="currentColor">
+      <path d="M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L.028 75.48.016 45.728zm4.326-39.027L87.914 0v41.527l-47.918.375zm47.918 46.525l-.014 41.573-47.904-6.763-.028-34.437z" />
+    </svg>
+  );
+}
+
+export function AppleIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 170 170" fill="currentColor">
+      <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.04-7.67-7.87-11.93-14.49-5.88-9.13-10.4-19.46-13.56-30.98-3.16-11.52-4.74-22.37-4.74-32.55 0-14.12 3.65-25.77 10.96-34.94 7.31-9.18 16.48-13.87 27.5-14.09 4.35 0 9.4 1.15 15.15 3.44 5.76 2.3 9.46 3.49 11.11 3.59 1.45 0 5.42-1.34 11.91-4.04 6.5-2.69 12.19-3.9 17.08-3.62 12.94.76 23.08 5.6 30.43 14.52-11.31 6.85-16.85 16.27-16.63 28.26.22 9.35 3.84 17.15 10.87 23.38 7.03 6.24 15.44 9.85 25.24 10.85-2.28 6.74-4.88 13.57-7.8 20.5zM119.22 31.84c0-7.39 2.65-14.34 7.96-20.85 5.3-6.51 11.91-10.51 19.82-11.99.11 1.09.16 2.06.16 2.93 0 7.39-2.82 14.45-8.46 21.18-5.65 6.74-12.44 10.7-20.37 11.9-.22-1.09-.33-2.17-.33-3.26l.22.09z" />
+    </svg>
+  );
+}
+
+export function LinuxIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.003 2c-2.4 0-4.34 1.94-4.34 4.34 0 1.25.52 2.38 1.36 3.18-.38.74-.6 1.58-.6 2.48 0 .61.1 1.19.29 1.73-.83.6-1.38 1.58-1.38 2.68 0 1.84 1.5 3.34 3.34 3.34.42 0 .82-.08 1.19-.23.63.42 1.38.67 2.19.67.81 0 1.56-.25 2.19-.67.37.15.77.23 1.19.23 1.84 0 3.34-1.5 3.34-3.34 0-1.1-.55-2.08-1.38-2.68.19-.54.29-1.12.29-1.73 0-.9-.22-1.74-.6-2.48.84-.8 1.36-1.93 1.36-3.18C20.68 3.94 18.74 2 16.34 2h-4.337zm-.003 2.17h4.34c1.2 0 2.17.97 2.17 2.17 0 .66-.3 1.25-.77 1.65l-.56.47.33.66c.26.52.4 1.1.4 1.7 0 .4-.07.78-.2 1.14l-.27.76.68.44c.59.38.96 1.03.96 1.76 0 .9-.68 1.64-1.56 1.73l-.44.05.12.43c.12.42.06.87-.16 1.24-.22.37-.58.62-1 .7l-.44.08-.12.43c-.15.54-.53.97-1.04 1.18-.51.21-1.09.18-1.57-.08l-.39-.21-.39.21c-.48.26-1.06.29-1.57.08-.51-.21-.89-.64-1.04-1.18l-.12-.43-.44-.08c-.42-.08-.78-.33-1-.7-.22-.37-.28-.82-.16-1.24l.12-.43-.44-.05c-.88-.09-1.56-.83-1.56-1.73 0-.73.37-1.38.96-1.76l.68-.44-.27-.76c-.13-.36-.2-.74-.2-1.14 0-.6.14-1.18.4-1.7l.33-.66-.56-.47c-.47-.4-.77-.99-.77-1.65 0-1.2.97-2.17 2.17-2.17z"/>
+    </svg>
+  );
+}
+
 function getPlatformIcon(platform: PlatformType) {
   switch (platform) {
     case "win":
-      return <Monitor className="w-4 h-4 text-blue-500" />;
+      return <WindowsIcon className="w-4 h-4 text-[#0078D4]" />;
     case "mac":
-      return <Apple className="w-4 h-4 text-slate-800" />;
+      return <AppleIcon className="w-4 h-4 text-slate-800" />;
     case "linux":
-      return <Terminal className="w-4 h-4 text-emerald-600" />;
+      return <LinuxIcon className="w-4 h-4 text-amber-500" />;
     default:
       return <FileCode className="w-4 h-4 text-gray-500" />;
   }
@@ -558,11 +582,11 @@ export default function DownloadPage() {
             </div>
 
             {/* Primary Recommended Download Card */}
-            <div className="mt-10 max-w-3xl mx-auto">
-              <div className="rounded-3xl border-2 border-[#FF6B2C]/30 bg-gradient-to-b from-white to-[#FFF9F6] p-6 sm:p-8 shadow-lg shadow-[#FF6B2C]/5 relative overflow-hidden">
+            <div className="mt-10 max-w-4xl mx-auto">
+              <div className="rounded-3xl border-2 border-[#FF6B2C]/30 bg-gradient-to-b from-white to-[#FFF9F6] p-7 sm:p-9 shadow-xl shadow-[#FF6B2C]/5 relative overflow-hidden">
                 {/* Ribbon */}
                 <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF1E8] text-[#FF6B2C] text-xs font-bold border border-[#FF6B2C]/30">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF1E8] text-[#FF6B2C] text-xs font-bold border border-[#FF6B2C]/30 shadow-xs">
                     <CheckCircle2 size={13} />
                     <span>Auto-detected for your system</span>
                   </span>
@@ -570,22 +594,22 @@ export default function DownloadPage() {
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                   <div>
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#667085]">
-                      {userOS === "win" && <Monitor className="w-4 h-4 text-blue-500" />}
-                      {userOS === "mac" && <Apple className="w-4 h-4 text-slate-800" />}
-                      {userOS === "linux" && <Terminal className="w-4 h-4 text-emerald-600" />}
+                    <div className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-wider text-[#667085]">
+                      {userOS === "win" && <WindowsIcon className="w-4 h-4 text-[#0078D4]" />}
+                      {userOS === "mac" && <AppleIcon className="w-4 h-4 text-slate-900" />}
+                      {userOS === "linux" && <LinuxIcon className="w-4 h-4 text-amber-500" />}
                       <span>
                         {userOS === "win" && "Windows 10 / 11 (64-bit)"}
                         {userOS === "mac" && (macArch === "arm" ? "macOS (Apple Silicon M1-M4)" : "macOS (Intel x64)")}
-                        {userOS === "linux" && "Linux (Universal AppImage)"}
+                        {userOS === "linux" && "Linux (Universal AppImage / deb)"}
                       </span>
                     </div>
 
-                    <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-[#111318]">
+                    <h2 className="mt-2 text-2xl sm:text-3xl font-extrabold text-[#111318] tracking-tight">
                       FucuFlow {latestRelease.tag_name}
                     </h2>
 
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[#667085]">
+                    <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs text-[#667085]">
                       <span className="flex items-center gap-1">
                         <Calendar size={13} />
                         {formatDate(latestRelease.published_at)}
@@ -598,7 +622,7 @@ export default function DownloadPage() {
                         </span>
                       )}
                       <span>•</span>
-                      <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      <span className="text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
                         Signed & Verified
                       </span>
                     </div>
@@ -646,7 +670,7 @@ export default function DownloadPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         download={recommendedAsset.name}
-                        className="inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-2xl bg-[#FF6B2C] px-8 py-4 text-base font-bold text-white shadow-md hover:bg-[#E85A1F] hover:shadow-[0_6px_20px_rgba(255,107,44,0.35)] transition-all active:scale-[0.98] cursor-pointer"
+                        className="inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-2xl bg-[#FF6B2C] px-8 py-4 text-base font-bold text-white shadow-md hover:bg-[#E85A1F] hover:shadow-[0_8px_25px_rgba(255,107,44,0.35)] transition-all active:scale-[0.98] cursor-pointer"
                       >
                         <Download size={20} className="animate-bounce" />
                         <span>
@@ -710,73 +734,83 @@ export default function DownloadPage() {
                     <button
                       type="button"
                       onClick={() => setUserOS("win")}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         userOS === "win"
-                          ? "bg-[#111318] text-white"
-                          : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318]"
+                          ? "bg-[#111318] text-white shadow-xs"
+                          : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318] hover:border-slate-300"
                       }`}
                     >
-                      <Monitor size={13} />
+                      <WindowsIcon className="w-3.5 h-3.5 text-[#0078D4]" />
                       <span>Windows</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setUserOS("mac")}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         userOS === "mac"
-                          ? "bg-[#111318] text-white"
-                          : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318]"
+                          ? "bg-[#111318] text-white shadow-xs"
+                          : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318] hover:border-slate-300"
                       }`}
                     >
-                      <Apple size={13} />
+                      <AppleIcon className="w-3.5 h-3.5 text-slate-900" />
                       <span>macOS</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setUserOS("linux")}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                      className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         userOS === "linux"
-                          ? "bg-[#111318] text-white"
-                          : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318]"
+                          ? "bg-[#111318] text-white shadow-xs"
+                          : "bg-white border border-[#E5E7EB] text-[#667085] hover:text-[#111318] hover:border-slate-300"
                       }`}
                     >
-                      <Terminal size={13} />
+                      <LinuxIcon className="w-3.5 h-3.5 text-amber-500" />
                       <span>Linux</span>
                     </button>
                     <Link
                       href="/editor"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/20 hover:bg-[#FFE6D7] transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/20 hover:bg-[#FFE6D7] transition-colors"
                     >
                       <Zap size={13} />
                       <span>Web Studio (No Install)</span>
                     </Link>
                   </div>
                 </div>
-              </div>
 
-              {/* Secondary Available Formats for Latest Release */}
-              {secondaryAssets.length > 0 && (
-                <div className="mt-4 px-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-[#667085]">
-                  <span className="font-semibold text-[#111318]">Other formats:</span>
-                  {secondaryAssets.slice(0, 4).map((asset) => (
-                    <a
-                      key={asset.id}
-                      href={asset.browser_download_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download={asset.name}
-                      className="hover:text-[#FF6B2C] underline decoration-dotted transition-colors font-mono cursor-pointer"
-                    >
-                      {asset.name} ({formatBytes(asset.size)})
-                    </a>
-                  ))}
-                  {secondaryAssets.length > 4 && (
-                    <a href="#all-releases" className="text-[#FF6B2C] font-semibold hover:underline">
-                      +{secondaryAssets.length - 4} more below ↓
-                    </a>
-                  )}
-                </div>
-              )}
+                {/* Secondary Available Formats for Latest Release */}
+                {secondaryAssets.length > 0 && (
+                  <div className="mt-5 pt-4 border-t border-[#E5E7EB]/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <span className="font-bold text-slate-700 shrink-0">Other platform packages:</span>
+                    <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+                      {secondaryAssets.slice(0, 5).map((asset) => {
+                        const plat = getAssetPlatform(asset.name);
+                        return (
+                          <a
+                            key={asset.id}
+                            href={asset.browser_download_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={asset.name}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#FF6B2C]/40 text-[#475467] hover:text-[#FF6B2C] shadow-2xs transition-all font-mono text-[11px] font-medium"
+                            title={asset.name}
+                          >
+                            {plat === "win" && <WindowsIcon className="w-3.5 h-3.5 text-[#0078D4]" />}
+                            {plat === "mac" && <AppleIcon className="w-3.5 h-3.5 text-slate-800" />}
+                            {plat === "linux" && <LinuxIcon className="w-3.5 h-3.5 text-amber-500" />}
+                            <span className="truncate max-w-[170px]">{asset.name.replace(/^FucuFlow[_-]?/i, "")}</span>
+                            <span className="text-[10px] text-slate-400">({formatBytes(asset.size)})</span>
+                          </a>
+                        );
+                      })}
+                      {secondaryAssets.length > 5 && (
+                        <a href="#all-releases" className="text-[#FF6B2C] font-bold text-xs hover:underline pl-1">
+                          +{secondaryAssets.length - 5} more ↓
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Feature Pills */}
@@ -831,41 +865,41 @@ export default function DownloadPage() {
                 </div>
 
                 {/* OS Switcher Buttons */}
-                <div className="flex items-center gap-1.5 bg-[#F1F3F7] p-1 rounded-2xl border border-[#E5E7EB] self-start sm:self-auto">
+                <div className="flex items-center gap-1.5 bg-[#F1F3F7] p-1.5 rounded-2xl border border-[#E5E7EB] self-start sm:self-auto">
                   <button
                     type="button"
                     onClick={() => setActiveCliTab("win")}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       activeCliTab === "win"
                         ? "bg-white text-[#111318] shadow-xs"
                         : "text-[#667085] hover:text-[#111318]"
                     }`}
                   >
-                    <Monitor size={14} className={activeCliTab === "win" ? "text-blue-500" : ""} />
+                    <WindowsIcon className={`w-3.5 h-3.5 ${activeCliTab === "win" ? "text-[#0078D4]" : "text-slate-400"}`} />
                     <span>Windows</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveCliTab("mac")}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       activeCliTab === "mac"
                         ? "bg-white text-[#111318] shadow-xs"
                         : "text-[#667085] hover:text-[#111318]"
                     }`}
                   >
-                    <Apple size={14} className={activeCliTab === "mac" ? "text-slate-800" : ""} />
+                    <AppleIcon className={`w-3.5 h-3.5 ${activeCliTab === "mac" ? "text-slate-900" : "text-slate-400"}`} />
                     <span>macOS</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveCliTab("linux")}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       activeCliTab === "linux"
                         ? "bg-white text-[#111318] shadow-xs"
                         : "text-[#667085] hover:text-[#111318]"
                     }`}
                   >
-                    <Terminal size={14} className={activeCliTab === "linux" ? "text-emerald-600" : ""} />
+                    <LinuxIcon className={`w-3.5 h-3.5 ${activeCliTab === "linux" ? "text-amber-500" : "text-slate-400"}`} />
                     <span>Linux</span>
                   </button>
                 </div>
@@ -1098,7 +1132,7 @@ export default function DownloadPage() {
                       : "text-[#667085] hover:text-[#111318]"
                   }`}
                 >
-                  <Monitor size={13} />
+                  <WindowsIcon className="w-3.5 h-3.5" />
                   <span>Windows</span>
                 </button>
                 <button
@@ -1110,7 +1144,7 @@ export default function DownloadPage() {
                       : "text-[#667085] hover:text-[#111318]"
                   }`}
                 >
-                  <Apple size={13} />
+                  <AppleIcon className="w-3.5 h-3.5" />
                   <span>macOS</span>
                 </button>
                 <button
@@ -1122,7 +1156,7 @@ export default function DownloadPage() {
                       : "text-[#667085] hover:text-[#111318]"
                   }`}
                 >
-                  <Terminal size={13} />
+                  <LinuxIcon className="w-3.5 h-3.5" />
                   <span>Linux</span>
                 </button>
               </div>
@@ -1317,39 +1351,42 @@ export default function DownloadPage() {
               </div>
 
               {/* OS Tabs for Instructions */}
-              <div className="mt-6 flex items-center gap-2 border-b border-[#E5E7EB] pb-3">
+              <div className="mt-6 flex flex-wrap items-center gap-2 border-b border-[#E5E7EB] pb-3">
                 <button
                   type="button"
                   onClick={() => setActiveInstructionTab("win")}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeInstructionTab === "win"
-                      ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30"
+                      ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30 shadow-2xs"
                       : "text-[#667085] hover:text-[#111318]"
                   }`}
                 >
-                  Windows Setup
+                  <WindowsIcon className={`w-3.5 h-3.5 ${activeInstructionTab === "win" ? "text-[#0078D4]" : "text-slate-400"}`} />
+                  <span>Windows Setup</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveInstructionTab("mac")}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeInstructionTab === "mac"
-                      ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30"
+                      ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30 shadow-2xs"
                       : "text-[#667085] hover:text-[#111318]"
                   }`}
                 >
-                  macOS Gatekeeper
+                  <AppleIcon className={`w-3.5 h-3.5 ${activeInstructionTab === "mac" ? "text-slate-900" : "text-slate-400"}`} />
+                  <span>macOS Gatekeeper</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveInstructionTab("linux")}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeInstructionTab === "linux"
-                      ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30"
+                      ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30 shadow-2xs"
                       : "text-[#667085] hover:text-[#111318]"
                   }`}
                 >
-                  Linux Permissions
+                  <LinuxIcon className={`w-3.5 h-3.5 ${activeInstructionTab === "linux" ? "text-amber-500" : "text-slate-400"}`} />
+                  <span>Linux Permissions</span>
                 </button>
               </div>
 

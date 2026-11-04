@@ -10,6 +10,7 @@ import {
   Check,
   Circle,
   Square,
+  Video,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
@@ -149,26 +150,35 @@ function EditorHeaderBase({
 
       {/* Right: Only recordscreen (icon), save (icon), and export */}
       <div className="flex items-center gap-2">
-        {/* Screen Recording Button (Icon only) */}
+        {/* Screen Recording Button (Red Icon + Text) */}
         {isRecording ? (
           <Button
             variant="danger"
-            size="icon-sm"
+            size="sm"
             onClick={onStopRecording}
-            className="animate-pulse border-red-500/50 shadow-sm shadow-red-500/30"
-            title={`Stop Recording (${formatRecTime(recordingDuration)})${clickCount > 0 ? ` - ${clickCount} clicks logged` : ""}`}
+            className="border-red-500/60 bg-red-600/20 text-red-500 hover:bg-red-600/30 shadow-[0_0_12px_rgba(239,68,68,0.4)] font-semibold"
+            title={`Recording in progress (${formatRecTime(recordingDuration)})${clickCount > 0 ? ` - ${clickCount} clicks logged` : ""}. Click to stop & import.`}
+            leftIcon={
+              <span className="relative flex items-center justify-center mr-0.5">
+                <span className="absolute inline-flex h-3.5 w-3.5 rounded-full bg-red-500 opacity-75 animate-ping" />
+                <Circle className="relative w-2.5 h-2.5 fill-red-500 text-red-500 animate-pulse" />
+              </span>
+            }
           >
-            <Square className="w-3.5 h-3.5 fill-white text-white" />
+            <span>Stop ({formatRecTime(recordingDuration)})</span>
           </Button>
         ) : (
           <Button
             variant="secondary"
-            size="icon-sm"
+            size="sm"
             onClick={onStartRecording}
             title="Record Screen with click logging"
-            className="group hover:border-[#FF6B2C]/50"
+            className="group hover:border-red-500/50 hover:bg-red-500/5 transition-all"
+            leftIcon={
+              <Circle className="w-2.5 h-2.5 fill-red-500 text-red-500 shadow-[0_0_8px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform" />
+            }
           >
-            <Circle className="w-3.5 h-3.5 fill-[#FF6B2C] text-[#FF6B2C] group-hover:scale-110 transition-transform" />
+            <span className="font-semibold text-slate-800 dark:text-slate-100">Record</span>
           </Button>
         )}
 

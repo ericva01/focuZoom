@@ -95,7 +95,7 @@ export default function EditorPage() {
     cursorStyle: "macos-arrow",
     cursorColor: "#FF6B2C",
     cursorSize: 22,
-    showRipple: false,
+    showRipple: true,
     rippleColor: "#FF6B2C",
 
     aspectRatio: "16:9",

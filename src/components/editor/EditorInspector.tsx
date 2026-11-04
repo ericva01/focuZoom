@@ -27,6 +27,8 @@ import {
   HardDrive,
   Undo2,
   Redo2,
+  Circle,
+  Video,
 } from "lucide-react";
 import {
   CanvasConfig,
@@ -1384,6 +1386,12 @@ function EditorInspectorBase({
                     size="md"
                     className="w-full"
                     onClick={onStopRecording}
+                    leftIcon={
+                      <span className="relative flex items-center justify-center mr-0.5">
+                        <span className="absolute inline-flex h-3.5 w-3.5 rounded-full bg-white opacity-60 animate-ping" />
+                        <Circle className="relative w-3 h-3 fill-white text-white animate-pulse" />
+                      </span>
+                    }
                   >
                     Stop Recording & Import
                   </Button>
@@ -1394,6 +1402,7 @@ function EditorInspectorBase({
                   size="md"
                   className="w-full"
                   onClick={onStartRecording}
+                  leftIcon={<Video className="w-4 h-4" />}
                 >
                   Start Screen Recording
                 </Button>

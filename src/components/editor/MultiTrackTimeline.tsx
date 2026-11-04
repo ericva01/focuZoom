@@ -750,12 +750,6 @@ function MultiTrackTimelineBase({
             <SkipForward className="w-3.5 h-3.5" />
           </button>
 
-          {/* Monospace SMPTE Timecode Badge */}
-          <div className="ml-2 font-mono text-xs px-3 py-1 rounded-xl bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 flex items-center gap-1.5 shadow-glass-inner">
-            <span className="text-[#FF6B2C] dark:text-[#FF8A4C] font-semibold">{formatSMPTETimecode(currentTime)}</span>
-            <span className="text-slate-400 dark:text-slate-500">/</span>
-            <span className="text-slate-500 dark:text-slate-400">{formatSMPTETimecode(totalTimelineDuration)}</span>
-          </div>
 
           {/* Playback speed selector */}
           <div className="hidden xl:flex items-center gap-1 bg-slate-100 dark:bg-black/30 px-2 py-0.5 rounded-xl border border-slate-200 dark:border-white/10">

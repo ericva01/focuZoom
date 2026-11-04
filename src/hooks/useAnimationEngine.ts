@@ -384,10 +384,11 @@ export function useAnimationEngine(
       frameW: number = 0,
       frameH: number = 0
     ) => {
-      if (activeEvent && config.showRipple) {
+      if (config.showRipple !== false && (activeEvent || targets.length > 0)) {
         const rippleDuration = 0.8;
-        const checkList = targets.length > 0 ? targets : [activeEvent];
+        const checkList: (ClickTarget | ClickEvent)[] = targets.length > 0 ? targets : (activeEvent ? [activeEvent] : []);
         for (const tgt of checkList) {
+          if (!tgt) continue;
           const clickDelta = t - tgt.timestamp;
           if (clickDelta >= 0 && clickDelta < rippleDuration) {
             const progress = clickDelta / rippleDuration;

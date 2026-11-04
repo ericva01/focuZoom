@@ -1106,9 +1106,12 @@ function LeftSettingsBase({
 
                   <button
                     onClick={onStopRecording}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#E85A1F] hover:bg-[#FF6B2C] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all"
+                    className="w-full py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-md shadow-red-600/30 flex items-center justify-center gap-2 transition-all"
                   >
-                    <Square className="w-3.5 h-3.5 fill-white" />
+                    <span className="relative flex items-center justify-center mr-0.5">
+                      <span className="absolute inline-flex h-3.5 w-3.5 rounded-full bg-white opacity-60 animate-ping" />
+                      <Circle className="relative w-3 h-3 fill-white text-white animate-pulse" />
+                    </span>
                     <span>Stop Recording & Import</span>
                   </button>
                 </div>
@@ -1117,7 +1120,7 @@ function LeftSettingsBase({
                   onClick={onStartRecording}
                   className="w-full py-2.5 px-4 rounded-xl bg-[#FF6B2C]/20 hover:bg-[#FF6B2C]/30 text-[#FF8A4C] hover:text-white font-semibold text-xs border border-[#FF6B2C]/30 shadow-glass-sm flex items-center justify-center gap-2 transition-all group"
                 >
-                  <Circle className="w-3.5 h-3.5 fill-sky-300 text-[#FF8A4C] group-hover:scale-110 transition-transform" />
+                  <Video className="w-4 h-4 text-[#FF8A4C] group-hover:scale-110 transition-transform" />
                   <span>Start Screen Recording</span>
                 </button>
               )}
