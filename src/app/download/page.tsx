@@ -813,35 +813,74 @@ export default function DownloadPage() {
               </div>
             </div>
 
-            {/* Feature Pills */}
-            <div className="mt-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4.5 flex items-center gap-3.5 shadow-xs">
-                <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] text-[#FF6B2C] flex items-center justify-center shrink-0">
-                  <ShieldCheck size={20} />
-                </div>
+            {/* Feature Highlights & Trust Bento Grid */}
+            <div className="mt-10 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+              {/* Feature 1: Privacy & Local Offline */}
+              <div className="group relative overflow-hidden rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-[#FAFBFC] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-[#FF6B2C]/40 hover:shadow-[0_8px_25px_rgba(255,107,44,0.09)] transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF6B2C]/0 to-transparent group-hover:via-[#FF6B2C] transition-all duration-500" />
                 <div>
-                  <h4 className="text-xs font-bold text-[#111318]">100% Local & Offline</h4>
-                  <p className="text-[11px] text-[#667085] mt-0.5">No video uploads to cloud. Zero telemetry.</p>
+                  <div className="flex items-center justify-between gap-2 mb-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#FFF5EE] to-[#FFE7DC] border border-[#FF6B2C]/20 flex items-center justify-center text-[#FF6B2C] shadow-2xs group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all duration-300">
+                      <ShieldCheck size={22} />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
+                      {isKhmer ? "ឯកជនភាព" : "Zero Cloud"}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-extrabold text-[#111318] tracking-tight group-hover:text-[#FF6B2C] transition-colors">
+                    {isKhmer ? "ដំណើរការលើម៉ាស៊ីន 100%" : "100% Local & Offline"}
+                  </h4>
+                  <p className="text-xs text-[#667085] leading-relaxed mt-1.5">
+                    {isKhmer
+                      ? "គ្មានការបញ្ជូនវីដេអូទៅកាន់ Cloud ឡើយ។ សុវត្ថិភាពទិន្នន័យឯកជន 100% លើកុំព្យូទ័ររបស់អ្នក។"
+                      : "No video uploads to cloud. All recordings and editing stay 100% on your device."}
+                  </p>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4.5 flex items-center gap-3.5 shadow-xs">
-                <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] text-[#FF6B2C] flex items-center justify-center shrink-0">
-                  <Zap size={20} />
-                </div>
+              {/* Feature 2: Hardware Acceleration & 60fps */}
+              <div className="group relative overflow-hidden rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-[#FAFBFC] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-[#FF6B2C]/40 hover:shadow-[0_8px_25px_rgba(255,107,44,0.09)] transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF6B2C]/0 to-transparent group-hover:via-[#FF6B2C] transition-all duration-500" />
                 <div>
-                  <h4 className="text-xs font-bold text-[#111318]">GPU Accelerated</h4>
-                  <p className="text-[11px] text-[#667085] mt-0.5">Fast 4K rendering & silky 60fps spring camera.</p>
+                  <div className="flex items-center justify-between gap-2 mb-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#FFF5EE] to-[#FFE7DC] border border-[#FF6B2C]/20 flex items-center justify-center text-[#FF6B2C] shadow-2xs group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all duration-300">
+                      <Zap size={22} />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#FF6B2C] bg-[#FFF1E8] px-2.5 py-0.5 rounded-full border border-[#FF6B2C]/30">
+                      {isKhmer ? "ល្បឿន 60 FPS" : "60 FPS Native"}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-extrabold text-[#111318] tracking-tight group-hover:text-[#FF6B2C] transition-colors">
+                    {isKhmer ? "ជំនួយដោយ GPU" : "GPU Accelerated"}
+                  </h4>
+                  <p className="text-xs text-[#667085] leading-relaxed mt-1.5">
+                    {isKhmer
+                      ? "ដំណើរការ Render កម្រិត 4K យ៉ាងរហ័ស ជាមួយចលនាកាមេរ៉ាស្ព្រីង 60 FPS យ៉ាងរលូន។"
+                      : "Ultra-fast 4K video rendering powered by silky 60fps spring camera dynamics."}
+                  </p>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4.5 flex items-center gap-3.5 shadow-xs">
-                <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] text-[#FF6B2C] flex items-center justify-center shrink-0">
-                  <Code2 size={20} />
-                </div>
+              {/* Feature 3: Free & Open Source MIT */}
+              <div className="group relative overflow-hidden rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-[#FAFBFC] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-[#FF6B2C]/40 hover:shadow-[0_8px_25px_rgba(255,107,44,0.09)] transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF6B2C]/0 to-transparent group-hover:via-[#FF6B2C] transition-all duration-500" />
                 <div>
-                  <h4 className="text-xs font-bold text-[#111318]">Open Source (MIT)</h4>
-                  <p className="text-[11px] text-[#667085] mt-0.5">Free forever. Auditable code on GitHub.</p>
+                  <div className="flex items-center justify-between gap-2 mb-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#FFF5EE] to-[#FFE7DC] border border-[#FF6B2C]/20 flex items-center justify-center text-[#FF6B2C] shadow-2xs group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all duration-300">
+                      <Code2 size={22} />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200/80">
+                      {isKhmer ? "កូដចំហ" : "MIT License"}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-extrabold text-[#111318] tracking-tight group-hover:text-[#FF6B2C] transition-colors">
+                    {isKhmer ? "កូដចំហ Open Source" : "Open Source (MIT)"}
+                  </h4>
+                  <p className="text-xs text-[#667085] leading-relaxed mt-1.5">
+                    {isKhmer
+                      ? "ឥតគិតថ្លៃរហូត កូដចំហមានតម្លាភាព អាចផ្ទៀងផ្ទាត់បាននៅលើ GitHub។"
+                      : "Free forever for personal and commercial use. Transparent code auditable on GitHub."}
+                  </p>
                 </div>
               </div>
             </div>
