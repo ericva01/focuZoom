@@ -20,12 +20,22 @@ import {
   CheckCircle2,
   Lock,
   Volume2,
+  Sparkles,
 } from "lucide-react";
 
 export function FeaturesView() {
   const { t, localePath, isKhmer } = useLanguage();
 
   const featureCards = [
+    {
+      id: "ai-copilot",
+      icon: Sparkles,
+      title: isKhmer ? "AI Copilot & ប្រព័ន្ធ MCP" : "AI Copilot & MCP Server",
+      description: isKhmer
+        ? "ភ្ជាប់ AI Agent (Gemini, GPT, Ollama ឬ Claude Desktop) ដើម្បីកាត់តវីដេអូដោយស្វ័យប្រវត្តិតាមរយៈ Prompt ។"
+        : "Connect AI agents (Gemini, GPT, local Ollama, or Claude Desktop) to direct and edit videos via prompt.",
+      badge: isKhmer ? "បញ្ញាសិប្បនិម្មិត" : "AI & MCP",
+    },
     {
       id: "focal-zoom",
       icon: Focus,
@@ -151,7 +161,7 @@ export function FeaturesView() {
         <section className="py-20 border-b border-[#E5E7EB] bg-[#F8F9FB]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
             {t.featuresPage.deepDives.map((item, index) => {
-              const mockType = index === 0 ? "zoom" : index === 1 ? "timeline" : index === 2 ? "3d" : "privacy";
+              const mockType = index === 0 ? "zoom" : index === 1 ? "timeline" : index === 2 ? "3d" : index === 3 ? "privacy" : "ai";
 
               return (
                 <div
@@ -271,6 +281,33 @@ export function FeaturesView() {
                         <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
                           <span>Telemetry: Disabled</span>
                           <span className="text-emerald-400 font-bold">Air-Gapped Ready</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {mockType === "ai" && (
+                      <div className="py-5 space-y-3 font-mono text-xs">
+                        <div className="p-3.5 rounded-xl bg-black/60 border border-[#FF6B2C]/30 space-y-2">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="flex items-center gap-1.5 text-[#FF8A4C] font-bold">
+                              <Sparkles className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                              AI Copilot Studio Prompt
+                            </span>
+                            <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">
+                              MCP Bridge: Online (9876)
+                            </span>
+                          </div>
+                          <p className="text-xs font-sans text-slate-200">
+                            &quot;Make it vertical for Reels (9:16), apply Hyper-Neon backdrop, and auto-zoom on 4 key clicks.&quot;
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px]">
+                          <span>⚡ Executed: set_aspect_ratio(&quot;9:16&quot;) + 4 3D Zooms</span>
+                          <span className="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded font-bold">Success</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+                          <span>Providers: Gemini • OpenAI • Ollama Local</span>
+                          <span className="text-purple-400">Claude & Cursor MCP</span>
                         </div>
                       </div>
                     )}

@@ -28,6 +28,12 @@ import {
   RefreshCw,
   Sparkles,
   Download,
+  Terminal,
+  Copy,
+  Check,
+  Radio,
+  Key,
+  Server,
 } from "lucide-react";
 import { getSavedProjects, deleteProject, saveProject, SavedProject } from "@/utils/projectStorage";
 import { SignInButton, Show, UserButton, ClerkLoaded, ClerkLoading, ClerkFailed } from "@clerk/react";
@@ -36,11 +42,14 @@ import { desktopBridge } from "@/lib/desktopBridge";
 import { ThemeMode } from "@/components/editor/EditorSettingsModal";
 import { GoogleDriveModal, GoogleDriveIcon } from "@/components/editor/GoogleDriveModal";
 import { googleDriveService } from "@/lib/googleDriveService";
+import { aiAgentService } from "@/lib/aiAgentService";
+import { agentLocalBridge } from "@/lib/agentLocalBridge";
+import { AiAgentConfig, AiAgentProvider } from "@/types/aiAgent";
 import { useAppUpdater } from "@/hooks/useAppUpdater";
 import { AppUpdateBanner } from "@/components/desktop/AppUpdateBanner";
 import { AppUpdateModal } from "@/components/desktop/AppUpdateModal";
 
-type DashboardTab = "overview" | "videos" | "settings";
+type DashboardTab = "overview" | "videos" | "settings" | "ai";
 
 export function DesktopAppDashboard() {
   const router = useRouter();
@@ -93,6 +102,51 @@ export function DesktopAppDashboard() {
 
   const [isGDriveModalOpen, setIsGDriveModalOpen] = useState<boolean>(false);
   const [gdriveStatus, setGdriveStatus] = useState(() => googleDriveService.getDriveStatus());
+
+  // AI Agent & MCP State
+  const [aiConfig, setAiConfig] = useState<AiAgentConfig>(() => aiAgentService.loadConfig());
+  const [bridgeStatus, setBridgeStatus] = useState<"connected" | "disconnected" | "connecting">("disconnected");
+  const [isTestingAi, setIsTestingAi] = useState(false);
+  const [aiTestResult, setAiTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [copiedAiId, setCopiedAiId] = useState<string | null>(null);
+  const [showAiKey, setShowAiKey] = useState(false);
+
+  useEffect(() => {
+    setBridgeStatus(agentLocalBridge.getStatus());
+    const unsub = agentLocalBridge.onStatusChange((status) => {
+      setBridgeStatus(status);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleSaveAiConfig = (updated: Partial<AiAgentConfig>) => {
+    const saved = aiAgentService.saveConfig(updated);
+    setAiConfig(saved);
+    if (saved.enableLocalBridge) {
+      agentLocalBridge.connect(saved.localBridgePort);
+    } else {
+      agentLocalBridge.disconnect();
+    }
+  };
+
+  const handleTestAi = async () => {
+    setIsTestingAi(true);
+    setAiTestResult(null);
+    try {
+      const res = await aiAgentService.testConnection(aiConfig);
+      setAiTestResult(res);
+    } catch (err: any) {
+      setAiTestResult({ success: false, message: err.message || "Failed to reach AI service." });
+    } finally {
+      setIsTestingAi(false);
+    }
+  };
+
+  const handleCopyAi = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedAiId(id);
+    setTimeout(() => setCopiedAiId(null), 2000);
+  };
 
   // Apply theme class to document element and compute effective theme
   useEffect(() => {
@@ -310,7 +364,29 @@ export function DesktopAppDashboard() {
               )}
             </button>
 
-            {/* 3. Settings */}
+            {/* 3. AI Agent & MCP Hub */}
+            <button
+              onClick={() => setActiveTab("ai")}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                activeTab === "ai"
+                  ? isLight
+                    ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
+                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
+                  : isLight
+                  ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                  : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles className={`w-4 h-4 ${activeTab === "ai" ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
+                <span>AI Agent & MCP</span>
+              </div>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/25 font-bold uppercase">
+                Copilot
+              </span>
+            </button>
+
+            {/* 4. Settings */}
             <button
               onClick={() => setActiveTab("settings")}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
@@ -498,8 +574,8 @@ export function DesktopAppDashboard() {
           {/* ===================================================================== */}
           {activeTab === "overview" && (
             <>
-              {/* 3 Quick Creation Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* 4 Quick Creation & Agent Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Card 1: 16:9 Landscape Video */}
                 <button
                   onClick={() => handleCreateNew("16:9")}
@@ -574,6 +650,33 @@ export function DesktopAppDashboard() {
                     </h3>
                     <p className={`text-[11px] mt-1 leading-relaxed ${isLight ? "text-slate-500" : "text-slate-400"}`}>
                       Import local MP4, WebM, or MOV video from disk.
+                    </p>
+                  </div>
+                </button>
+
+                {/* Card 4: AI Agent Copilot & MCP */}
+                <button
+                  onClick={() => setActiveTab("ai")}
+                  className={`p-4 rounded-2xl border transition-all text-left group flex items-start gap-3.5 cursor-pointer shadow-xs ${
+                    isLight
+                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-[#FF6B2C]/60"
+                      : "bg-[#080D1A]/90 hover:bg-[#0E152B] border-white/[0.08] hover:border-[#FF6B2C]/50"
+                  }`}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF6B2C] to-amber-500 text-white flex items-center justify-center flex-shrink-0 group-hover:scale-105 shadow-sm transition-all">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-[#FF6B2C]" : "text-white group-hover:text-white"}`}>
+                        Connect AI Agent
+                      </h3>
+                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-[#FF6B2C]/20 text-[#FF6B2C] border border-[#FF6B2C]/30 font-bold">
+                        MCP
+                      </span>
+                    </div>
+                    <p className={`text-[11px] mt-1 leading-relaxed ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                      Direct edits via Gemini/OpenAI or Claude & Cursor MCP.
                     </p>
                   </div>
                 </button>
@@ -1146,6 +1249,480 @@ export function DesktopAppDashboard() {
                     <span>GitHub</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ===================================================================== */}
+          {/* TAB 4: AI AGENT & MODEL CONTEXT PROTOCOL (MCP) HUB                    */}
+          {/* ===================================================================== */}
+          {activeTab === "ai" && (
+            <div className="space-y-8 max-w-4xl">
+              {/* Header */}
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h2 className={`text-2xl font-bold tracking-tight flex items-center gap-2.5 ${isLight ? "text-slate-900" : "text-white"}`}>
+                    <span>AI Agent & MCP Studio Hub</span>
+                    <span className="text-xs uppercase font-mono px-2 py-0.5 rounded-full bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 font-bold">
+                      Hybrid Architecture
+                    </span>
+                  </h2>
+                  <p className={`text-xs mt-1 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                    Configure your in-studio AI Copilot (Gemini, OpenAI, Ollama) or connect external AI agents (Claude Desktop, Cursor, Antigravity) via MCP.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => router.push("/editor")}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Launch Studio with AI</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Live Bridge Status Card */}
+              <div className={`p-5 rounded-3xl border transition-all ${
+                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+              }`}>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="relative flex items-center justify-center">
+                      <span className={`w-3.5 h-3.5 rounded-full ${
+                        bridgeStatus === "connected"
+                          ? "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.9)] animate-pulse"
+                          : bridgeStatus === "connecting"
+                          ? "bg-amber-500 animate-ping"
+                          : "bg-slate-400"
+                      }`} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>
+                          Local Agent WebSocket Bridge
+                        </h3>
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/40 text-slate-300 border border-white/10">
+                          ws://127.0.0.1:{aiConfig.localBridgePort || 9876}/editor
+                        </span>
+                      </div>
+                      <p className={`text-xs mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                        {bridgeStatus === "connected"
+                          ? "Ready! External AI agents running in Claude Desktop, Cursor, or scripts can control FucuFlow in real time."
+                          : "Local bridge daemon is currently idle. Run 'npm run agent:bridge' in terminal to enable external agent sync."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleSaveAiConfig({ enableLocalBridge: !aiConfig.enableLocalBridge })}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                        aiConfig.enableLocalBridge
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                          : "bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-500"
+                      }`}
+                    >
+                      {aiConfig.enableLocalBridge ? "Bridge Enabled" : "Bridge Disabled"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 1: In-App AI Copilot (Bring Your Own Key) */}
+              <div className={`p-6 rounded-3xl border space-y-5 transition-all ${
+                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-[#FF6B2C]/10 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
+                      <Cpu className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>
+                        In-App AI Copilot (BYO Key)
+                      </h3>
+                      <p className={`text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                        Direct video timeline edits and 3D zooms using natural language prompts.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Provider Selector Cards */}
+                <div>
+                  <label className={`text-xs font-semibold block mb-2 ${isLight ? "text-slate-700" : "text-slate-300"}`}>
+                    Select AI Provider
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[
+                      { id: "gemini" as const, name: "Google Gemini", badge: "Free Tier / Fast", defaultModel: "gemini-2.0-flash" },
+                      { id: "openai" as const, name: "OpenAI", badge: "GPT-4o / 4o-mini", defaultModel: "gpt-4o-mini" },
+                      { id: "ollama" as const, name: "Ollama (Local)", badge: "100% Free & Offline", defaultModel: "llama3.2" },
+                      { id: "custom" as const, name: "Custom / OpenRouter", badge: "Groq / vLLM", defaultModel: "default" },
+                    ].map((p) => {
+                      const isSelected = aiConfig.provider === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            handleSaveAiConfig({
+                              provider: p.id,
+                              model: aiConfig.provider !== p.id ? p.defaultModel : aiConfig.model,
+                              customEndpoint: p.id === "ollama" ? "http://localhost:11434/v1" : aiConfig.customEndpoint,
+                            });
+                            setAiTestResult(null);
+                          }}
+                          className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+                            isSelected
+                              ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border-[#FF6B2C] ring-2 ring-[#FF6B2C]/20 text-[#FF6B2C] font-bold"
+                              : isLight
+                              ? "bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300"
+                              : "bg-white/[0.03] border-white/10 text-slate-200 hover:border-white/20"
+                          }`}
+                        >
+                          <div className="text-xs font-bold flex items-center justify-between">
+                            <span>{p.name}</span>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                          </div>
+                          <span className={`text-[10px] block mt-1 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                            {p.badge}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* API Key Input (if not Ollama) */}
+                {aiConfig.provider !== "ollama" && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className={`text-xs font-semibold flex items-center gap-1.5 ${isLight ? "text-slate-700" : "text-slate-300"}`}>
+                        <Key className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                        <span>API Key</span>
+                      </label>
+                      {aiConfig.provider === "gemini" && (
+                        <a
+                          href="https://aistudio.google.com/app/apikey"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[11px] text-[#FF6B2C] hover:underline flex items-center gap-1 font-semibold"
+                        >
+                          Get Free Gemini Key <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                      {aiConfig.provider === "openai" && (
+                        <a
+                          href="https://platform.openai.com/api-keys"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[11px] text-[#FF6B2C] hover:underline flex items-center gap-1 font-semibold"
+                        >
+                          Get OpenAI Key <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showAiKey ? "text" : "password"}
+                        value={aiConfig.apiKey}
+                        onChange={(e) => handleSaveAiConfig({ apiKey: e.target.value })}
+                        placeholder={aiConfig.provider === "gemini" ? "AIzaSy..." : "sk-proj-..."}
+                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none border focus:border-[#FF6B2C] pr-20 ${
+                          isLight ? "bg-white border-slate-300 text-slate-900" : "bg-black/50 border-white/15 text-white"
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAiKey(!showAiKey)}
+                        className={`absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-semibold px-2 py-1 rounded cursor-pointer ${
+                          isLight ? "bg-slate-100 text-slate-600" : "bg-white/10 text-slate-300"
+                        }`}
+                      >
+                        {showAiKey ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                    <p className={`text-[10px] mt-1 flex items-center gap-1 ${isLight ? "text-slate-400" : "text-slate-500"}`}>
+                      <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                      Saved locally on your machine only. Never transmitted to third-party tracking servers.
+                    </p>
+                  </div>
+                )}
+
+                {/* Endpoint (for Ollama or Custom) */}
+                {(aiConfig.provider === "ollama" || aiConfig.provider === "custom") && (
+                  <div>
+                    <label className={`text-xs font-semibold block mb-1.5 ${isLight ? "text-slate-700" : "text-slate-300"}`}>
+                      API Base Endpoint URL
+                    </label>
+                    <input
+                      type="text"
+                      value={aiConfig.customEndpoint || ""}
+                      onChange={(e) => handleSaveAiConfig({ customEndpoint: e.target.value })}
+                      placeholder="http://localhost:11434/v1"
+                      className={`w-full rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none border focus:border-[#FF6B2C] ${
+                        isLight ? "bg-white border-slate-300 text-slate-900" : "bg-black/50 border-white/15 text-white"
+                      }`}
+                    />
+                    <p className={`text-[10px] mt-1 ${isLight ? "text-slate-400" : "text-slate-500"}`}>
+                      {aiConfig.provider === "ollama"
+                        ? "Default Ollama local server is http://localhost:11434/v1. Run 'ollama serve' in your terminal."
+                        : "OpenAI-compatible base URL (e.g. OpenRouter, vLLM, Groq)."}
+                    </p>
+                  </div>
+                )}
+
+                {/* Model Selection */}
+                <div>
+                  <label className={`text-xs font-semibold block mb-1.5 ${isLight ? "text-slate-700" : "text-slate-300"}`}>
+                    Model Name
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={aiConfig.model}
+                      onChange={(e) => handleSaveAiConfig({ model: e.target.value })}
+                      className={`flex-1 rounded-xl px-3.5 py-2 text-xs font-mono outline-none border focus:border-[#FF6B2C] ${
+                        isLight ? "bg-white border-slate-300 text-slate-900" : "bg-black/50 border-white/15 text-white"
+                      }`}
+                    />
+                    {aiConfig.provider === "gemini" && (
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSaveAiConfig({ model: "gemini-2.0-flash" })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            aiConfig.model === "gemini-2.0-flash"
+                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
+                          }`}
+                        >
+                          2.0 Flash
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveAiConfig({ model: "gemini-1.5-pro" })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            aiConfig.model === "gemini-1.5-pro"
+                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
+                          }`}
+                        >
+                          1.5 Pro
+                        </button>
+                      </div>
+                    )}
+                    {aiConfig.provider === "openai" && (
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSaveAiConfig({ model: "gpt-4o-mini" })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            aiConfig.model === "gpt-4o-mini"
+                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
+                          }`}
+                        >
+                          4o-mini
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveAiConfig({ model: "gpt-4o" })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            aiConfig.model === "gpt-4o"
+                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
+                          }`}
+                        >
+                          GPT-4o
+                        </button>
+                      </div>
+                    )}
+                    {aiConfig.provider === "ollama" && (
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSaveAiConfig({ model: "llama3.2" })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            aiConfig.model === "llama3.2"
+                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
+                          }`}
+                        >
+                          llama3.2
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveAiConfig({ model: "qwen2.5" })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            aiConfig.model === "qwen2.5"
+                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
+                          }`}
+                        >
+                          qwen2.5
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Test Connection Button & Result */}
+                <div className="pt-2 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleTestAi}
+                    disabled={isTestingAi || (!aiConfig.apiKey && aiConfig.provider !== "ollama")}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {isTestingAi ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Radio className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                    )}
+                    <span>{isTestingAi ? "Testing..." : "Test Connection"}</span>
+                  </button>
+
+                  {aiTestResult && (
+                    <div className={`flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-xl border ${
+                      aiTestResult.success
+                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                        : "bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400"
+                    }`}>
+                      {aiTestResult.success ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <ShieldCheck className="w-4 h-4 shrink-0 text-red-500" />}
+                      <span>{aiTestResult.message}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Section 2: External Agent & Model Context Protocol (MCP) Integration */}
+              <div className={`p-6 rounded-3xl border space-y-5 transition-all ${
+                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-purple-600/10 text-purple-500 border border-purple-500/30 flex items-center justify-center">
+                      <Server className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>
+                        Model Context Protocol (MCP) Integration
+                      </h3>
+                      <p className={`text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                        Connect Claude Desktop, Cursor, or Antigravity to direct FucuFlow via autonomous tools.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold">
+                    JSON-RPC 2.0
+                  </span>
+                </div>
+
+                {/* Claude Desktop Config Snippet */}
+                <div className={`p-4 rounded-2xl border space-y-2.5 ${
+                  isLight ? "bg-slate-50 border-slate-200" : "bg-black/30 border-white/10"
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                      Claude Desktop (claude_desktop_config.json)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyAi(
+                        JSON.stringify({
+                          mcpServers: {
+                            fucuflow: {
+                              command: "node",
+                              args: ["./scripts/mcp-server/index.mjs"],
+                            },
+                          },
+                        }, null, 2),
+                        "claude-dash"
+                      )}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6B2C] hover:underline cursor-pointer"
+                    >
+                      {copiedAiId === "claude-dash" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedAiId === "claude-dash" ? "Copied!" : "Copy JSON"}</span>
+                    </button>
+                  </div>
+                  <pre className="p-3 rounded-xl bg-black/60 text-[11px] font-mono text-slate-300 overflow-x-auto border border-white/5">
+{`{
+  "mcpServers": {
+    "fucuflow": {
+      "command": "node",
+      "args": ["./scripts/mcp-server/index.mjs"]
+    }
+  }
+}`}
+                  </pre>
+                </div>
+
+                {/* Cursor & Antigravity Config Snippet */}
+                <div className={`p-4 rounded-2xl border space-y-2.5 ${
+                  isLight ? "bg-slate-50 border-slate-200" : "bg-black/30 border-white/10"
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                      Cursor / Antigravity (.cursor/mcp.json)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyAi(
+                        JSON.stringify({
+                          mcpServers: {
+                            fucuflow: {
+                              command: "node",
+                              args: ["scripts/mcp-server/index.mjs"],
+                            },
+                          },
+                        }, null, 2),
+                        "cursor-dash"
+                      )}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6B2C] hover:underline cursor-pointer"
+                    >
+                      {copiedAiId === "cursor-dash" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedAiId === "cursor-dash" ? "Copied!" : "Copy JSON"}</span>
+                    </button>
+                  </div>
+                  <pre className="p-3 rounded-xl bg-black/60 text-[11px] font-mono text-slate-300 overflow-x-auto border border-white/5">
+{`{
+  "mcpServers": {
+    "fucuflow": {
+      "command": "node",
+      "args": ["scripts/mcp-server/index.mjs"]
+    }
+  }
+}`}
+                  </pre>
+                </div>
+
+                {/* Terminal Commands */}
+                <div className={`p-4 rounded-2xl border space-y-2.5 ${
+                  isLight ? "bg-slate-50 border-slate-200" : "bg-black/30 border-white/10"
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                      <Terminal className="w-3.5 h-3.5 text-emerald-500" />
+                      Start Local Agent Bridge in Terminal:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyAi("npm run agent:bridge", "cmd-dash")}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6B2C] hover:underline cursor-pointer"
+                    >
+                      {copiedAiId === "cmd-dash" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedAiId === "cmd-dash" ? "Copied!" : "Copy Command"}</span>
+                    </button>
+                  </div>
+                  <pre className="p-2.5 rounded-xl bg-black/60 text-[11px] font-mono text-emerald-400 border border-white/5">
+                    npm run agent:bridge
+                  </pre>
                 </div>
               </div>
             </div>

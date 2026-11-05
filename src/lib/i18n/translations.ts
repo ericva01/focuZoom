@@ -635,6 +635,17 @@ const en: Translations = {
           "Permanent offline functionality for air-gapped environments",
         ],
       },
+      {
+        id: "ai-agent-mcp",
+        badge: "AI Agent & MCP",
+        title: "Autonomous AI Copilot & Model Context Protocol",
+        description: "Direct your video edits using natural language or connect external AI agents (Claude Desktop, Cursor, Antigravity) via MCP to automate 3D zooms, styling, and video creation.",
+        highlights: [
+          "In-app AI Copilot supporting Google Gemini, OpenAI GPT, and 100% offline Ollama",
+          "Standard Model Context Protocol (MCP) stdio server for Claude Desktop & Cursor",
+          "14 automated tools: 3D zoom keyframing, vertical video reformatting, canvas styling, and clip trimming",
+        ],
+      },
     ],
   },
   solutionsPage: {
@@ -1166,6 +1177,17 @@ const km: Translations = {
           "គ្មានការបង្ហោះទៅ Cloud ភាគីទីបី ឬ Server ខាងក្រៅឡើយ",
           "មិនបាច់ចុះឈ្មោះ គ្មានការត្រួតពិនិត្យ License ឬបង្ខំទិញ Subscription",
           "ដំណើរការដោយគ្មានអ៊ីនធឺណិតជារៀងរហូត សម្រាប់បរិយាកាសសុវត្ថិភាពខ្ពស់",
+        ],
+      },
+      {
+        id: "ai-agent-mcp",
+        badge: "AI Agent & MCP",
+        title: "ប្រព័ន្ធ AI Copilot ស្វ័យប្រវត្ត & Model Context Protocol",
+        description: "បញ្ជាការកាត់តវីដេអូរបស់អ្នកដោយប្រើភាសាធម្មជាតិ ឬភ្ជាប់ជាមួយ AI Agent ខាងក្រៅ (Claude Desktop, Cursor, Antigravity) តាមរយៈ MCP ដើម្បីបន្ថែម Keyframe ពង្រីក 3D, ប្តូររចនាបថ និងកាត់តដោយស្វ័យប្រវត្តិ។",
+        highlights: [
+          "AI Copilot ក្នុងកម្មវិធីគាំទ្រ Google Gemini, OpenAI GPT និង Ollama លើម៉ាស៊ីនផ្ទាល់",
+          "Server ស្តង់ដារ Model Context Protocol (MCP) សម្រាប់ Claude Desktop & Cursor",
+          "ឧបករណ៍ស្វ័យប្រវត្តិ ១៤ ប្រភេទ៖ កំណត់ Keyframe ពង្រីក 3D, ប្តូរទំហំ 9:16 បែប TikTok, រចនាបថ Canvas និងកាត់ត Clip",
         ],
       },
     ],
