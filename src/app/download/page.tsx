@@ -57,6 +57,70 @@ const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache
 const FALLBACK_RELEASES: GitHubRelease[] = [
   {
     id: 1,
+    tag_name: "v0.2.1",
+    name: "FucuFlow v0.2.1",
+    published_at: "2026-11-05T14:55:00Z",
+    prerelease: false,
+    html_url: `https://github.com/${GITHUB_REPO}/releases/tag/v0.2.1`,
+    body: `### FucuFlow v0.2.1 Release
+- Autonomous AI Agent Copilot with Gemini, OpenAI, and local Ollama
+- Model Context Protocol (MCP) server & Local Agent Bridge for Claude Desktop / Cursor
+- Auto-fallback for Gemini high-demand errors (gemini-1.5-flash)
+- Native desktop studio routing and seamless in-app navigation
+- Native installers for Windows 10/11, macOS (Apple Silicon & Intel), and Linux`,
+    assets: [
+      {
+        id: 101,
+        name: "FucuFlow_0.2.1_x64-setup.exe",
+        size: 7300000,
+        download_count: 5,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.1/FucuFlow_0.2.1_x64-setup.exe`,
+        created_at: "2026-11-05T14:55:00Z",
+      },
+      {
+        id: 102,
+        name: "FucuFlow_0.2.1_x64_en-US.msi",
+        size: 9100000,
+        download_count: 5,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.1/FucuFlow_0.2.1_x64_en-US.msi`,
+        created_at: "2026-11-05T14:55:00Z",
+      },
+      {
+        id: 103,
+        name: "FucuFlow_0.2.1_aarch64.dmg",
+        size: 9500000,
+        download_count: 5,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.1/FucuFlow_0.2.1_aarch64.dmg`,
+        created_at: "2026-11-05T14:55:00Z",
+      },
+      {
+        id: 104,
+        name: "FucuFlow_0.2.1_x64.dmg",
+        size: 9600000,
+        download_count: 5,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.1/FucuFlow_0.2.1_x64.dmg`,
+        created_at: "2026-11-05T14:55:00Z",
+      },
+      {
+        id: 105,
+        name: "FucuFlow_0.2.1_amd64.AppImage",
+        size: 98900000,
+        download_count: 5,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.1/FucuFlow_0.2.1_amd64.AppImage`,
+        created_at: "2026-11-05T14:55:00Z",
+      },
+      {
+        id: 106,
+        name: "FucuFlow_0.2.1_amd64.deb",
+        size: 9960000,
+        download_count: 5,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.1/FucuFlow_0.2.1_amd64.deb`,
+        created_at: "2026-11-05T14:55:00Z",
+      },
+    ],
+  },
+  {
+    id: 2,
     tag_name: "v0.2.0",
     name: "FucuFlow v0.2.0",
     published_at: "2026-11-01T10:47:33Z",
