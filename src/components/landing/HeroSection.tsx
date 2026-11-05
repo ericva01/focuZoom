@@ -97,13 +97,13 @@ export function HeroSection() {
         {/* Top Announcement Pill */}
         <div ref={pillRef} className="flex justify-center">
           <Link
-            href={localePath("/product")}
+            href={localePath("/features")}
             className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-1.5 text-xs font-medium text-[#111318] shadow-sm transition-all hover:border-[#FF6B2C]/40"
           >
             <span className="flex h-2 w-2 rounded-full bg-[#FF6B2C] animate-pulse" />
-            <span className="text-[#FF6B2C] font-semibold">FucuFlow</span>
+            <span className="text-[#FF6B2C] font-semibold">AI Agent & MCP Live</span>
             <span className="text-[#667085]">|</span>
-            <span>{t.hero.pill}</span>
+            <span>Autonomous Video Editing with Claude, Cursor, & Gemini</span>
             <ArrowRight size={13} className="text-[#667085]" />
           </Link>
         </div>
@@ -146,6 +146,10 @@ export function HeroSection() {
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />
               <span>{t.hero.badges.free}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 size={15} className="text-[#FF6B2C]" />
+              <span>AI Agent & MCP Connected</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle2 size={15} className="text-[#FF6B2C]" />

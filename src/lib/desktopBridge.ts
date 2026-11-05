@@ -38,34 +38,26 @@ declare global {
 
 export function isTauriEnvironment(): boolean {
   if (typeof window === "undefined") return false;
+  // Only detect authentic Tauri runtime flags
   return Boolean(
-    (window as unknown as { isTauri?: boolean }).isTauri ||
-    (window as unknown as { __IS_DESKTOP_APP__?: boolean }).__IS_DESKTOP_APP__ ||
+    (window as unknown as { isTauri?: boolean }).isTauri === true ||
+    (window as unknown as { __IS_DESKTOP_APP__?: boolean }).__IS_DESKTOP_APP__ === true ||
     window.__TAURI_INTERNALS__ ||
-    window.__TAURI__ ||
-    (window as unknown as { __TAURI_METADATA__?: unknown }).__TAURI_METADATA__ ||
-    (window as unknown as { __TAURI_POST_MESSAGE__?: unknown }).__TAURI_POST_MESSAGE__ ||
-    (window as unknown as { rpc?: unknown }).rpc
+    (window.__TAURI__ && typeof window.__TAURI__ === "object")
   );
 }
 
 export function isElectronEnvironment(): boolean {
   if (typeof window === "undefined") return false;
-  return Boolean(window.electronAPI?.isElectron);
+  return Boolean(window.electronAPI?.isElectron === true);
 }
 
 export function isDesktopApp(): boolean {
   if (typeof window === "undefined") return false;
+  // Strictly return true only if running inside native desktop runtime (Tauri or Electron)
   if (isTauriEnvironment() || isElectronEnvironment()) return true;
-  try {
-    if (localStorage.getItem("fucuflow_is_desktop") === "true") return true;
-    if (sessionStorage.getItem("fucuflow_is_desktop") === "true") return true;
-    if (window.location.pathname.startsWith("/desktop")) {
-      localStorage.setItem("fucuflow_is_desktop", "true");
-      sessionStorage.setItem("fucuflow_is_desktop", "true");
-      return true;
-    }
-  } catch {}
+  // If explicitly navigating the /desktop URL path
+  if (window.location.pathname.startsWith("/desktop")) return true;
   return false;
 }
 

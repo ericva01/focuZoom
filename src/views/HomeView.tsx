@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
@@ -11,26 +11,26 @@ import { SecuritySection } from "@/components/landing/SecuritySection";
 import { OpenSourcePillarsSection } from "@/components/landing/OpenSourcePillarsSection";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
-import { DesktopAppDashboard } from "@/components/desktop/DesktopAppDashboard";
-import { isDesktopApp } from "@/lib/desktopBridge";
+import { isTauriEnvironment, isElectronEnvironment } from "@/lib/desktopBridge";
 
 export function HomeView() {
-  const [isDesktopMode, setIsDesktopMode] = useState<boolean>(false);
-
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const isDesktop = isDesktopApp();
-      const isDesktopQuery =
-        window.location.search.includes("desktop=true") ||
-        window.location.search.includes("view=desktop") ||
-        window.location.search.includes("view");
-      setIsDesktopMode(isDesktop || isDesktopQuery);
+      // Clean up any stale/legacy localStorage desktop flags so web visitors always see the marketing landing page
+      try {
+        localStorage.removeItem("fucuflow_is_desktop");
+        sessionStorage.removeItem("fucuflow_is_desktop");
+      } catch {
+        // ignore
+      }
+
+      // If running inside authentic native desktop wrapper runtime (Tauri or Electron),
+      // route to the dedicated desktop dashboard
+      if (isTauriEnvironment() || isElectronEnvironment()) {
+        window.location.replace("/desktop");
+      }
     }
   }, []);
-
-  if (isDesktopMode) {
-    return <DesktopAppDashboard />;
-  }
 
   return (
     <div className="website-ui min-h-screen flex flex-col bg-[#F8F9FB] text-[#111318] selection:bg-[#FFF1E8] selection:text-[#FF6B2C]">
