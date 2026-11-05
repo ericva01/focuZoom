@@ -14,7 +14,7 @@ const HISTORY_KEY = "fucuflow_ai_agent_history";
 export const DEFAULT_AI_CONFIG: AiAgentConfig = {
   provider: "gemini",
   apiKey: "",
-  model: "gemini-1.5-flash",
+  model: "gemini-3.8-flash",
   customEndpoint: "http://localhost:11434/v1",
   temperature: 0.3,
   enableLocalBridge: true,
@@ -342,6 +342,11 @@ class AiAgentService {
         if (stored) {
           const parsed = JSON.parse(stored);
           this.config = { ...DEFAULT_AI_CONFIG, ...parsed };
+          // Automatically migrate retired Google models to the current standard
+          if (this.config.provider === "gemini" && (this.config.model === "gemini-2.0-flash" || !this.config.model)) {
+            this.config.model = "gemini-3.8-flash";
+            this.saveConfig(this.config);
+          }
         }
       } catch (err) {
         console.warn("Failed to read AI config:", err);
