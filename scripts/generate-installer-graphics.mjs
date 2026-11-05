@@ -1,11 +1,34 @@
 import fs from "fs";
 import path from "path";
-import sharp from "sharp";
 
 // Ensure output directory
 const outDir = path.resolve("src-tauri/installer");
 if (!fs.existsSync(outDir)) {
   fs.mkdirSync(outDir, { recursive: true });
+}
+
+// Check if all installer graphics already exist. If so, skip generation cleanly.
+const wixDialog = path.join(outDir, "wix-dialog.bmp");
+const wixBanner = path.join(outDir, "wix-banner.bmp");
+const nsisSidebar = path.join(outDir, "nsis-sidebar.bmp");
+const nsisHeader = path.join(outDir, "nsis-header.bmp");
+
+if (
+  fs.existsSync(wixDialog) &&
+  fs.existsSync(wixBanner) &&
+  fs.existsSync(nsisSidebar) &&
+  fs.existsSync(nsisHeader)
+) {
+  console.log("✓ Windows installer graphics already exist in src-tauri/installer. Skipping generation.");
+  process.exit(0);
+}
+
+let sharp;
+try {
+  sharp = (await import("sharp")).default;
+} catch {
+  console.warn("⚠️ sharp module not available and some installer graphics are missing. Continuing build without regenerating.");
+  process.exit(0);
 }
 
 // Convert raw RGBA Buffer to uncompressed 24-bit Windows BMP Buffer

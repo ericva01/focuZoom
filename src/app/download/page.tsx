@@ -57,6 +57,78 @@ const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache
 const FALLBACK_RELEASES: GitHubRelease[] = [
   {
     id: 1,
+    tag_name: "v0.2.0",
+    name: "FucuFlow v0.2.0",
+    published_at: "2026-11-01T10:47:33Z",
+    prerelease: false,
+    html_url: `https://github.com/${GITHUB_REPO}/releases/tag/v0.2.0`,
+    body: `### FucuFlow v0.2.0 Release
+- Clerk authentication integration with secure login & profile management
+- Automatic in-app update checker and notification banner
+- Dynamic 3D camera pan & focal auto-zoom keyframe editor
+- Multi-track timeline, zero-cloud local video storage, and 4K 60FPS export
+- Native installers for Windows 10/11, macOS (Apple Silicon & Intel), and Linux`,
+    assets: [
+      {
+        id: 201,
+        name: "FucuFlow_0.2.0_x64-setup.exe",
+        size: 7225188,
+        download_count: 140,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.0/FucuFlow_0.2.0_x64-setup.exe`,
+        created_at: "2026-11-01T10:47:33Z",
+      },
+      {
+        id: 202,
+        name: "FucuFlow_0.2.0_x64_en-US.msi",
+        size: 9097216,
+        download_count: 65,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.0/FucuFlow_0.2.0_x64_en-US.msi`,
+        created_at: "2026-11-01T10:46:33Z",
+      },
+      {
+        id: 203,
+        name: "FucuFlow_0.2.0_aarch64.dmg",
+        size: 9493747,
+        download_count: 110,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.0/FucuFlow_0.2.0_aarch64.dmg`,
+        created_at: "2026-11-01T10:42:01Z",
+      },
+      {
+        id: 204,
+        name: "FucuFlow_0.2.0_x64.dmg",
+        size: 9586500,
+        download_count: 55,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.0/FucuFlow_0.2.0_x64.dmg`,
+        created_at: "2026-11-01T10:41:59Z",
+      },
+      {
+        id: 205,
+        name: "FucuFlow_0.2.0_amd64.AppImage",
+        size: 98884088,
+        download_count: 80,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.0/FucuFlow_0.2.0_amd64.AppImage`,
+        created_at: "2026-11-01T10:47:33Z",
+      },
+      {
+        id: 206,
+        name: "FucuFlow_0.2.0_amd64.deb",
+        size: 9953306,
+        download_count: 45,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.0/FucuFlow_0.2.0_amd64.deb`,
+        created_at: "2026-11-01T10:47:33Z",
+      },
+      {
+        id: 207,
+        name: "FucuFlow-0.2.0-1.x86_64.rpm",
+        size: 9955626,
+        download_count: 20,
+        browser_download_url: `https://github.com/${GITHUB_REPO}/releases/download/v0.2.0/FucuFlow-0.2.0-1.x86_64.rpm`,
+        created_at: "2026-11-01T10:47:33Z",
+      },
+    ],
+  },
+  {
+    id: 2,
     tag_name: "v0.1.6",
     name: "FucuFlow v0.1.6",
     published_at: "2026-09-21T18:00:00Z",
@@ -69,7 +141,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
 - Native builds for Windows 10/11, macOS Apple Silicon & Intel, and Linux`,
     assets: [
       {
-        id: 201,
+        id: 301,
         name: "FucuFlow_0.1.6_x64-setup.exe",
         size: 7063071,
         download_count: 120,
@@ -77,7 +149,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
         created_at: "2026-09-21T18:00:00Z",
       },
       {
-        id: 202,
+        id: 302,
         name: "FucuFlow_0.1.6_x64_en-US.msi",
         size: 8470528,
         download_count: 45,
@@ -85,7 +157,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
         created_at: "2026-09-21T18:00:00Z",
       },
       {
-        id: 203,
+        id: 303,
         name: "FucuFlow_0.1.6_aarch64.dmg",
         size: 9349790,
         download_count: 85,
@@ -93,7 +165,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
         created_at: "2026-09-21T18:00:00Z",
       },
       {
-        id: 204,
+        id: 304,
         name: "FucuFlow_0.1.6_x64.dmg",
         size: 9437417,
         download_count: 40,
@@ -101,7 +173,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
         created_at: "2026-09-21T18:00:00Z",
       },
       {
-        id: 205,
+        id: 305,
         name: "FucuFlow_0.1.6_amd64.AppImage",
         size: 98740728,
         download_count: 65,
@@ -109,7 +181,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
         created_at: "2026-09-21T18:00:00Z",
       },
       {
-        id: 206,
+        id: 306,
         name: "FucuFlow_0.1.6_amd64.deb",
         size: 9806768,
         download_count: 30,
@@ -117,7 +189,7 @@ const FALLBACK_RELEASES: GitHubRelease[] = [
         created_at: "2026-09-21T18:00:00Z",
       },
       {
-        id: 207,
+        id: 307,
         name: "FucuFlow-0.1.6-1.x86_64.rpm",
         size: 9808158,
         download_count: 15,
