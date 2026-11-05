@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
@@ -11,9 +11,12 @@ import { SecuritySection } from "@/components/landing/SecuritySection";
 import { OpenSourcePillarsSection } from "@/components/landing/OpenSourcePillarsSection";
 import { FaqSection } from "@/components/landing/FaqSection";
 import { FinalCtaSection } from "@/components/landing/FinalCtaSection";
-import { isTauriEnvironment, isElectronEnvironment } from "@/lib/desktopBridge";
+import { DesktopAppDashboard } from "@/components/desktop/DesktopAppDashboard";
+import { isTauriEnvironment, isElectronEnvironment, isDesktopApp } from "@/lib/desktopBridge";
 
 export function HomeView() {
+  const [isDesktopMode, setIsDesktopMode] = useState<boolean>(false);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       // Clean up any stale/legacy localStorage desktop flags so web visitors always see the marketing landing page
@@ -25,12 +28,17 @@ export function HomeView() {
       }
 
       // If running inside authentic native desktop wrapper runtime (Tauri or Electron),
-      // route to the dedicated desktop dashboard
-      if (isTauriEnvironment() || isElectronEnvironment()) {
+      // render DesktopAppDashboard and route to the dedicated desktop dashboard
+      if (isTauriEnvironment() || isElectronEnvironment() || isDesktopApp()) {
+        setIsDesktopMode(true);
         window.location.replace("/desktop");
       }
     }
   }, []);
+
+  if (isDesktopMode) {
+    return <DesktopAppDashboard />;
+  }
 
   return (
     <div className="website-ui min-h-screen flex flex-col bg-[#F8F9FB] text-[#111318] selection:bg-[#FFF1E8] selection:text-[#FF6B2C]">

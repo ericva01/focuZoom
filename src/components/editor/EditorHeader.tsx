@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { AspectRatio } from "@/types/editor";
 import { Button } from "@/components/ui/Button";
+import { isDesktopApp } from "@/lib/desktopBridge";
 
 interface EditorHeaderProps {
   projectName: string;
@@ -97,6 +98,9 @@ function EditorHeaderBase({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const isDesktop = isDesktopApp() || isElectron;
+  const homeHref = isDesktop ? "/desktop" : "/";
+
   return (
     <header className="h-14 border-b border-slate-200 dark:border-white/[0.08] bg-white/90 dark:bg-[#090D16]/80 backdrop-blur-xl px-4 flex items-center justify-between z-30 select-none text-slate-800 dark:text-slate-100">
       {/* Left: Brand, Back & Sidebar Toggle */}
@@ -116,18 +120,18 @@ function EditorHeaderBase({
           </Button>
         )}
 
-        <Link href={isElectron ? "/desktop" : "/"}>
+        <Link href={homeHref}>
           <Button
             variant="ghost"
             size="icon-sm"
-            title={isElectron ? "Return to Desktop Studio" : "Return to Landing Page"}
+            title={isDesktop ? "Return to Desktop Dashboard" : "Return to Landing Page"}
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
 
         <div className="flex items-center gap-2.5 ml-1">
-          <Link href="/" title="FucuFlow Home">
+          <Link href={homeHref} title={isDesktop ? "Return to Desktop Dashboard" : "FucuFlow Home"}>
             <Logo size="sm" showText={false} />
           </Link>
 

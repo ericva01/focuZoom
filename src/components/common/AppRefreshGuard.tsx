@@ -110,18 +110,10 @@ export function AppRefreshGuard() {
       }
     };
 
-    // 4. BeforeUnload confirmation: protect against any unexpected reload or window close in desktop app
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-      return "";
-    };
-
     window.addEventListener("keydown", handleKeyDownCapture, { capture: true });
     window.addEventListener("dragover", handleDragOver);
     window.addEventListener("drop", handleDrop);
     window.addEventListener("contextmenu", handleContextMenu);
-    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       document.documentElement.classList.remove("is-desktop-app");
@@ -130,7 +122,6 @@ export function AppRefreshGuard() {
       window.removeEventListener("dragover", handleDragOver);
       window.removeEventListener("drop", handleDrop);
       window.removeEventListener("contextmenu", handleContextMenu);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
       if (toastTimerRef.current) {
         clearTimeout(toastTimerRef.current);
       }

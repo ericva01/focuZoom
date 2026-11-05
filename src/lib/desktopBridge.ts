@@ -38,12 +38,15 @@ declare global {
 
 export function isTauriEnvironment(): boolean {
   if (typeof window === "undefined") return false;
-  // Only detect authentic Tauri runtime flags
+  // Detect authentic Tauri runtime flags and Tauri WebView domains
   return Boolean(
     (window as unknown as { isTauri?: boolean }).isTauri === true ||
     (window as unknown as { __IS_DESKTOP_APP__?: boolean }).__IS_DESKTOP_APP__ === true ||
     window.__TAURI_INTERNALS__ ||
-    (window.__TAURI__ && typeof window.__TAURI__ === "object")
+    (window.__TAURI__ && typeof window.__TAURI__ === "object") ||
+    window.location.hostname === "tauri.localhost" ||
+    window.location.protocol === "tauri:" ||
+    navigator.userAgent.includes("Tauri")
   );
 }
 

@@ -354,12 +354,12 @@ export default function EditorPage() {
     }
   }, []);
 
-  // Electron Integration State
+  // Desktop App Integration State (Tauri & Electron)
   const [isElectron, setIsElectron] = useState<boolean>(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.electronAPI?.isElectron) {
-      setIsElectron(true);
+    if (typeof window !== "undefined") {
+      setIsElectron(Boolean(window.electronAPI?.isElectron || desktopBridge.isDesktop));
     }
   }, []);
 
