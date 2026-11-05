@@ -14,7 +14,7 @@ const HISTORY_KEY = "fucuflow_ai_agent_history";
 export const DEFAULT_AI_CONFIG: AiAgentConfig = {
   provider: "gemini",
   apiKey: "",
-  model: "gemini-2.0-flash",
+  model: "gemini-1.5-flash",
   customEndpoint: "http://localhost:11434/v1",
   temperature: 0.3,
   enableLocalBridge: true,
@@ -387,20 +387,45 @@ class AiAgentService {
     try {
       if (config.provider === "gemini") {
         if (!config.apiKey) return { success: false, message: "Gemini API key is required." };
-        const model = config.model || "gemini-2.0-flash";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
-          config.apiKey.trim()
-        )}`;
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: "Hello! Reply with 'OK' if you can read this." }] }],
-          }),
-        });
+        const model = config.model || "gemini-1.5-flash";
+        const makeGeminiRequest = async (m: string) => {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(
+            config.apiKey.trim()
+          )}`;
+          return fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: "Hello! Reply with 'OK' if you can read this." }] }],
+            }),
+          });
+        };
+
+        let res = await makeGeminiRequest(model);
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error?.message || `HTTP error ${res.status}`);
+          const errMsg = errData.error?.message || `HTTP error ${res.status}`;
+          
+          // If the model is experiencing high demand (503/429/high demand), try stable gemini-1.5-flash
+          const isHighDemand =
+            res.status === 503 ||
+            res.status === 429 ||
+            errMsg.toLowerCase().includes("high demand") ||
+            errMsg.toLowerCase().includes("overloaded") ||
+            errMsg.toLowerCase().includes("temporarily unavailable");
+
+          if (isHighDemand && model !== "gemini-1.5-flash") {
+            const fallbackRes = await makeGeminiRequest("gemini-1.5-flash");
+            if (fallbackRes.ok) {
+              config.model = "gemini-1.5-flash";
+              this.saveConfig(config);
+              return {
+                success: true,
+                message: `'${model}' is currently overloaded on Google's free tier. Switched to 'gemini-1.5-flash' which connected successfully!`,
+              };
+            }
+          }
+          throw new Error(errMsg);
         }
         return { success: true, message: `Connected successfully to Google Gemini (${model})!` };
       }
@@ -553,8 +578,8 @@ ${this.config.systemPromptExtra ? `\nUSER CUSTOM PREFERENCES:\n${this.config.sys
       throw new Error("Gemini API key is missing. Please configure it in AI Agent Settings.");
     }
 
-    const model = config.model || "gemini-2.0-flash";
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+    let model = config.model || "gemini-1.5-flash";
+    let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
       config.apiKey.trim()
     )}`;
 
@@ -591,7 +616,7 @@ ${this.config.systemPromptExtra ? `\nUSER CUSTOM PREFERENCES:\n${this.config.sys
       },
     };
 
-    const res = await fetch(url, {
+    let res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -599,7 +624,33 @@ ${this.config.systemPromptExtra ? `\nUSER CUSTOM PREFERENCES:\n${this.config.sys
 
     if (!res.ok) {
       const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.error?.message || `Gemini API returned error ${res.status}`);
+      const errMsg = errJson.error?.message || `Gemini API returned error ${res.status}`;
+
+      // High demand auto-fallback to stable gemini-1.5-flash
+      const isHighDemand =
+        res.status === 503 ||
+        res.status === 429 ||
+        errMsg.toLowerCase().includes("high demand") ||
+        errMsg.toLowerCase().includes("overloaded");
+
+      if (isHighDemand && model !== "gemini-1.5-flash") {
+        console.warn(`[AiAgentService] ${model} is experiencing high demand. Falling back to gemini-1.5-flash.`);
+        model = "gemini-1.5-flash";
+        url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+          config.apiKey.trim()
+        )}`;
+        res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          const fbErr = await res.json().catch(() => ({}));
+          throw new Error(fbErr.error?.message || errMsg);
+        }
+      } else {
+        throw new Error(errMsg);
+      }
     }
 
     const data = await res.json();

@@ -211,7 +211,7 @@ export function AiAgentSettingsModal({
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   {[
-                    { id: "gemini", name: "Google Gemini", badge: "Free tier / Fast", defaultModel: "gemini-2.0-flash" },
+                    { id: "gemini", name: "Google Gemini", badge: "Free tier / Fast", defaultModel: "gemini-1.5-flash" },
                     { id: "openai", name: "OpenAI", badge: "GPT-4o mini / 4o", defaultModel: "gpt-4o-mini" },
                     { id: "ollama", name: "Ollama (Local)", badge: "100% Free / Offline", defaultModel: "llama3.2" },
                     { id: "custom", name: "Custom / OpenRouter", badge: "Groq / vLLM", defaultModel: "default" },
@@ -342,34 +342,49 @@ export function AiAgentSettingsModal({
                     className="flex-1 bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs font-mono outline-none focus:border-[#FF6B2C]"
                   />
                   {config.provider === "gemini" && (
-                    <div className="flex gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       <Button
-                        variant="secondary"
+                        variant={config.model === "gemini-1.5-flash" ? "primary" : "secondary"}
+                        size="sm"
+                        onClick={() => setConfig({ ...config, model: "gemini-1.5-flash" })}
+                        title="Recommended: Most stable & reliable on Google AI Studio"
+                      >
+                        1.5 Flash (Stable)
+                      </Button>
+                      <Button
+                        variant={config.model === "gemini-2.0-flash" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gemini-2.0-flash" })}
                       >
                         2.0 Flash
                       </Button>
                       <Button
-                        variant="secondary"
+                        variant={config.model === "gemini-1.5-pro" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gemini-1.5-pro" })}
                       >
                         1.5 Pro
+                      </Button>
+                      <Button
+                        variant={config.model === "gemini-1.5-flash-8b" ? "primary" : "secondary"}
+                        size="sm"
+                        onClick={() => setConfig({ ...config, model: "gemini-1.5-flash-8b" })}
+                      >
+                        1.5 Flash-8B
                       </Button>
                     </div>
                   )}
                   {config.provider === "openai" && (
                     <div className="flex gap-1.5">
                       <Button
-                        variant="secondary"
+                        variant={config.model === "gpt-4o-mini" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gpt-4o-mini" })}
                       >
                         4o-mini
                       </Button>
                       <Button
-                        variant="secondary"
+                        variant={config.model === "gpt-4o" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gpt-4o" })}
                       >
@@ -380,14 +395,14 @@ export function AiAgentSettingsModal({
                   {config.provider === "ollama" && (
                     <div className="flex gap-1.5">
                       <Button
-                        variant="secondary"
+                        variant={config.model === "llama3.2" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "llama3.2" })}
                       >
                         llama3.2
                       </Button>
                       <Button
-                        variant="secondary"
+                        variant={config.model === "qwen2.5" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "qwen2.5" })}
                       >
@@ -401,18 +416,51 @@ export function AiAgentSettingsModal({
               {/* Test Connection Result */}
               {testResult && (
                 <div
-                  className={`p-3 rounded-xl border flex items-start gap-2.5 text-xs ${
+                  className={`p-3.5 rounded-xl border flex flex-col gap-2 text-xs ${
                     testResult.success
                       ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
                       : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
                   }`}
                 >
-                  {testResult.success ? (
-                    <Check className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  )}
-                  <div className="flex-1 font-medium">{testResult.message}</div>
+                  <div className="flex items-start gap-2.5">
+                    {testResult.success ? (
+                      <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-500" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-500" />
+                    )}
+                    <div className="flex-1 font-medium">{testResult.message}</div>
+                  </div>
+
+                  {!testResult.success &&
+                    (testResult.message.toLowerCase().includes("high demand") ||
+                      testResult.message.toLowerCase().includes("overloaded") ||
+                      testResult.message.toLowerCase().includes("503")) && (
+                      <div className="pt-2 border-t border-red-500/20 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-[11px] text-slate-300">
+                          Google&apos;s experimental model is busy. Switch to stable <strong>gemini-1.5-flash</strong>:
+                        </span>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={async () => {
+                            const newCfg = { ...config, model: "gemini-1.5-flash" };
+                            setConfig(newCfg);
+                            setIsTesting(true);
+                            setTestResult(null);
+                            try {
+                              const res = await aiAgentService.testConnection(newCfg);
+                              setTestResult(res);
+                            } catch (e: any) {
+                              setTestResult({ success: false, message: e.message });
+                            } finally {
+                              setIsTesting(false);
+                            }
+                          }}
+                        >
+                          Switch to 1.5 Flash & Re-test
+                        </Button>
+                      </div>
+                    )}
                 </div>
               )}
 
