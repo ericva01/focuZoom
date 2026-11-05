@@ -8,9 +8,11 @@ type StateProvider = () => EditorStateSnapshot;
 
 class AgentLocalBridgeClient {
   private ws: WebSocket | null = null;
-  private isEnabled: boolean = true;
+  private isEnabled: boolean = false;
   private port: number = 9876;
   private reconnectTimer: NodeJS.Timeout | null = null;
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 2;
   private statusListeners: Set<StatusCallback> = new Set();
   private actionHandler: ActionHandler | null = null;
   private stateProvider: StateProvider | null = null;
@@ -18,7 +20,7 @@ class AgentLocalBridgeClient {
 
   public init({
     port = 9876,
-    enabled = true,
+    enabled = false,
     actionHandler,
     stateProvider,
   }: {
@@ -33,6 +35,7 @@ class AgentLocalBridgeClient {
     if (stateProvider) this.stateProvider = stateProvider;
 
     if (this.isEnabled) {
+      this.reconnectAttempts = 0;
       this.connect();
     } else {
       this.disconnect();
@@ -88,6 +91,7 @@ class AgentLocalBridgeClient {
 
       socket.onopen = () => {
         this.ws = socket;
+        this.reconnectAttempts = 0;
         this.setStatus("connected");
         // Handshake
         socket.send(
@@ -117,7 +121,9 @@ class AgentLocalBridgeClient {
       socket.onerror = () => {
         // Silently close and let onclose handle reconnect
         if (this.ws) {
-          this.ws.close();
+          try {
+            this.ws.close();
+          } catch {}
         }
       };
     } catch {
@@ -128,6 +134,7 @@ class AgentLocalBridgeClient {
 
   public disconnect() {
     this.isEnabled = false;
+    this.reconnectAttempts = 0;
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -144,13 +151,18 @@ class AgentLocalBridgeClient {
   private scheduleReconnect() {
     if (!this.isEnabled) return;
     if (this.reconnectTimer) return;
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      // Avoid infinite reconnection error logs if local bridge process isn't running
+      return;
+    }
 
+    this.reconnectAttempts++;
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       if (this.isEnabled) {
         this.connect();
       }
-    }, 4000);
+    }, 5000);
   }
 
   private async handleIncomingMessage(msg: any) {

@@ -17,7 +17,7 @@ export const DEFAULT_AI_CONFIG: AiAgentConfig = {
   model: "gemini-3.8-flash",
   customEndpoint: "http://localhost:11434/v1",
   temperature: 0.3,
-  enableLocalBridge: true,
+  enableLocalBridge: false,
   localBridgePort: 9876,
   systemPromptExtra: "",
 };
