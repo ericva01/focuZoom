@@ -418,8 +418,8 @@ class AiAgentService {
    */
   private getGeminiApiVersions(model: string): ("v1" | "v1beta")[] {
     const trimmed = (model || "").trim().toLowerCase();
-    // Gemini 2.0+ models were introduced in v1beta
-    if (trimmed.startsWith("gemini-2")) {
+    // Gemini 2.0+ and 3.0+ preview models were introduced in v1beta
+    if (trimmed.startsWith("gemini-2") || trimmed.startsWith("gemini-3")) {
       return ["v1beta", "v1"];
     }
     // Gemini 1.5 GA models (flash, pro) are stable in v1, with fallbacks to v1beta
@@ -467,6 +467,7 @@ class AiAgentService {
 
         // 2. If requested model failed, test stable fallback models
         const candidateFallbacks = [
+          "gemini-3.8-flash",
           "gemini-1.5-flash",
           "gemini-2.0-flash",
           "gemini-1.5-pro",
@@ -736,6 +737,7 @@ ${this.config.systemPromptExtra ? `\nUSER CUSTOM PREFERENCES:\n${this.config.sys
 
       if (isHighDemandOrNotFound) {
         const fallbackCandidates = [
+          "gemini-3.8-flash",
           "gemini-1.5-flash",
           "gemini-2.0-flash",
           "gemini-1.5-pro",

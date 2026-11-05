@@ -367,6 +367,14 @@ export function AiAgentSettingsModal({
                   {config.provider === "gemini" && (
                     <div className="flex flex-wrap gap-1.5 items-center">
                       <Button
+                        variant={config.model === "gemini-3.8-flash" ? "primary" : "secondary"}
+                        size="sm"
+                        onClick={() => setConfig({ ...config, model: "gemini-3.8-flash" })}
+                        title="Google Gemini 3.8 Flash (Latest generation agent model)"
+                      >
+                        3.8 Flash (Latest)
+                      </Button>
+                      <Button
                         variant={config.model === "gemini-1.5-flash" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gemini-1.5-flash" })}
