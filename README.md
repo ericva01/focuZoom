@@ -33,6 +33,57 @@
 - ⚡ **Local & Offline Rendering:** Render directly on your device with hardware-accelerated VP9/VP8 WebM encoding.
 - 📁 **Custom Local Save Destination:** Choose your desired folder on any local drive before or after rendering with native file pickers.
 - ☁️ **Personal Google Drive Cloud Save:** Connect your personal Google Drive in 1-click (OAuth2) to automatically upload rendered videos and backup projects directly to a dedicated `FucuFlow Studio Videos` folder with instant shareable links.
+- 🤖 **AI Agent Copilot & MCP Server Bridge:** Connect an in-app AI Copilot (Google Gemini, OpenAI GPT, Anthropic Claude, or local Ollama) or connect external AI agents (Claude Desktop, Cursor, Antigravity, custom scripts) via Model Context Protocol (MCP) to automate 3D zoom keyframing, vertical video reformatting, canvas styling, and video production through natural language.
+
+---
+
+## 🤖 AI Agent & Model Context Protocol (MCP) Integration
+
+FucuFlow features a hybrid AI architecture that lets you connect your AI agent in two powerful ways:
+
+### 1. In-App AI Copilot (Bring Your Own Key)
+Click **AI Agent** in the editor header or open the **AI** tab in the right inspector panel:
+- **Google Gemini:** Connect your Gemini API key (free tier available) to use fast `gemini-2.0-flash` or `gemini-1.5-pro`.
+- **OpenAI:** Connect `gpt-4o` or `gpt-4o-mini`.
+- **Ollama (100% Free & Offline):** Connect to your local Ollama instance (`http://localhost:11434/v1`) running `llama3.2`, `qwen2.5`, etc.
+- **Custom / OpenRouter:** Use any OpenAI-compatible endpoint.
+
+**Example Prompts:**
+- *"Analyze my video duration and place 4 dynamic 3D zoom keyframes focused on key action points."*
+- *"Reformat this project for TikTok / Instagram Reels: set aspect ratio to 9:16 and apply Hyper Neon backdrop."*
+- *"Apply a vivid cinematic color grade with warm amber temperature and obsidian dark frame."*
+
+### 2. External Agent & MCP Server (Claude Desktop, Cursor, Antigravity)
+FucuFlow provides a native Model Context Protocol (MCP) server so autonomous agents running in Claude Desktop, Cursor, Antigravity, or Python can programmatically control FucuFlow in real time.
+
+#### Quick Start:
+1. Start the local bridge server:
+   ```bash
+   npm run agent:bridge
+   ```
+2. In **Claude Desktop** (`claude_desktop_config.json`):
+   ```json
+   {
+     "mcpServers": {
+       "fucuflow": {
+         "command": "node",
+         "args": ["<path-to-fucuflow>/scripts/mcp-server/index.mjs"]
+       }
+     }
+   }
+   ```
+3. In **Cursor** (`.cursor/mcp.json`):
+   ```json
+   {
+     "mcpServers": {
+       "fucuflow": {
+         "command": "node",
+         "args": ["scripts/mcp-server/index.mjs"]
+       }
+     }
+   }
+   ```
+4. Now your external agent has direct access to tools like `fucuflow_add_zoom_keyframe`, `fucuflow_auto_generate_zooms`, `fucuflow_set_aspect_ratio`, `fucuflow_update_canvas_config`, `fucuflow_set_color_grading`, and `fucuflow_get_state`!
 
 ---
 

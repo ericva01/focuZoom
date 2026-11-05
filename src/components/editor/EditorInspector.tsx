@@ -29,7 +29,10 @@ import {
   Redo2,
   Circle,
   Video,
+  Sparkles,
 } from "lucide-react";
+import { AiAgentPanel } from "./AiAgentPanel";
+import { EditorStateSnapshot, EditorActionPayload } from "@/types/aiAgent";
 import {
   CanvasConfig,
   ClickEvent,
@@ -100,9 +103,15 @@ interface EditorInspectorProps {
   canRedo?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
+  // AI Agent Integration
+  stateSnapshot?: EditorStateSnapshot;
+  onExecuteAiAction?: (action: EditorActionPayload) => Promise<any> | any;
+  onOpenAiSettings?: () => void;
+  activeTab?: InspectorTab;
+  onTabChange?: (tab: InspectorTab) => void;
 }
 
-type InspectorTab = "clip" | "canvas" | "keyframes" | "webcam" | "cursor" | "media" | "settings";
+export type InspectorTab = "clip" | "canvas" | "keyframes" | "webcam" | "cursor" | "media" | "settings" | "ai";
 
 function EditorInspectorBase({
   config,
@@ -155,8 +164,18 @@ function EditorInspectorBase({
   canRedo = false,
   onUndo,
   onRedo,
+  stateSnapshot,
+  onExecuteAiAction,
+  onOpenAiSettings,
+  activeTab: externalActiveTab,
+  onTabChange,
 }: EditorInspectorProps) {
-  const [activeTab, setActiveTab] = useState<InspectorTab>("canvas");
+  const [internalTab, setInternalTab] = useState<InspectorTab>("canvas");
+  const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalTab;
+  const setActiveTab = (tab: InspectorTab) => {
+    if (onTabChange) onTabChange(tab);
+    setInternalTab(tab);
+  };
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const customBgInputRef = useRef<HTMLInputElement | null>(null);
   const webcamFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -306,6 +325,20 @@ function EditorInspectorBase({
         >
           <Settings className="w-3.5 h-3.5 shrink-0" />
           <span className="hidden sm:inline">Config</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("ai")}
+          className={`flex-1 py-1.5 px-1 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
+            activeTab === "ai"
+              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
+              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
+          }`}
+          title="AI Studio Copilot & Agent Bridge"
+        >
+          <Sparkles className="w-3.5 h-3.5 shrink-0 text-[#FF6B2C]" />
+          <span className="hidden sm:inline">AI</span>
         </button>
       </div>
 
@@ -2330,12 +2363,27 @@ function EditorInspectorBase({
             )}
           </div>
         )}
+
+        {/* ============================================================ */}
+        {/* TAB 8: AI AGENT COPILOT & BRIDGE */}
+        {/* ============================================================ */}
+        {activeTab === "ai" && stateSnapshot && (
+          <div className="-m-4 h-[calc(100%+2rem)] min-h-[500px] flex flex-col">
+            <AiAgentPanel
+              stateSnapshot={stateSnapshot}
+              onExecuteAction={onExecuteAiAction || (() => {})}
+              onOpenSettings={onOpenAiSettings || (() => {})}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 export const EditorInspector = memo(EditorInspectorBase, (prev, next) => {
+  if (prev.activeTab !== next.activeTab) return false;
+  if (prev.stateSnapshot !== next.stateSnapshot) return false;
   if (prev.config !== next.config) return false;
   if (prev.clips !== next.clips) return false;
   if (prev.selectedClipId !== next.selectedClipId) return false;

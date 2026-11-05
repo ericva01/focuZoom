@@ -15,6 +15,7 @@ import {
   Cloud,
   MousePointer,
   Settings,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { getStorageUsage } from "@/utils/indexedDBStorage";
@@ -35,6 +36,7 @@ interface EditorSettingsModalProps {
   onSaveNow?: () => void;
   onClearCache?: () => void;
   onOpenGoogleDrive?: () => void;
+  onOpenAiAgentSettings?: () => void;
   hideDeviceCursor?: boolean;
   onToggleHideDeviceCursor?: (enabled: boolean) => void;
 }
@@ -51,6 +53,7 @@ export function EditorSettingsModal({
   onSaveNow,
   onClearCache,
   onOpenGoogleDrive,
+  onOpenAiAgentSettings,
   hideDeviceCursor = true,
   onToggleHideDeviceCursor,
 }: EditorSettingsModalProps) {
@@ -330,6 +333,42 @@ export function EditorSettingsModal({
                   className="text-xs font-bold shrink-0 ml-2"
                 >
                   {gdriveStatus.isConnected ? "Manage" : "Connect"}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* 5. AI Studio Copilot & MCP Agent Integration */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#FF6B2C] to-amber-500 flex items-center justify-center text-white shadow-sm">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <span>AI Agent & Copilot Studio</span>
+                    <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#FF6B2C]/20 text-[#FF6B2C] border border-[#FF6B2C]/30">
+                      Gemini / OpenAI / MCP
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Connect your Gemini, OpenAI, or Ollama API key, or connect Claude Desktop & Cursor via MCP.
+                  </p>
+                </div>
+              </div>
+
+              {onOpenAiAgentSettings && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    onClose();
+                    onOpenAiAgentSettings();
+                  }}
+                  className="text-xs font-bold shrink-0 ml-2"
+                >
+                  Configure AI
                 </Button>
               )}
             </div>

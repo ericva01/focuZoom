@@ -13,6 +13,7 @@ import {
   Video,
   PanelLeftClose,
   PanelLeftOpen,
+  Sparkles,
 } from "lucide-react";
 import { AspectRatio } from "@/types/editor";
 import { Button } from "@/components/ui/Button";
@@ -63,6 +64,10 @@ interface EditorHeaderProps {
   onToggleTheme?: () => void;
   onOpenSettings?: () => void;
   autoSaveStatus?: string | null;
+  // AI Agent Integration
+  onOpenAiAgent?: () => void;
+  isAiAgentOpen?: boolean;
+  aiBridgeStatus?: "connected" | "disconnected" | "connecting";
 }
 
 function EditorHeaderBase({
@@ -80,6 +85,9 @@ function EditorHeaderBase({
   onStopRecording,
   isLeftCollapsed = false,
   onToggleLeftCollapse,
+  onOpenAiAgent,
+  isAiAgentOpen = false,
+  aiBridgeStatus = "disconnected",
 }: EditorHeaderProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
@@ -148,8 +156,29 @@ function EditorHeaderBase({
         </div>
       </div>
 
-      {/* Right: Only recordscreen (icon), save (icon), and export */}
+      {/* Right: AI Agent, recordscreen (icon), save (icon), and export */}
       <div className="flex items-center gap-2">
+        {/* AI Agent Copilot & MCP Bridge Button */}
+        {onOpenAiAgent && (
+          <Button
+            variant={isAiAgentOpen ? "active" : "secondary"}
+            size="sm"
+            onClick={onOpenAiAgent}
+            title="Open AI Studio Copilot & Agent Bridge"
+            className="group border-[#FF6B2C]/30 hover:border-[#FF6B2C] hover:bg-[#FF6B2C]/10 transition-all"
+            leftIcon={
+              <Sparkles className="w-3.5 h-3.5 text-[#FF6B2C] group-hover:rotate-12 transition-transform" />
+            }
+          >
+            <span className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+              AI Agent
+              {aiBridgeStatus === "connected" && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
+              )}
+            </span>
+          </Button>
+        )}
+
         {/* Screen Recording Button (Red Icon + Text) */}
         {isRecording ? (
           <Button

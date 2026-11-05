@@ -12,7 +12,9 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "npm run build:web && tauri build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "agent:bridge": "node scripts/mcp-bridge/local-bridge.mjs",
+    "agent:mcp": "node scripts/mcp-server/index.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.11",

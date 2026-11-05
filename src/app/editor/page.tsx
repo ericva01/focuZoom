@@ -31,6 +31,11 @@ import { EditorSettingsModal, ThemeMode } from "@/components/editor/EditorSettin
 import { GoogleDriveModal } from "@/components/editor/GoogleDriveModal";
 import { googleDriveService } from "@/lib/googleDriveService";
 import { desktopBridge } from "@/lib/desktopBridge";
+import { InspectorTab } from "@/components/editor/EditorInspector";
+import { AiAgentSettingsModal } from "@/components/editor/AiAgentSettingsModal";
+import { agentLocalBridge } from "@/lib/agentLocalBridge";
+import { aiAgentService } from "@/lib/aiAgentService";
+import { EditorActionPayload, EditorStateSnapshot } from "@/types/aiAgent";
 
 export default function EditorPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -41,6 +46,9 @@ export default function EditorPage() {
   // Inspector panel resize and collapse state (top-right)
   const [inspectorWidth, setInspectorWidth] = useState<number>(380);
   const [isInspectorCollapsed, setIsInspectorCollapsed] = useState<boolean>(false);
+  const [inspectorActiveTab, setInspectorActiveTab] = useState<InspectorTab>("canvas");
+  const [isAiSettingsOpen, setIsAiSettingsOpen] = useState<boolean>(false);
+  const [bridgeStatus, setBridgeStatus] = useState<"connected" | "disconnected" | "connecting">("disconnected");
   const [isDraggingDivider, setIsDraggingDivider] = useState<boolean>(false);
   const dragDividerRef = useRef<boolean>(false);
 
@@ -1313,6 +1321,266 @@ export default function EditorPage() {
     document.body.style.userSelect = "none";
   };
 
+  // Snapshot provider for AI Agent and MCP Bridge
+  const getEditorStateSnapshot = useCallback((): EditorStateSnapshot => {
+    return {
+      projectName,
+      duration: effectiveDuration,
+      currentTime: playback.currentTime,
+      aspectRatio: config.aspectRatio,
+      renderMode: config.renderMode,
+      screenAnglePreset: config.screenAnglePreset,
+      backgroundPreset: config.backgroundPreset,
+      keyframeCount: events.length,
+      keyframes: events.map((e) => ({
+        id: e.id,
+        timestamp: e.timestamp,
+        zoom: e.zoom,
+        x: e.x,
+        y: e.y,
+        label: e.label,
+      })),
+      clipsCount: clips.length,
+      clips: clips.map((c) => ({
+        id: c.id,
+        name: c.name,
+        start: c.sourceStart,
+        end: c.sourceEnd,
+        duration: c.duration,
+        speed: c.speed,
+      })),
+      colorAdjustments: {
+        brightness: config.videoBrightness ?? 1.0,
+        contrast: config.videoContrast ?? 1.0,
+        saturation: config.videoSaturation ?? 1.0,
+        temperature: config.videoTemperature ?? 0.0,
+        tint: config.videoTint ?? 0.0,
+      },
+      webcamEnabled: enableWebcam,
+    };
+  }, [
+    projectName,
+    effectiveDuration,
+    playback.currentTime,
+    config,
+    events,
+    clips,
+    enableWebcam,
+  ]);
+
+  const editorStateSnapshot = useMemo(() => getEditorStateSnapshot(), [getEditorStateSnapshot]);
+
+  // AI Agent & MCP Bridge Action Executor
+  const handleExecuteAiAction = useCallback(
+    async (payload: EditorActionPayload) => {
+      recordHistory();
+      const { action, params } = payload;
+
+      switch (action) {
+        case "add_zoom_keyframe": {
+          const maxDur = effectiveDuration || 10;
+          const targetTime = Math.max(0, Math.min(maxDur, params.timestamp ?? playback.currentTime));
+          const newEvent: ClickEvent = {
+            id: `event_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            timestamp: targetTime,
+            x: Math.max(0, Math.min(1, params.x ?? 0.5)),
+            y: Math.max(0, Math.min(1, params.y ?? 0.5)),
+            zoom: Math.max(1.1, Math.min(4.0, params.zoom ?? config.defaultZoomScale ?? 2.2)),
+            duration: params.holdDuration || 1.5,
+            holdDuration: params.holdDuration || 1.5,
+            zoomInDuration: config.zoomDuration || 0.85,
+            zoomOutDuration: config.zoomOutDuration || 0.85,
+            label: params.label || "AI Focal Zoom",
+            enabled: true,
+          };
+          setEvents((prev) => [...prev, newEvent].sort((a, b) => a.timestamp - b.timestamp));
+          setSelectedEventId(newEvent.id);
+          return { success: true, keyframeId: newEvent.id, timestamp: targetTime };
+        }
+
+        case "auto_generate_zooms": {
+          const count = Math.max(1, Math.min(12, params.count ?? 4));
+          const zoomScale = params.zoomScale ?? 2.2;
+          const maxDur = effectiveDuration || 10;
+          const step = maxDur / (count + 1);
+          const focalPoints = [
+            { x: 0.5, y: 0.45, label: "Center Stage" },
+            { x: 0.3, y: 0.35, label: "Top-Left Focus" },
+            { x: 0.7, y: 0.4, label: "Top-Right Focus" },
+            { x: 0.5, y: 0.65, label: "Bottom Panel Focus" },
+          ];
+          const newEvents: ClickEvent[] = [];
+          for (let i = 1; i <= count; i++) {
+            const pt = focalPoints[(i - 1) % focalPoints.length];
+            newEvents.push({
+              id: `ai_auto_${Date.now()}_${i}`,
+              timestamp: Number((i * step).toFixed(2)),
+              x: pt.x,
+              y: pt.y,
+              zoom: zoomScale,
+              holdDuration: 1.5,
+              zoomInDuration: 0.85,
+              zoomOutDuration: 0.85,
+              label: pt.label,
+              enabled: true,
+            });
+          }
+          setEvents((prev) => [...prev, ...newEvents].sort((a, b) => a.timestamp - b.timestamp));
+          return { success: true, countCreated: newEvents.length };
+        }
+
+        case "clear_zoom_keyframes": {
+          setEvents([]);
+          setSelectedEventId(null);
+          return { success: true, cleared: true };
+        }
+
+        case "remove_zoom_keyframe": {
+          if (params.id) {
+            setEvents((prev) => prev.filter((e) => e.id !== params.id));
+          } else if (params.timestamp !== undefined) {
+            const targetT = params.timestamp;
+            setEvents((prev) =>
+              prev.filter((e) => Math.abs(e.timestamp - targetT) > 0.3)
+            );
+          }
+          return { success: true };
+        }
+
+        case "update_canvas_config": {
+          handleUpdateConfig(params);
+          return { success: true, updatedConfig: params };
+        }
+
+        case "set_preset": {
+          if (params.preset) {
+            handleUpdateConfig({ backgroundPreset: params.preset });
+          }
+          return { success: true };
+        }
+
+        case "set_aspect_ratio": {
+          if (params.aspectRatio) {
+            handleUpdateConfig({ aspectRatio: params.aspectRatio as AspectRatio });
+          }
+          return { success: true, aspectRatio: params.aspectRatio };
+        }
+
+        case "set_color_grading": {
+          const updates: Partial<CanvasConfig> = {};
+          if (params.brightness !== undefined) updates.videoBrightness = params.brightness;
+          if (params.contrast !== undefined) updates.videoContrast = params.contrast;
+          if (params.saturation !== undefined) updates.videoSaturation = params.saturation;
+          if (params.temperature !== undefined) updates.videoTemperature = params.temperature;
+          if (params.tint !== undefined) updates.videoTint = params.tint;
+          handleUpdateConfig(updates);
+          return { success: true, colorGrading: updates };
+        }
+
+        case "split_clip": {
+          const targetClip = params.clipId
+            ? clips.find((c) => c.id === params.clipId)
+            : clips[0];
+          if (targetClip && params.timestamp !== undefined) {
+            handleSplitClip(targetClip.id, params.timestamp);
+            return { success: true, splitAt: params.timestamp };
+          }
+          return { success: false, error: "Clip not found for split" };
+        }
+
+        case "trim_clip": {
+          const targetClip = params.clipId
+            ? clips.find((c) => c.id === params.clipId)
+            : clips[0];
+          if (targetClip && params.start !== undefined && params.end !== undefined) {
+            handleTrimClip(targetClip.id, params.start, params.end);
+            return { success: true, trimmed: { start: params.start, end: params.end } };
+          }
+          return { success: false, error: "Clip not found for trim" };
+        }
+
+        case "configure_webcam": {
+          if (params.enabled !== undefined) {
+            setEnableWebcam(params.enabled);
+          }
+          handleUpdateConfig({
+            webcamConfig: {
+              ...(config.webcamConfig || {
+                shape: "circle",
+                position: "bottom-right",
+                customX: 0.85,
+                customY: 0.82,
+                size: 180,
+                borderColor: "#FF6B2C",
+                borderWidth: 3,
+                shadow: true,
+                mirror: true,
+                enabled: true,
+              }),
+              ...(params.shape ? { shape: params.shape } : {}),
+              ...(params.position ? { position: params.position } : {}),
+              ...(params.size ? { size: params.size } : {}),
+              ...(params.borderColor ? { borderColor: params.borderColor } : {}),
+              ...(params.enabled !== undefined ? { enabled: params.enabled } : {}),
+            },
+          });
+          return { success: true };
+        }
+
+        case "set_playback_speed": {
+          if (params.speed) {
+            playback.setPlaybackSpeed(params.speed);
+          }
+          return { success: true, speed: params.speed };
+        }
+
+        case "seek_to_time": {
+          if (params.time !== undefined) {
+            playback.seek(params.time);
+          }
+          return { success: true, seekTime: params.time };
+        }
+
+        case "trigger_export": {
+          setIsExportOpen(true);
+          return { success: true, exportOpened: true };
+        }
+
+        default:
+          return { success: false, error: `Unknown action: ${action}` };
+      }
+    },
+    [
+      recordHistory,
+      effectiveDuration,
+      playback,
+      config,
+      handleUpdateConfig,
+      clips,
+      handleSplitClip,
+      handleTrimClip,
+      setEnableWebcam,
+    ]
+  );
+
+  // Initialize and synchronize with Local Bridge for External AI Agents
+  useEffect(() => {
+    const aiConfig = aiAgentService.loadConfig();
+    agentLocalBridge.init({
+      port: aiConfig.localBridgePort || 9876,
+      enabled: aiConfig.enableLocalBridge,
+      actionHandler: handleExecuteAiAction,
+      stateProvider: getEditorStateSnapshot,
+    });
+    const unsub = agentLocalBridge.onStatusChange((status) => {
+      setBridgeStatus(status);
+    });
+    return () => {
+      unsub();
+      agentLocalBridge.disconnect();
+    };
+  }, [handleExecuteAiAction, getEditorStateSnapshot]);
+
   return (
     <div
       className={`flex flex-col h-screen w-screen transition-colors duration-200 ${
@@ -1336,6 +1604,12 @@ export default function EditorPage() {
         clickCount={screenRecorder.clickCount}
         onStartRecording={screenRecorder.startRecording}
         onStopRecording={screenRecorder.stopRecording}
+        onOpenAiAgent={() => {
+          setIsInspectorCollapsed(false);
+          setInspectorActiveTab("ai");
+        }}
+        isAiAgentOpen={!isInspectorCollapsed && inspectorActiveTab === "ai"}
+        aiBridgeStatus={bridgeStatus}
       />
 
       {/* Floating Active Recording HUD Overlay */}
@@ -1457,6 +1731,11 @@ export default function EditorPage() {
         >
           <div style={{ width: inspectorWidth }} className="h-full">
             <EditorInspector
+              activeTab={inspectorActiveTab}
+              onTabChange={setInspectorActiveTab}
+              stateSnapshot={editorStateSnapshot}
+              onExecuteAiAction={handleExecuteAiAction}
+              onOpenAiSettings={() => setIsAiSettingsOpen(true)}
               config={config}
               onChangeConfig={handleUpdateConfig}
               clips={clips}
@@ -1667,6 +1946,7 @@ export default function EditorPage() {
         onChangeAutoSaveInterval={handleChangeAutoSaveInterval}
         onSaveNow={() => handleSaveProject(false)}
         onOpenGoogleDrive={() => setIsGoogleDriveModalOpen(true)}
+        onOpenAiAgentSettings={() => setIsAiSettingsOpen(true)}
         hideDeviceCursor={config.hideDeviceCursor !== false}
         onToggleHideDeviceCursor={(val) => handleUpdateConfig({ hideDeviceCursor: val })}
         onClearCache={() => {
@@ -1684,6 +1964,12 @@ export default function EditorPage() {
           setIsGDriveConnected(true);
         }}
         onBackupProject={handleBackupProjectToGoogleDrive}
+      />
+
+      {/* 8. AI Agent & MCP Server Settings Modal */}
+      <AiAgentSettingsModal
+        isOpen={isAiSettingsOpen}
+        onClose={() => setIsAiSettingsOpen(false)}
       />
     </div>
   );
