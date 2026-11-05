@@ -381,53 +381,133 @@ class AiAgentService {
   }
 
   /**
+   * Discovers available Google Gemini models for the provided API key
+   */
+  public async listGeminiModels(apiKey: string): Promise<string[]> {
+    if (!apiKey?.trim()) return [];
+    const versions = ["v1", "v1beta"];
+    const foundModels: string[] = [];
+    for (const v of versions) {
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/${v}/models?key=${encodeURIComponent(apiKey.trim())}`
+        );
+        if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          if (Array.isArray(data.models)) {
+            for (const m of data.models) {
+              const methods: string[] = m.supportedGenerationMethods || [];
+              if (methods.includes("generateContent")) {
+                const name = (m.name || "").replace(/^models\//, "");
+                if (name && !foundModels.includes(name)) {
+                  foundModels.push(name);
+                }
+              }
+            }
+          }
+        }
+      } catch {
+        // Network or CORS failure
+      }
+    }
+    return foundModels;
+  }
+
+  /**
+   * Determines API versions to try for a given Gemini model
+   */
+  private getGeminiApiVersions(model: string): ("v1" | "v1beta")[] {
+    const trimmed = (model || "").trim().toLowerCase();
+    // Gemini 2.0+ models were introduced in v1beta
+    if (trimmed.startsWith("gemini-2")) {
+      return ["v1beta", "v1"];
+    }
+    // Gemini 1.5 GA models (flash, pro) are stable in v1, with fallbacks to v1beta
+    return ["v1", "v1beta"];
+  }
+
+  /**
    * Tests connection with configured provider
    */
   public async testConnection(config: AiAgentConfig): Promise<{ success: boolean; message: string }> {
     try {
       if (config.provider === "gemini") {
-        if (!config.apiKey) return { success: false, message: "Gemini API key is required." };
-        const model = config.model || "gemini-1.5-flash";
-        const makeGeminiRequest = async (m: string) => {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(
-            config.apiKey.trim()
-          )}`;
-          return fetch(url, {
+        if (!config.apiKey?.trim()) return { success: false, message: "Gemini API key is required." };
+        const requestedModel = (config.model || "").trim() || "gemini-1.5-flash";
+
+        const pingModel = async (m: string, v: "v1" | "v1beta") => {
+          const url = `https://generativelanguage.googleapis.com/${v}/models/${encodeURIComponent(
+            m
+          )}:generateContent?key=${encodeURIComponent(config.apiKey.trim())}`;
+          const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               contents: [{ parts: [{ text: "Hello! Reply with 'OK' if you can read this." }] }],
             }),
           });
+          return res;
         };
 
-        let res = await makeGeminiRequest(model);
-        if (!res.ok) {
+        // 1. Try requested model on its preferred version, then alternate
+        let lastErr = "";
+        for (const v of this.getGeminiApiVersions(requestedModel)) {
+          const res = await pingModel(requestedModel, v);
+          if (res.ok) {
+            config.model = requestedModel;
+            this.saveConfig(config);
+            return {
+              success: true,
+              message: `Connected successfully to Google Gemini (${requestedModel} on ${v})!`,
+            };
+          }
           const errData = await res.json().catch(() => ({}));
-          const errMsg = errData.error?.message || `HTTP error ${res.status}`;
-          
-          // If the model is experiencing high demand (503/429/high demand), try stable gemini-1.5-flash
-          const isHighDemand =
-            res.status === 503 ||
-            res.status === 429 ||
-            errMsg.toLowerCase().includes("high demand") ||
-            errMsg.toLowerCase().includes("overloaded") ||
-            errMsg.toLowerCase().includes("temporarily unavailable");
+          lastErr = errData.error?.message || `HTTP ${res.status}`;
+        }
 
-          if (isHighDemand && model !== "gemini-1.5-flash") {
-            const fallbackRes = await makeGeminiRequest("gemini-1.5-flash");
-            if (fallbackRes.ok) {
-              config.model = "gemini-1.5-flash";
+        // 2. If requested model failed, test stable fallback models
+        const candidateFallbacks = [
+          "gemini-1.5-flash",
+          "gemini-2.0-flash",
+          "gemini-1.5-pro",
+          "gemini-1.5-flash-8b",
+          "gemini-2.5-flash",
+        ].filter((m) => m !== requestedModel);
+
+        for (const candidate of candidateFallbacks) {
+          for (const v of this.getGeminiApiVersions(candidate)) {
+            const res = await pingModel(candidate, v);
+            if (res.ok) {
+              config.model = candidate;
               this.saveConfig(config);
               return {
                 success: true,
-                message: `'${model}' is currently overloaded on Google's free tier. Switched to 'gemini-1.5-flash' which connected successfully!`,
+                message: `'${requestedModel}' was unavailable. Switched and connected to '${candidate}' (${v})!`,
               };
             }
           }
-          throw new Error(errMsg);
         }
-        return { success: true, message: `Connected successfully to Google Gemini (${model})!` };
+
+        // 3. Auto-query live models from Google AI Studio for this specific API key
+        const liveModels = await this.listGeminiModels(config.apiKey);
+        for (const liveModel of liveModels) {
+          if (liveModel === requestedModel || candidateFallbacks.includes(liveModel)) continue;
+          for (const v of this.getGeminiApiVersions(liveModel)) {
+            const res = await pingModel(liveModel, v);
+            if (res.ok) {
+              config.model = liveModel;
+              this.saveConfig(config);
+              return {
+                success: true,
+                message: `Connected successfully to discovered Gemini model '${liveModel}' (${v})!`,
+              };
+            }
+          }
+        }
+
+        const modelsHint =
+          liveModels.length > 0 ? ` Available models on your key: ${liveModels.slice(0, 5).join(", ")}` : "";
+        throw new Error(`${lastErr}.${modelsHint}`);
       }
 
       if (config.provider === "openai") {
@@ -578,10 +658,7 @@ ${this.config.systemPromptExtra ? `\nUSER CUSTOM PREFERENCES:\n${this.config.sys
       throw new Error("Gemini API key is missing. Please configure it in AI Agent Settings.");
     }
 
-    let model = config.model || "gemini-1.5-flash";
-    let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
-      config.apiKey.trim()
-    )}`;
+    let model = (config.model || "").trim() || "gemini-1.5-flash";
 
     // Convert tool definitions to Gemini format
     const geminiFunctionDeclarations = AI_TOOLS_DEFINITIONS.map((tool) => ({
@@ -616,40 +693,74 @@ ${this.config.systemPromptExtra ? `\nUSER CUSTOM PREFERENCES:\n${this.config.sys
       },
     };
 
-    let res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const callGemini = async (m: string, v: "v1" | "v1beta") => {
+      const url = `https://generativelanguage.googleapis.com/${v}/models/${encodeURIComponent(
+        m
+      )}:generateContent?key=${encodeURIComponent(config.apiKey.trim())}`;
+      return fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    };
 
-    if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
-      const errMsg = errJson.error?.message || `Gemini API returned error ${res.status}`;
+    let res: Response | null = null;
+    let lastErrMsg = "";
 
-      // High demand auto-fallback to stable gemini-1.5-flash
-      const isHighDemand =
+    // 1. Try requested model across versions (v1, v1beta)
+    for (const v of this.getGeminiApiVersions(model)) {
+      const attempt = await callGemini(model, v);
+      if (attempt.ok) {
+        res = attempt;
+        break;
+      }
+      const errJson = await attempt.json().catch(() => ({}));
+      lastErrMsg = errJson.error?.message || `HTTP ${attempt.status}`;
+      // If error is not a 404 version mismatch, record and break to fallback logic
+      if (attempt.status !== 404 && !lastErrMsg.toLowerCase().includes("not found")) {
+        res = attempt;
+        break;
+      }
+    }
+
+    // 2. If requested model was overloaded (503/429) or not found (404), fall back to candidates
+    if (!res || !res.ok) {
+      const isHighDemandOrNotFound =
+        !res ||
         res.status === 503 ||
         res.status === 429 ||
-        errMsg.toLowerCase().includes("high demand") ||
-        errMsg.toLowerCase().includes("overloaded");
+        res.status === 404 ||
+        lastErrMsg.toLowerCase().includes("high demand") ||
+        lastErrMsg.toLowerCase().includes("overloaded") ||
+        lastErrMsg.toLowerCase().includes("not found");
 
-      if (isHighDemand && model !== "gemini-1.5-flash") {
-        console.warn(`[AiAgentService] ${model} is experiencing high demand. Falling back to gemini-1.5-flash.`);
-        model = "gemini-1.5-flash";
-        url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
-          config.apiKey.trim()
-        )}`;
-        res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        if (!res.ok) {
-          const fbErr = await res.json().catch(() => ({}));
-          throw new Error(fbErr.error?.message || errMsg);
+      if (isHighDemandOrNotFound) {
+        const fallbackCandidates = [
+          "gemini-1.5-flash",
+          "gemini-2.0-flash",
+          "gemini-1.5-pro",
+          "gemini-1.5-flash-8b",
+          "gemini-2.5-flash",
+        ].filter((m) => m !== model);
+
+        for (const candidate of fallbackCandidates) {
+          for (const v of this.getGeminiApiVersions(candidate)) {
+            const fbRes = await callGemini(candidate, v);
+            if (fbRes.ok) {
+              console.log(`[AiAgentService] Switched model to ${candidate} (${v})`);
+              model = candidate;
+              config.model = candidate;
+              this.saveConfig(config);
+              res = fbRes;
+              break;
+            }
+          }
+          if (res && res.ok) break;
         }
-      } else {
-        throw new Error(errMsg);
+      }
+
+      if (!res || !res.ok) {
+        throw new Error(lastErrMsg || "Gemini API request failed.");
       }
     }
 

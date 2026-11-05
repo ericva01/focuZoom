@@ -45,6 +45,8 @@ export function AiAgentSettingsModal({
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [bridgeStatus, setBridgeStatus] = useState<"connected" | "disconnected" | "connecting">("disconnected");
+  const [discoveredModels, setDiscoveredModels] = useState<string[]>([]);
+  const [isDetectingModels, setIsDetectingModels] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -83,16 +85,37 @@ export function AiAgentSettingsModal({
     onClose();
   };
 
-  const handleTestConnection = async () => {
+  const handleTestConnection = async (overrideConfig?: AiAgentConfig) => {
     setIsTesting(true);
     setTestResult(null);
     try {
-      const result = await aiAgentService.testConnection(config);
+      const targetConfig = overrideConfig || config;
+      const result = await aiAgentService.testConnection(targetConfig);
+      // Synchronize modal state with any model auto-switched by fallback logic
+      const updated = aiAgentService.getConfig();
+      setConfig(updated);
       setTestResult(result);
     } catch (err: any) {
       setTestResult({ success: false, message: err.message || "Failed to reach agent service." });
     } finally {
       setIsTesting(false);
+    }
+  };
+
+  const handleDetectModels = async () => {
+    if (!config.apiKey?.trim()) return;
+    setIsDetectingModels(true);
+    try {
+      const models = await aiAgentService.listGeminiModels(config.apiKey);
+      setDiscoveredModels(models);
+      if (models.length > 0 && !models.includes(config.model)) {
+        const preferred = models.find((m) => m === "gemini-1.5-flash") || models.find((m) => m.includes("flash")) || models[0];
+        setConfig((prev) => ({ ...prev, model: preferred }));
+      }
+    } catch (err) {
+      console.error("Failed to detect Gemini models:", err);
+    } finally {
+      setIsDetectingModels(false);
     }
   };
 
@@ -342,12 +365,12 @@ export function AiAgentSettingsModal({
                     className="flex-1 bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs font-mono outline-none focus:border-[#FF6B2C]"
                   />
                   {config.provider === "gemini" && (
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 items-center">
                       <Button
                         variant={config.model === "gemini-1.5-flash" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gemini-1.5-flash" })}
-                        title="Recommended: Most stable & reliable on Google AI Studio"
+                        title="Google Gemini 1.5 Flash (Stable v1)"
                       >
                         1.5 Flash (Stable)
                       </Button>
@@ -355,6 +378,7 @@ export function AiAgentSettingsModal({
                         variant={config.model === "gemini-2.0-flash" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gemini-2.0-flash" })}
+                        title="Google Gemini 2.0 Flash"
                       >
                         2.0 Flash
                       </Button>
@@ -362,6 +386,7 @@ export function AiAgentSettingsModal({
                         variant={config.model === "gemini-1.5-pro" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gemini-1.5-pro" })}
+                        title="Google Gemini 1.5 Pro"
                       >
                         1.5 Pro
                       </Button>
@@ -369,8 +394,18 @@ export function AiAgentSettingsModal({
                         variant={config.model === "gemini-1.5-flash-8b" ? "primary" : "secondary"}
                         size="sm"
                         onClick={() => setConfig({ ...config, model: "gemini-1.5-flash-8b" })}
+                        title="Google Gemini 1.5 Flash-8B"
                       >
                         1.5 Flash-8B
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDetectModels}
+                        disabled={isDetectingModels || !config.apiKey?.trim()}
+                        title="Scan Google AI Studio for all models enabled on your API key"
+                      >
+                        {isDetectingModels ? "Scanning..." : "Scan Key Models"}
                       </Button>
                     </div>
                   )}
@@ -411,6 +446,30 @@ export function AiAgentSettingsModal({
                     </div>
                   )}
                 </div>
+
+                {config.provider === "gemini" && discoveredModels.length > 0 && (
+                  <div className="mt-2.5 p-2.5 bg-slate-100 dark:bg-white/[0.04] rounded-xl border border-slate-200 dark:border-white/10">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block mb-1.5">
+                      Models detected on your Google AI Studio key (click to select):
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {discoveredModels.map((m) => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => setConfig({ ...config, model: m })}
+                          className={`text-[10px] px-2.5 py-1 rounded-lg font-mono transition-colors ${
+                            config.model === m
+                              ? "bg-[#FF6B2C] text-white font-semibold shadow-sm"
+                              : "bg-white dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:bg-[#FF6B2C]/20 border border-slate-200 dark:border-white/10"
+                          }`}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Test Connection Result */}
@@ -431,36 +490,20 @@ export function AiAgentSettingsModal({
                     <div className="flex-1 font-medium">{testResult.message}</div>
                   </div>
 
-                  {!testResult.success &&
-                    (testResult.message.toLowerCase().includes("high demand") ||
-                      testResult.message.toLowerCase().includes("overloaded") ||
-                      testResult.message.toLowerCase().includes("503")) && (
-                      <div className="pt-2 border-t border-red-500/20 flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-[11px] text-slate-300">
-                          Google&apos;s experimental model is busy. Switch to stable <strong>gemini-1.5-flash</strong>:
-                        </span>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={async () => {
-                            const newCfg = { ...config, model: "gemini-1.5-flash" };
-                            setConfig(newCfg);
-                            setIsTesting(true);
-                            setTestResult(null);
-                            try {
-                              const res = await aiAgentService.testConnection(newCfg);
-                              setTestResult(res);
-                            } catch (e: any) {
-                              setTestResult({ success: false, message: e.message });
-                            } finally {
-                              setIsTesting(false);
-                            }
-                          }}
-                        >
-                          Switch to 1.5 Flash & Re-test
-                        </Button>
-                      </div>
-                    )}
+                  {!testResult.success && config.provider === "gemini" && (
+                    <div className="pt-2 border-t border-red-500/20 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-[11px] text-slate-300">
+                        Need an active model? Let FucuFlow find & connect to a working model:
+                      </span>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleTestConnection()}
+                      >
+                        ⚡ Auto-Detect & Connect Best Model
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -469,7 +512,7 @@ export function AiAgentSettingsModal({
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={handleTestConnection}
+                  onClick={() => handleTestConnection()}
                   disabled={isTesting || (!config.apiKey && config.provider !== "ollama")}
                   leftIcon={
                     isTesting ? (
