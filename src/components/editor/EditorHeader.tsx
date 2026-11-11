@@ -14,6 +14,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Sparkles,
+  Pencil,
 } from "lucide-react";
 import { AspectRatio } from "@/types/editor";
 import { Button } from "@/components/ui/Button";
@@ -153,7 +154,7 @@ function EditorHeaderBase({
                 className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/[0.06] px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1.5 group border border-transparent hover:border-slate-300 dark:hover:border-white/[0.08]"
               >
                 <span>{projectName}</span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-select">✎</span>
+                <Pencil className="w-3 h-3 text-slate-400 dark:text-slate-500 group-hover:text-select" aria-hidden="true" />
               </button>
             )}
           </div>

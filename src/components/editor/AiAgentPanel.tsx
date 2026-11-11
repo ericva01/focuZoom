@@ -18,6 +18,9 @@ import {
   ArrowRight,
   Loader2,
   Wand2,
+  Zap,
+  Smartphone,
+  Clapperboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { aiAgentService } from "@/lib/aiAgentService";
@@ -113,19 +116,23 @@ export function AiAgentPanel({
 
   const quickPrompts = [
     {
-      label: "⚡ Smart 3D Zooms",
+      label: "Smart 3D Zooms",
+      icon: Zap,
       prompt: "Analyze my video duration and place 4 dynamic 3D zoom keyframes focused on key screen areas with smooth cubic-out easing.",
     },
     {
-      label: "📱 TikTok / Reels (9:16)",
+      label: "TikTok / Reels (9:16)",
+      icon: Smartphone,
       prompt: "Reformat this project for TikTok / Instagram Reels: set aspect ratio to 9:16 and apply the Hyper Neon backdrop preset.",
     },
     {
-      label: "🎬 Cinematic YouTube (16:9)",
+      label: "Cinematic YouTube (16:9)",
+      icon: Clapperboard,
       prompt: "Transform this recording into a cinematic 16:9 YouTube video with Obsidian Dark background and isometric 3D camera angle.",
     },
     {
-      label: "✨ Vivid Color Grade",
+      label: "Vivid Color Grade",
+      icon: Sparkles,
       prompt: "Apply a vibrant color grade: boost contrast to 1.15, saturation to 1.25, and add a subtle warm amber temperature (+0.15).",
     },
   ];
@@ -229,8 +236,9 @@ export function AiAgentPanel({
             key={i}
             onClick={() => handleSendMessage(qp.prompt)}
             disabled={isLoading}
-            className="flex-shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-200/50 dark:bg-white/[0.06] hover:bg-select/20 hover:text-select border border-transparent hover:border-select/30 text-slate-600 dark:text-slate-300 transition-all"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-200/50 dark:bg-white/[0.06] hover:bg-select/20 hover:text-select border border-transparent hover:border-select/30 text-slate-600 dark:text-slate-300 transition-all"
           >
+            <qp.icon className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
             {qp.label}
           </button>
         ))}

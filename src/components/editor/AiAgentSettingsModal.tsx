@@ -19,6 +19,7 @@ import {
   HelpCircle,
   Trash2,
   RefreshCw,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { aiAgentService, DEFAULT_AI_CONFIG } from "@/lib/aiAgentService";
@@ -508,7 +509,8 @@ export function AiAgentSettingsModal({
                         size="sm"
                         onClick={() => handleTestConnection()}
                       >
-                        ⚡ Auto-Detect & Connect Best Model
+                        <Zap className="inline w-3.5 h-3.5 mr-1.5 -mt-0.5" aria-hidden="true" />
+                        Auto-Detect & Connect Best Model
                       </Button>
                     </div>
                   )}

@@ -14,6 +14,7 @@ import {
   UploadCloud,
   Copy,
   Check,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
@@ -463,7 +464,8 @@ export function GoogleDriveModal({
             {/* Privacy Guarantee Note */}
             <div className="p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 text-[11px] text-slate-500 dark:text-slate-400 space-y-1 leading-relaxed">
               <p className="font-semibold text-slate-700 dark:text-slate-300">
-                🔒 Zero-Cloud, Direct Device-to-Google Privacy
+                <Lock className="inline w-3.5 h-3.5 mr-1.5 -mt-0.5" aria-hidden="true" />
+                Zero-Cloud, Direct Device-to-Google Privacy
               </p>
               Your videos are rendered on your local hardware and uploaded directly from your browser to your Google Drive account. No third-party servers ever receive your credentials or media.
             </div>

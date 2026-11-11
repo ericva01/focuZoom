@@ -34,6 +34,7 @@ import {
   Radio,
   Key,
   Server,
+  Zap,
 } from "lucide-react";
 import { getSavedProjects, deleteProject, saveProject, SavedProject } from "@/utils/projectStorage";
 import { SignInButton, Show, UserButton, ClerkLoaded, ClerkLoading, ClerkFailed } from "@clerk/react";
@@ -1045,7 +1046,7 @@ export function DesktopAppDashboard() {
                           </div>
                           {isSelected && (
                             <span className="w-5 h-5 rounded-full bg-select text-onselect flex items-center justify-center text-[11px] font-bold shadow-xs">
-                              ✓
+                              <Check className="w-3 h-3" aria-hidden="true" />
                             </span>
                           )}
                         </div>
@@ -1686,7 +1687,8 @@ export function DesktopAppDashboard() {
                         }}
                         className="px-3 py-1 rounded-lg bg-select text-onselect font-bold text-xs hover:bg-select transition-all cursor-pointer"
                       >
-                        ⚡ Switch to Gemini 3.8 Flash & Re-test
+                        <Zap className="inline w-3.5 h-3.5 mr-1 -mt-0.5" aria-hidden="true" />
+                        Switch to Gemini 3.8 Flash & Re-test
                       </button>
                     </div>
                   )}

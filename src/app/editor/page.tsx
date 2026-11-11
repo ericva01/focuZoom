@@ -11,7 +11,9 @@ import { useVideoPlayback } from "@/hooks/useVideoPlayback";
 import { useScreenRecorder } from "@/hooks/useScreenRecorder";
 import { generateSampleScreenRecording } from "@/utils/sampleVideoGenerator";
 import { clusterNearbyClicks, ungroupClickEvent, groupClickEvents, mergeOverlappingEvents } from "@/utils/clickClusterer";
-import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight,
+  X,
+} from "lucide-react";
 import {
   AspectRatio,
   CanvasConfig,
@@ -1662,7 +1664,7 @@ export default function EditorPage() {
             className="text-select hover:text-white ml-2 p-0.5 rounded transition-colors cursor-pointer"
             title="Dismiss error"
           >
-            ✕
+            <X className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
         </div>
       )}

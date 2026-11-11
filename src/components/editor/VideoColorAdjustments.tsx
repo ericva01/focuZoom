@@ -10,6 +10,11 @@ import {
   Thermometer,
   Flame,
   Droplets,
+  Sun,
+  Zap,
+  Lightbulb,
+  Sunrise,
+  Snowflake,
 } from "lucide-react";
 import { CanvasConfig } from "@/types/editor";
 
@@ -55,7 +60,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
       s: 1.0,
       temp: 0.0,
       tint: 0.0,
-      icon: "☀️",
+      icon: Sun,
     },
     {
       name: "Fix Dark (+25%)",
@@ -64,7 +69,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
       s: 1.1,
       temp: 0.0,
       tint: 0.0,
-      icon: "⚡",
+      icon: Zap,
     },
     {
       name: "Super Bright",
@@ -73,7 +78,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
       s: 1.15,
       temp: 0.0,
       tint: 0.0,
-      icon: "💡",
+      icon: Lightbulb,
     },
     {
       name: "Warm Sunlight",
@@ -82,7 +87,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
       s: 1.2,
       temp: 0.38,
       tint: 0.0,
-      icon: "🌅",
+      icon: Sunrise,
     },
     {
       name: "Cool Studio",
@@ -91,7 +96,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
       s: 1.1,
       temp: -0.35,
       tint: 0.05,
-      icon: "❄️",
+      icon: Snowflake,
     },
     {
       name: "Vivid / Pop",
@@ -100,7 +105,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
       s: 1.35,
       temp: 0.0,
       tint: 0.0,
-      icon: "🎨",
+      icon: Palette,
     },
   ];
 
@@ -174,7 +179,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
                     : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-slate-300 dark:border-white/10"
                 }`}
               >
-                <span>{preset.icon}</span>
+                <preset.icon className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                 <span className="truncate">{preset.name}</span>
               </button>
             );
@@ -204,7 +209,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
                   className="text-[9px] text-slate-400 hover:text-white"
                   title="Reset Brightness"
                 >
-                  ↺
+                  <RotateCcw className="w-3 h-3" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -245,7 +250,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
                   className="text-[9px] text-slate-400 hover:text-white"
                   title="Reset Contrast"
                 >
-                  ↺
+                  <RotateCcw className="w-3 h-3" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -281,7 +286,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
                   className="text-[9px] text-slate-400 hover:text-white"
                   title="Reset Saturation"
                 >
-                  ↺
+                  <RotateCcw className="w-3 h-3" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -344,7 +349,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
                   className="text-[9px] text-slate-400 hover:text-white"
                   title="Reset Temperature"
                 >
-                  ↺
+                  <RotateCcw className="w-3 h-3" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -403,7 +408,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
                   className="text-[9px] text-slate-400 hover:text-white"
                   title="Reset Tint"
                 >
-                  ↺
+                  <RotateCcw className="w-3 h-3" aria-hidden="true" />
                 </button>
               )}
             </div>

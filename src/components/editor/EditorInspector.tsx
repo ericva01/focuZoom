@@ -901,7 +901,7 @@ function EditorInspectorBase({
                   {/* Horizontal Position Slider */}
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px]">
-                      <span className="text-slate-400">Horizontal (Left ↔ Right)</span>
+                      <span className="text-slate-400">Horizontal (left to right)</span>
                       <span className="tabular-nums text-blue-400 font-bold">{Math.round(selectedEvent.x * 100)}%</span>
                     </div>
                     <input
@@ -920,7 +920,7 @@ function EditorInspectorBase({
                   {/* Vertical Position Slider */}
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px]">
-                      <span className="text-slate-400">Vertical (Top ↔ Bottom)</span>
+                      <span className="text-slate-400">Vertical (top to bottom)</span>
                       <span className="tabular-nums text-blue-400 font-bold">{Math.round(selectedEvent.y * 100)}%</span>
                     </div>
                     <input
