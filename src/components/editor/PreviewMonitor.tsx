@@ -149,15 +149,15 @@ export function PreviewMonitor({
         {/* Left: Aspect Ratio & Resolution Selectors */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-xs">
-            <Ratio className="w-3.5 h-3.5 text-[#FF6B2C] ml-1 mr-0.5" />
+            <Ratio className="w-3.5 h-3.5 text-select ml-1 mr-0.5" />
             {aspectRatios.map((ar) => (
               <button
                 key={ar.id}
                 type="button"
                 onClick={() => onChangeConfig({ aspectRatio: ar.id })}
-                className={`px-2 py-0.5 rounded-lg text-[11px] font-mono transition-all ${
+                className={`px-2 py-0.5 rounded-lg text-[11px] tabular-nums transition-all ${
                   config.aspectRatio === ar.id
-                    ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-xs"
+                    ? "bg-slate-200 text-select dark:bg-select/20 dark:text-select font-bold border border-select/40 shadow-xs"
                     : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
@@ -167,16 +167,16 @@ export function PreviewMonitor({
           </div>
 
           <div className="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-300 dark:border-white/10 shadow-xs">
-            <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 px-1">RES:</span>
+            <span className="text-[10px] tabular-nums font-bold text-slate-500 dark:text-slate-400 px-1">RES:</span>
             {resolutionPresets.map((rp) => (
               <button
                 key={rp.id}
                 type="button"
                 onClick={() => onChangeConfig({ resolutionPreset: rp.id })}
                 title={`${rp.desc} preview resolution (${rp.label})`}
-                className={`px-2 py-0.5 rounded-lg text-[11px] font-mono uppercase transition-all ${
+                className={`px-2 py-0.5 rounded-lg text-[11px] tabular-nums transition-all ${
                   (config.resolutionPreset || "1080p") === rp.id
-                    ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-xs"
+                    ? "bg-slate-200 text-select dark:bg-select/20 dark:text-select font-bold border border-select/40 shadow-xs"
                     : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
@@ -187,11 +187,11 @@ export function PreviewMonitor({
         </div>
 
         {/* Center: Stage Status Badge */}
-        <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-slate-600 dark:text-slate-400 bg-white dark:bg-white/[0.04] px-3 py-1 rounded-xl border border-slate-300 dark:border-white/[0.08] shadow-xs">
+        <div className="hidden sm:flex items-center gap-2 tabular-nums text-[11px] text-slate-600 dark:text-slate-400 bg-white dark:bg-white/[0.04] px-3 py-1 rounded-xl border border-slate-300 dark:border-white/[0.08] shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-slate-900 dark:text-white font-medium">Stage Monitor</span>
           <span className="text-slate-400 dark:text-slate-500">·</span>
-          <span className="text-[#FF6B2C] dark:text-[#FF8A4C] font-bold">{currentResolution.label}</span>
+          <span className="text-select dark:text-select font-bold">{currentResolution.label}</span>
           <span className="text-slate-600 dark:text-slate-400">({currentResolution.width}x{currentResolution.height}) 60 FPS</span>
         </div>
 
@@ -212,7 +212,7 @@ export function PreviewMonitor({
             title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
             className={`p-1.5 rounded-xl border transition-all ${
               isFullscreen
-                ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] border-[#FF6B2C]/30"
+                ? "bg-select/20 text-select dark:text-select border-select/30"
                 : "text-slate-600 hover:text-slate-900 border-slate-300 bg-white hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
             }`}
           >
@@ -271,7 +271,7 @@ export function PreviewMonitor({
             type="button"
             onClick={onTogglePlay}
             title={isPlaying ? "Pause" : "Play"}
-            className="w-6 h-6 rounded-lg bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] hover:bg-[#FF6B2C]/30 flex items-center justify-center border border-[#FF6B2C]/30 shadow-glass-sm"
+            className="w-6 h-6 rounded-lg bg-select/20 text-select dark:text-select hover:bg-select/30 flex items-center justify-center border border-select/30 shadow-glass-sm"
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
           </button>
@@ -285,7 +285,7 @@ export function PreviewMonitor({
           </button>
         </div>
 
-        <div className="font-mono text-xs text-slate-600 dark:text-slate-300">
+        <div className="tabular-nums text-xs text-slate-600 dark:text-slate-300">
           <span className="text-slate-900 dark:text-white font-semibold">{formatSMPTETimecode(currentTime)}</span>
           <span className="text-slate-400 dark:text-slate-500"> / </span>
           <span className="text-slate-500 dark:text-slate-400">{formatSMPTETimecode(duration)}</span>
@@ -298,7 +298,7 @@ export function PreviewMonitor({
             title={isLooping ? "Looping On" : "Looping Off"}
             className={`p-1.5 rounded-lg border transition-all ${
               isLooping
-                ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] border-[#FF6B2C]/30"
+                ? "bg-select/20 text-select dark:text-select border-select/30"
                 : "text-slate-500 hover:text-slate-900 border-transparent hover:bg-slate-200/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.06]"
             }`}
           >
@@ -310,7 +310,7 @@ export function PreviewMonitor({
             title={isFullscreen ? "Exit Fullscreen (Esc / F)" : "Fullscreen (F)"}
             className={`p-1.5 rounded-lg border transition-all ${
               isFullscreen
-                ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] border-[#FF6B2C]/30"
+                ? "bg-select/20 text-select dark:text-select border-select/30"
                 : "text-slate-500 hover:text-slate-900 border-transparent hover:bg-slate-200/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.06]"
             }`}
           >

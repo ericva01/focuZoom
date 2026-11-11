@@ -641,7 +641,7 @@ function MultiTrackTimelineBase({
   }, [totalTimelineDuration, rulerInterval]);
 
   return (
-    <div className="h-72 border-t border-slate-200 dark:border-white/[0.1] bg-white/95 dark:bg-[#090D16]/95 backdrop-blur-2xl flex flex-col select-none relative z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+    <div className="h-72 border-t border-slate-200 dark:border-white/[0.1] bg-white/95 dark:bg-[#131B24]/95 backdrop-blur-2xl flex flex-col select-none relative z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
       {/* 1. Dedicated CapCut-Style Editing Toolbar */}
       <div className="h-11 px-4 border-b border-slate-300 dark:border-white/[0.08] bg-white/95 dark:bg-white/[0.02] flex items-center justify-between gap-2 text-xs">
         {/* Left: Trim & Cut Action Controls */}
@@ -652,9 +652,9 @@ function MultiTrackTimelineBase({
             onClick={handleTriggerSplit}
             disabled={!activeClipUnderPlayhead}
             title="Split Clip at Playhead (S)"
-            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-[#FFF1E8] text-slate-800 hover:text-[#FF6B2C] border border-slate-300 hover:border-[#FF6B2C]/40 dark:bg-white/[0.06] dark:hover:bg-[#FF6B2C]/20 dark:text-slate-200 dark:border-white/10 font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-xs"
+            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-200 text-slate-800 hover:text-select border border-slate-300 hover:border-select/40 dark:bg-white/[0.06] dark:hover:bg-select/20 dark:text-slate-200 dark:border-white/10 font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-xs"
           >
-            <Scissors className="w-3.5 h-3.5 text-[#FF6B2C]" />
+            <Scissors className="w-3.5 h-3.5 text-select" />
             <span className="text-xs font-semibold">Split</span>
           </button>
 
@@ -664,9 +664,9 @@ function MultiTrackTimelineBase({
             onClick={handleTriggerDelete}
             disabled={!activeSelectedClip}
             title="Delete Selected Clip (Del)"
-            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-800 hover:text-rose-600 border border-slate-300 hover:border-rose-300 dark:bg-white/[0.06] dark:hover:bg-[#FF6B2C]/20 dark:text-slate-200 dark:border-white/10 font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-xs"
+            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-800 hover:text-rose-600 border border-slate-300 hover:border-rose-300 dark:bg-white/[0.06] dark:hover:bg-select/20 dark:text-slate-200 dark:border-white/10 font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-xs"
           >
-            <Trash2 className="w-3.5 h-3.5 text-[#FF6B2C]" />
+            <Trash2 className="w-3.5 h-3.5 text-select" />
             <span className="text-xs">Delete</span>
           </button>
 
@@ -689,7 +689,7 @@ function MultiTrackTimelineBase({
             type="button"
             onClick={onAddKeyframeAtCurrentTime}
             title="Add 3D Dolly Zoom Target at Playhead (K)"
-            className="px-2.5 py-1.5 rounded-lg bg-[#FFF1E8] hover:bg-[#FFE6D7] text-[#FF6B2C] border border-[#FF6B2C]/40 font-bold dark:bg-[#FF6B2C]/15 dark:hover:bg-[#FF6B2C]/25 dark:text-[#FF8A4C] dark:border-[#FF6B2C]/40 shadow-xs flex items-center gap-1.5 transition-all"
+            className="px-2.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-select border border-select/40 font-bold dark:bg-select/15 dark:hover:bg-select/25 dark:text-select dark:border-select/40 shadow-xs flex items-center gap-1.5 transition-all"
           >
             <Focus className="w-3.5 h-3.5" />
             <span className="text-xs">Add Zoom Keyframe</span>
@@ -735,7 +735,7 @@ function MultiTrackTimelineBase({
             type="button"
             onClick={onTogglePlay}
             title={isPlaying ? "Pause (Space)" : "Play (Space)"}
-            className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#FF7A3D] to-[#FF6B2C] hover:from-[#FF8A4C] hover:to-[#E85A1F] text-white flex items-center justify-center shadow-[0_0_15px_rgba(255,107,44,0.4)] transition-transform active:scale-95"
+            className="w-8 h-8 rounded-xl bg-gradient-to-b from-select to-select hover:from-select hover:to-select text-white flex items-center justify-center shadow-[0_0_15px_rgba(242,106,33,0.4)] transition-transform active:scale-95"
           >
             {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
           </button>
@@ -758,9 +758,9 @@ function MultiTrackTimelineBase({
                 key={spd}
                 type="button"
                 onClick={() => onSpeedChange(spd)}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-all ${
+                className={`px-1.5 py-0.5 rounded text-[10px] tabular-nums transition-all ${
                   playbackSpeed === spd
-                    ? "bg-[#FF6B2C]/25 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40"
+                    ? "bg-select/25 text-select dark:text-select font-bold border border-select/40"
                     : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 }`}
               >
@@ -779,7 +779,7 @@ function MultiTrackTimelineBase({
             title={snappingEnabled ? "Magnetic Snapping Enabled" : "Magnetic Snapping Disabled"}
             className={`p-1.5 rounded-lg border transition-all ${
               snappingEnabled
-                ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm"
+                ? "bg-select/15 text-select dark:text-select border-select/40 shadow-glass-sm"
                 : "bg-slate-100 text-slate-500 border-slate-200 hover:text-slate-800 dark:bg-white/[0.04] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
             }`}
           >
@@ -793,7 +793,7 @@ function MultiTrackTimelineBase({
             title={isLooping ? "Timeline Loop Enabled" : "Timeline Loop Disabled"}
             className={`p-1.5 rounded-lg border transition-all ${
               isLooping
-                ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm"
+                ? "bg-select/15 text-select dark:text-select border-select/40 shadow-glass-sm"
                 : "bg-slate-100 text-slate-500 border-slate-200 hover:text-slate-800 dark:bg-white/[0.04] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
             }`}
           >
@@ -810,11 +810,11 @@ function MultiTrackTimelineBase({
               step="0.1"
               value={zoomScale}
               onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-              className="w-18 accent-[#FF6B2C] cursor-pointer h-1 bg-slate-300 dark:bg-white/10 rounded"
+              className="w-18 accent-select cursor-pointer h-1 bg-slate-300 dark:bg-white/10 rounded"
               title="Timeline Scale Zoom"
             />
             <ZoomIn className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-            <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400 w-7 text-right">
+            <span className="tabular-nums text-[10px] text-slate-500 dark:text-slate-400 w-7 text-right">
               {Math.round(zoomScale * 100)}%
             </span>
           </div>
@@ -827,11 +827,11 @@ function MultiTrackTimelineBase({
         className="flex-1 overflow-x-auto overflow-y-auto flex flex-col relative"
       >
         {/* Timecode Ruler Bar */}
-        <div className="sticky top-0 z-20 flex h-7 border-b border-slate-300 dark:border-white/[0.08] bg-slate-200/90 dark:bg-[#090D16]/90 backdrop-blur-md">
+        <div className="sticky top-0 z-20 flex h-7 border-b border-slate-300 dark:border-white/[0.08] bg-slate-200/90 dark:bg-[#131B24]/90 backdrop-blur-md">
           {/* Header left placeholder */}
-          <div className="w-36 flex-shrink-0 border-r border-slate-300 dark:border-white/[0.08] bg-slate-200 dark:bg-black/50 px-3 flex items-center justify-between text-[11px] font-mono text-slate-800 dark:text-slate-300 font-bold">
-            <span>TRACKS</span>
-            <span className="text-[10px] text-[#FF6B2C] dark:text-[#FF8A4C] font-semibold">30 FPS</span>
+          <div className="w-36 flex-shrink-0 border-r border-slate-300 dark:border-white/[0.08] bg-slate-200 dark:bg-black/50 px-3 flex items-center justify-between text-[11px] tabular-nums text-slate-800 dark:text-slate-300 font-bold">
+            <span>Tracks</span>
+            <span className="text-[10px] text-select dark:text-select font-semibold">30 FPS</span>
           </div>
 
           {/* Timecode Ruler Canvas */}
@@ -853,7 +853,7 @@ function MultiTrackTimelineBase({
                     className={`w-px ${isMajor ? "bg-slate-400 dark:bg-white/[0.25] h-3" : "bg-slate-300 dark:bg-white/[0.12] h-1.5 mt-2"}`}
                   />
                   {isMajor && (
-                    <span className="absolute top-1 left-1.5 text-[9px] font-mono font-semibold text-slate-700 dark:text-slate-300 select-none">
+                    <span className="absolute top-1 left-1.5 text-[9px] tabular-nums font-semibold text-slate-700 dark:text-slate-300 select-none">
                       {formatSMPTETimecode(tickSec).substring(3, 8)}
                     </span>
                   )}
@@ -870,7 +870,7 @@ function MultiTrackTimelineBase({
                 willChange: "transform",
               }}
             >
-              <div className="w-3 h-3 bg-[#FF6B2C] rotate-45 -mt-1.5 shadow-[0_0_10px_rgba(255,107,44,0.8)] border border-white" />
+              <div className="w-3 h-3 bg-[#F26A21] rotate-45 -mt-1.5 shadow-[0_0_10px_rgba(242,106,33,0.8)] border border-white" />
             </div>
           </div>
         </div>
@@ -885,7 +885,7 @@ function MultiTrackTimelineBase({
           {/* Marquee Selection Area Box (Active when holding right click and dragging across tracks) */}
           {marqueeSelection && (
             <div
-              className="absolute z-50 pointer-events-none rounded-lg border-2 border-[#FF6B2C]/90 bg-[#FF6B2C]/20 backdrop-blur-[2px] shadow-[0_0_20px_rgba(255,107,44,0.35)]"
+              className="absolute z-50 pointer-events-none rounded-lg border-2 border-select/90 bg-select/20 backdrop-blur-[2px] shadow-[0_0_20px_rgba(242,106,33,0.35)]"
               style={{
                 left: `${Math.min(marqueeSelection.relStartX, marqueeSelection.relCurrentX)}px`,
                 top: `${Math.min(marqueeSelection.relStartY, marqueeSelection.relCurrentY)}px`,
@@ -893,7 +893,7 @@ function MultiTrackTimelineBase({
                 height: `${Math.abs(marqueeSelection.relCurrentY - marqueeSelection.relStartY)}px`,
               }}
             >
-              <div className="absolute -top-7 left-2 px-2 py-0.5 rounded-md bg-white dark:bg-[#090D16]/95 border border-[#FF6B2C]/60 text-[10px] font-mono text-[#FF6B2C] dark:text-orange-200 shadow-md">
+              <div className="absolute -top-7 left-2 px-2 py-0.5 rounded-md bg-white dark:bg-[#131B24]/95 border border-select/60 text-[10px] tabular-nums text-select dark:text-orange-200 shadow-md">
                 Box Select (Release to select)
               </div>
             </div>
@@ -901,14 +901,14 @@ function MultiTrackTimelineBase({
 
           {/* Laser Playhead Needle running vertically across ALL tracks */}
           <div
-            className="absolute top-0 bottom-0 w-px bg-[#FF6B2C] shadow-[0_0_8px_rgba(255,107,44,0.9)] z-30 pointer-events-none"
+            className="absolute top-0 bottom-0 w-px bg-[#F26A21] shadow-[0_0_8px_rgba(242,106,33,0.9)] z-30 pointer-events-none"
             style={{
               transform: `translate3d(${144 + playheadX}px, 0, 0)`,
               left: 0,
               willChange: "transform",
             }}
           >
-            <div className="w-2 h-2 rounded-full bg-[#FF8A4C] absolute -top-1 -left-0.5" />
+            <div className="w-2 h-2 rounded-full bg-[#F26A21] absolute -top-1 -left-0.5" />
           </div>
 
           {/* ============================================================ */}
@@ -1011,7 +1011,7 @@ function MultiTrackTimelineBase({
 
                     {/* Clip Content Thumbnail & Metadata */}
                     <div className="flex-1 px-2 overflow-hidden flex items-center gap-2 pointer-events-none">
-                      <div className="w-5 h-5 rounded-md bg-white/[0.08] border border-white/10 flex items-center justify-center text-[9px] font-mono text-purple-300 flex-shrink-0">
+                      <div className="w-5 h-5 rounded-md bg-white/[0.08] border border-white/10 flex items-center justify-center text-[9px] tabular-nums text-purple-300 flex-shrink-0">
                         #{idx + 1}
                       </div>
 
@@ -1019,7 +1019,7 @@ function MultiTrackTimelineBase({
                         <div className="text-[11px] font-medium text-white truncate">
                           {clip.name}
                         </div>
-                        <div className="text-[9px] font-mono text-purple-200/80 truncate">
+                        <div className="text-[9px] tabular-nums text-purple-200/80 truncate">
                           {clip.duration.toFixed(1)}s · {clip.speed}X
                         </div>
                       </div>
@@ -1057,7 +1057,7 @@ function MultiTrackTimelineBase({
             <div className="w-36 flex-shrink-0 border-r border-slate-300 dark:border-white/[0.08] bg-slate-200/90 dark:bg-black/40 px-3 flex items-center justify-between text-xs text-slate-800 dark:text-slate-300 sticky left-0 z-10 shadow-xs">
               <div className="flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
                 <Focus className="w-3.5 h-3.5" />
-                <span className="text-[11px]">Auto Zoom</span>
+                <span className="text-[11px]">Auto zoom</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <button
@@ -1167,15 +1167,15 @@ function MultiTrackTimelineBase({
                     className={`absolute top-1.5 bottom-1.5 rounded-xl border flex items-center justify-between z-10 select-none group/zoom transition-all cursor-grab active:cursor-grabbing ${
                       isSelected
                         ? isGrouped
-                          ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 border-white text-white shadow-[0_0_18px_rgba(99,102,241,0.9)] ring-2 ring-indigo-400 z-20 scale-[1.02]"
-                          : "bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 border-white text-white shadow-[0_0_18px_rgba(59,130,246,0.9)] ring-2 ring-blue-400 z-20 scale-[1.02]"
+                          ? "bg-[#F26A21] border-[#F26A21] text-[#1C2733] z-20"
+                          : "bg-[#F26A21] border-[#F26A21] text-[#1C2733] z-20"
                         : isNearCurrent
                         ? isGrouped
-                          ? "bg-gradient-to-r from-blue-600/90 via-indigo-600/90 to-purple-600/90 border-indigo-400/70 text-white shadow-[0_0_12px_rgba(99,102,241,0.6)]"
-                          : "bg-gradient-to-r from-blue-600/90 via-blue-500/90 to-indigo-600/90 border-blue-400/70 text-white shadow-[0_0_12px_rgba(59,130,246,0.6)]"
+                          ? "bg-slate-700 border-[#F26A21] text-white"
+                          : "bg-slate-700 border-[#F26A21] text-white"
                         : isGrouped
-                        ? "bg-gradient-to-r from-blue-700/80 via-indigo-700/80 to-purple-700/80 hover:brightness-110 border-indigo-400/40 text-white shadow-md hover:shadow-lg"
-                        : "bg-blue-600/75 hover:bg-blue-600 border-blue-400/40 text-white shadow-md hover:shadow-lg"
+                        ? "bg-slate-800 hover:bg-slate-700 border-[#F26A21]/70 text-slate-100"
+                        : "bg-slate-800 hover:bg-slate-700 border-[#F26A21]/70 text-slate-100"
                     }`}
                   >
                     {/* Left Trim Handle */}
@@ -1231,16 +1231,16 @@ function MultiTrackTimelineBase({
                               <span className="text-[11px] font-bold text-white truncate">
                                 {tgt.zoom || ev.zoom || 2}X
                               </span>
-                              <span className="text-[9px] font-mono text-indigo-100/75 hidden md:inline">
+                              <span className="text-[9px] tabular-nums text-indigo-100/75 hidden md:inline">
                                 {tgt.timestamp.toFixed(1)}s
                               </span>
                             </div>
                           ))}
                           <div className="px-2 flex items-center gap-1 flex-shrink-0 bg-black/25 h-full">
-                            <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-100 bg-white/20 px-1 py-0.5 rounded">
+                            <span className="text-[9px] font-bold text-indigo-100 bg-white/20 px-1 py-0.5 rounded">
                               Section
                             </span>
-                            <span className="text-[10px] font-mono text-indigo-100 font-semibold">
+                            <span className="text-[10px] tabular-nums text-indigo-100 font-semibold">
                               :{liveDuration.toFixed(1)}s
                             </span>
                           </div>
@@ -1251,7 +1251,7 @@ function MultiTrackTimelineBase({
                           <span className="text-xs font-bold text-white tracking-wide truncate">
                             Zoom {ev.zoom || 2}X
                           </span>
-                          <span className="text-[10px] font-mono text-blue-200/90 hidden sm:inline">
+                          <span className="text-[10px] tabular-nums text-blue-200/90 hidden sm:inline">
                             :{liveDuration.toFixed(1)}s
                           </span>
                         </div>
@@ -1302,7 +1302,7 @@ function MultiTrackTimelineBase({
                           e.stopPropagation();
                           onDeleteEvent(ev.id);
                         }}
-                        className={`p-1 text-white/70 hover:text-white hover:bg-[#FF6B2C]/30 rounded-md mr-1 transition-all z-20 cursor-pointer ${
+                        className={`p-1 text-white/70 hover:text-white hover:bg-select/30 rounded-md mr-1 transition-all z-20 cursor-pointer ${
                           isSelected ? "opacity-100 bg-black/20" : "opacity-0 group-hover/zoom:opacity-100"
                         }`}
                         title="Delete Zoom Effect (or press Delete key)"
@@ -1433,7 +1433,7 @@ function MultiTrackTimelineBase({
 
                     {/* Canvas Waveform Peak Display */}
                     <div className="flex-1 h-full flex items-center px-2 gap-2 overflow-hidden pointer-events-none relative">
-                      <span className="text-[9px] font-mono text-indigo-300 font-semibold truncate select-none bg-indigo-950/70 px-1.5 py-0.5 rounded backdrop-blur-sm border border-indigo-500/20 z-10 flex-shrink-0">
+                      <span className="text-[9px] tabular-nums text-indigo-300 font-semibold truncate select-none bg-indigo-950/70 px-1.5 py-0.5 rounded backdrop-blur-sm border border-indigo-500/20 z-10 flex-shrink-0">
                         {clip.name}
                       </span>
                       <div className="flex-1 h-full flex items-center overflow-hidden">
@@ -1521,14 +1521,14 @@ function MultiTrackTimelineBase({
                       }`}
                     >
                       <div className="flex-1 px-2.5 overflow-hidden flex items-center gap-2 pointer-events-none">
-                        <div className="w-5 h-5 rounded-full bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-[9px] font-mono text-emerald-300 flex-shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-emerald-500/30 border border-emerald-400/40 flex items-center justify-center text-[9px] tabular-nums text-emerald-300 flex-shrink-0">
                           <Camera className="w-2.5 h-2.5" />
                         </div>
                         <div className="overflow-hidden flex items-center gap-2">
                           <div className="text-[11px] font-medium text-emerald-200 truncate">
                             {webcamClip.name || "Webcam Overlay"}
                           </div>
-                          <div className="text-[9px] font-mono text-emerald-300/70 truncate">
+                          <div className="text-[9px] tabular-nums text-emerald-300/70 truncate">
                             {webcamClip.duration.toFixed(1)}s (PiP)
                           </div>
                         </div>
@@ -1554,7 +1554,7 @@ function MultiTrackTimelineBase({
             onContextMenu={(e) => e.preventDefault()}
           >
             {/* Header / Category hint */}
-            <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] mb-1">
+            <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 dark:text-slate-500 flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06] mb-1">
               <span>
                 {contextMenu.type === "clip"
                   ? "Video Clip Actions"
@@ -1563,7 +1563,7 @@ function MultiTrackTimelineBase({
                   : "Timeline Actions"}
               </span>
               {selectedEventIds.length > 0 && (
-                <span className="text-[10px] text-indigo-400 font-mono font-medium">
+                <span className="text-[10px] text-indigo-400 tabular-nums font-medium">
                   {selectedEventIds.length} selected
                 </span>
               )}
@@ -1596,7 +1596,7 @@ function MultiTrackTimelineBase({
                   Group Selected {selectedEventIds.length > 1 ? `(${selectedEventIds.length})` : ""}
                 </span>
               </div>
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] tabular-nums text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
                 Ctrl+G
               </kbd>
             </button>
@@ -1642,7 +1642,7 @@ function MultiTrackTimelineBase({
                       Ungroup Section {targetCount > 1 ? `(${targetCount})` : ""}
                     </span>
                   </div>
-                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] tabular-nums text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
                     Ctrl+Shift+G
                   </kbd>
                 </button>
@@ -1670,7 +1670,7 @@ function MultiTrackTimelineBase({
                 <Layers className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
                 <span>Select All Animations ({events.length})</span>
               </div>
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] tabular-nums text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
                 Ctrl+A
               </kbd>
             </button>
@@ -1715,7 +1715,7 @@ function MultiTrackTimelineBase({
                 <Plus className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
                 <span>Add Keyframe at Playhead</span>
               </div>
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] tabular-nums text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
                 K
               </kbd>
             </button>
@@ -1738,7 +1738,7 @@ function MultiTrackTimelineBase({
                     <Scissors className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />
                     <span>Split Clip at Playhead</span>
                   </div>
-                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] tabular-nums text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
                     S
                   </kbd>
                 </button>
@@ -1756,7 +1756,7 @@ function MultiTrackTimelineBase({
                     <Trash2 className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
                     <span>Delete Clip</span>
                   </div>
-                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] tabular-nums text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
                     Del
                   </kbd>
                 </button>
@@ -1789,7 +1789,7 @@ function MultiTrackTimelineBase({
                         : "Delete Animation"}
                     </span>
                   </div>
-                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] font-mono text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[10px] tabular-nums text-slate-500 dark:text-slate-400 border border-slate-200/50 dark:border-white/5">
                     Del
                   </kbd>
                 </button>

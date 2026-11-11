@@ -102,7 +102,7 @@ function EditorHeaderBase({
   const homeHref = isDesktop ? "/desktop" : "/";
 
   return (
-    <header className="h-14 border-b border-slate-200 dark:border-white/[0.08] bg-white/90 dark:bg-[#090D16]/80 backdrop-blur-xl px-4 flex items-center justify-between z-30 select-none text-slate-800 dark:text-slate-100">
+    <header className="h-14 border-b border-slate-200 dark:border-white/[0.08] bg-white/90 dark:bg-[#131B24]/80 backdrop-blur-xl px-4 flex items-center justify-between z-30 select-none text-slate-800 dark:text-slate-100">
       {/* Left: Brand, Back & Sidebar Toggle */}
       <div className="flex items-center gap-2">
         {onToggleLeftCollapse && (
@@ -113,7 +113,7 @@ function EditorHeaderBase({
             title={isLeftCollapsed ? "Expand Left Panel" : "Collapse Left Panel"}
           >
             {isLeftCollapsed ? (
-              <PanelLeftOpen className="w-4 h-4 text-[#FF6B2C]" />
+              <PanelLeftOpen className="w-4 h-4 text-select" />
             ) : (
               <PanelLeftClose className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             )}
@@ -145,7 +145,7 @@ function EditorHeaderBase({
                 onBlur={() => setIsEditingTitle(false)}
                 onKeyDown={(e) => e.key === "Enter" && setIsEditingTitle(false)}
                 autoFocus
-                className="bg-white dark:bg-black/50 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white text-xs font-semibold px-2.5 py-1 rounded-lg outline-none w-48 shadow-xs focus:border-[#FF6B2C]"
+                className="bg-white dark:bg-black/50 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white text-xs font-semibold px-2.5 py-1 rounded-lg outline-none w-48 shadow-xs focus:border-select"
               />
             ) : (
               <button
@@ -153,7 +153,7 @@ function EditorHeaderBase({
                 className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/[0.06] px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1.5 group border border-transparent hover:border-slate-300 dark:hover:border-white/[0.08]"
               >
                 <span>{projectName}</span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-[#FF8A4C]">✎</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-select">✎</span>
               </button>
             )}
           </div>
@@ -169,13 +169,13 @@ function EditorHeaderBase({
             size="sm"
             onClick={onOpenAiAgent}
             title="Open AI Studio Copilot & Agent Bridge"
-            className="group border-[#FF6B2C]/30 hover:border-[#FF6B2C] hover:bg-[#FF6B2C]/10 transition-all"
+            className="group"
             leftIcon={
-              <Sparkles className="w-3.5 h-3.5 text-[#FF6B2C] group-hover:rotate-12 transition-transform" />
+              <Sparkles className="w-3.5 h-3.5" />
             }
           >
             <span className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-              AI Agent
+              Ask the agent
               {aiBridgeStatus === "connected" && (
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]" />
               )}
@@ -206,9 +206,9 @@ function EditorHeaderBase({
             size="sm"
             onClick={onStartRecording}
             title="Record Screen with click logging"
-            className="group hover:border-red-500/50 hover:bg-red-500/5 transition-all"
+            className="group"
             leftIcon={
-              <Circle className="w-2.5 h-2.5 fill-red-500 text-red-500 shadow-[0_0_8px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform" />
+              <Circle className="w-2.5 h-2.5 fill-[#F26A21] text-[#F26A21]" />
             }
           >
             <span className="font-semibold text-slate-800 dark:text-slate-100">Record</span>
@@ -228,7 +228,7 @@ function EditorHeaderBase({
             {isSavedFeedback ? (
               <Check className="w-4 h-4 text-emerald-500 animate-in zoom-in-75 duration-200" />
             ) : (
-              <Save className="w-4 h-4 text-[#FF6B2C]" />
+              <Save className="w-4 h-4" />
             )}
           </Button>
         )}
@@ -242,7 +242,7 @@ function EditorHeaderBase({
           leftIcon={<Download className="w-3.5 h-3.5" />}
           title="Export Video (MP4 / WebM)"
         >
-          <span>Export Video</span>
+          <span>Export video</span>
         </Button>
       </div>
     </header>

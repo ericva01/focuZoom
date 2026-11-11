@@ -10,9 +10,9 @@ body.is-desktop-app {
 }
 
 :root {
-  --background: #090D16;
-  --foreground: #F8FAFC;
-  --foreground-muted: #94A3B8;
+  --background: #131B24;
+  --foreground: #ECEEF0;
+  --foreground-muted: #AEB8C0;
 
   /* Glass Surface Fills */
   --glass-bg-subtle: rgba(255, 255, 255, 0.03);
@@ -35,9 +35,9 @@ body.is-desktop-app {
 }
 
 :root.light, .light {
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --foreground-muted: #64748B;
+  --background: #ECEEF0;
+  --foreground: #1C2733;
+  --foreground-muted: #55636F;
 
   /* Glass Surface Fills for Light Theme */
   --glass-bg-subtle: rgba(0, 0, 0, 0.03);
@@ -170,12 +170,12 @@ body.is-desktop-app {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Google Sans', 'Kantumruy Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Jost', 'Kantumruy Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
 }
 
 :lang(km), [lang="km"], .font-khmer {
-  font-family: 'Google Sans', 'Kantumruy Pro', sans-serif;
+  font-family: 'Jost', 'Kantumruy Pro', sans-serif;
   letter-spacing: 0.01em;
 }
 
@@ -267,69 +267,69 @@ body {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #E2E8F0;
+  color: #C9CFD4;
 }
 
 /* Light Theme Glassmorphism Overrides */
 .light .glass-panel,
 :root.light .glass-panel {
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #C9CFD4;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  color: #0F172A;
+  color: #1C2733;
 }
 
 .light .glass-panel-subtle,
 :root.light .glass-panel-subtle {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background: #ECEEF0;
+  border: 1px solid #C9CFD4;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
-  color: #0F172A;
+  color: #1C2733;
 }
 
 .light .glass-panel-elevated,
 :root.light .glass-panel-elevated {
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #9AA5AE;
   box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.04);
-  color: #0F172A;
+  color: #1C2733;
 }
 
 .light .glass-panel-interactive,
 :root.light .glass-panel-interactive {
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #C9CFD4;
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
-  color: #0F172A;
+  color: #1C2733;
 }
 
 .light .glass-panel-interactive:hover,
 :root.light .glass-panel-interactive:hover {
   background: #FFFFFF;
-  border-color: #CBD5E1;
+  border-color: #9AA5AE;
   box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.08);
-  color: #0F172A;
+  color: #1C2733;
 }
 
 .light .glass-input,
 :root.light .glass-input {
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  color: #0F172A;
+  border: 1px solid #9AA5AE;
+  color: #1C2733;
   box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
 .light .glass-input:focus,
 :root.light .glass-input:focus {
-  border-color: #FF6B2C;
-  box-shadow: 0 0 0 2px rgba(255, 107, 44, 0.2);
+  border-color: #F26A21;
+  box-shadow: 0 0 0 2px rgba(242, 106, 33, 0.25);
 }
 
 .light .glass-badge,
 :root.light .glass-badge {
-  background: #F1F5F9;
-  border: 1px solid #CBD5E1;
-  color: #0F172A;
+  background: #DCE1E5;
+  border: 1px solid #9AA5AE;
+  color: #1C2733;
   font-weight: 600;
 }
 
@@ -395,7 +395,7 @@ body {
 
 /* Marketing website interaction styles, isolated from the editor. */
 .website-ui :is(a, button, input, textarea, [role="slider"]):focus-visible {
-  outline: 2px solid #FF6B2C;
+  outline: 2px solid #1C2733;
   outline-offset: 3px;
 }
 .website-ui section[id] {
@@ -426,3 +426,117 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* ------------------------------------------------------------------
+   Studio look: bundled typefaces, flat ink panels, timeline ruler.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/studio/jost-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/studio/jost-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('/fonts/studio/source-serif-4-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('/fonts/studio/source-serif-4-latin-wght-italic.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Khmer stacks marks above and below the line, so headings need more room than Latin. */
+.website-ui[data-lang="km"] :is(h1, h2, h3) {
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+/* App panels: flat ink surfaces in place of frosted glass. */
+:root {
+  --foreground: #ECEEF0;
+  --glass-border-accent: rgba(242, 106, 33, 0.45);
+}
+.glass-panel,
+.glass-panel-subtle,
+.glass-panel-elevated,
+.glass-panel-interactive {
+  background: #1C2733;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid #3A4857;
+  box-shadow: none;
+}
+.glass-panel-elevated {
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.4);
+}
+.glass-panel-interactive:hover {
+  background: #263341;
+  border-color: #55636F;
+  box-shadow: none;
+  transform: none;
+}
+.glass-input {
+  background: #131B24;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid #55636F;
+  box-shadow: none;
+}
+.glass-input:focus {
+  border-color: #ECEEF0;
+  box-shadow: none;
+}
+.glass-badge {
+  background: #263341;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid #3A4857;
+  color: #ECEEF0;
+}
+.ambient-backdrop::before,
+.ambient-backdrop::after {
+  display: none;
+}
+
+/* Timeline ruler under the website's 3D stage: major ticks every 3 s, minor every 0.25 s. */
+.studio-ruler {
+  background-image:
+    linear-gradient(to right, #1C2733 0, #1C2733 1px, transparent 1px),
+    linear-gradient(to right, #9AA5AE 0, #9AA5AE 1px, transparent 1px);
+  background-size: 25% 22px, 2.0833% 10px;
+  background-repeat: repeat-x;
+}
+.studio-scrub {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  background: transparent;
+  cursor: ew-resize;
+}
+.studio-scrub::-webkit-slider-runnable-track { height: 64px; background: transparent; }
+.studio-scrub::-moz-range-track { height: 64px; background: transparent; }
+.studio-scrub::-webkit-slider-thumb { -webkit-appearance: none; width: 3px; height: 64px; border: 0; border-radius: 0; background: #F26A21; }
+.studio-scrub::-moz-range-thumb { width: 3px; height: 64px; border: 0; border-radius: 0; background: #F26A21; }
+
+/* Selected-state colour used by the app: flips with the theme. */
+:root { --select: 236 238 240; --onselect: 28 39 51; }
+:root.light, .light { --select: 28 39 51; --onselect: 255 255 255; }

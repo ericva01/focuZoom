@@ -72,7 +72,7 @@ export function Timeline({
   };
 
   return (
-    <div className="h-24 border-t border-white/[0.08] bg-[#090D16]/85 backdrop-blur-xl px-6 flex flex-col justify-center gap-2 select-none z-20">
+    <div className="h-24 border-t border-white/[0.08] bg-[#131B24]/85 backdrop-blur-xl px-6 flex flex-col justify-center gap-2 select-none z-20">
       {/* 1. Scrubber Track */}
       <div className="relative flex items-center group">
         <div
@@ -84,17 +84,17 @@ export function Timeline({
         >
           {/* Played Progress bar */}
           <div
-            className="h-full bg-gradient-to-r from-[#FF7A3D] to-[#FF8A4C] rounded-full relative shadow-[0_0_12px_rgba(255,107,44,0.4)]"
+            className="h-full bg-gradient-to-r from-select to-select rounded-full relative shadow-[0_0_12px_rgba(242,106,33,0.4)]"
             style={{ width: `${progressPercent}%` }}
           >
             {/* Playhead thumb */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-glass-md border-2 border-[#FF6B2C] scale-90 group-hover:scale-110 transition-transform" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-glass-md border-2 border-select scale-90 group-hover:scale-110 transition-transform" />
           </div>
 
           {/* Hover indicator tooltip */}
           {hoverTime !== null && (
             <div
-              className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-lg glass-panel text-[10px] font-mono text-white border border-white/[0.15] shadow-glass-sm pointer-events-none"
+              className="absolute -top-7 -translate-x-1/2 px-2 py-0.5 rounded-lg glass-panel text-[10px] tabular-nums text-white border border-white/[0.15] shadow-glass-sm pointer-events-none"
               style={{ left: `${(hoverTime / safeDuration) * 100}%` }}
             >
               {formatTimecode(hoverTime)}
@@ -112,12 +112,12 @@ export function Timeline({
                   onSelectEvent(ev);
                 }}
                 className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full z-10 transition-transform hover:scale-150 flex items-center justify-center border border-white/60 ${
-                  ev.enabled ? "bg-[#FF6B2C] shadow-[0_0_8px_rgba(255,107,44,0.6)]" : "bg-slate-600 opacity-60"
+                  ev.enabled ? "bg-select shadow-[0_0_8px_rgba(242,106,33,0.6)]" : "bg-slate-600 opacity-60"
                 }`}
                 style={{ left: `${eventPercent}%` }}
                 title={`Zoom Event: ${ev.label || "Click target"} at ${formatTimecode(ev.timestamp)} (${ev.zoom}x)`}
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-[#090D16]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#131B24]" />
               </button>
             );
           })}
@@ -128,8 +128,8 @@ export function Timeline({
       <div className="flex items-center justify-between text-xs text-slate-300">
         {/* Left: Timecode & Add Click Event Mode Button */}
         <div className="flex items-center gap-3">
-          <div className="font-mono text-xs font-semibold text-white bg-white/[0.04] px-3 py-1 rounded-xl border border-white/[0.08] flex items-center gap-1.5 shadow-glass-sm">
-            <Clock className="w-3.5 h-3.5 text-[#FF6B2C]" />
+          <div className="tabular-nums text-xs font-semibold text-white bg-white/[0.04] px-3 py-1 rounded-xl border border-white/[0.08] flex items-center gap-1.5 shadow-glass-sm">
+            <Clock className="w-3.5 h-3.5 text-select" />
             <span>{formatTimecode(currentTime)}</span>
             <span className="text-slate-500">/</span>
             <span className="text-slate-400">{formatTimecode(duration)}</span>
@@ -194,9 +194,9 @@ export function Timeline({
               <button
                 key={spd}
                 onClick={() => onSpeedChange(spd)}
-                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono transition-all duration-200 ${
+                className={`px-2.5 py-0.5 rounded-lg text-[10px] tabular-nums transition-all duration-200 ${
                   playbackSpeed === spd
-                    ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
+                    ? "bg-select/20 text-select font-bold border border-select/30 shadow-glass-sm"
                     : "text-slate-400 hover:text-white"
                 }`}
               >

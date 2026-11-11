@@ -232,8 +232,8 @@ export function DesktopAppDashboard() {
       keyframeCount: 1,
       config: {
         aspectRatio,
-        cursorColor: "#FF6B2C",
-        rippleColor: "#FF6B2C",
+        cursorColor: "#F26A21",
+        rippleColor: "#F26A21",
       },
     };
     saveProject(newProj);
@@ -257,8 +257,8 @@ export function DesktopAppDashboard() {
             videoSrc: result.dataUrl,
             videoFileName: result.fileName,
             config: {
-              cursorColor: "#FF6B2C",
-              rippleColor: "#FF6B2C",
+              cursorColor: "#F26A21",
+              rippleColor: "#F26A21",
             },
           };
           saveProject(newProj);
@@ -288,8 +288,8 @@ export function DesktopAppDashboard() {
           keyframeCount: 1,
           videoFileName: file.name,
           config: {
-            cursorColor: "#FF6B2C",
-            rippleColor: "#FF6B2C",
+            cursorColor: "#F26A21",
+            rippleColor: "#F26A21",
           },
         };
         saveProject(newProj);
@@ -314,11 +314,11 @@ export function DesktopAppDashboard() {
   });
 
   return (
-    <div className={`flex h-screen w-screen font-sans select-none overflow-hidden ${isLight ? "bg-[#F8F9FB] text-slate-900" : "bg-[#060913] text-[#F8FAFC]"}`}>
+    <div className={`flex h-screen w-screen font-sans select-none overflow-hidden ${isLight ? "bg-[#ECEEF0] text-slate-900" : "bg-[#0F161D] text-[#F8FAFC]"}`}>
       {/* ========================================================================= */}
       {/* 1. LEFT NAVIGATION SIDEBAR (FucuFlow Obsidian & Orange Brand)              */}
       {/* ========================================================================= */}
-      <aside className={`w-60 flex-shrink-0 flex flex-col justify-between p-4 z-20 ${isLight ? "bg-white border-r border-slate-200" : "bg-[#080D1A] border-r border-white/[0.08]"}`}>
+      <aside className={`w-60 flex-shrink-0 flex flex-col justify-between p-4 z-20 ${isLight ? "bg-white border-r border-slate-200" : "bg-[#131B24] border-r border-white/[0.08]"}`}>
         <div className="space-y-6">
           {/* FucuFlow Workspace Header */}
           <div className="flex items-center gap-3 px-1.5 py-1.5 transition-all cursor-pointer group select-none">
@@ -333,10 +333,10 @@ export function DesktopAppDashboard() {
               />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className={`text-xs font-bold uppercase tracking-wider truncate ${isLight ? "text-slate-900" : "text-white"}`}>
+              <span className={`text-xs font-bold truncate ${isLight ? "text-slate-900" : "text-white"}`}>
                 FUCUFLOW
               </span>
-              <span className="text-[10px] text-[#FF6B2C] font-mono font-semibold">Desktop Edition</span>
+              <span className="text-[10px] text-select tabular-nums font-semibold">Desktop Edition</span>
             </div>
           </div>
 
@@ -348,14 +348,14 @@ export function DesktopAppDashboard() {
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === "overview"
                   ? isLight
-                    ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
-                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
+                    ? "bg-slate-200 text-select font-bold border border-select/30 shadow-xs"
+                    : "bg-select/15 text-select font-bold border border-select/30 shadow-xs"
                   : isLight
                   ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
-              <LayoutGrid className={`w-4 h-4 ${activeTab === "overview" ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
+              <LayoutGrid className={`w-4 h-4 ${activeTab === "overview" ? "text-select" : isLight ? "text-slate-500" : "text-slate-400"}`} />
               <span>Overview</span>
             </button>
 
@@ -365,22 +365,22 @@ export function DesktopAppDashboard() {
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === "videos"
                   ? isLight
-                    ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
-                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
+                    ? "bg-slate-200 text-select font-bold border border-select/30 shadow-xs"
+                    : "bg-select/15 text-select font-bold border border-select/30 shadow-xs"
                   : isLight
                   ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
               <div className="flex items-center gap-3">
-                <Film className={`w-4 h-4 ${activeTab === "videos" ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
+                <Film className={`w-4 h-4 ${activeTab === "videos" ? "text-select" : isLight ? "text-slate-500" : "text-slate-400"}`} />
                 <span>Videos</span>
               </div>
               {savedProjects.length > 0 && (
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold ${
+                <span className={`text-[10px] tabular-nums px-2 py-0.5 rounded-md font-bold ${
                   isLight
-                    ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30"
-                    : "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30"
+                    ? "bg-slate-200 text-select border border-select/30"
+                    : "bg-select/20 text-select border border-select/30"
                 }`}>
                   {savedProjects.length}
                 </span>
@@ -393,18 +393,18 @@ export function DesktopAppDashboard() {
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === "ai"
                   ? isLight
-                    ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
-                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
+                    ? "bg-slate-200 text-select font-bold border border-select/30 shadow-xs"
+                    : "bg-select/15 text-select font-bold border border-select/30 shadow-xs"
                   : isLight
                   ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
               <div className="flex items-center gap-3">
-                <Sparkles className={`w-4 h-4 ${activeTab === "ai" ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
+                <Sparkles className={`w-4 h-4 ${activeTab === "ai" ? "text-select" : isLight ? "text-slate-500" : "text-slate-400"}`} />
                 <span>AI Agent & MCP</span>
               </div>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/25 font-bold uppercase">
+              <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded bg-select/15 text-select border border-select/25 font-bold">
                 Copilot
               </span>
             </button>
@@ -415,19 +415,19 @@ export function DesktopAppDashboard() {
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 activeTab === "settings"
                   ? isLight
-                    ? "bg-[#FFF1E8] text-[#FF6B2C] font-bold border border-[#FF6B2C]/30 shadow-xs"
-                    : "bg-[#FF6B2C]/15 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-xs"
+                    ? "bg-slate-200 text-select font-bold border border-select/30 shadow-xs"
+                    : "bg-select/15 text-select font-bold border border-select/30 shadow-xs"
                   : isLight
                   ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   : "text-slate-300 hover:text-white hover:bg-white/[0.06]"
               }`}
             >
               <div className="flex items-center gap-3">
-                <Settings className={`w-4 h-4 ${activeTab === "settings" ? "text-[#FF6B2C]" : isLight ? "text-slate-500" : "text-slate-400"}`} />
+                <Settings className={`w-4 h-4 ${activeTab === "settings" ? "text-select" : isLight ? "text-slate-500" : "text-slate-400"}`} />
                 <span>Settings</span>
               </div>
               {updateAvailable && (
-                <span className="w-2 h-2 rounded-full bg-[#FF6B2C] animate-pulse" title="Update available" />
+                <span className="w-2 h-2 rounded-full bg-select animate-pulse" title="Update available" />
               )}
             </button>
           </nav>
@@ -439,7 +439,7 @@ export function DesktopAppDashboard() {
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
             <div className="flex flex-col min-w-0">
               <span className={`text-[11px] font-semibold truncate ${isLight ? "text-slate-800" : "text-slate-200"}`}>100% Offline Engine</span>
-              <span className={`text-[10px] font-mono ${isLight ? "text-slate-500" : "text-slate-500"}`}>Hardware Accelerated</span>
+              <span className={`text-[10px] tabular-nums ${isLight ? "text-slate-500" : "text-slate-500"}`}>Hardware Accelerated</span>
             </div>
             <ShieldCheck className="w-3.5 h-3.5 text-slate-400 ml-auto flex-shrink-0" />
           </div>
@@ -449,12 +449,12 @@ export function DesktopAppDashboard() {
       {/* ========================================================================= */}
       {/* 2. MAIN DESKTOP WORKSPACE VIEW                                            */}
       {/* ========================================================================= */}
-      <main className={`flex-1 flex flex-col min-w-0 overflow-y-auto ${isLight ? "bg-[#F8F9FB]" : "bg-[#060913]"}`}>
+      <main className={`flex-1 flex flex-col min-w-0 overflow-y-auto ${isLight ? "bg-[#ECEEF0]" : "bg-[#0F161D]"}`}>
         {/* Top Desktop Bar */}
         <header className={`h-16 flex-shrink-0 px-6 sm:px-8 border-b flex items-center justify-between gap-6 backdrop-blur-xl sticky top-0 z-30 ${
           isLight
             ? "bg-white/85 border-slate-200"
-            : "bg-[#080D1A]/80 border-white/[0.08]"
+            : "bg-[#131B24]/80 border-white/[0.08]"
         }`}>
           {/* Search Bar Input */}
           <div className="relative flex-1 max-w-md">
@@ -466,8 +466,8 @@ export function DesktopAppDashboard() {
               placeholder="Search saved videos..."
               className={`w-full rounded-full pl-10 pr-4 py-2 text-xs outline-none transition-colors ${
                 isLight
-                  ? "bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#FF6B2C]"
-                  : "bg-[#0B1020] border border-white/10 text-white placeholder:text-slate-500 focus:border-[#FF6B2C]/60"
+                  ? "bg-slate-100 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-select"
+                  : "bg-[#18222D] border border-white/10 text-white placeholder:text-slate-500 focus:border-select/60"
               }`}
             />
           </div>
@@ -490,7 +490,7 @@ export function DesktopAppDashboard() {
             {/* Signature Solid White Capsule Pill CTA */}
             <button
               onClick={() => handleCreateNew("16:9")}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold shadow-[0_0_20px_rgba(255,107,44,0.3)] hover:shadow-[0_0_30px_rgba(255,107,44,0.5)] transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-select hover:bg-select text-onselect text-xs font-bold shadow-[0_0_20px_rgba(242,106,33,0.3)] hover:shadow-[0_0_30px_rgba(242,106,33,0.5)] transition-all cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>New Video</span>
@@ -502,18 +502,18 @@ export function DesktopAppDashboard() {
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 ${
                 activeTab === "settings"
                   ? isLight
-                    ? "bg-[#FFF1E8] border-[#FF6B2C]/40 text-[#FF6B2C]"
-                    : "bg-[#FFF1E8]/15 border-[#FF6B2C]/40 text-[#FF8A4C]"
+                    ? "bg-slate-200 border-select/40 text-select"
+                    : "bg-slate-200/15 border-select/40 text-select"
                   : isLight
                   ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700"
                   : "bg-white/[0.06] hover:bg-white/[0.12] border-white/15 text-slate-200 hover:text-white"
               }`}
               title="Application Settings"
             >
-              <Settings className="w-3.5 h-3.5 text-[#FF6B2C]" />
+              <Settings className="w-3.5 h-3.5 text-select" />
               <span>Settings</span>
               {updateAvailable && (
-                <span className="w-2 h-2 rounded-full bg-[#FF6B2C] animate-pulse" title="Update available" />
+                <span className="w-2 h-2 rounded-full bg-select animate-pulse" title="Update available" />
               )}
             </button>
 
@@ -532,7 +532,7 @@ export function DesktopAppDashboard() {
                   }`}
                   title="Login"
                 >
-                  <LogIn className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <LogIn className="w-3.5 h-3.5 text-select" />
                   <span>Login</span>
                 </button>
               </ClerkLoading>
@@ -548,7 +548,7 @@ export function DesktopAppDashboard() {
                   }`}
                   title="Login"
                 >
-                  <LogIn className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <LogIn className="w-3.5 h-3.5 text-select" />
                   <span>Login</span>
                 </button>
               </ClerkFailed>
@@ -568,7 +568,7 @@ export function DesktopAppDashboard() {
                       }`}
                       title="Login"
                     >
-                      <LogIn className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                      <LogIn className="w-3.5 h-3.5 text-select" />
                       <span>Login</span>
                     </button>
                   </SignInButton>
@@ -604,19 +604,19 @@ export function DesktopAppDashboard() {
                   onClick={() => handleCreateNew("16:9")}
                   className={`p-4 rounded-2xl border transition-all text-left group flex items-start gap-3.5 cursor-pointer shadow-xs ${
                     isLight
-                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-[#FF6B2C]/60"
-                      : "bg-[#080D1A]/90 hover:bg-[#0E152B] border-white/[0.08] hover:border-[#FF6B2C]/50"
+                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-select/60"
+                      : "bg-[#131B24]/90 hover:bg-[#1C2733] border-white/[0.08] hover:border-select/50"
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-[#FF6B2C] flex-shrink-0 group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all ${
+                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-select flex-shrink-0 group-hover:scale-105 group-hover:bg-select group-hover:text-onselect transition-all ${
                     isLight
-                      ? "bg-[#FFF1E8] border-[#FF6B2C]/30"
-                      : "bg-[#FFF1E8]/10 border-[#FF6B2C]/25"
+                      ? "bg-slate-200 border-select/30"
+                      : "bg-slate-200/10 border-select/25"
                   }`}>
                     <Monitor className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-[#FF6B2C]" : "text-white group-hover:text-white"}`}>
+                    <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-select" : "text-white group-hover:text-white"}`}>
                       16:9 Landscape Video
                     </h3>
                     <p className={`text-[11px] mt-1 leading-relaxed ${isLight ? "text-slate-500" : "text-slate-400"}`}>
@@ -630,19 +630,19 @@ export function DesktopAppDashboard() {
                   onClick={() => handleCreateNew("9:16")}
                   className={`p-4 rounded-2xl border transition-all text-left group flex items-start gap-3.5 cursor-pointer shadow-xs ${
                     isLight
-                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-[#FF6B2C]/60"
-                      : "bg-[#080D1A]/90 hover:bg-[#0E152B] border-white/[0.08] hover:border-[#FF6B2C]/50"
+                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-select/60"
+                      : "bg-[#131B24]/90 hover:bg-[#1C2733] border-white/[0.08] hover:border-select/50"
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-[#FF6B2C] flex-shrink-0 group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all ${
+                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-select flex-shrink-0 group-hover:scale-105 group-hover:bg-select group-hover:text-onselect transition-all ${
                     isLight
-                      ? "bg-[#FFF1E8] border-[#FF6B2C]/30"
-                      : "bg-[#FFF1E8]/10 border-[#FF6B2C]/25"
+                      ? "bg-slate-200 border-select/30"
+                      : "bg-slate-200/10 border-select/25"
                   }`}>
                     <Smartphone className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-[#FF6B2C]" : "text-white group-hover:text-white"}`}>
+                    <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-select" : "text-white group-hover:text-white"}`}>
                       9:16 Vertical Reel
                     </h3>
                     <p className={`text-[11px] mt-1 leading-relaxed ${isLight ? "text-slate-500" : "text-slate-400"}`}>
@@ -656,19 +656,19 @@ export function DesktopAppDashboard() {
                   onClick={handleNativeImport}
                   className={`p-4 rounded-2xl border transition-all text-left group flex items-start gap-3.5 cursor-pointer shadow-xs ${
                     isLight
-                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-[#FF6B2C]/60"
-                      : "bg-[#080D1A]/90 hover:bg-[#0E152B] border-white/[0.08] hover:border-[#FF6B2C]/50"
+                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-select/60"
+                      : "bg-[#131B24]/90 hover:bg-[#1C2733] border-white/[0.08] hover:border-select/50"
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-[#FF6B2C] flex-shrink-0 group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all ${
+                  <div className={`w-10 h-10 rounded-xl border flex items-center justify-center text-select flex-shrink-0 group-hover:scale-105 group-hover:bg-select group-hover:text-onselect transition-all ${
                     isLight
-                      ? "bg-[#FFF1E8] border-[#FF6B2C]/30"
-                      : "bg-[#FFF1E8]/10 border-[#FF6B2C]/25"
+                      ? "bg-slate-200 border-select/30"
+                      : "bg-slate-200/10 border-select/25"
                   }`}>
                     <FolderOpen className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-[#FF6B2C]" : "text-white group-hover:text-white"}`}>
+                    <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-select" : "text-white group-hover:text-white"}`}>
                       Open Video File
                     </h3>
                     <p className={`text-[11px] mt-1 leading-relaxed ${isLight ? "text-slate-500" : "text-slate-400"}`}>
@@ -682,19 +682,19 @@ export function DesktopAppDashboard() {
                   onClick={() => setActiveTab("ai")}
                   className={`p-4 rounded-2xl border transition-all text-left group flex items-start gap-3.5 cursor-pointer shadow-xs ${
                     isLight
-                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-[#FF6B2C]/60"
-                      : "bg-[#080D1A]/90 hover:bg-[#0E152B] border-white/[0.08] hover:border-[#FF6B2C]/50"
+                      ? "bg-white hover:bg-slate-50 border-slate-200 hover:border-select/60"
+                      : "bg-[#131B24]/90 hover:bg-[#1C2733] border-white/[0.08] hover:border-select/50"
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF6B2C] to-amber-500 text-white flex items-center justify-center flex-shrink-0 group-hover:scale-105 shadow-sm transition-all">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-select to-amber-500 text-white flex items-center justify-center flex-shrink-0 group-hover:scale-105 shadow-sm transition-all">
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-[#FF6B2C]" : "text-white group-hover:text-white"}`}>
+                      <h3 className={`text-xs font-bold transition-colors ${isLight ? "text-slate-900 group-hover:text-select" : "text-white group-hover:text-white"}`}>
                         Connect AI Agent
                       </h3>
-                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-[#FF6B2C]/20 text-[#FF6B2C] border border-[#FF6B2C]/30 font-bold">
+                      <span className="text-[9px] tabular-nums px-1.5 py-0.2 rounded bg-select/20 text-select border border-select/30 font-bold">
                         MCP
                       </span>
                     </div>
@@ -706,34 +706,34 @@ export function DesktopAppDashboard() {
               </div>
 
               {/* Hero Showcase Card with Interactive 3D Dolly Preview */}
-              <div className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#080D1A] via-[#0A1024] to-[#0D142E] border shadow-xl flex flex-col lg:flex-row items-center gap-8 relative overflow-hidden ${
+              <div className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#131B24] via-[#1C2733] to-[#1C2733] border shadow-xl flex flex-col lg:flex-row items-center gap-8 relative overflow-hidden ${
                 isLight ? "border-slate-300/80 shadow-md" : "border-white/10 shadow-xl"
               }`}>
-                <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-b from-[#FF6B2C]/10 via-[#FF7A3D]/5 to-transparent blur-3xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-b from-select/10 via-select/5 to-transparent blur-3xl pointer-events-none" />
 
                 {/* Left Preview Screen Player */}
                 <div
                   onClick={() => handleCreateNew("16:9")}
-                  className="relative w-full md:w-96 aspect-video rounded-2xl bg-[#060913] border border-white/10 shadow-2xl overflow-hidden flex items-center justify-center cursor-pointer group flex-shrink-0"
+                  className="relative w-full md:w-96 aspect-video rounded-2xl bg-[#0F161D] border border-white/10 shadow-2xl overflow-hidden flex items-center justify-center cursor-pointer group flex-shrink-0"
                 >
-                  <div className="w-36 h-36 rounded-full border border-[#FF6B2C]/20 flex items-center justify-center relative">
-                    <div className="w-28 h-28 rounded-full bg-[#0E152B]/80 border border-[#FF6B2C]/30 flex items-center justify-center backdrop-blur-md">
+                  <div className="w-36 h-36 rounded-full border border-select/20 flex items-center justify-center relative">
+                    <div className="w-28 h-28 rounded-full bg-[#1C2733]/80 border border-select/30 flex items-center justify-center backdrop-blur-md">
                       <div className="w-12 h-12 rounded-full bg-white text-slate-950 flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.4)] group-hover:scale-110 transition-all">
                         <Play className="w-5 h-5 fill-current ml-0.5 text-slate-950" />
                       </div>
                     </div>
                   </div>
 
-                  <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-mono text-white flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C] animate-pulse" />
+                  <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[10px] tabular-nums text-white flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-select animate-pulse" />
                     <span>FucuFlow 3D Dolly Engine</span>
                   </div>
                 </div>
 
                 {/* Right Headline & Description & Button */}
                 <div className="flex-1 max-w-xl text-left space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF1E8]/10 border border-[#FF6B2C]/30 text-[#FF8A4C] text-xs font-mono font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B2C]" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/10 border border-select/30 text-select text-xs tabular-nums font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-select" />
                     <span>Native Desktop Studio</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
@@ -745,7 +745,7 @@ export function DesktopAppDashboard() {
                   <div className="pt-2">
                     <button
                       onClick={() => handleCreateNew("16:9")}
-                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs sm:text-sm font-bold shadow-[0_0_25px_rgba(255,107,44,0.35)] hover:shadow-[0_0_35px_rgba(255,107,44,0.5)] transition-all cursor-pointer active:scale-95"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-select hover:bg-select text-onselect text-xs sm:text-sm font-bold shadow-[0_0_25px_rgba(242,106,33,0.35)] hover:shadow-[0_0_35px_rgba(242,106,33,0.5)] transition-all cursor-pointer active:scale-95"
                     >
                       <span>Get Started</span>
                       <ChevronRight className="w-4 h-4 text-white" />
@@ -758,10 +758,10 @@ export function DesktopAppDashboard() {
               <div className="space-y-4 pt-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Film className="w-4 h-4 text-[#FF6B2C]" />
+                    <Film className="w-4 h-4 text-select" />
                     <h3 className={`text-base font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Recent Videos</h3>
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold ${
-                      isLight ? "text-[#FF6B2C] bg-[#FFF1E8] border border-[#FF6B2C]/30" : "text-[#FF8A4C] bg-[#FFF1E8]/15 border border-[#FF6B2C]/30"
+                    <span className={`text-xs tabular-nums px-2 py-0.5 rounded-full font-bold ${
+                      isLight ? "text-select bg-slate-200 border border-select/30" : "text-select bg-slate-200/15 border border-select/30"
                     }`}>
                       {savedProjects.length}
                     </span>
@@ -769,7 +769,7 @@ export function DesktopAppDashboard() {
                   {savedProjects.length > 3 && (
                     <button
                       onClick={() => setActiveTab("videos")}
-                      className="text-xs font-bold text-[#FF6B2C] hover:text-[#FF7A3D] flex items-center gap-1 transition-colors cursor-pointer"
+                      className="text-xs font-bold text-select hover:text-select flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       <span>View All Videos</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -779,12 +779,12 @@ export function DesktopAppDashboard() {
 
                 {filteredProjects.length === 0 ? (
                   <div className={`p-10 rounded-2xl border backdrop-blur-md text-center flex flex-col items-center justify-center space-y-3 ${
-                    isLight ? "bg-white border-slate-200 shadow-xs" : "bg-[#080D1A]/50 border-white/[0.08]"
+                    isLight ? "bg-white border-slate-200 shadow-xs" : "bg-[#131B24]/50 border-white/[0.08]"
                   }`}>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-[#FF6B2C] shadow-[0_0_25px_rgba(255,107,44,0.15)] ${
-                      isLight ? "bg-[#FFF1E8] border border-[#FF6B2C]/30" : "bg-[#0E152B] border border-white/10"
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-select shadow-[0_0_25px_rgba(242,106,33,0.15)] ${
+                      isLight ? "bg-slate-200 border border-select/30" : "bg-[#1C2733] border border-white/10"
                     }`}>
-                      <Film className="w-6 h-6 text-[#FF6B2C] stroke-[1.5]" />
+                      <Film className="w-6 h-6 text-select stroke-[1.5]" />
                     </div>
                     <div className="max-w-md space-y-1">
                       <h4 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>No saved videos yet</h4>
@@ -794,7 +794,7 @@ export function DesktopAppDashboard() {
                     </div>
                     <button
                       onClick={() => handleCreateNew("16:9")}
-                      className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold shadow-[0_0_20px_rgba(255,107,44,0.3)] transition-all cursor-pointer active:scale-95"
+                      className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-select hover:bg-select text-onselect text-xs font-bold shadow-[0_0_20px_rgba(242,106,33,0.3)] transition-all cursor-pointer active:scale-95"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Create First Video</span>
@@ -808,24 +808,24 @@ export function DesktopAppDashboard() {
                         onClick={() => router.push(`/editor?id=${project.id}`)}
                         className={`group relative rounded-2xl border transition-all p-4 cursor-pointer flex items-center justify-between gap-4 shadow-xs ${
                           isLight
-                            ? "bg-white border-slate-200 hover:border-[#FF6B2C]/50 hover:bg-slate-50"
-                            : "bg-[#080D1A] border-white/[0.08] hover:border-[#FF6B2C]/50 hover:bg-[#0D1429]"
+                            ? "bg-white border-slate-200 hover:border-select/50 hover:bg-slate-50"
+                            : "bg-[#131B24] border-white/[0.08] hover:border-select/50 hover:bg-[#1C2733]"
                         }`}
                       >
                         <div className="flex items-center gap-3.5 min-w-0">
-                          <div className={`w-12 h-12 rounded-xl border flex items-center justify-center text-[#FF6B2C] flex-shrink-0 group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all ${
-                            isLight ? "bg-[#FFF1E8] border-[#FF6B2C]/30" : "bg-[#0E152B] border-white/10"
+                          <div className={`w-12 h-12 rounded-xl border flex items-center justify-center text-select flex-shrink-0 group-hover:scale-105 group-hover:bg-select group-hover:text-onselect transition-all ${
+                            isLight ? "bg-slate-200 border-select/30" : "bg-[#1C2733] border-white/10"
                           }`}>
                             <Play className="w-5 h-5 fill-current ml-0.5" />
                           </div>
                           <div className="min-w-0">
                             <h4 className={`text-xs font-bold transition-colors truncate ${
-                              isLight ? "text-slate-900 group-hover:text-[#FF6B2C]" : "text-white group-hover:text-[#FF8A4C]"
+                              isLight ? "text-slate-900 group-hover:text-select" : "text-white group-hover:text-select"
                             }`}>
                               {project.name}
                             </h4>
-                            <div className={`flex items-center gap-2 text-[10px] font-mono mt-1 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
-                              <span className="text-[#FF6B2C] font-semibold">{project.aspectRatio}</span>
+                            <div className={`flex items-center gap-2 text-[10px] tabular-nums mt-1 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                              <span className="text-select font-semibold">{project.aspectRatio}</span>
                               <span>·</span>
                               <span>{project.duration}s</span>
                               <span>·</span>
@@ -868,7 +868,7 @@ export function DesktopAppDashboard() {
                 <div className="flex items-center gap-3">
                   {/* Aspect Ratio Filter */}
                   <div className={`flex items-center border rounded-xl p-1 text-xs ${
-                    isLight ? "bg-white border-slate-200 shadow-xs" : "bg-[#080D1A] border-white/10"
+                    isLight ? "bg-white border-slate-200 shadow-xs" : "bg-[#131B24] border-white/10"
                   }`}>
                     {["all", "16:9", "9:16"].map((ratio) => (
                       <button
@@ -876,10 +876,10 @@ export function DesktopAppDashboard() {
                         onClick={() => setFilterRatio(ratio)}
                         className={`px-3 py-1 rounded-lg font-medium transition-all ${
                           filterRatio === ratio
-                            ? "bg-[#FF6B2C] text-white"
+                            ? "bg-select text-onselect"
                             : isLight
                             ? "text-slate-600 hover:text-slate-900"
-                            : "text-slate-400 hover:text-white"
+                            : "text-slate-400 hover:text-onselect"
                         }`}
                       >
                         {ratio === "all" ? "All Formats" : ratio}
@@ -889,7 +889,7 @@ export function DesktopAppDashboard() {
 
                   <button
                     onClick={() => handleCreateNew("16:9")}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-select hover:bg-select text-onselect text-xs font-bold transition-all shadow-sm active:scale-95"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Create Video</span>
@@ -899,10 +899,10 @@ export function DesktopAppDashboard() {
 
               {filteredProjects.length === 0 ? (
                 <div className={`p-16 rounded-3xl border text-center flex flex-col items-center justify-center space-y-4 ${
-                  isLight ? "bg-white border-slate-200 shadow-xs" : "bg-[#080D1A]/50 border-white/[0.08]"
+                  isLight ? "bg-white border-slate-200 shadow-xs" : "bg-[#131B24]/50 border-white/[0.08]"
                 }`}>
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-[#FF6B2C] ${
-                    isLight ? "bg-[#FFF1E8] border border-[#FF6B2C]/30" : "bg-[#0E152B] border border-white/10"
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-select ${
+                    isLight ? "bg-slate-200 border border-select/30" : "bg-[#1C2733] border border-white/10"
                   }`}>
                     <Film className="w-8 h-8" />
                   </div>
@@ -914,7 +914,7 @@ export function DesktopAppDashboard() {
                   </p>
                   <button
                     onClick={() => handleCreateNew("16:9")}
-                    className="px-5 py-2.5 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-select hover:bg-select text-onselect text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
                   >
                     Create First Video
                   </button>
@@ -927,20 +927,20 @@ export function DesktopAppDashboard() {
                       onClick={() => router.push(`/editor?id=${project.id}`)}
                       className={`group rounded-3xl border transition-all p-5 cursor-pointer flex flex-col justify-between space-y-4 shadow-xs ${
                         isLight
-                          ? "bg-white border-slate-200 hover:border-[#FF6B2C]/50 hover:bg-slate-50"
-                          : "bg-[#080D1A] border-white/[0.08] hover:border-[#FF6B2C]/50"
+                          ? "bg-white border-slate-200 hover:border-select/50 hover:bg-slate-50"
+                          : "bg-[#131B24] border-white/[0.08] hover:border-select/50"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center text-[#FF6B2C] flex-shrink-0 group-hover:scale-105 group-hover:bg-[#FF6B2C] group-hover:text-white transition-all ${
-                          isLight ? "bg-[#FFF1E8] border-[#FF6B2C]/30" : "bg-[#0E152B] border-white/10"
+                        <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center text-select flex-shrink-0 group-hover:scale-105 group-hover:bg-select group-hover:text-onselect transition-all ${
+                          isLight ? "bg-slate-200 border-select/30" : "bg-[#1C2733] border-white/10"
                         }`}>
                           <Play className="w-5 h-5 fill-current ml-0.5" />
                         </div>
-                        <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full font-bold ${
+                        <span className={`text-[10px] tabular-nums px-2.5 py-1 rounded-full font-bold ${
                           isLight
-                            ? "bg-[#FFF1E8] text-[#FF6B2C] border border-[#FF6B2C]/30"
-                            : "bg-[#FFF1E8]/10 text-[#FF8A4C] border border-[#FF6B2C]/30"
+                            ? "bg-slate-200 text-select border border-select/30"
+                            : "bg-slate-200/10 text-select border border-select/30"
                         }`}>
                           {project.aspectRatio}
                         </span>
@@ -948,11 +948,11 @@ export function DesktopAppDashboard() {
 
                       <div>
                         <h4 className={`text-sm font-bold transition-colors truncate ${
-                          isLight ? "text-slate-900 group-hover:text-[#FF6B2C]" : "text-white group-hover:text-[#FF8A4C]"
+                          isLight ? "text-slate-900 group-hover:text-select" : "text-white group-hover:text-select"
                         }`}>
                           {project.name}
                         </h4>
-                        <div className={`flex items-center gap-2 text-xs font-mono mt-1.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                        <div className={`flex items-center gap-2 text-xs tabular-nums mt-1.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
                           <span>{project.duration}s duration</span>
                           <span>·</span>
                           <span>{project.keyframeCount || 1} keyframes</span>
@@ -960,7 +960,7 @@ export function DesktopAppDashboard() {
                       </div>
 
                       <div className={`pt-3 border-t flex items-center justify-between text-xs ${isLight ? "border-slate-100" : "border-white/[0.06]"}`}>
-                        <span className={`font-mono text-[11px] ${isLight ? "text-slate-400" : "text-slate-500"}`}>
+                        <span className={`tabular-nums text-[11px] ${isLight ? "text-slate-400" : "text-slate-500"}`}>
                           {new Date(project.updatedAt || project.createdAt).toLocaleDateString()}
                         </span>
                         <div className="flex items-center gap-2">
@@ -971,7 +971,7 @@ export function DesktopAppDashboard() {
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
-                          <span className="text-[#FF6B2C] group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-bold">
+                          <span className="text-select group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-bold">
                             <span>Open</span>
                             <ChevronRight className="w-3.5 h-3.5" />
                           </span>
@@ -998,10 +998,10 @@ export function DesktopAppDashboard() {
 
               {/* Setting Section 1: Appearance / Theme */}
               <div className={`p-6 rounded-3xl border space-y-5 transition-all ${
-                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-select/15 text-select border border-select/30 flex items-center justify-center">
                     <Moon className="w-5 h-5" />
                   </div>
                   <div>
@@ -1025,26 +1025,26 @@ export function DesktopAppDashboard() {
                         className={`relative p-4 rounded-2xl border text-left flex flex-col justify-between gap-3 transition-all cursor-pointer group ${
                           isSelected
                             ? isLight
-                              ? "bg-[#FFF1E8] border-2 border-[#FF6B2C] shadow-sm text-slate-900"
-                              : "bg-[#FF6B2C]/10 border-2 border-[#FF6B2C] shadow-[0_0_20px_rgba(255,107,44,0.15)] text-white"
+                              ? "bg-slate-200 border-2 border-select shadow-sm text-slate-900"
+                              : "bg-select/10 border-2 border-select shadow-[0_0_20px_rgba(242,106,33,0.15)] text-white"
                             : isLight
                             ? "bg-slate-50 hover:bg-slate-100/80 border-slate-200 text-slate-700 hover:text-slate-900"
-                            : "bg-[#070B16] hover:bg-[#0E1426] border-white/10 text-slate-300 hover:text-white"
+                            : "bg-[#131B24] hover:bg-[#1C2733] border-white/10 text-slate-300 hover:text-white"
                         }`}
                       >
                         {/* Top Icon & Active Indicator */}
                         <div className="flex items-center justify-between">
                           <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
                             isSelected
-                              ? "bg-[#FF6B2C] text-white"
+                              ? "bg-select text-onselect"
                               : isLight
                               ? "bg-slate-200/80 text-slate-600 group-hover:text-slate-900"
-                              : "bg-white/10 text-slate-400 group-hover:text-white"
+                              : "bg-white/10 text-slate-400 group-hover:text-onselect"
                           }`}>
                             <Icon className="w-4 h-4" />
                           </div>
                           {isSelected && (
-                            <span className="w-5 h-5 rounded-full bg-[#FF6B2C] text-white flex items-center justify-center text-[11px] font-bold shadow-xs">
+                            <span className="w-5 h-5 rounded-full bg-select text-onselect flex items-center justify-center text-[11px] font-bold shadow-xs">
                               ✓
                             </span>
                           )}
@@ -1065,11 +1065,11 @@ export function DesktopAppDashboard() {
 
               {/* Setting Section 2: Auto-Save Engine */}
               <div className={`p-6 rounded-3xl border space-y-4 transition-all ${
-                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-select/15 text-select border border-select/30 flex items-center justify-center">
                       <Save className="w-5 h-5" />
                     </div>
                     <div>
@@ -1082,8 +1082,8 @@ export function DesktopAppDashboard() {
                     role="switch"
                     aria-checked={autoSaveEnabled}
                     onClick={() => handleToggleAutoSave(!autoSaveEnabled)}
-                    className={`w-12 h-6.5 rounded-full transition-colors relative flex items-center px-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF6B2C]/50 ${
-                      autoSaveEnabled ? "bg-[#FF6B2C]" : isLight ? "bg-slate-300" : "bg-white/20"
+                    className={`w-12 h-6.5 rounded-full transition-colors relative flex items-center px-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-select/50 ${
+                      autoSaveEnabled ? "bg-select" : isLight ? "bg-slate-300" : "bg-white/20"
                     }`}
                   >
                     <div
@@ -1100,10 +1100,10 @@ export function DesktopAppDashboard() {
                     <select
                       value={autoSaveInterval}
                       onChange={(e) => handleChangeAutoSaveInterval(Number(e.target.value))}
-                      className={`border rounded-xl px-3 py-1.5 text-xs outline-none focus:border-[#FF6B2C] font-medium cursor-pointer ${
+                      className={`border rounded-xl px-3 py-1.5 text-xs outline-none focus:border-select font-medium cursor-pointer ${
                         isLight
                           ? "bg-slate-50 border-slate-300 text-slate-900"
-                          : "bg-[#070B16] border-white/15 text-white"
+                          : "bg-[#131B24] border-white/15 text-white"
                       }`}
                     >
                       <option value={3}>Every 3 seconds</option>
@@ -1117,10 +1117,10 @@ export function DesktopAppDashboard() {
 
               {/* Setting Section 3: Hardware Acceleration & Local Storage */}
               <div className={`p-6 rounded-3xl border space-y-4 transition-all ${
-                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-select/15 text-select border border-select/30 flex items-center justify-center">
                     <Cpu className="w-5 h-5" />
                   </div>
                   <div>
@@ -1134,7 +1134,7 @@ export function DesktopAppDashboard() {
                     isLight ? "bg-slate-50/80 border-slate-200" : "bg-white/[0.03] border-white/[0.08]"
                   }`}>
                     <span className={isLight ? "text-slate-700 font-semibold" : "text-slate-300 font-medium"}>GPU Decode / Encode Pipeline</span>
-                    <span className="text-emerald-700 dark:text-emerald-400 font-mono text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="text-emerald-700 dark:text-emerald-400 tabular-nums text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       <span>Active (Direct3D / Vulkan / Metal)</span>
                     </span>
@@ -1144,8 +1144,8 @@ export function DesktopAppDashboard() {
                     isLight ? "bg-slate-50/80 border-slate-200" : "bg-white/[0.03] border-white/[0.08]"
                   }`}>
                     <span className={isLight ? "text-slate-700 font-semibold" : "text-slate-300 font-medium"}>Privacy Status</span>
-                    <span className="text-[#FF6B2C] dark:text-[#FF8A4C] font-mono text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FF6B2C]/10 border border-[#FF6B2C]/20">
-                      <ShieldCheck className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                    <span className="text-select dark:text-select tabular-nums text-xs font-bold flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-select/10 border border-select/20">
+                      <ShieldCheck className="w-3.5 h-3.5 text-select" />
                       <span>100% Local (Zero Cloud)</span>
                     </span>
                   </div>
@@ -1154,7 +1154,7 @@ export function DesktopAppDashboard() {
 
               {/* Setting Section 4: Personal Google Drive Cloud Save */}
               <div className={`p-6 rounded-3xl border space-y-4 transition-all ${
-                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -1165,7 +1165,7 @@ export function DesktopAppDashboard() {
                       <h3 className={`text-sm font-bold flex items-center gap-2 ${isLight ? "text-slate-900" : "text-white"}`}>
                         <span>Personal Google Drive</span>
                         {gdriveStatus.isConnected && (
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                          <span className="text-[10px] tabular-nums font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                             Connected
                           </span>
                         )}
@@ -1181,7 +1181,7 @@ export function DesktopAppDashboard() {
                   <button
                     type="button"
                     onClick={() => setIsGDriveModalOpen(true)}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-xl bg-select hover:bg-select text-onselect text-xs font-bold transition-colors cursor-pointer shadow-2xs"
                   >
                     {gdriveStatus.isConnected ? "Manage Account" : "Connect Drive"}
                   </button>
@@ -1190,11 +1190,11 @@ export function DesktopAppDashboard() {
 
               {/* Setting Section 5: Application Updates & Version */}
               <div className={`p-6 rounded-3xl border space-y-4 transition-all ${
-                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200/90 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-[#FF6B2C]/10 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center shadow-xs">
+                    <div className="w-10 h-10 rounded-2xl bg-select/10 text-select border border-select/30 flex items-center justify-center shadow-xs">
                       <Sparkles className="w-5 h-5" />
                     </div>
                     <div>
@@ -1202,7 +1202,7 @@ export function DesktopAppDashboard() {
                         <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>
                           FucuFlow Studio Desktop
                         </h3>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] tabular-nums font-bold bg-select/15 text-select border border-select/30">
                           v{currentVersion}
                         </span>
                       </div>
@@ -1226,7 +1226,7 @@ export function DesktopAppDashboard() {
                           : "bg-white/10 hover:bg-white/15 border-white/15 text-white"
                       }`}
                     >
-                      <RefreshCw className={`w-3.5 h-3.5 text-[#FF6B2C] ${isCheckingUpdate ? "animate-spin" : ""}`} />
+                      <RefreshCw className={`w-3.5 h-3.5 text-select ${isCheckingUpdate ? "animate-spin" : ""}`} />
                       <span>{isCheckingUpdate ? "Checking..." : "Check for Updates"}</span>
                     </button>
 
@@ -1234,7 +1234,7 @@ export function DesktopAppDashboard() {
                       <button
                         type="button"
                         onClick={() => setIsUpdateModalOpen(true)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-select hover:bg-select text-onselect text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Update to v{latestVersion}</span>
@@ -1252,7 +1252,7 @@ export function DesktopAppDashboard() {
 
               {/* Setting Section 6: About & Open Source */}
               <div className={`p-6 rounded-3xl border space-y-3 shadow-xs ${
-                isLight ? "bg-white border-slate-200" : "bg-[#080D1A] border-white/[0.08]"
+                isLight ? "bg-white border-slate-200" : "bg-[#131B24] border-white/[0.08]"
               }`}>
                 <div className="flex items-center justify-between">
                   <div>
@@ -1265,8 +1265,8 @@ export function DesktopAppDashboard() {
                     rel="noreferrer"
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       isLight
-                        ? "bg-slate-100 hover:bg-[#FF6B2C] hover:text-white text-slate-800"
-                        : "bg-white/10 hover:bg-[#FF6B2C] text-white"
+                        ? "bg-slate-100 hover:bg-select hover:text-onselect text-slate-800"
+                        : "bg-white/10 hover:bg-select text-onselect"
                     }`}
                   >
                     <span>GitHub</span>
@@ -1287,7 +1287,7 @@ export function DesktopAppDashboard() {
                 <div>
                   <h2 className={`text-2xl font-bold tracking-tight flex items-center gap-2.5 ${isLight ? "text-slate-900" : "text-white"}`}>
                     <span>AI Agent & MCP Studio Hub</span>
-                    <span className="text-xs uppercase font-mono px-2 py-0.5 rounded-full bg-[#FF6B2C]/15 text-[#FF6B2C] border border-[#FF6B2C]/30 font-bold">
+                    <span className="text-xs tabular-nums px-2 py-0.5 rounded-full bg-select/15 text-select border border-select/30 font-bold">
                       Hybrid Architecture
                     </span>
                   </h2>
@@ -1299,7 +1299,7 @@ export function DesktopAppDashboard() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => router.push("/editor")}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-select hover:bg-select text-onselect text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Launch Studio with AI</span>
@@ -1310,7 +1310,7 @@ export function DesktopAppDashboard() {
 
               {/* Live Bridge Status Card */}
               <div className={`p-5 rounded-3xl border transition-all ${
-                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-3.5">
@@ -1328,7 +1328,7 @@ export function DesktopAppDashboard() {
                         <h3 className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>
                           Local Agent WebSocket Bridge
                         </h3>
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/40 text-slate-300 border border-white/10">
+                        <span className="text-[10px] tabular-nums font-bold px-2 py-0.5 rounded bg-black/40 text-slate-300 border border-white/10">
                           ws://127.0.0.1:{aiConfig.localBridgePort || 9876}/editor
                         </span>
                       </div>
@@ -1357,11 +1357,11 @@ export function DesktopAppDashboard() {
 
               {/* Section 1: In-App AI Copilot (Bring Your Own Key) */}
               <div className={`p-6 rounded-3xl border space-y-5 transition-all ${
-                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-[#FF6B2C]/10 text-[#FF6B2C] border border-[#FF6B2C]/30 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-select/10 text-select border border-select/30 flex items-center justify-center">
                       <Cpu className="w-5 h-5" />
                     </div>
                     <div>
@@ -1402,7 +1402,7 @@ export function DesktopAppDashboard() {
                           }}
                           className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                             isSelected
-                              ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border-[#FF6B2C] ring-2 ring-[#FF6B2C]/20 text-[#FF6B2C] font-bold"
+                              ? "bg-slate-200 dark:bg-select/15 border-select ring-2 ring-select/20 text-select font-bold"
                               : isLight
                               ? "bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300"
                               : "bg-white/[0.03] border-white/10 text-slate-200 hover:border-white/20"
@@ -1410,7 +1410,7 @@ export function DesktopAppDashboard() {
                         >
                           <div className="text-xs font-bold flex items-center justify-between">
                             <span>{p.name}</span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                            {isSelected && <Check className="w-3.5 h-3.5 text-select" />}
                           </div>
                           <span className={`text-[10px] block mt-1 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
                             {p.badge}
@@ -1426,7 +1426,7 @@ export function DesktopAppDashboard() {
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className={`text-xs font-semibold flex items-center gap-1.5 ${isLight ? "text-slate-700" : "text-slate-300"}`}>
-                        <Key className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                        <Key className="w-3.5 h-3.5 text-select" />
                         <span>API Key</span>
                       </label>
                       {aiConfig.provider === "gemini" && (
@@ -1434,7 +1434,7 @@ export function DesktopAppDashboard() {
                           href="https://aistudio.google.com/app/apikey"
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] text-[#FF6B2C] hover:underline flex items-center gap-1 font-semibold"
+                          className="text-[11px] text-select hover:underline flex items-center gap-1 font-semibold"
                         >
                           Get Free Gemini Key <ExternalLink className="w-3 h-3" />
                         </a>
@@ -1444,7 +1444,7 @@ export function DesktopAppDashboard() {
                           href="https://platform.openai.com/api-keys"
                           target="_blank"
                           rel="noreferrer"
-                          className="text-[11px] text-[#FF6B2C] hover:underline flex items-center gap-1 font-semibold"
+                          className="text-[11px] text-select hover:underline flex items-center gap-1 font-semibold"
                         >
                           Get OpenAI Key <ExternalLink className="w-3 h-3" />
                         </a>
@@ -1456,7 +1456,7 @@ export function DesktopAppDashboard() {
                         value={aiConfig.apiKey}
                         onChange={(e) => handleSaveAiConfig({ apiKey: e.target.value })}
                         placeholder={aiConfig.provider === "gemini" ? "AIzaSy..." : "sk-proj-..."}
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none border focus:border-[#FF6B2C] pr-20 ${
+                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs tabular-nums outline-none border focus:border-select pr-20 ${
                           isLight ? "bg-white border-slate-300 text-slate-900" : "bg-black/50 border-white/15 text-white"
                         }`}
                       />
@@ -1488,7 +1488,7 @@ export function DesktopAppDashboard() {
                       value={aiConfig.customEndpoint || ""}
                       onChange={(e) => handleSaveAiConfig({ customEndpoint: e.target.value })}
                       placeholder="http://localhost:11434/v1"
-                      className={`w-full rounded-xl px-3.5 py-2.5 text-xs font-mono outline-none border focus:border-[#FF6B2C] ${
+                      className={`w-full rounded-xl px-3.5 py-2.5 text-xs tabular-nums outline-none border focus:border-select ${
                         isLight ? "bg-white border-slate-300 text-slate-900" : "bg-black/50 border-white/15 text-white"
                       }`}
                     />
@@ -1510,7 +1510,7 @@ export function DesktopAppDashboard() {
                       type="text"
                       value={aiConfig.model}
                       onChange={(e) => handleSaveAiConfig({ model: e.target.value })}
-                      className={`flex-1 rounded-xl px-3.5 py-2 text-xs font-mono outline-none border focus:border-[#FF6B2C] ${
+                      className={`flex-1 rounded-xl px-3.5 py-2 text-xs tabular-nums outline-none border focus:border-select ${
                         isLight ? "bg-white border-slate-300 text-slate-900" : "bg-black/50 border-white/15 text-white"
                       }`}
                     />
@@ -1521,7 +1521,7 @@ export function DesktopAppDashboard() {
                           onClick={() => handleSaveAiConfig({ model: "gemini-3.8-flash" })}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             aiConfig.model === "gemini-3.8-flash"
-                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              ? "bg-select text-onselect border-select"
                               : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
                           }`}
                           title="Google Gemini 3.8 Flash (Latest AI agent model)"
@@ -1533,7 +1533,7 @@ export function DesktopAppDashboard() {
                           onClick={() => handleSaveAiConfig({ model: "gemini-1.5-flash" })}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             aiConfig.model === "gemini-1.5-flash"
-                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              ? "bg-select text-onselect border-select"
                               : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
                           }`}
                           title="Google Gemini 1.5 Flash (Stable v1)"
@@ -1545,7 +1545,7 @@ export function DesktopAppDashboard() {
                           onClick={() => handleSaveAiConfig({ model: "gemini-1.5-pro" })}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             aiConfig.model === "gemini-1.5-pro"
-                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              ? "bg-select text-onselect border-select"
                               : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
                           }`}
                           title="Google Gemini 1.5 Pro"
@@ -1572,7 +1572,7 @@ export function DesktopAppDashboard() {
                           onClick={() => handleSaveAiConfig({ model: "gpt-4o-mini" })}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             aiConfig.model === "gpt-4o-mini"
-                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              ? "bg-select text-onselect border-select"
                               : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
                           }`}
                         >
@@ -1583,7 +1583,7 @@ export function DesktopAppDashboard() {
                           onClick={() => handleSaveAiConfig({ model: "gpt-4o" })}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             aiConfig.model === "gpt-4o"
-                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              ? "bg-select text-onselect border-select"
                               : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
                           }`}
                         >
@@ -1598,7 +1598,7 @@ export function DesktopAppDashboard() {
                           onClick={() => handleSaveAiConfig({ model: "llama3.2" })}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             aiConfig.model === "llama3.2"
-                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              ? "bg-select text-onselect border-select"
                               : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
                           }`}
                         >
@@ -1609,7 +1609,7 @@ export function DesktopAppDashboard() {
                           onClick={() => handleSaveAiConfig({ model: "qwen2.5" })}
                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             aiConfig.model === "qwen2.5"
-                              ? "bg-[#FF6B2C] text-white border-[#FF6B2C]"
+                              ? "bg-select text-onselect border-select"
                               : isLight ? "bg-slate-100 border-slate-200 text-slate-700" : "bg-white/10 border-white/10 text-slate-300"
                           }`}
                         >
@@ -1621,7 +1621,7 @@ export function DesktopAppDashboard() {
 
                   {aiConfig.provider === "gemini" && discoveredAiModels.length > 0 && (
                     <div className="mt-2.5 p-2.5 bg-slate-100 dark:bg-white/[0.04] rounded-xl border border-slate-200 dark:border-white/10">
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block mb-1.5">
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1.5">
                         Models detected on your Google AI Studio key:
                       </span>
                       <div className="flex flex-wrap gap-1.5">
@@ -1630,10 +1630,10 @@ export function DesktopAppDashboard() {
                             key={m}
                             type="button"
                             onClick={() => handleSaveAiConfig({ model: m })}
-                            className={`text-[10px] px-2.5 py-1 rounded-lg font-mono transition-colors ${
+                            className={`text-[10px] px-2.5 py-1 rounded-lg tabular-nums transition-colors ${
                               aiConfig.model === m
-                                ? "bg-[#FF6B2C] text-white font-semibold"
-                                : "bg-white dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:bg-[#FF6B2C]/20 border border-slate-200 dark:border-white/10"
+                                ? "bg-select text-onselect font-semibold"
+                                : "bg-white dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:bg-select/20 border border-slate-200 dark:border-white/10"
                             }`}
                           >
                             {m}
@@ -1656,7 +1656,7 @@ export function DesktopAppDashboard() {
                       {isTestingAi ? (
                         <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                       ) : (
-                        <Radio className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                        <Radio className="w-3.5 h-3.5 text-select" />
                       )}
                       <span>{isTestingAi ? "Testing..." : "Test Connection"}</span>
                     </button>
@@ -1684,7 +1684,7 @@ export function DesktopAppDashboard() {
                           handleSaveAiConfig({ model: "gemini-3.8-flash" });
                           await handleTestAi({ model: "gemini-3.8-flash" });
                         }}
-                        className="px-3 py-1 rounded-lg bg-[#FF6B2C] text-white font-bold text-xs hover:bg-[#e0561b] transition-all cursor-pointer"
+                        className="px-3 py-1 rounded-lg bg-select text-onselect font-bold text-xs hover:bg-select transition-all cursor-pointer"
                       >
                         ⚡ Switch to Gemini 3.8 Flash & Re-test
                       </button>
@@ -1695,7 +1695,7 @@ export function DesktopAppDashboard() {
 
               {/* Section 2: External Agent & Model Context Protocol (MCP) Integration */}
               <div className={`p-6 rounded-3xl border space-y-5 transition-all ${
-                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0C1120] border-white/10 shadow-lg"
+                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#18222D] border-white/10 shadow-lg"
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -1711,7 +1711,7 @@ export function DesktopAppDashboard() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold">
+                  <span className="text-[10px] tabular-nums px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 border border-purple-500/30 font-bold">
                     JSON-RPC 2.0
                   </span>
                 </div>
@@ -1721,7 +1721,7 @@ export function DesktopAppDashboard() {
                   isLight ? "bg-slate-50 border-slate-200" : "bg-black/30 border-white/10"
                 }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                    <span className="text-xs tabular-nums font-bold text-slate-800 dark:text-slate-200">
                       Claude Desktop (claude_desktop_config.json)
                     </span>
                     <button
@@ -1737,13 +1737,13 @@ export function DesktopAppDashboard() {
                         }, null, 2),
                         "claude-dash"
                       )}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6B2C] hover:underline cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-select hover:underline cursor-pointer"
                     >
                       {copiedAiId === "claude-dash" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                       <span>{copiedAiId === "claude-dash" ? "Copied!" : "Copy JSON"}</span>
                     </button>
                   </div>
-                  <pre className="p-3 rounded-xl bg-black/60 text-[11px] font-mono text-slate-300 overflow-x-auto border border-white/5">
+                  <pre className="p-3 rounded-xl bg-black/60 text-[11px] tabular-nums text-slate-300 overflow-x-auto border border-white/5">
 {`{
   "mcpServers": {
     "fucuflow": {
@@ -1760,7 +1760,7 @@ export function DesktopAppDashboard() {
                   isLight ? "bg-slate-50 border-slate-200" : "bg-black/30 border-white/10"
                 }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
+                    <span className="text-xs tabular-nums font-bold text-slate-800 dark:text-slate-200">
                       Cursor / Antigravity (.cursor/mcp.json)
                     </span>
                     <button
@@ -1776,13 +1776,13 @@ export function DesktopAppDashboard() {
                         }, null, 2),
                         "cursor-dash"
                       )}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6B2C] hover:underline cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-select hover:underline cursor-pointer"
                     >
                       {copiedAiId === "cursor-dash" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                       <span>{copiedAiId === "cursor-dash" ? "Copied!" : "Copy JSON"}</span>
                     </button>
                   </div>
-                  <pre className="p-3 rounded-xl bg-black/60 text-[11px] font-mono text-slate-300 overflow-x-auto border border-white/5">
+                  <pre className="p-3 rounded-xl bg-black/60 text-[11px] tabular-nums text-slate-300 overflow-x-auto border border-white/5">
 {`{
   "mcpServers": {
     "fucuflow": {
@@ -1799,20 +1799,20 @@ export function DesktopAppDashboard() {
                   isLight ? "bg-slate-50 border-slate-200" : "bg-black/30 border-white/10"
                 }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <span className="text-xs tabular-nums font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                       <Terminal className="w-3.5 h-3.5 text-emerald-500" />
                       Start Local Agent Bridge in Terminal:
                     </span>
                     <button
                       type="button"
                       onClick={() => handleCopyAi("npm run agent:bridge", "cmd-dash")}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF6B2C] hover:underline cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-select hover:underline cursor-pointer"
                     >
                       {copiedAiId === "cmd-dash" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                       <span>{copiedAiId === "cmd-dash" ? "Copied!" : "Copy Command"}</span>
                     </button>
                   </div>
-                  <pre className="p-2.5 rounded-xl bg-black/60 text-[11px] font-mono text-emerald-400 border border-white/5">
+                  <pre className="p-2.5 rounded-xl bg-black/60 text-[11px] tabular-nums text-emerald-400 border border-white/5">
                     npm run agent:bridge
                   </pre>
                 </div>

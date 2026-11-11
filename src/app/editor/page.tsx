@@ -82,9 +82,9 @@ export default function EditorPage() {
     // Backdrop & Geometry
     backgroundType: "gradient",
     backgroundPreset: "mesh-purple",
-    solidBackgroundColor: "#111318",
-    customGradientFrom: "#17191F",
-    customGradientTo: "#FF6B2C",
+    solidBackgroundColor: "#1C2733",
+    customGradientFrom: "#1C2733",
+    customGradientTo: "#F26A21",
     cornerRadius: 20,
     padding: 36,
     shadowIntensity: "cinematic",
@@ -101,10 +101,10 @@ export default function EditorPage() {
     showCursor: true,
     hideDeviceCursor: true,
     cursorStyle: "macos-arrow",
-    cursorColor: "#FF6B2C",
+    cursorColor: "#F26A21",
     cursorSize: 22,
     showRipple: true,
-    rippleColor: "#FF6B2C",
+    rippleColor: "#F26A21",
 
     aspectRatio: "16:9",
     resolutionPreset: "1080p",
@@ -123,7 +123,7 @@ export default function EditorPage() {
       customX: 0.85,
       customY: 0.82,
       size: 180,
-      borderColor: "#FF6B2C",
+      borderColor: "#F26A21",
       borderWidth: 3,
       shadow: true,
       mirror: true,
@@ -247,7 +247,7 @@ export default function EditorPage() {
         duration: recDuration,
         startTimeline: 0,
         endTimeline: recDuration,
-        color: "#FF6B2C",
+        color: "#F26A21",
         speed: 1.0,
       };
       recordHistory();
@@ -335,7 +335,7 @@ export default function EditorPage() {
         duration: sample.duration,
         startTimeline: 0,
         endTimeline: sample.duration,
-        color: "#FF6B2C",
+        color: "#F26A21",
         speed: 1.0,
       };
       setClips([initialClip]);
@@ -403,7 +403,7 @@ export default function EditorPage() {
         duration: vidDur,
         startTimeline: 0,
         endTimeline: vidDur,
-        color: "#FF6B2C",
+        color: "#F26A21",
         speed: 1.0,
       };
       setClips([initialClip]);
@@ -1511,7 +1511,7 @@ export default function EditorPage() {
                 customX: 0.85,
                 customY: 0.82,
                 size: 180,
-                borderColor: "#FF6B2C",
+                borderColor: "#F26A21",
                 borderWidth: 3,
                 shadow: true,
                 mirror: true,
@@ -1584,7 +1584,7 @@ export default function EditorPage() {
   return (
     <div
       className={`flex flex-col h-screen w-screen transition-colors duration-200 ${
-        effectiveTheme === "light" ? "bg-[#F1F5F9] text-slate-800" : "bg-[#090D16] text-slate-100"
+        effectiveTheme === "light" ? "bg-[#F1F5F9] text-slate-800" : "bg-[#131B24] text-slate-100"
       } overflow-hidden font-sans select-none relative`}
     >
       {/* Subtle atmospheric ambient glow */}
@@ -1614,17 +1614,17 @@ export default function EditorPage() {
 
       {/* Floating Active Recording HUD Overlay */}
       {screenRecorder.isRecording && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3.5 px-5 py-2.5 rounded-xl glass-panel-elevated border-[#FF6B2C]/40 shadow-[0_0_35px_rgba(255,107,44,0.3)] animate-pulse">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3.5 px-5 py-2.5 rounded-xl glass-panel-elevated border-select/40 shadow-[0_0_35px_rgba(242,106,33,0.3)] animate-pulse">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FF6B2C] animate-ping" />
-            <span className="text-xs font-bold text-white tracking-wide uppercase">
+            <span className="w-2.5 h-2.5 rounded-full bg-select animate-ping" />
+            <span className="text-xs font-bold text-white tracking-wide">
               Screen Recording Active
             </span>
           </div>
 
           <div className="h-4 w-px bg-white/20" />
 
-          <div className="text-xs font-mono text-[#FF8A4C] font-bold">
+          <div className="text-xs tabular-nums text-select font-bold">
             {Math.floor(screenRecorder.recordingDuration / 60).toString().padStart(2, "0")}:
             {Math.floor(screenRecorder.recordingDuration % 60).toString().padStart(2, "0")}
           </div>
@@ -1632,7 +1632,7 @@ export default function EditorPage() {
           <div className="h-4 w-px bg-white/20" />
 
           <div className="text-xs text-slate-300 flex items-center gap-1.5">
-            <span className="text-[#FF8A4C] font-bold font-mono bg-[#FFF1E8]/15 border border-[#FF6B2C]/30 px-2 py-0.5 rounded-md text-[11px]">
+            <span className="text-select font-bold tabular-nums bg-slate-200/15 border border-select/30 px-2 py-0.5 rounded-md text-[11px]">
               {screenRecorder.clickCount}
             </span>
             <span className="text-[11px] text-slate-400">
@@ -1644,7 +1644,7 @@ export default function EditorPage() {
 
           <button
             onClick={screenRecorder.stopRecording}
-            className="flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-[#FF6B2C] hover:bg-[#E85A1F] text-white text-xs font-bold shadow-md shadow-[#FF6B2C]/30 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-select hover:bg-select text-onselect text-xs font-bold shadow-md shadow-select/30 transition-all"
           >
             <span>Stop & Import</span>
           </button>
@@ -1653,13 +1653,13 @@ export default function EditorPage() {
 
       {/* Screen Recorder Error Notification */}
       {screenRecorder.error && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl glass-panel border-[#FF6B2C]/50 text-orange-200 text-xs shadow-xl backdrop-blur-xl">
-          <AlertCircle className="w-4 h-4 text-[#FF6B2C] flex-shrink-0" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl glass-panel border-select/50 text-orange-200 text-xs shadow-xl backdrop-blur-xl">
+          <AlertCircle className="w-4 h-4 text-select flex-shrink-0" />
           <span>{screenRecorder.error}</span>
           <button
             type="button"
             onClick={screenRecorder.clearError}
-            className="text-[#FF6B2C] hover:text-white ml-2 p-0.5 rounded transition-colors cursor-pointer"
+            className="text-select hover:text-white ml-2 p-0.5 rounded transition-colors cursor-pointer"
             title="Dismiss error"
           >
             ✕
@@ -1702,7 +1702,7 @@ export default function EditorPage() {
         {/* Draggable Divider between Monitor and Inspector */}
         <div
           onMouseDown={handleStartDragDivider}
-          className="relative w-1.5 hover:w-2 bg-white/[0.06] hover:bg-[#FF6B2C]/40 active:bg-[#FF6B2C]/60 cursor-col-resize flex-shrink-0 transition-colors z-20 group flex items-center justify-center select-none"
+          className="relative w-1.5 hover:w-2 bg-white/[0.06] hover:bg-select/40 active:bg-select/60 cursor-col-resize flex-shrink-0 transition-colors z-20 group flex items-center justify-center select-none"
           title="Drag to resize Inspector panel"
         >
           {/* Collapse / Expand toggle button on divider */}
@@ -1711,11 +1711,11 @@ export default function EditorPage() {
               e.stopPropagation();
               setIsInspectorCollapsed((prev) => !prev);
             }}
-            className="absolute z-30 w-4 h-7 rounded-l-md bg-white/95 dark:bg-[#090D16]/90 hover:bg-slate-100 dark:hover:bg-white/[0.12] border border-r-0 border-slate-300 dark:border-white/[0.12] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-center shadow-glass-sm -left-4 transition-colors backdrop-blur-md"
+            className="absolute z-30 w-4 h-7 rounded-l-md bg-white/95 dark:bg-[#131B24]/90 hover:bg-slate-100 dark:hover:bg-white/[0.12] border border-r-0 border-slate-300 dark:border-white/[0.12] text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-center shadow-glass-sm -left-4 transition-colors backdrop-blur-md"
             title={isInspectorCollapsed ? "Expand Inspector" : "Collapse Inspector"}
           >
             {isInspectorCollapsed ? (
-              <ChevronLeft className="w-3 h-3 text-[#FF6B2C]" />
+              <ChevronLeft className="w-3 h-3 text-select" />
             ) : (
               <ChevronRight className="w-3 h-3 text-slate-400" />
             )}
@@ -1775,7 +1775,7 @@ export default function EditorPage() {
                       customX: 0.85,
                       customY: 0.82,
                       size: 180,
-                      borderColor: "#FF6B2C",
+                      borderColor: "#F26A21",
                       borderWidth: 3,
                       shadow: true,
                       mirror: true,

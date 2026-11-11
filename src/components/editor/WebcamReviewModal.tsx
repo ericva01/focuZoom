@@ -36,7 +36,7 @@ export interface WebcamReviewModalProps {
 }
 
 const BORDER_COLORS = [
-  { name: "Orange", hex: "#FF6B2C", class: "bg-[#FF6B2C]" },
+  { name: "Orange", hex: "#F26A21", class: "bg-select" },
   { name: "Emerald", hex: "#10b981", class: "bg-emerald-500" },
   { name: "Sky", hex: "#38bdf8", class: "bg-sky-400" },
   { name: "Amber", hex: "#f59e0b", class: "bg-amber-500" },
@@ -75,7 +75,7 @@ export function WebcamReviewModal({
         customX: 0.85,
         customY: 0.82,
         size: 180,
-        borderColor: "#FF6B2C",
+        borderColor: "#F26A21",
         borderWidth: 3,
         shadow: true,
         mirror: true,
@@ -209,7 +209,7 @@ export function WebcamReviewModal({
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-3.5 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF8A4C] shadow-glass-sm">
+            <div className="w-9 h-9 rounded-xl bg-select/20 border border-select/30 flex items-center justify-center text-select shadow-glass-sm">
               <Camera className="w-4 h-4" />
             </div>
             <div>
@@ -217,7 +217,7 @@ export function WebcamReviewModal({
                 <h2 className="font-bold text-sm text-white tracking-wide">
                   Webcam Review & Setup
                 </h2>
-                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-mono text-emerald-300">
+                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] tabular-nums text-emerald-300">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Live Preview
                 </span>
@@ -244,7 +244,7 @@ export function WebcamReviewModal({
           {/* Left Column: Interactive Live Preview Monitor */}
           <div className="md:col-span-6 flex flex-col items-center justify-center bg-black/40 rounded-2xl border border-white/[0.08] p-4 relative min-h-[260px] overflow-hidden group">
             {/* Ambient Backing Glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#FF7A3D]/10 via-transparent to-purple-500/10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-select/10 via-transparent to-purple-500/10 pointer-events-none" />
 
             {/* Live Camera Bubble Feed */}
             <div
@@ -254,7 +254,7 @@ export function WebcamReviewModal({
               style={{
                 width: `${Math.min(220, Math.max(140, wConfig.size))}px`,
                 height: `${Math.min(220, Math.max(140, wConfig.size))}px`,
-                border: `${wConfig.borderWidth}px solid ${wConfig.borderColor || "#FF6B2C"}`,
+                border: `${wConfig.borderWidth}px solid ${wConfig.borderColor || "#F26A21"}`,
               }}
             >
               {liveWebcamStream ? (
@@ -281,17 +281,17 @@ export function WebcamReviewModal({
                 className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-black/70 hover:bg-black/90 text-white text-[10px] border border-white/20 backdrop-blur-md flex items-center gap-1 transition-all"
                 title="Toggle Mirror Flip"
               >
-                <FlipHorizontal className="w-3 h-3 text-[#FF8A4C]" />
-                <span className="text-[9px] font-mono font-medium hidden sm:inline">
+                <FlipHorizontal className="w-3 h-3 text-select" />
+                <span className="text-[9px] tabular-nums font-medium hidden sm:inline">
                   {wConfig.mirror ? "Mirrored" : "Normal"}
                 </span>
               </button>
             </div>
 
             {/* Status info under preview */}
-            <div className="mt-4 flex items-center gap-3 text-[11px] text-slate-400 font-mono">
+            <div className="mt-4 flex items-center gap-3 text-[11px] text-slate-400 tabular-nums">
               <span className="flex items-center gap-1">
-                <Video className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                <Video className="w-3.5 h-3.5 text-select" />
                 <span>720p HD</span>
               </span>
               <span>•</span>
@@ -304,11 +304,11 @@ export function WebcamReviewModal({
             <div className="w-full mt-3 pt-3 border-t border-white/[0.08] flex items-center gap-2.5 px-2">
               <div className="flex items-center gap-1 text-[11px] text-slate-400 flex-shrink-0">
                 {hasMicPermission === false ? (
-                  <MicOff className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <MicOff className="w-3.5 h-3.5 text-select" />
                 ) : (
                   <Mic className="w-3.5 h-3.5 text-emerald-400" />
                 )}
-                <span className="text-[10px] font-mono">Mic:</span>
+                <span className="text-[10px] tabular-nums">Mic:</span>
               </div>
 
               {/* Volume Bars Meter */}
@@ -323,7 +323,7 @@ export function WebcamReviewModal({
                       className={`flex-1 h-full rounded-sm transition-all duration-75 ${
                         isActive
                           ? isHigh
-                            ? "bg-[#FF6B2C] shadow-[0_0_6px_rgba(255,107,44,0.8)]"
+                            ? "bg-select shadow-[0_0_6px_rgba(242,106,33,0.8)]"
                             : "bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.8)]"
                           : "bg-white/[0.05]"
                       }`}
@@ -332,7 +332,7 @@ export function WebcamReviewModal({
                 })}
               </div>
 
-              <span className="text-[10px] font-mono text-slate-400 w-8 text-right">
+              <span className="text-[10px] tabular-nums text-slate-400 w-8 text-right">
                 {micVolume}%
               </span>
             </div>
@@ -344,7 +344,7 @@ export function WebcamReviewModal({
             <div className="glass-panel p-3 rounded-xl space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-semibold text-white flex items-center gap-1.5">
-                  <Video className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <Video className="w-3.5 h-3.5 text-select" />
                   Camera Device
                 </label>
                 <button
@@ -369,7 +369,7 @@ export function WebcamReviewModal({
                   updateWebcam({ deviceId: newDevId });
                   onStartWebcamPreview(newDevId);
                 }}
-                className="w-full bg-[#090D16] border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-[#FF6B2C] transition-colors"
+                className="w-full bg-[#131B24] border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-select transition-colors"
               >
                 {availableCameras.length > 0 ? (
                   availableCameras.map((cam) => (
@@ -401,11 +401,11 @@ export function WebcamReviewModal({
                       onClick={() => updateWebcam({ shape: sh.id })}
                       className={`p-2 rounded-lg text-center border flex items-center justify-center gap-1.5 transition-all ${
                         isCurrent
-                          ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border-[#FF6B2C]/50 shadow-glass-sm font-semibold"
+                          ? "bg-select/25 text-select border-select/50 shadow-glass-sm font-semibold"
                           : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                       }`}
                     >
-                      <Icon className="w-3.5 h-3.5 text-[#FF8A4C]" />
+                      <Icon className="w-3.5 h-3.5 text-select" />
                       <span className="text-[11px]">{sh.label}</span>
                     </button>
                   );
@@ -437,7 +437,7 @@ export function WebcamReviewModal({
                       }
                       className={`p-1.5 rounded-lg text-left px-2.5 border transition-all ${
                         isCurrent
-                          ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border-[#FF6B2C]/50 shadow-glass-sm font-semibold"
+                          ? "bg-select/25 text-select border-select/50 shadow-glass-sm font-semibold"
                           : "bg-white/[0.03] text-slate-300 border-white/10 hover:bg-white/[0.06]"
                       }`}
                     >
@@ -454,7 +454,7 @@ export function WebcamReviewModal({
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-slate-300">Bubble Size</span>
-                  <span className="font-mono text-[#FF6B2C] font-bold">{wConfig.size}px</span>
+                  <span className="tabular-nums text-select font-bold">{wConfig.size}px</span>
                 </div>
                 <input
                   type="range"
@@ -463,7 +463,7 @@ export function WebcamReviewModal({
                   step="10"
                   value={wConfig.size}
                   onChange={(e) => updateWebcam({ size: parseInt(e.target.value) })}
-                  className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-white/10 rounded"
+                  className="w-full accent-select cursor-pointer h-1 bg-white/10 rounded"
                 />
               </div>
 
@@ -471,7 +471,7 @@ export function WebcamReviewModal({
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-[11px]">
                   <span className="text-slate-300">Border Accent</span>
-                  <span className="font-mono text-slate-400 text-[10px]">
+                  <span className="tabular-nums text-slate-400 text-[10px]">
                     {wConfig.borderWidth}px
                   </span>
                 </div>
@@ -500,7 +500,7 @@ export function WebcamReviewModal({
                       max="8"
                       value={wConfig.borderWidth}
                       onChange={(e) => updateWebcam({ borderWidth: parseInt(e.target.value) })}
-                      className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-white/10 rounded"
+                      className="w-full accent-select cursor-pointer h-1 bg-white/10 rounded"
                       title="Border thickness"
                     />
                   </div>
@@ -520,7 +520,7 @@ export function WebcamReviewModal({
               onSetEnableWebcam(false);
               onClose();
             }}
-            className="text-slate-400 hover:text-[#FF8A4C] text-xs w-full sm:w-auto"
+            className="text-slate-400 hover:text-select text-xs w-full sm:w-auto"
             leftIcon={<VideoOff className="w-3.5 h-3.5" />}
           >
             Turn Off Camera

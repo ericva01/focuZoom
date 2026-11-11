@@ -43,14 +43,14 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
 
   if (variant === "footer") {
     return (
-      <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl border border-[#E5E7EB] bg-[#F8F9FB] ${className}`}>
-        <Globe size={13} className="text-[#667085] ml-1.5" />
+      <div className={`inline-flex items-center gap-1.5 p-1 rounded-xl border border-[#C9CFD4] bg-[#ECEEF0] ${className}`}>
+        <Globe size={13} className="text-[#55636F] ml-1.5" />
         <button
           onClick={() => handleSwitch("en")}
           className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
             isEn
-              ? "bg-white text-[#111318] shadow-xs"
-              : "text-[#667085] hover:text-[#111318]"
+              ? "bg-white text-[#1C2733] shadow-xs"
+              : "text-[#55636F] hover:text-[#1C2733]"
           }`}
           title="Switch to English"
         >
@@ -60,8 +60,8 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
           onClick={() => handleSwitch("kh")}
           className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
             isKh
-              ? "bg-[#FF6B2C] text-white shadow-xs"
-              : "text-[#667085] hover:text-[#111318]"
+              ? "bg-[#F26A21] text-white shadow-xs"
+              : "text-[#55636F] hover:text-[#1C2733]"
           }`}
           title="ប្តូរទៅភាសាខ្មែរ"
         >
@@ -73,18 +73,18 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
 
   if (variant === "mobile") {
     return (
-      <div className={`flex items-center justify-between p-3 rounded-xl border border-[#E5E7EB] bg-[#F8F9FB] ${className}`}>
-        <div className="flex items-center gap-2 text-xs font-semibold text-[#111318]">
-          <Globe size={16} className="text-[#FF6B2C]" />
+      <div className={`flex items-center justify-between p-3 rounded-xl border border-[#C9CFD4] bg-[#ECEEF0] ${className}`}>
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#1C2733]">
+          <Globe size={16} className="text-[#F26A21]" />
           <span>ភាសា / Language</span>
         </div>
-        <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#E5E7EB]">
+        <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-[#C9CFD4]">
           <button
             onClick={() => handleSwitch("kh")}
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
               isKh
-                ? "bg-[#FF6B2C] text-white shadow-xs"
-                : "text-[#667085] hover:text-[#111318]"
+                ? "bg-[#F26A21] text-white shadow-xs"
+                : "text-[#55636F] hover:text-[#1C2733]"
             }`}
           >
             🇰🇭 ខ្មែរ
@@ -93,8 +93,8 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
             onClick={() => handleSwitch("en")}
             className={`px-3 py-1 text-xs font-semibold rounded-md transition-all cursor-pointer ${
               isEn
-                ? "bg-[#111318] text-white shadow-xs"
-                : "text-[#667085] hover:text-[#111318]"
+                ? "bg-[#1C2733] text-white shadow-xs"
+                : "text-[#55636F] hover:text-[#1C2733]"
             }`}
           >
             🇺🇸 EN
@@ -110,7 +110,7 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
       <DropdownMenu.Trigger asChild>
         <button
           aria-label="Language / ភាសា"
-          className={`p-2 rounded-xl border border-[#E5E7EB] bg-white hover:bg-[#F8F9FB] text-[#667085] hover:text-[#111318] transition-colors inline-flex items-center justify-center cursor-pointer shadow-xs active:scale-95 ${className}`}
+          className={`p-2 rounded-xl border border-[#C9CFD4] bg-white hover:bg-[#ECEEF0] text-[#55636F] hover:text-[#1C2733] transition-colors inline-flex items-center justify-center cursor-pointer shadow-xs active:scale-95 ${className}`}
           title="Language / ភាសា"
         >
           <Globe size={16} />
@@ -120,35 +120,35 @@ export function LanguageSwitcher({ variant = "navbar", className = "" }: Languag
         <DropdownMenu.Content
           align="end"
           sideOffset={8}
-          className="z-50 min-w-[140px] overflow-hidden rounded-xl border border-[#E5E7EB] bg-white p-1 text-[#111318] shadow-lg animate-in fade-in-0 zoom-in-95"
+          className="z-50 min-w-[140px] overflow-hidden rounded-xl border border-[#C9CFD4] bg-white p-1 text-[#1C2733] shadow-lg animate-in fade-in-0 zoom-in-95"
         >
           <DropdownMenu.Item
             onClick={() => handleSwitch("kh")}
             className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors outline-none ${
               isKh
-                ? "bg-[#FFF1E8] text-[#FF6B2C]"
-                : "text-[#667085] hover:bg-[#F8F9FB] hover:text-[#111318]"
+                ? "bg-[#FFF1E8] text-[#F26A21]"
+                : "text-[#55636F] hover:bg-[#ECEEF0] hover:text-[#1C2733]"
             }`}
           >
             <span className="flex items-center gap-2">
               <span>🇰🇭</span>
               <span>ខ្មែរ</span>
             </span>
-            {isKh && <Check size={14} className="text-[#FF6B2C]" />}
+            {isKh && <Check size={14} className="text-[#F26A21]" />}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onClick={() => handleSwitch("en")}
             className={`flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors outline-none ${
               isEn
-                ? "bg-[#FFF1E8] text-[#FF6B2C]"
-                : "text-[#667085] hover:bg-[#F8F9FB] hover:text-[#111318]"
+                ? "bg-[#FFF1E8] text-[#F26A21]"
+                : "text-[#55636F] hover:bg-[#ECEEF0] hover:text-[#1C2733]"
             }`}
           >
             <span className="flex items-center gap-2">
               <span>🇺🇸</span>
               <span>English</span>
             </span>
-            {isEn && <Check size={14} className="text-[#FF6B2C]" />}
+            {isEn && <Check size={14} className="text-[#F26A21]" />}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

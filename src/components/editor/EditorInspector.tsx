@@ -217,128 +217,58 @@ function EditorInspectorBase({
     { label: "Deep Forest", hex: "#042C1D" },
     { label: "Dark Emerald", hex: "#084D35" },
     { label: "Rich Slate", hex: "#0F172A" },
-    { label: "Charcoal Black", hex: "#090D16" },
+    { label: "Charcoal Black", hex: "#131B24" },
     { label: "Neutral Studio", hex: "#1E293B" },
   ];
 
   return (
-    <div className="h-full flex flex-col bg-white/95 dark:bg-[#090D16]/90 backdrop-blur-xl border-l border-slate-200 dark:border-white/[0.08] select-none overflow-hidden text-slate-800 dark:text-slate-100">
-      {/* 1. Inspector Tab Dock */}
-      <div className="p-2 border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.02] flex items-center gap-1">
+    <div className="h-full flex flex-col bg-white/95 dark:bg-[#131B24]/90 backdrop-blur-xl border-l border-slate-200 dark:border-white/[0.08] select-none overflow-hidden text-slate-800 dark:text-slate-100">
+      {/* 1. Inspector tabs: plain text, the current one underlined in the keyframe orange */}
+      <div role="tablist" aria-label="Inspector" className="flex flex-wrap gap-x-1 px-3 border-b border-slate-200 dark:border-slate-700">
+        {(
+          [
+            { id: "keyframes", label: "Zoom", count: events.length },
+            { id: "clip", label: "Clip" },
+            { id: "canvas", label: "Canvas" },
+            { id: "webcam", label: "Webcam" },
+            { id: "cursor", label: "Cursor" },
+            { id: "ai", label: "Agent" },
+          ] as { id: InspectorTab; label: string; count?: number }[]
+        ).map((tab) => {
+          // Media lives inside Clip now, so an old "media" selection still lights up Clip.
+          const current = activeTab === tab.id || (tab.id === "clip" && activeTab === "media");
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={current}
+              onClick={() => setActiveTab(tab.id)}
+              className={`min-h-[40px] px-1.5 text-[13px] border-b-2 -mb-px transition-colors ${
+                current
+                  ? "border-[#F26A21] text-slate-900 dark:text-white font-semibold"
+                  : "border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              }`}
+            >
+              {tab.label}
+              {tab.count ? <span className="ml-1.5 tabular-nums text-slate-500 dark:text-slate-400">{tab.count}</span> : null}
+            </button>
+          );
+        })}
         <button
           type="button"
-          onClick={() => setActiveTab("clip")}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
-            activeTab === "clip"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
-          }`}
-        >
-          <Scissors className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Clip</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("canvas")}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
-            activeTab === "canvas"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
-          }`}
-        >
-          <Palette className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">3D</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("keyframes")}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
-            activeTab === "keyframes"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
-          }`}
-        >
-          <Focus className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Zoom</span>
-          {events.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] text-[10px] font-mono flex items-center justify-center">
-              {events.length}
-            </span>
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("webcam")}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
-            activeTab === "webcam"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
-          }`}
-          title="Webcam Facecam PiP settings"
-        >
-          <Camera className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Face</span>
-          {enableWebcam && (
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("cursor")}
-          className={`flex-1 py-1.5 px-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
-            activeTab === "cursor"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
-          }`}
-        >
-          <MousePointer className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Cursor</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("media")}
-          className={`flex-1 py-1.5 px-1 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
-            activeTab === "media"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
-          }`}
-          title="Media & Screen Recordings"
-        >
-          <Upload className="w-3.5 h-3.5 shrink-0" />
-          <span className="hidden sm:inline">Media</span>
-        </button>
-
-        <button
-          type="button"
+          role="tab"
+          aria-selected={activeTab === "settings"}
+          aria-label="Settings"
+          title="Settings"
           onClick={() => setActiveTab("settings")}
-          className={`flex-1 py-1.5 px-1 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
+          className={`ml-auto min-h-[40px] px-1.5 border-b-2 -mb-px transition-colors ${
             activeTab === "settings"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
+              ? "border-[#F26A21] text-slate-900 dark:text-white"
+              : "border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           }`}
-          title="Settings (Theme, Auto-Save & Storage)"
         >
-          <Settings className="w-3.5 h-3.5 shrink-0" />
-          <span className="hidden sm:inline">Config</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("ai")}
-          className={`flex-1 py-1.5 px-1 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-all ${
-            activeTab === "ai"
-              ? "bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm font-semibold"
-              : "text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/[0.04]"
-          }`}
-          title="AI Studio Copilot & Agent Bridge"
-        >
-          <Sparkles className="w-3.5 h-3.5 shrink-0 text-[#FF6B2C]" />
-          <span className="hidden sm:inline">AI</span>
+          <Settings className="w-4 h-4" />
         </button>
       </div>
 
@@ -356,9 +286,9 @@ function EditorInspectorBase({
                     key={clip.id}
                     type="button"
                     onClick={() => onSelectClip(clip.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all whitespace-nowrap ${
+                    className={`px-2.5 py-1 rounded-lg text-xs tabular-nums transition-all whitespace-nowrap ${
                       selectedClipId === clip.id
-                        ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border border-[#FF6B2C]/40 font-semibold"
+                        ? "bg-select/25 text-select border border-select/40 font-semibold"
                         : "bg-white/[0.04] text-slate-400 hover:text-white border border-transparent"
                     }`}
                   >
@@ -374,7 +304,7 @@ function EditorInspectorBase({
                 <div className="glass-panel p-4 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-slate-800 dark:text-white">Active Clip Properties</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30">
+                    <span className="text-[10px] tabular-nums px-2 py-0.5 rounded bg-select/15 text-select dark:text-select border border-select/30">
                       ID: {activeClip.id}
                     </span>
                   </div>
@@ -382,14 +312,14 @@ function EditorInspectorBase({
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/10">
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Timeline In / Out</span>
-                      <span className="font-mono text-slate-800 dark:text-white font-medium">
+                      <span className="tabular-nums text-slate-800 dark:text-white font-medium">
                         {formatSMPTETimecode(activeClip.startTimeline).substring(3, 8)} - {formatSMPTETimecode(activeClip.endTimeline).substring(3, 8)}
                       </span>
                     </div>
 
                     <div className="p-2.5 rounded-lg bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/10">
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Duration</span>
-                      <span className="font-mono text-[#FF6B2C] dark:text-[#FF8A4C] font-semibold">
+                      <span className="tabular-nums text-select dark:text-select font-semibold">
                         {activeClip.duration.toFixed(2)}s
                       </span>
                     </div>
@@ -436,7 +366,7 @@ function EditorInspectorBase({
                       variant="secondary"
                       size="sm"
                       onClick={() => onSplitClip(activeClip.id, currentTime)}
-                      leftIcon={<Scissors className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                      leftIcon={<Scissors className="w-3.5 h-3.5 text-select" />}
                       className="w-full justify-start"
                     >
                       Split Here
@@ -486,7 +416,7 @@ function EditorInspectorBase({
                 <div className="glass-panel p-4 rounded-xl space-y-2.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-slate-200">Clip Playback Speed</label>
-                    <span className="text-xs font-mono text-[#FF6B2C] font-bold">{config.playbackSpeed}x</span>
+                    <span className="text-xs tabular-nums text-select font-bold">{config.playbackSpeed}x</span>
                   </div>
                   <div className="grid grid-cols-4 gap-1.5">
                     {[0.5, 1.0, 1.5, 2.0].map((spd) => (
@@ -494,9 +424,9 @@ function EditorInspectorBase({
                         key={spd}
                         type="button"
                         onClick={() => onChangeConfig({ playbackSpeed: spd })}
-                        className={`py-1.5 rounded-lg text-xs font-mono transition-all ${
+                        className={`py-1.5 rounded-lg text-xs tabular-nums transition-all ${
                           config.playbackSpeed === spd
-                            ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
+                            ? "bg-select/20 text-select font-bold border border-select/30 shadow-glass-sm"
                             : "bg-white/[0.04] text-slate-300 hover:text-white border border-transparent"
                         }`}
                       >
@@ -526,10 +456,10 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Ratio className="w-4 h-4 text-[#FF6B2C]" />
+                  <Ratio className="w-4 h-4 text-select" />
                   <span className="text-xs font-semibold text-slate-800 dark:text-white">Canvas Aspect Ratio</span>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
+                <span className="text-[10px] tabular-nums px-2 py-0.5 rounded bg-select/15 text-select dark:text-select border border-select/30 font-bold">
                   {config.aspectRatio || "16:9"}
                 </span>
               </div>
@@ -548,7 +478,7 @@ function EditorInspectorBase({
                       onClick={() => onChangeConfig({ aspectRatio: ratio.value })}
                       className={`py-2 px-1 rounded-xl text-center border transition-all ${
                         isSelected
-                          ? "bg-[#FFF1E8] text-[#FF6B2C] dark:bg-[#FF6B2C]/20 dark:text-[#FF8A4C] border-[#FF6B2C]/50 shadow-glass-sm font-bold"
+                          ? "bg-slate-200 text-select dark:bg-select/20 dark:text-select border-select/50 shadow-glass-sm font-bold"
                           : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                       }`}
                     >
@@ -572,7 +502,7 @@ function EditorInspectorBase({
                   size="sm"
                   onClick={onTakeSnapshot}
                   disabled={!metadata}
-                  leftIcon={<Camera className="w-3.5 h-3.5 text-[#FF8A4C]" />}
+                  leftIcon={<Camera className="w-3.5 h-3.5 text-select" />}
                   title="Save current canvas frame as high-res PNG"
                 >
                   Snapshot
@@ -590,7 +520,7 @@ function EditorInspectorBase({
                   <label className="text-xs font-semibold text-slate-800 dark:text-white block">Screen Render Resolution</label>
                   <p className="text-[10px] text-slate-400 mt-0.5">High-DPI canvas supersampling for razor sharp text</p>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
+                <span className="text-[10px] tabular-nums px-2 py-0.5 rounded-full bg-select/20 text-select border border-select/30 font-bold">
                   {(config.resolutionPreset || "4k").toUpperCase()}
                 </span>
               </div>
@@ -608,7 +538,7 @@ function EditorInspectorBase({
                       onClick={() => onChangeConfig({ resolutionPreset: res.id })}
                       className={`p-2 rounded-xl text-center border transition-all ${
                         isSelected
-                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border-[#FF6B2C]/40 shadow-glass-sm font-bold"
+                          ? "bg-select/20 text-select border-select/40 shadow-glass-sm font-bold"
                           : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                       }`}
                     >
@@ -639,7 +569,7 @@ function EditorInspectorBase({
                       pIdx === 0 ? "col-span-2" : ""
                     } ${
                       config.screenAnglePreset === preset.id
-                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
+                        ? "bg-select/20 text-select border border-select/40 shadow-glass-sm"
                         : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                     }`}
                   >
@@ -654,7 +584,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-slate-800 dark:text-white">Stage Inset (Padding)</label>
-                <div className="flex items-center gap-1 font-mono text-xs text-[#FF6B2C] font-bold">
+                <div className="flex items-center gap-1 tabular-nums text-xs text-select font-bold">
                   <span>{config.padding}</span>
                   <span className="text-slate-400">px</span>
                 </div>
@@ -676,9 +606,9 @@ function EditorInspectorBase({
                     key={pad}
                     type="button"
                     onClick={() => onChangeConfig({ padding: pad })}
-                    className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
+                    className={`py-1 rounded-lg text-[10px] tabular-nums transition-all ${
                       config.padding === pad
-                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30"
+                        ? "bg-select/20 text-select font-bold border border-select/30"
                         : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/70 dark:bg-white/[0.04] dark:text-slate-400 dark:border-transparent dark:hover:text-white"
                     }`}
                   >
@@ -692,7 +622,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-slate-800 dark:text-white">Corner Curvature</label>
-                <div className="flex items-center gap-1 font-mono text-xs text-[#FF6B2C] font-bold">
+                <div className="flex items-center gap-1 tabular-nums text-xs text-select font-bold">
                   <span>{config.cornerRadius}</span>
                   <span className="text-slate-400">px</span>
                 </div>
@@ -714,9 +644,9 @@ function EditorInspectorBase({
                     key={rad}
                     type="button"
                     onClick={() => onChangeConfig({ cornerRadius: rad })}
-                    className={`py-1 rounded-lg text-[10px] font-mono transition-all ${
+                    className={`py-1 rounded-lg text-[10px] tabular-nums transition-all ${
                       config.cornerRadius === rad
-                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30"
+                        ? "bg-select/20 text-select font-bold border border-select/30"
                         : "bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/70 dark:bg-white/[0.04] dark:text-slate-400 dark:border-transparent dark:hover:text-white"
                     }`}
                   >
@@ -742,7 +672,7 @@ function EditorInspectorBase({
                     onClick={() => onChangeConfig({ backgroundType: type.id })}
                     className={`py-1 rounded-lg text-xs font-medium transition-all ${
                       config.backgroundType === type.id
-                        ? "bg-[#FF6B2C]/20 text-[#FF6B2C] dark:text-[#FF8A4C] font-bold border border-[#FF6B2C]/40 shadow-glass-sm"
+                        ? "bg-select/20 text-select dark:text-select font-bold border border-select/40 shadow-glass-sm"
                         : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                     }`}
                   >
@@ -761,7 +691,7 @@ function EditorInspectorBase({
                       onClick={() => onChangeConfig({ backgroundPreset: g.id })}
                       className={`h-10 rounded-xl bg-gradient-to-r ${g.class} p-2 text-left flex items-end justify-between border transition-all ${
                         config.backgroundPreset === g.id
-                          ? "border-white ring-2 ring-[#FF6B2C]/60 shadow-glass-md"
+                          ? "border-white ring-2 ring-select/60 shadow-glass-md"
                           : "border-white/15 opacity-80 hover:opacity-100"
                       }`}
                     >
@@ -786,12 +716,12 @@ function EditorInspectorBase({
                       onClick={() => onChangeConfig({ solidBackgroundColor: c.hex })}
                       className={`h-10 rounded-xl p-2 text-left border flex items-end justify-between transition-all ${
                         config.solidBackgroundColor === c.hex
-                          ? "border-white ring-2 ring-[#FF6B2C]/60"
+                          ? "border-white ring-2 ring-select/60"
                           : "border-white/15 opacity-80 hover:opacity-100"
                       }`}
                       style={{ backgroundColor: c.hex }}
                     >
-                      <span className="text-[10px] font-mono text-white drop-shadow">
+                      <span className="text-[10px] tabular-nums text-white drop-shadow">
                         {c.label.split(" ")[1] || c.label}
                       </span>
                     </button>
@@ -814,7 +744,7 @@ function EditorInspectorBase({
                     size="sm"
                     className="w-full"
                     onClick={() => customBgInputRef.current?.click()}
-                    leftIcon={<ImageIcon className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                    leftIcon={<ImageIcon className="w-3.5 h-3.5 text-select" />}
                   >
                     Select Background Image
                   </Button>
@@ -831,9 +761,9 @@ function EditorInspectorBase({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <Focus className="w-4 h-4 text-[#FF6B2C]" />
+                <Focus className="w-4 h-4 text-select" />
                 <span className="text-xs font-semibold text-slate-800 dark:text-white">Zoom Keyframes</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30">
+                <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded-full bg-select/20 text-select border border-select/30">
                   {events.length}
                 </span>
               </div>
@@ -874,7 +804,7 @@ function EditorInspectorBase({
                     <button
                       type="button"
                       onClick={() => onDeleteEvent(selectedEvent.id)}
-                      className="flex items-center gap-1 text-[#FF6B2C] hover:text-[#FF8A4C] text-xs px-2 py-1 rounded bg-[#FF6B2C]/10 hover:bg-[#FF6B2C]/20 transition-colors cursor-pointer"
+                      className="flex items-center gap-1 text-select hover:text-select text-xs px-2 py-1 rounded bg-select/10 hover:bg-select/20 transition-colors cursor-pointer"
                       title="Delete this zoom effect (or press Delete key)"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -941,7 +871,7 @@ function EditorInspectorBase({
                 <div className="space-y-2 pt-2 border-t border-white/[0.08]">
                   <div className="flex justify-between items-center text-[11px]">
                     <span className="font-medium text-slate-300">Focus Target Position</span>
-                    <span className="font-mono text-blue-300 text-[10px]">
+                    <span className="tabular-nums text-blue-300 text-[10px]">
                       X: {Math.round(selectedEvent.x * 100)}% · Y: {Math.round(selectedEvent.y * 100)}%
                     </span>
                   </div>
@@ -972,7 +902,7 @@ function EditorInspectorBase({
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px]">
                       <span className="text-slate-400">Horizontal (Left ↔ Right)</span>
-                      <span className="font-mono text-blue-400 font-bold">{Math.round(selectedEvent.x * 100)}%</span>
+                      <span className="tabular-nums text-blue-400 font-bold">{Math.round(selectedEvent.x * 100)}%</span>
                     </div>
                     <input
                       type="range"
@@ -991,7 +921,7 @@ function EditorInspectorBase({
                   <div className="space-y-1">
                     <div className="flex justify-between text-[10px]">
                       <span className="text-slate-400">Vertical (Top ↔ Bottom)</span>
-                      <span className="font-mono text-blue-400 font-bold">{Math.round(selectedEvent.y * 100)}%</span>
+                      <span className="tabular-nums text-blue-400 font-bold">{Math.round(selectedEvent.y * 100)}%</span>
                     </div>
                     <input
                       type="range"
@@ -1011,7 +941,7 @@ function EditorInspectorBase({
                 <div className="space-y-2 pt-2 border-t border-white/[0.08]">
                   <div className="flex justify-between items-center text-[10px]">
                     <span className="text-slate-400">Hold Focus Duration</span>
-                    <span className="font-mono text-emerald-400 font-bold">
+                    <span className="tabular-nums text-emerald-400 font-bold">
                       {(selectedEvent.holdDuration ?? 1.4).toFixed(1)}s
                     </span>
                   </div>
@@ -1034,7 +964,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-3.5 rounded-xl space-y-3 border-white/10 bg-white/[0.02]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
-                  <Clock className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <Clock className="w-3.5 h-3.5 text-select" />
                   <span>Default Camera Timing</span>
                 </div>
                 <span className="text-[10px] text-slate-400">Global defaults</span>
@@ -1065,7 +995,7 @@ function EditorInspectorBase({
                       }
                       className={`py-1 px-2 rounded-lg text-[10px] font-medium border transition-all ${
                         isActive
-                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 font-semibold"
+                          ? "bg-select/20 text-select border border-select/40 font-semibold"
                           : "bg-white/[0.03] text-slate-400 border-white/10 hover:text-white hover:bg-white/[0.06]"
                       }`}
                     >
@@ -1080,7 +1010,7 @@ function EditorInspectorBase({
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-slate-400">Dolly-In</span>
-                    <span className="font-mono text-[#FF6B2C] font-bold">{(config.zoomDuration ?? 0.6).toFixed(2)}s</span>
+                    <span className="tabular-nums text-select font-bold">{(config.zoomDuration ?? 0.6).toFixed(2)}s</span>
                   </div>
                   <input
                     type="range"
@@ -1097,7 +1027,7 @@ function EditorInspectorBase({
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-slate-400">Hold</span>
-                    <span className="font-mono text-emerald-400 font-bold">{(config.zoomHoldDuration ?? 1.4).toFixed(1)}s</span>
+                    <span className="tabular-nums text-emerald-400 font-bold">{(config.zoomHoldDuration ?? 1.4).toFixed(1)}s</span>
                   </div>
                   <input
                     type="range"
@@ -1114,7 +1044,7 @@ function EditorInspectorBase({
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px]">
                     <span className="text-slate-400">Zoom-Out</span>
-                    <span className="font-mono text-[#FF6B2C] font-bold">{(config.zoomOutDuration ?? 0.6).toFixed(2)}s</span>
+                    <span className="tabular-nums text-select font-bold">{(config.zoomOutDuration ?? 0.6).toFixed(2)}s</span>
                   </div>
                   <input
                     type="range"
@@ -1152,14 +1082,14 @@ function EditorInspectorBase({
                       }}
                       className={`p-3.5 rounded-xl border transition-all cursor-pointer space-y-3 ${
                         isNearCurrent
-                          ? "bg-[#FF6B2C]/15 border-[#FF6B2C]/50 shadow-glass-md"
+                          ? "bg-select/15 border-select/50 shadow-glass-md"
                           : "bg-slate-100 dark:bg-black/40 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-200/50 dark:hover:bg-white/[0.03]"
                       }`}
                     >
                       {/* Top Bar: Identifier, Timestamp, Delete */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-md bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-[#FF6B2C] dark:text-[#FF8A4C] font-mono text-[10px] flex items-center justify-center font-bold">
+                          <span className="w-5 h-5 rounded-md bg-select/20 border border-select/30 text-select dark:text-select tabular-nums text-[10px] flex items-center justify-center font-bold">
                             #{index + 1}
                           </span>
                           <span className="text-xs font-semibold text-slate-800 dark:text-white">
@@ -1175,7 +1105,7 @@ function EditorInspectorBase({
                               onSelectEvent(ev);
                               onSeek?.(ev.timestamp);
                             }}
-                            className="px-2 py-0.5 rounded-md bg-slate-200/70 hover:bg-[#FF6B2C]/20 text-[11px] font-mono text-[#FF6B2C] dark:text-[#FF8A4C] border border-slate-300 dark:border-white/10 hover:border-[#FF6B2C]/40 dark:bg-white/[0.06] transition-colors cursor-pointer"
+                            className="px-2 py-0.5 rounded-md bg-slate-200/70 hover:bg-select/20 text-[11px] tabular-nums text-select dark:text-select border border-slate-300 dark:border-white/10 hover:border-select/40 dark:bg-white/[0.06] transition-colors cursor-pointer"
                             title="Jump playhead to this keyframe"
                           >
                             {formatSMPTETimecode(ev.timestamp).substring(3, 8)}
@@ -1186,7 +1116,7 @@ function EditorInspectorBase({
                               e.stopPropagation();
                               onDeleteEvent(ev.id);
                             }}
-                            className="text-slate-400 hover:text-[#FF6B2C] dark:text-slate-500 p-1 transition-colors cursor-pointer"
+                            className="text-slate-400 hover:text-select dark:text-slate-500 p-1 transition-colors cursor-pointer"
                             title="Delete Keyframe"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1207,12 +1137,12 @@ function EditorInspectorBase({
                                 onUpdateEvent(ev.id, { timestamp: newTime });
                                 onSeek?.(newTime);
                               }}
-                              className="w-5 h-5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 text-xs flex items-center justify-center font-mono cursor-pointer"
+                              className="w-5 h-5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 text-xs flex items-center justify-center tabular-nums cursor-pointer"
                               title="Step Back 0.1s"
                             >
                               -
                             </button>
-                            <span className="font-mono text-xs text-[#FF6B2C] font-semibold w-12 text-center">
+                            <span className="tabular-nums text-xs text-select font-semibold w-12 text-center">
                               {ev.timestamp.toFixed(2)}s
                             </span>
                             <button
@@ -1223,7 +1153,7 @@ function EditorInspectorBase({
                                 onUpdateEvent(ev.id, { timestamp: newTime });
                                 onSeek?.(newTime);
                               }}
-                              className="w-5 h-5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 text-xs flex items-center justify-center font-mono cursor-pointer"
+                              className="w-5 h-5 rounded bg-white/[0.06] hover:bg-white/[0.12] text-slate-300 text-xs flex items-center justify-center tabular-nums cursor-pointer"
                               title="Step Forward 0.1s"
                             >
                               +
@@ -1263,9 +1193,9 @@ function EditorInspectorBase({
                                 e.stopPropagation();
                                 onUpdateEvent(ev.id, { zoom: scale });
                               }}
-                              className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all ${
+                              className={`px-2 py-0.5 rounded text-[10px] tabular-nums transition-all ${
                                 ev.zoom === scale
-                                  ? "bg-[#FF6B2C]/25 text-[#FF8A4C] border border-[#FF6B2C]/40 font-bold"
+                                  ? "bg-select/25 text-select border border-select/40 font-bold"
                                   : "bg-white/[0.04] text-slate-400 hover:text-white border border-transparent"
                               }`}
                             >
@@ -1279,11 +1209,11 @@ function EditorInspectorBase({
                       <div className="pt-2 border-t border-white/[0.06] space-y-2.5">
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="font-medium text-slate-300 flex items-center gap-1">
-                            <Timer className="w-3 h-3 text-[#FF6B2C]" />
+                            <Timer className="w-3 h-3 text-select" />
                             Zoom & Hold Timing
                           </span>
-                          <span className="text-[10px] font-mono text-slate-400">
-                            Span: <span className="text-[#FF8A4C] font-semibold">{totalSpan.toFixed(2)}s</span>
+                          <span className="text-[10px] tabular-nums text-slate-400">
+                            Span: <span className="text-select font-semibold">{totalSpan.toFixed(2)}s</span>
                           </span>
                         </div>
 
@@ -1291,7 +1221,7 @@ function EditorInspectorBase({
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px]">
                             <span className="text-slate-400">Dolly-In Duration</span>
-                            <span className="font-mono text-[#FF6B2C] font-bold">{inDur.toFixed(2)}s</span>
+                            <span className="tabular-nums text-select font-bold">{inDur.toFixed(2)}s</span>
                           </div>
                           <input
                             type="range"
@@ -1311,7 +1241,7 @@ function EditorInspectorBase({
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px]">
                             <span className="text-slate-400">Hold Focus Duration</span>
-                            <span className="font-mono text-emerald-400 font-bold">{holdDur.toFixed(2)}s</span>
+                            <span className="tabular-nums text-emerald-400 font-bold">{holdDur.toFixed(2)}s</span>
                           </div>
                           <input
                             type="range"
@@ -1331,7 +1261,7 @@ function EditorInspectorBase({
                         <div className="space-y-1">
                           <div className="flex justify-between text-[10px]">
                             <span className="text-slate-400">Zoom-Out Duration</span>
-                            <span className="font-mono text-[#FF6B2C] font-bold">{outDur.toFixed(2)}s</span>
+                            <span className="tabular-nums text-select font-bold">{outDur.toFixed(2)}s</span>
                           </div>
                           <input
                             type="range"
@@ -1352,7 +1282,7 @@ function EditorInspectorBase({
                           <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-black/40 overflow-hidden flex border border-slate-300 dark:border-white/[0.06]">
                             <div
                               style={{ width: `${(inDur / totalSpan) * 100}%` }}
-                              className="bg-[#FF6B2C] h-full"
+                              className="bg-select h-full"
                               title={`Dolly-In: ${inDur.toFixed(2)}s`}
                             />
                             <div
@@ -1362,11 +1292,11 @@ function EditorInspectorBase({
                             />
                             <div
                               style={{ width: `${(outDur / totalSpan) * 100}%` }}
-                              className="bg-[#FF6B2C] h-full"
+                              className="bg-select h-full"
                               title={`Zoom-Out: ${outDur.toFixed(2)}s`}
                             />
                           </div>
-                          <div className="flex justify-between text-[9px] text-slate-500 font-mono mt-1">
+                          <div className="flex justify-between text-[9px] text-slate-500 tabular-nums mt-1">
                             <span>{ev.timestamp.toFixed(1)}s</span>
                             <span>Hold ({(ev.timestamp + inDur).toFixed(1)}s)</span>
                             <span>{(ev.timestamp + totalSpan).toFixed(1)}s</span>
@@ -1384,15 +1314,15 @@ function EditorInspectorBase({
         {/* ============================================================ */}
         {/* TAB 4: MEDIA & RECORDING HUB */}
         {/* ============================================================ */}
-        {activeTab === "media" && (
+        {(activeTab === "media" || activeTab === "clip") && (
           <div className="space-y-4">
             {/* Screen Recording Controls */}
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-800 dark:text-white">Screen Capture Hub</span>
                 {isRecording && (
-                  <span className="flex items-center gap-1 text-[#FF6B2C] font-mono text-[11px] font-bold animate-pulse">
-                    <span className="w-2 h-2 rounded-full bg-[#FF6B2C]" />
+                  <span className="flex items-center gap-1 text-select tabular-nums text-[11px] font-bold animate-pulse">
+                    <span className="w-2 h-2 rounded-full bg-select" />
                     REC
                   </span>
                 )}
@@ -1400,9 +1330,9 @@ function EditorInspectorBase({
 
               {isRecording ? (
                 <div className="space-y-2">
-                  <div className="p-3 rounded-lg bg-[#17191F] border border-[#FF6B2C]/30 flex items-center justify-between font-mono text-xs">
+                  <div className="p-3 rounded-lg bg-[#1C2733] border border-select/30 flex items-center justify-between tabular-nums text-xs">
                     <span className="text-slate-300">Elapsed:</span>
-                    <span className="text-[#FF6B2C] font-bold">
+                    <span className="text-select font-bold">
                       {Math.floor(recordingDuration / 60)
                         .toString()
                         .padStart(2, "0")}
@@ -1451,7 +1381,7 @@ function EditorInspectorBase({
                 className="w-full"
                 onClick={onLoadDemo}
                 isLoading={isGeneratingDemo}
-                leftIcon={<Film className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                leftIcon={<Film className="w-3.5 h-3.5 text-select" />}
               >
                 Load Sample Screen Recording
               </Button>
@@ -1490,7 +1420,7 @@ function EditorInspectorBase({
                   size="md"
                   className="w-full text-xs"
                   onClick={onNativeOpenVideo}
-                  leftIcon={<FolderOpen className="w-3.5 h-3.5 text-[#FF8A4C]" />}
+                  leftIcon={<FolderOpen className="w-3.5 h-3.5 text-select" />}
                 >
                   Open Video from Computer (Ctrl+O)
                 </Button>
@@ -1506,7 +1436,7 @@ function EditorInspectorBase({
                     <span className="text-xs font-semibold text-slate-800 dark:text-white">Google Drive Backup</span>
                   </div>
                   {isGoogleDriveConnected ? (
-                    <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-500 font-bold">
+                    <span className="flex items-center gap-1 text-[10px] tabular-nums text-emerald-500 font-bold">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       Connected
                     </span>
@@ -1539,7 +1469,7 @@ function EditorInspectorBase({
                   className="w-full text-xs"
                   onClick={onTakeSnapshot}
                   disabled={!metadata}
-                  leftIcon={<Camera className="w-3.5 h-3.5 text-[#FF8A4C]" />}
+                  leftIcon={<Camera className="w-3.5 h-3.5 text-select" />}
                 >
                   Export Current Frame (PNG)
                 </Button>
@@ -1550,7 +1480,7 @@ function EditorInspectorBase({
             {metadata && (
               <div className="glass-panel p-4 rounded-xl space-y-2 text-xs">
                 <span className="text-xs font-semibold text-slate-800 dark:text-white block">Source Metadata</span>
-                <div className="space-y-1 font-mono text-[11px] text-slate-700 dark:text-slate-300">
+                <div className="space-y-1 tabular-nums text-[11px] text-slate-700 dark:text-slate-300">
                   <div className="flex justify-between">
                     <span className="text-slate-500 dark:text-slate-400">File:</span>
                     <span className="text-slate-900 dark:text-white font-medium truncate max-w-[160px]">{metadata.name}</span>
@@ -1575,13 +1505,13 @@ function EditorInspectorBase({
         {activeTab === "cursor" && (
           <div className="space-y-4">
             {/* Master Cursor Overlay Switch */}
-            <div className="glass-panel p-4 rounded-xl space-y-3 border-[#FF6B2C]/30 bg-gradient-to-r from-amber-950/20 to-transparent">
+            <div className="glass-panel p-4 rounded-xl space-y-3 border-select/30 bg-gradient-to-r from-amber-950/20 to-transparent">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div
                     className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
                       config.showCursor
-                        ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-[#FF8A4C] shadow-glass-sm"
+                        ? "bg-select/20 border-select/40 text-select shadow-glass-sm"
                         : "bg-white/[0.04] border-white/10 text-slate-500"
                     }`}
                   >
@@ -1603,7 +1533,7 @@ function EditorInspectorBase({
                   type="button"
                   onClick={() => onChangeConfig({ showCursor: !config.showCursor })}
                   className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
-                    config.showCursor ? "bg-[#FF6B2C] shadow-[0_0_12px_rgba(255,107,44,0.5)]" : "bg-white/15"
+                    config.showCursor ? "bg-select shadow-[0_0_12px_rgba(242,106,33,0.5)]" : "bg-white/15"
                   }`}
                   title={config.showCursor ? "Hide cursor overlay" : "Show cursor overlay"}
                 >
@@ -1623,7 +1553,7 @@ function EditorInspectorBase({
                   <div
                     className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
                       config.hideDeviceCursor !== false
-                        ? "bg-[#FF6B2C]/20 border-[#FF6B2C]/40 text-[#FF8A4C] shadow-glass-sm"
+                        ? "bg-select/20 border-select/40 text-select shadow-glass-sm"
                         : "bg-white/[0.04] border-white/10 text-slate-500"
                     }`}
                   >
@@ -1643,7 +1573,7 @@ function EditorInspectorBase({
                   type="button"
                   onClick={() => onChangeConfig({ hideDeviceCursor: config.hideDeviceCursor === false ? true : false })}
                   className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-0.5 ${
-                    config.hideDeviceCursor !== false ? "bg-[#FF6B2C] shadow-[0_0_12px_rgba(255,107,44,0.5)]" : "bg-white/15"
+                    config.hideDeviceCursor !== false ? "bg-select shadow-[0_0_12px_rgba(242,106,33,0.5)]" : "bg-white/15"
                   }`}
                   title={config.hideDeviceCursor !== false ? "Disable hiding real cursor" : "Hide real cursor when recording"}
                 >
@@ -1672,7 +1602,7 @@ function EditorInspectorBase({
                     onClick={() => onChangeConfig({ cursorStyle: cur.id })}
                     className={`p-2.5 rounded-xl text-left border transition-all ${
                       config.cursorStyle === cur.id
-                        ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
+                        ? "bg-select/20 text-select border border-select/40 shadow-glass-sm"
                         : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                     }`}
                   >
@@ -1686,7 +1616,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-slate-800 dark:text-white">Cursor Size</label>
-                <span className="font-mono text-[#FF6B2C] font-bold">{config.cursorSize}px</span>
+                <span className="tabular-nums text-select font-bold">{config.cursorSize}px</span>
               </div>
               <input
                 type="range"
@@ -1706,7 +1636,7 @@ function EditorInspectorBase({
                   type="button"
                   onClick={() => onChangeConfig({ showRipple: !config.showRipple })}
                   className={`w-10 h-5 rounded-full transition-colors relative ${
-                    config.showRipple ? "bg-[#FF6B2C]" : "bg-white/10"
+                    config.showRipple ? "bg-select" : "bg-white/10"
                   }`}
                 >
                   <div
@@ -1752,7 +1682,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#FF6B2C",
+                            borderColor: "#F26A21",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -1784,7 +1714,7 @@ function EditorInspectorBase({
                 size="md"
                 className="w-full text-xs font-semibold"
                 onClick={onOpenWebcamReview}
-                leftIcon={<Camera className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                leftIcon={<Camera className="w-3.5 h-3.5 text-select" />}
               >
                 Open Camera Review & Setup
               </Button>
@@ -1820,7 +1750,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#FF6B2C",
+                            borderColor: "#F26A21",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -1839,7 +1769,7 @@ function EditorInspectorBase({
                   size="sm"
                   className="w-full text-xs"
                   onClick={() => webcamFileInputRef.current?.click()}
-                  leftIcon={<Upload className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                  leftIcon={<Upload className="w-3.5 h-3.5 text-select" />}
                 >
                   {config.webcamConfig?.url ? "Replace Webcam Video" : "Upload Webcam Video (MP4/WebM)"}
                 </Button>
@@ -1847,7 +1777,7 @@ function EditorInspectorBase({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs text-[#FF8A4C] hover:text-[#FF8A4C] px-2 flex-shrink-0"
+                    className="text-xs text-select hover:text-select px-2 flex-shrink-0"
                     title="Remove Webcam Overlay"
                     onClick={() => {
                       onChangeConfig({
@@ -1858,7 +1788,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#FF6B2C",
+                            borderColor: "#F26A21",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -1874,7 +1804,7 @@ function EditorInspectorBase({
                 )}
               </div>
               {config.webcamConfig?.url && (
-                <div className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 pt-0.5">
+                <div className="flex items-center gap-1.5 text-[10px] tabular-nums text-emerald-400 pt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   <span>Webcam video active</span>
                 </div>
@@ -1899,7 +1829,7 @@ function EditorInspectorBase({
                           customX: 0.85,
                           customY: 0.82,
                           size: 180,
-                          borderColor: "#FF6B2C",
+                          borderColor: "#F26A21",
                           borderWidth: 3,
                           shadow: true,
                           mirror: true,
@@ -1908,7 +1838,7 @@ function EditorInspectorBase({
                       },
                     });
                   }}
-                  className="w-full bg-slate-100 dark:bg-[#090D16] border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none focus:border-[#FF6B2C] transition-colors"
+                  className="w-full bg-slate-100 dark:bg-[#131B24] border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-white outline-none focus:border-select transition-colors"
                 >
                   {availableCameras.map((cam) => (
                     <option key={cam.deviceId} value={cam.deviceId}>
@@ -1943,7 +1873,7 @@ function EditorInspectorBase({
                               customX: 0.85,
                               customY: 0.82,
                               size: 180,
-                              borderColor: "#FF6B2C",
+                              borderColor: "#F26A21",
                               borderWidth: 3,
                               shadow: true,
                               mirror: true,
@@ -1954,7 +1884,7 @@ function EditorInspectorBase({
                       }
                       className={`p-2.5 rounded-xl text-center border transition-all ${
                         currentShape === sh.id
-                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 shadow-glass-sm"
+                          ? "bg-select/20 text-select border border-select/40 shadow-glass-sm"
                           : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                       }`}
                     >
@@ -1990,7 +1920,7 @@ function EditorInspectorBase({
                               customX: 0.85,
                               customY: 0.82,
                               size: 180,
-                              borderColor: "#FF6B2C",
+                              borderColor: "#F26A21",
                               borderWidth: 3,
                               shadow: true,
                               mirror: true,
@@ -2003,7 +1933,7 @@ function EditorInspectorBase({
                       }
                       className={`p-2 rounded-xl text-center border transition-all text-xs font-medium ${
                         currentPos === pos.id
-                          ? "bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/40 font-semibold"
+                          ? "bg-select/20 text-select border border-select/40 font-semibold"
                           : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-200 dark:bg-white/[0.03] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.06]"
                       }`}
                     >
@@ -2021,7 +1951,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-2.5">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-slate-800 dark:text-white">Bubble Size</label>
-                <span className="font-mono text-[#FF6B2C] font-bold">
+                <span className="tabular-nums text-select font-bold">
                   {config.webcamConfig?.size || 180}px
                 </span>
               </div>
@@ -2040,7 +1970,7 @@ function EditorInspectorBase({
                         customX: 0.85,
                         customY: 0.82,
                         size: 180,
-                        borderColor: "#FF6B2C",
+                        borderColor: "#F26A21",
                         borderWidth: 3,
                         shadow: true,
                         mirror: true,
@@ -2049,7 +1979,7 @@ function EditorInspectorBase({
                     },
                   })
                 }
-                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
+                className="w-full accent-select cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
               />
             </div>
 
@@ -2072,7 +2002,7 @@ function EditorInspectorBase({
                           customX: 0.85,
                           customY: 0.82,
                           size: 180,
-                          borderColor: "#FF6B2C",
+                          borderColor: "#F26A21",
                           borderWidth: 3,
                           shadow: true,
                           mirror: true,
@@ -2082,7 +2012,7 @@ function EditorInspectorBase({
                     })
                   }
                   className={`w-10 h-5 rounded-full transition-colors relative ${
-                    config.webcamConfig?.mirror ?? true ? "bg-[#FF6B2C]" : "bg-white/10"
+                    config.webcamConfig?.mirror ?? true ? "bg-select" : "bg-white/10"
                   }`}
                 >
                   <div
@@ -2110,7 +2040,7 @@ function EditorInspectorBase({
                           customX: 0.85,
                           customY: 0.82,
                           size: 180,
-                          borderColor: "#FF6B2C",
+                          borderColor: "#F26A21",
                           borderWidth: 3,
                           shadow: true,
                           mirror: true,
@@ -2120,7 +2050,7 @@ function EditorInspectorBase({
                     })
                   }
                   className={`w-10 h-5 rounded-full transition-colors relative ${
-                    config.webcamConfig?.shadow ?? true ? "bg-[#FF6B2C]" : "bg-white/10"
+                    config.webcamConfig?.shadow ?? true ? "bg-select" : "bg-white/10"
                   }`}
                 >
                   <div
@@ -2136,7 +2066,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex justify-between items-center text-xs">
                 <label className="font-semibold text-slate-800 dark:text-white">Border Width</label>
-                <span className="font-mono text-[#FF6B2C] font-bold">
+                <span className="tabular-nums text-select font-bold">
                   {config.webcamConfig?.borderWidth ?? 3}px
                 </span>
               </div>
@@ -2155,7 +2085,7 @@ function EditorInspectorBase({
                         customX: 0.85,
                         customY: 0.82,
                         size: 180,
-                        borderColor: "#FF6B2C",
+                        borderColor: "#F26A21",
                         borderWidth: 3,
                         shadow: true,
                         mirror: true,
@@ -2164,7 +2094,7 @@ function EditorInspectorBase({
                     },
                   })
                 }
-                className="w-full accent-[#FF6B2C] cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
+                className="w-full accent-select cursor-pointer h-1 bg-slate-200 dark:bg-white/10 rounded"
               />
 
               <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between">
@@ -2172,7 +2102,7 @@ function EditorInspectorBase({
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
-                    value={config.webcamConfig?.borderColor || "#FF6B2C"}
+                    value={config.webcamConfig?.borderColor || "#F26A21"}
                     onChange={(e) =>
                       onChangeConfig({
                         webcamConfig: {
@@ -2183,7 +2113,7 @@ function EditorInspectorBase({
                             customX: 0.85,
                             customY: 0.82,
                             size: 180,
-                            borderColor: "#FF6B2C",
+                            borderColor: "#F26A21",
                             borderWidth: 3,
                             shadow: true,
                             mirror: true,
@@ -2194,8 +2124,8 @@ function EditorInspectorBase({
                     }
                     className="w-7 h-7 rounded-lg border border-white/20 bg-transparent cursor-pointer"
                   />
-                  <span className="font-mono text-xs text-slate-300 uppercase">
-                    {config.webcamConfig?.borderColor || "#FF6B2C"}
+                  <span className="tabular-nums text-xs text-slate-300">
+                    {config.webcamConfig?.borderColor || "#F26A21"}
                   </span>
                 </div>
               </div>
@@ -2214,7 +2144,7 @@ function EditorInspectorBase({
                 <span className="text-xs font-semibold text-slate-800 dark:text-white block">
                   Theme & Appearance
                 </span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded capitalize bg-[#FF6B2C]/15 text-[#FF6B2C] dark:text-[#FF8A4C] border border-[#FF6B2C]/30 font-bold">
+                <span className="text-[10px] tabular-nums px-2 py-0.5 rounded capitalize bg-select/15 text-select dark:text-select border border-select/30 font-bold">
                   {theme || "dark"} mode
                 </span>
               </div>
@@ -2228,11 +2158,11 @@ function EditorInspectorBase({
                   onClick={() => onThemeChange?.("dark")}
                   className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1.5 transition-all ${
                     theme === "dark"
-                      ? "bg-[#FFF1E8]/10 dark:bg-[#FF6B2C]/20 border-[#FF6B2C] text-[#FF6B2C] dark:text-white font-bold shadow-xs"
+                      ? "bg-slate-200/10 dark:bg-select/20 border-select text-select dark:text-white font-bold shadow-xs"
                       : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.03] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
                   }`}
                 >
-                  <Moon className={`w-4 h-4 ${theme === "dark" ? "text-[#FF6B2C]" : ""}`} />
+                  <Moon className={`w-4 h-4 ${theme === "dark" ? "text-select" : ""}`} />
                   <span className="text-xs font-semibold">Dark</span>
                 </button>
 
@@ -2241,7 +2171,7 @@ function EditorInspectorBase({
                   onClick={() => onThemeChange?.("light")}
                   className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1.5 transition-all ${
                     theme === "light"
-                      ? "bg-[#FFF1E8] border-[#FF6B2C] text-[#FF6B2C] font-bold shadow-xs"
+                      ? "bg-slate-200 border-select text-select font-bold shadow-xs"
                       : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.03] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
                   }`}
                 >
@@ -2254,11 +2184,11 @@ function EditorInspectorBase({
                   onClick={() => onThemeChange?.("system")}
                   className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1.5 transition-all ${
                     theme === "system"
-                      ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/20 border-[#FF6B2C] text-[#FF6B2C] dark:text-white font-bold shadow-xs"
+                      ? "bg-slate-200 dark:bg-select/20 border-select text-select dark:text-white font-bold shadow-xs"
                       : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.03] dark:text-slate-400 dark:border-white/10 dark:hover:text-white"
                   }`}
                 >
-                  <Laptop className={`w-4 h-4 ${theme === "system" ? "text-[#FF6B2C]" : ""}`} />
+                  <Laptop className={`w-4 h-4 ${theme === "system" ? "text-select" : ""}`} />
                   <span className="text-xs font-semibold">System</span>
                 </button>
               </div>
@@ -2268,7 +2198,7 @@ function EditorInspectorBase({
             <div className="glass-panel p-4 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#FF6B2C]" />
+                  <Clock className="w-4 h-4 text-select" />
                   <div>
                     <span className="text-xs font-semibold text-slate-800 dark:text-white block">Auto-Save</span>
                     <span className="text-[10px] text-slate-500 dark:text-slate-400">Save timeline & keyframes periodically</span>
@@ -2278,7 +2208,7 @@ function EditorInspectorBase({
                   type="button"
                   onClick={() => onToggleAutoSave?.(!autoSaveEnabled)}
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                    autoSaveEnabled ? "bg-[#FF6B2C]" : "bg-slate-300 dark:bg-white/20"
+                    autoSaveEnabled ? "bg-select" : "bg-slate-300 dark:bg-white/20"
                   }`}
                 >
                   <span
@@ -2298,9 +2228,9 @@ function EditorInspectorBase({
                         key={sec}
                         type="button"
                         onClick={() => onChangeAutoSaveInterval?.(sec)}
-                        className={`py-1.5 rounded-lg text-xs font-mono transition-all ${
+                        className={`py-1.5 rounded-lg text-xs tabular-nums transition-all ${
                           autoSaveInterval === sec
-                            ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/20 border border-[#FF6B2C] text-[#FF6B2C] dark:text-[#FF8A4C] font-bold"
+                            ? "bg-slate-200 dark:bg-select/20 border border-select text-select dark:text-select font-bold"
                             : "bg-slate-100 dark:bg-white/[0.03] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10"
                         }`}
                       >
@@ -2321,7 +2251,7 @@ function EditorInspectorBase({
                     <span className="text-xs font-semibold text-slate-800 dark:text-white">Google Drive</span>
                   </div>
                   {isGoogleDriveConnected ? (
-                    <span className="text-[10px] font-mono text-emerald-500 font-bold">Connected</span>
+                    <span className="text-[10px] tabular-nums text-emerald-500 font-bold">Connected</span>
                   ) : (
                     <span className="text-[10px] text-slate-400">Offline</span>
                   )}
@@ -2343,7 +2273,7 @@ function EditorInspectorBase({
               <div className="glass-panel p-4 rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-[#FF6B2C]" />
+                    <Settings className="w-4 h-4 text-select" />
                     <div>
                       <span className="text-xs font-semibold text-slate-800 dark:text-white block">Advanced Settings</span>
                       <span className="text-[10px] text-slate-500 dark:text-slate-400">Storage, cache & recording options</span>

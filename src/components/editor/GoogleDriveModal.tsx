@@ -198,7 +198,7 @@ export function GoogleDriveModal({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg my-auto rounded-3xl bg-white dark:bg-[#090D18] border border-slate-200 dark:border-white/15 p-6 shadow-2xl backdrop-blur-2xl text-slate-800 dark:text-slate-100 max-h-[calc(100vh-2rem)] overflow-y-auto select-none"
+        className="relative w-full max-w-lg my-auto rounded-3xl bg-white dark:bg-[#131B24] border border-slate-200 dark:border-white/15 p-6 shadow-2xl backdrop-blur-2xl text-slate-800 dark:text-slate-100 max-h-[calc(100vh-2rem)] overflow-y-auto select-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -211,7 +211,7 @@ export function GoogleDriveModal({
               <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
                 <span>Personal Google Drive</span>
                 {status.isConnected && (
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[10px] tabular-nums font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                     Connected
                   </span>
                 )}
@@ -252,17 +252,17 @@ export function GoogleDriveModal({
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Connected Account</span>
-                <span className="text-xs font-mono font-bold text-slate-900 dark:text-white">
+                <span className="text-xs tabular-nums font-bold text-slate-900 dark:text-white">
                   {status.user?.email || "Google User"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/10">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Folder className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <Folder className="w-3.5 h-3.5 text-select" />
                   Target Folder
                 </span>
-                <span className="text-xs font-mono text-slate-800 dark:text-slate-200 font-semibold">
+                <span className="text-xs tabular-nums text-slate-800 dark:text-slate-200 font-semibold">
                   FucuFlow Studio Videos
                 </span>
               </div>
@@ -284,7 +284,7 @@ export function GoogleDriveModal({
                     isBackingUp ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <UploadCloud className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                      <UploadCloud className="w-3.5 h-3.5 text-select" />
                     )
                   }
                   className="w-full text-xs font-semibold"
@@ -331,7 +331,7 @@ export function GoogleDriveModal({
                 onClick={() => setActiveTab("oauth")}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "oauth"
-                    ? "bg-white dark:bg-[#121829] text-slate-900 dark:text-white shadow-2xs"
+                    ? "bg-white dark:bg-[#1C2733] text-slate-900 dark:text-white shadow-2xs"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
@@ -342,7 +342,7 @@ export function GoogleDriveModal({
                 onClick={() => setActiveTab("token")}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "token"
-                    ? "bg-white dark:bg-[#121829] text-slate-900 dark:text-white shadow-2xs"
+                    ? "bg-white dark:bg-[#1C2733] text-slate-900 dark:text-white shadow-2xs"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
@@ -355,13 +355,13 @@ export function GoogleDriveModal({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                      <Key className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                      <Key className="w-3.5 h-3.5 text-select" />
                       Google Cloud OAuth Client ID
                     </label>
                     <button
                       type="button"
                       onClick={() => setShowHelp(!showHelp)}
-                      className="text-[11px] text-[#FF6B2C] hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                      className="text-[11px] text-select hover:underline flex items-center gap-1 cursor-pointer font-medium"
                     >
                       <HelpCircle className="w-3 h-3" />
                       <span>{showHelp ? "Hide guide" : "How to get Client ID?"}</span>
@@ -373,10 +373,10 @@ export function GoogleDriveModal({
                     value={clientIdInput}
                     onChange={(e) => setClientIdInput(e.target.value)}
                     placeholder="e.g. 123456789-xxxx.apps.googleusercontent.com"
-                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-[#FF6B2C] transition-colors"
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 text-xs tabular-nums text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-select transition-colors"
                   />
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                    Uses Google Drive <code className="text-[#FF6B2C] font-mono text-[10px]">drive.file</code> scope: FucuFlow can <strong>only</strong> access files it creates, never your private documents.
+                    Uses Google Drive <code className="text-select tabular-nums text-[10px]">drive.file</code> scope: FucuFlow can <strong>only</strong> access files it creates, never your private documents.
                   </p>
                 </div>
 
@@ -384,17 +384,17 @@ export function GoogleDriveModal({
                   <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-950 dark:text-amber-200 space-y-2 leading-relaxed animate-in slide-in-from-top-2">
                     <p className="font-bold">How to create a free Google OAuth Client ID in 2 minutes:</p>
                     <ol className="list-decimal pl-4 space-y-1 text-[11px]">
-                      <li>Go to the <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline font-bold text-[#FF6B2C]">Google Cloud Console Credentials</a> page.</li>
+                      <li>Go to the <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline font-bold text-select">Google Cloud Console Credentials</a> page.</li>
                       <li>Click <strong>+ Create Credentials &rarr; OAuth Client ID</strong>.</li>
                       <li>Select Application type: <strong>Web application</strong>.</li>
                       <li>Under <em>Authorized JavaScript origins</em>, add your origin:</li>
                     </ol>
                     <div className="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-white dark:bg-black/30 border border-amber-300 dark:border-amber-700/50">
-                      <code className="text-[11px] font-mono">{currentOrigin}</code>
+                      <code className="text-[11px] tabular-nums">{currentOrigin}</code>
                       <button
                         type="button"
                         onClick={handleCopyOrigin}
-                        className="px-2 py-0.5 rounded bg-[#FF6B2C] text-white text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                        className="px-2 py-0.5 rounded bg-select text-onselect text-[10px] font-bold flex items-center gap-1 cursor-pointer"
                       >
                         {copiedOrigin ? <Check size={11} /> : <Copy size={11} />}
                         <span>{copiedOrigin ? "Copied" : "Copy"}</span>
@@ -434,10 +434,10 @@ export function GoogleDriveModal({
                     value={manualTokenInput}
                     onChange={(e) => setManualTokenInput(e.target.value)}
                     placeholder="Paste your personal OAuth access token (ya29....)"
-                    className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-[#FF6B2C] transition-colors resize-none"
+                    className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 text-xs tabular-nums text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-select transition-colors resize-none"
                   />
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                    Useful for quick personal testing via <a href="https://developers.google.com/oauthplayground" target="_blank" rel="noopener noreferrer" className="text-[#FF6B2C] underline">OAuth Playground</a> or command line tokens.
+                    Useful for quick personal testing via <a href="https://developers.google.com/oauthplayground" target="_blank" rel="noopener noreferrer" className="text-select underline">OAuth Playground</a> or command line tokens.
                   </p>
                 </div>
 

@@ -213,7 +213,7 @@ export function ExportModal({
         customX: 0.85,
         customY: 0.82,
         size: 180,
-        borderColor: "#FF6B2C",
+        borderColor: "#F26A21",
         borderWidth: 3,
         shadow: true,
         mirror: true,
@@ -272,7 +272,7 @@ export function ExportModal({
             exportCtx.save();
             exportCtx.translate(posX, posY);
             exportCtx.lineWidth = wConfig.borderWidth * scaleFactor;
-            exportCtx.strokeStyle = wConfig.borderColor || "#FF6B2C";
+            exportCtx.strokeStyle = wConfig.borderColor || "#F26A21";
             exportCtx.beginPath();
             if (wConfig.shape === "circle") {
               exportCtx.arc(0, 0, bubbleSize / 2, 0, Math.PI * 2);
@@ -353,7 +353,7 @@ export function ExportModal({
           particleCount: 100,
           spread: 80,
           origin: { y: 0.5 },
-          colors: ["#FF6B2C", "#818cf8", "#c084fc"],
+          colors: ["#F26A21", "#818cf8", "#c084fc"],
         });
       } catch {
         // ignore
@@ -552,11 +552,11 @@ export function ExportModal({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-lg my-auto rounded-3xl bg-white dark:bg-[#090D18] border border-slate-200 dark:border-white/15 p-6 sm:p-7 relative overflow-hidden space-y-4 shadow-2xl text-slate-800 dark:text-slate-100 max-h-[calc(100vh-2rem)] overflow-y-auto select-none">
+      <div className="w-full max-w-lg my-auto rounded-3xl bg-white dark:bg-[#131B24] border border-slate-200 dark:border-white/15 p-6 sm:p-7 relative overflow-hidden space-y-4 shadow-2xl text-slate-800 dark:text-slate-100 max-h-[calc(100vh-2rem)] overflow-y-auto select-none">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF6B2C] shadow-xs">
+            <div className="w-9 h-9 rounded-2xl bg-slate-200 dark:bg-select/15 border border-select/30 flex items-center justify-center text-select shadow-xs">
               <Film className="w-4 h-4" />
             </div>
             <div>
@@ -580,7 +580,7 @@ export function ExportModal({
             <div className="space-y-2 p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10">
               <div className="flex justify-between text-xs">
                 <span className="text-slate-500 dark:text-slate-400 font-medium">Resolution</span>
-                <span className="text-slate-900 dark:text-white font-mono font-bold">
+                <span className="text-slate-900 dark:text-white tabular-nums font-bold">
                   {canvasRef.current
                     ? `${canvasRef.current.width}x${canvasRef.current.height} (${
                         canvasRef.current.width >= 3000
@@ -594,11 +594,11 @@ export function ExportModal({
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-500 dark:text-slate-400 font-medium">Duration</span>
-                <span className="text-slate-900 dark:text-white font-mono font-bold">{duration.toFixed(1)}s</span>
+                <span className="text-slate-900 dark:text-white tabular-nums font-bold">{duration.toFixed(1)}s</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-500 dark:text-slate-400 font-medium">Hardware Codec</span>
-                <span className="text-slate-900 dark:text-white font-mono font-bold">WebM (VP9 / WebCodecs)</span>
+                <span className="text-slate-900 dark:text-white tabular-nums font-bold">WebM (VP9 / WebCodecs)</span>
               </div>
             </div>
 
@@ -611,7 +611,7 @@ export function ExportModal({
                   onClick={() => setExportFps(30)}
                   className={`p-2.5 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
                     exportFps === 30
-                      ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border-2 border-[#FF6B2C] text-slate-900 dark:text-white shadow-2xs"
+                      ? "bg-slate-200 dark:bg-select/15 border-2 border-select text-slate-900 dark:text-white shadow-2xs"
                       : "bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
@@ -624,11 +624,11 @@ export function ExportModal({
                   onClick={() => setExportFps(60)}
                   className={`p-2.5 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
                     exportFps === 60
-                      ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border-2 border-[#FF6B2C] text-slate-900 dark:text-white shadow-2xs"
+                      ? "bg-slate-200 dark:bg-select/15 border-2 border-select text-slate-900 dark:text-white shadow-2xs"
                       : "bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="font-bold text-[#FF6B2C]">60 FPS (Ultra Smooth)</div>
+                  <div className="font-bold text-select">60 FPS (Ultra Smooth)</div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400">High-fidelity motion</div>
                 </button>
               </div>
@@ -643,7 +643,7 @@ export function ExportModal({
                   onClick={() => setBitrate(8000000)}
                   className={`p-2.5 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
                     bitrate === 8000000
-                      ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border-2 border-[#FF6B2C] text-slate-900 dark:text-white shadow-2xs"
+                      ? "bg-slate-200 dark:bg-select/15 border-2 border-select text-slate-900 dark:text-white shadow-2xs"
                       : "bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
@@ -656,11 +656,11 @@ export function ExportModal({
                   onClick={() => setBitrate(16000000)}
                   className={`p-2.5 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
                     bitrate === 16000000
-                      ? "bg-[#FFF1E8] dark:bg-[#FF6B2C]/15 border-2 border-[#FF6B2C] text-slate-900 dark:text-white shadow-2xs"
+                      ? "bg-slate-200 dark:bg-select/15 border-2 border-select text-slate-900 dark:text-white shadow-2xs"
                       : "bg-slate-50 dark:bg-white/[0.03] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="font-bold text-[#FF6B2C]">Ultra (16 Mbps)</div>
+                  <div className="font-bold text-select">Ultra (16 Mbps)</div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400">Crisp high-bitrate 4K</div>
                 </button>
               </div>
@@ -670,14 +670,14 @@ export function ExportModal({
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <Folder className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                  <Folder className="w-3.5 h-3.5 text-select" />
                   <span>Local Save Folder</span>
                 </label>
                 {exportFolder && (
                   <button
                     type="button"
                     onClick={() => setExportFolder(null)}
-                    className="text-[10px] text-[#FF6B2C] hover:underline cursor-pointer"
+                    className="text-[10px] text-select hover:underline cursor-pointer"
                   >
                     Reset
                   </button>
@@ -686,7 +686,7 @@ export function ExportModal({
 
               <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-slate-900 dark:text-white truncate font-mono font-medium">
+                  <p className="text-xs text-slate-900 dark:text-white truncate tabular-nums font-medium">
                     {exportFolder ? exportFolder : "Prompt Folder on Save (Default)"}
                   </p>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
@@ -705,7 +705,7 @@ export function ExportModal({
                     isSelectingFolder ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <FolderOpen className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                      <FolderOpen className="w-3.5 h-3.5 text-select" />
                     )
                   }
                   className="text-xs shrink-0"
@@ -729,7 +729,7 @@ export function ExportModal({
               <button
                 type="button"
                 onClick={() => setIsGDriveModalOpen(true)}
-                className="text-[11px] font-bold text-[#FF6B2C] hover:underline shrink-0 cursor-pointer"
+                className="text-[11px] font-bold text-select hover:underline shrink-0 cursor-pointer"
               >
                 {isGDriveConnected ? "Manage" : "Connect"}
               </button>
@@ -750,7 +750,7 @@ export function ExportModal({
         {/* State 2: Export in Progress */}
         {isExporting && (
           <div className="py-6 text-center space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin text-[#FF6B2C] mx-auto" />
+            <Loader2 className="w-8 h-8 animate-spin text-select mx-auto" />
             <div className="space-y-0.5">
               <div className="text-slate-900 dark:text-white font-bold text-sm">Rendering 3D Frame by Frame...</div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -762,15 +762,15 @@ export function ExportModal({
             <div className="space-y-2">
               <div className="w-full h-2.5 rounded-full bg-slate-100 dark:bg-black/40 overflow-hidden border border-slate-200 dark:border-white/10">
                 <div
-                  className="h-full bg-gradient-to-r from-[#FF7A3D] to-[#FF8A4C] transition-all duration-100 shadow-[0_0_10px_rgba(255,107,44,0.5)]"
+                  className="h-full bg-gradient-to-r from-select to-select transition-all duration-100 shadow-[0_0_10px_rgba(242,106,33,0.5)]"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <div className="flex justify-between items-center text-[11px] font-mono">
+              <div className="flex justify-between items-center text-[11px] tabular-nums">
                 <span className="text-slate-500 dark:text-slate-400 font-medium">
                   {remainingSec > 0 ? `~${remainingSec}s remaining` : "Finalizing file..."}
                 </span>
-                <span className="text-[#FF6B2C] font-bold">
+                <span className="text-select font-bold">
                   {Math.round(progress)}% Complete
                 </span>
               </div>
@@ -798,12 +798,12 @@ export function ExportModal({
                   Video rendered successfully ({fileSize})
                 </div>
                 {savedFilePath && (
-                  <div className="text-[11px] text-emerald-800 dark:text-emerald-400 truncate mt-0.5 font-mono">
+                  <div className="text-[11px] text-emerald-800 dark:text-emerald-400 truncate mt-0.5 tabular-nums">
                     Saved locally: {savedFilePath}
                   </div>
                 )}
                 {gdriveResult && (
-                  <div className="text-[11px] text-emerald-800 dark:text-emerald-400 truncate mt-0.5 font-mono">
+                  <div className="text-[11px] text-emerald-800 dark:text-emerald-400 truncate mt-0.5 tabular-nums">
                     Uploaded to Google Drive: {gdriveResult.name}
                   </div>
                 )}
@@ -819,11 +819,11 @@ export function ExportModal({
             <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                  <Folder className="w-4 h-4 text-[#FF6B2C]" />
+                  <Folder className="w-4 h-4 text-select" />
                   Save on Local Computer
                 </span>
                 {savedFilePath && (
-                  <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="text-[10px] tabular-nums text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
                     <Check className="w-3 h-3" /> Saved Locally
                   </span>
                 )}
@@ -850,7 +850,7 @@ export function ExportModal({
                   <Button
                     variant="secondary"
                     onClick={handleShowInFolder}
-                    leftIcon={<ExternalLink className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                    leftIcon={<ExternalLink className="w-3.5 h-3.5 text-select" />}
                     className="w-full text-xs font-semibold cursor-pointer"
                   >
                     Open Folder
@@ -860,7 +860,7 @@ export function ExportModal({
                     variant="secondary"
                     onClick={() => handleSaveVideo(true)}
                     disabled={isSaving}
-                    leftIcon={<FolderOpen className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                    leftIcon={<FolderOpen className="w-3.5 h-3.5 text-select" />}
                     className="w-full text-xs font-semibold cursor-pointer"
                   >
                     Choose Folder...
@@ -877,7 +877,7 @@ export function ExportModal({
                   Save to Personal Google Drive
                 </span>
                 {isGDriveConnected && (
-                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate max-w-[150px]" title={gdriveUserEmail || ""}>
+                  <span className="text-[10px] tabular-nums text-slate-500 dark:text-slate-400 truncate max-w-[150px]" title={gdriveUserEmail || ""}>
                     {gdriveUserEmail}
                   </span>
                 )}
@@ -895,13 +895,13 @@ export function ExportModal({
                 <div className="space-y-1.5 py-1">
                   <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-[#FF6B2C] transition-all duration-150"
+                      className="h-full bg-gradient-to-r from-emerald-500 to-select transition-all duration-150"
                       style={{ width: `${gdriveUploadProgress}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                  <div className="flex justify-between text-[11px] tabular-nums text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1">
-                      <Loader2 className="w-3 h-3 animate-spin text-[#FF6B2C]" />
+                      <Loader2 className="w-3 h-3 animate-spin text-select" />
                       Uploading to Drive...
                     </span>
                     <span className="font-bold text-slate-800 dark:text-slate-200">{gdriveUploadProgress}%</span>
@@ -917,7 +917,7 @@ export function ExportModal({
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       Saved in &ldquo;FucuFlow Studio Videos&rdquo;
                     </span>
-                    {gdriveResult.size && <span className="font-mono text-[10px] opacity-75">{gdriveResult.size}</span>}
+                    {gdriveResult.size && <span className="tabular-nums text-[10px] opacity-75">{gdriveResult.size}</span>}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -992,7 +992,7 @@ export function ExportModal({
                 &larr; Render Again
               </button>
               {exportFolder && (
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate max-w-[200px]" title={exportFolder}>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 tabular-nums truncate max-w-[200px]" title={exportFolder}>
                   Folder: {exportFolder}
                 </span>
               )}

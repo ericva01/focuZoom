@@ -1,4 +1,4 @@
-import { SolutionsView } from "@/views/SolutionsView";
+import { FeaturesView } from "@/views/FeaturesView";
 
 export const metadata = {
   title: "Solutions",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function SolutionsPage() {
-  return <SolutionsView />;
+  return <FeaturesView />;
 }
