@@ -335,7 +335,7 @@ function VideoCanvasBase({
       className="w-full h-full min-h-0 bg-transparent flex flex-col items-center justify-center p-2 sm:p-3 overflow-hidden relative select-none"
     >
       {/* Ambient background glow */}
-      <div className="absolute w-[600px] h-[450px] bg-[#FF6B2C]/[0.05] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute w-[600px] h-[450px] bg-select/[0.05] rounded-full blur-[140px] pointer-events-none" />
 
       {/* Hidden HTML5 Video element used as texture source - ALWAYS mounted so videoRef is immediately available */}
       <video
@@ -350,8 +350,8 @@ function VideoCanvasBase({
       {/* Empty Timeline Stage Overlay when video clip has been deleted */}
       {clips !== undefined && clips.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 p-4 animate-in fade-in duration-200">
-          <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-white/95 dark:bg-[#090D16]/90 border border-slate-300 dark:border-white/15 backdrop-blur-xl shadow-xl max-w-sm text-center">
-            <div className="w-12 h-12 rounded-xl bg-[#FFF1E8] dark:bg-[#FF6B2C]/10 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FF6B2C]">
+          <div className="flex flex-col items-center gap-2.5 px-6 py-5 rounded-2xl bg-white/95 dark:bg-[#131B24]/90 border border-slate-300 dark:border-white/15 backdrop-blur-xl shadow-xl max-w-sm text-center">
+            <div className="w-12 h-12 rounded-xl bg-slate-200 dark:bg-select/10 border border-select/30 flex items-center justify-center text-select">
               <Film className="w-6 h-6" />
             </div>
             <div>
@@ -366,24 +366,24 @@ function VideoCanvasBase({
 
       {/* Right-Click Moving Banner Overlay */}
       {isRightClickDragging && (
-        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#17191F]/95 border border-[#FF6B2C]/60 text-white font-bold text-xs shadow-lg backdrop-blur-xl animate-pulse">
-          <Crosshair className="w-4 h-4 text-[#FF8A4C] animate-spin" />
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1C2733]/95 border border-select/60 text-white font-bold text-xs shadow-lg backdrop-blur-xl animate-pulse">
+          <Crosshair className="w-4 h-4 text-select animate-spin" />
           <span>Moving Focus Point: ({Math.round((hoverCoords?.x ?? 0.5) * 100)}%, {Math.round((hoverCoords?.y ?? 0.5) * 100)}%) · Release to save</span>
         </div>
       )}
 
       {/* Mode Banner Overlay */}
       {isAddMode && !isRightClickDragging && (
-        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#17191F]/95 border border-[#FF6B2C]/50 text-white font-bold text-xs shadow-lg backdrop-blur-xl animate-pulse">
-          <Crosshair className="w-4 h-4 text-[#FF6B2C]" />
+        <div className="absolute top-6 z-30 flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1C2733]/95 border border-select/50 text-white font-bold text-xs shadow-lg backdrop-blur-xl animate-pulse">
+          <Crosshair className="w-4 h-4 text-select" />
           <span>3D Focal Target Mode: Click on any element on the 3D screen to set a camera dolly target!</span>
         </div>
       )}
 
       {/* Just Added Confirmation Toast */}
       {justAddedToast && (
-        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#17191F]/95 border border-[#FF6B2C]/50 text-white font-semibold text-xs shadow-lg backdrop-blur-xl animate-in fade-in zoom-in duration-200">
-          <Check className="w-4 h-4 text-[#FF6B2C]" />
+        <div className="absolute top-16 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#1C2733]/95 border border-select/50 text-white font-semibold text-xs shadow-lg backdrop-blur-xl animate-in fade-in zoom-in duration-200">
+          <Check className="w-4 h-4 text-select" />
           <span>3D Target set at ({Math.round(justAddedToast.x * 100)}%, {Math.round(justAddedToast.y * 100)}%)!</span>
         </div>
       )}
@@ -393,7 +393,7 @@ function VideoCanvasBase({
         onContextMenu={(e) => e.preventDefault()}
         className={`relative flex items-center justify-center max-h-full max-w-full rounded-2xl overflow-hidden shadow-[0_12px_45px_rgba(0,0,0,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] border-2 border-slate-300 dark:border-white/[0.14] group ${
           config.backgroundType === "transparent"
-            ? "bg-slate-200 dark:bg-[#090D16] [background-image:linear-gradient(45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(-45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgba(0,0,0,0.05)_75%),linear-gradient(-45deg,transparent_75%,rgba(0,0,0,0.05)_75%)] [background-size:20px_20px] [background-position:0_0,0_10px,10px_-10px,-10px_0px]"
+            ? "bg-slate-200 dark:bg-[#131B24] [background-image:linear-gradient(45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(-45deg,rgba(0,0,0,0.05)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgba(0,0,0,0.05)_75%),linear-gradient(-45deg,transparent_75%,rgba(0,0,0,0.05)_75%)] [background-size:20px_20px] [background-position:0_0,0_10px,10px_-10px,-10px_0px]"
             : "bg-transparent"
         }`}
         style={{
@@ -454,15 +454,15 @@ function VideoCanvasBase({
 
         {/* Live 3D Camera Zoom Indicator HUD Badge */}
         <div className="absolute bottom-4 left-4 z-20 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/75 border border-white/15 text-xs shadow-lg backdrop-blur-xl text-white">
-          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-[#FF8A4C] animate-pulse" : "text-slate-400"}`} />
-          <span className="text-[10px] text-slate-300 font-mono font-bold uppercase tracking-wider hidden sm:inline">
+          <Cuboid className={`w-3.5 h-3.5 ${cameraState.isZoomed ? "text-select animate-pulse" : "text-slate-400"}`} />
+          <span className="text-[10px] text-slate-300 tabular-nums font-bold hidden sm:inline">
             3D Studio
           </span>
-          <span className="font-mono text-white font-bold">
+          <span className="tabular-nums text-white font-bold">
             {cameraState.scale.toFixed(2)}x Dolly
           </span>
           {cameraState.isZoomed && (
-            <span className="text-[10px] text-[#FF8A4C] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 shadow-glass-sm">
+            <span className="text-[10px] text-select font-semibold px-2 py-0.5 rounded-md bg-select/20 border border-select/30 shadow-glass-sm">
               Focus Active
             </span>
           )}
@@ -471,7 +471,7 @@ function VideoCanvasBase({
         {/* Coordinate Crosshair Tracker during Add Mode */}
         {isAddMode && hoverCoords && (
           <div
-            className="absolute pointer-events-none z-20 px-2.5 py-1 rounded-lg glass-panel text-[#FF8A4C] font-mono text-[10px] border-[#FF6B2C]/40 shadow-glass-sm -translate-x-1/2 -translate-y-8"
+            className="absolute pointer-events-none z-20 px-2.5 py-1 rounded-lg glass-panel text-select tabular-nums text-[10px] border-select/40 shadow-glass-sm -translate-x-1/2 -translate-y-8"
             style={{
               left: `${hoverCoords.x * 100}%`,
               top: `${hoverCoords.y * 100}%`,
@@ -491,7 +491,7 @@ function VideoCanvasBase({
               customX: 0.85,
               customY: 0.82,
               size: 180,
-              borderColor: "#FF6B2C",
+              borderColor: "#F26A21",
               borderWidth: 3,
               shadow: true,
               mirror: true,
@@ -555,7 +555,7 @@ function VideoCanvasBase({
                 onMouseDown={handleWebcamMouseDown}
                 title="Drag to reposition webcam bubble"
                 className={`absolute z-30 cursor-move group/pip transition-shadow ${
-                  isDraggingWebcam ? "ring-2 ring-[#FF6B2C] scale-105" : "hover:scale-[1.02]"
+                  isDraggingWebcam ? "ring-2 ring-select scale-105" : "hover:scale-[1.02]"
                 }`}
                 style={{
                   left: `${posX * 100}%`,
@@ -570,7 +570,7 @@ function VideoCanvasBase({
                     wConfig.shadow ? "shadow-[0_10px_35px_rgba(0,0,0,0.6)]" : ""
                   }`}
                   style={{
-                    border: `${wConfig.borderWidth}px solid ${wConfig.borderColor || "#FF6B2C"}`,
+                    border: `${wConfig.borderWidth}px solid ${wConfig.borderColor || "#F26A21"}`,
                   }}
                 >
                   <video
@@ -583,9 +583,9 @@ function VideoCanvasBase({
                     } ${webcamStream || effectiveWebcamUrl ? "opacity-100" : "opacity-0"}`}
                   />
                   {!(webcamStream || effectiveWebcamUrl) && (
-                    <div className="absolute inset-0 bg-white/90 dark:bg-[#090D16]/90 flex flex-col items-center justify-center gap-1.5 text-slate-500 dark:text-slate-400 p-2 text-center pointer-events-none">
-                      <Camera className="w-6 h-6 text-[#FF6B2C] animate-pulse" />
-                      <span className="text-[9px] font-mono text-slate-700 dark:text-slate-300">Camera Active</span>
+                    <div className="absolute inset-0 bg-white/90 dark:bg-[#131B24]/90 flex flex-col items-center justify-center gap-1.5 text-slate-500 dark:text-slate-400 p-2 text-center pointer-events-none">
+                      <Camera className="w-6 h-6 text-select animate-pulse" />
+                      <span className="text-[9px] tabular-nums text-slate-700 dark:text-slate-300">Camera Active</span>
                     </div>
                   )}
                   {/* Subtle hover badge */}

@@ -136,7 +136,7 @@ export function AppRefreshGuard() {
       aria-live="polite"
       className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[99999] pointer-events-none transition-all duration-300 ease-out animate-in fade-in slide-in-from-bottom-3"
     >
-      <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#0D111A]/95 backdrop-blur-xl border border-amber-500/30 text-amber-300 shadow-[0_8px_32px_rgba(0,0,0,0.45)] text-xs sm:text-sm font-medium">
+      <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#18222D]/95 backdrop-blur-xl border border-amber-500/30 text-amber-300 shadow-[0_8px_32px_rgba(0,0,0,0.45)] text-xs sm:text-sm font-medium">
         <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
         <span>
           {isKhmer

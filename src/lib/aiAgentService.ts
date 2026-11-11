@@ -14,7 +14,7 @@ const HISTORY_KEY = "fucuflow_ai_agent_history";
 export const DEFAULT_AI_CONFIG: AiAgentConfig = {
   provider: "gemini",
   apiKey: "",
-  model: "gemini-3.8-flash",
+  model: "gemini-3.6-flash",
   customEndpoint: "http://localhost:11434/v1",
   temperature: 0.3,
   enableLocalBridge: false,

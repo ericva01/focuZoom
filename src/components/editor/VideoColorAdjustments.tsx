@@ -105,11 +105,11 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
   ];
 
   return (
-    <div className="glass-panel p-4 rounded-xl space-y-3.5 border-l-2 border-l-[#FF6B2C] select-none">
+    <div className="glass-panel p-4 rounded-xl space-y-3.5 border-l-2 border-l-select select-none">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-[#FF6B2C]/15 flex items-center justify-center text-[#FF6B2C]">
+          <div className="w-6 h-6 rounded-lg bg-select/15 flex items-center justify-center text-select">
             <SunMedium className="w-3.5 h-3.5" />
           </div>
           <div>
@@ -117,7 +117,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
               <span className="text-xs font-semibold text-slate-800 dark:text-white block">
                 Color, Brightness &amp; White Balance
               </span>
-              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-500 font-mono">
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-500 tabular-nums">
                 GPU 60fps
               </span>
             </div>
@@ -131,7 +131,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
           <button
             type="button"
             onClick={resetAll}
-            className="flex items-center gap-1 text-[10px] text-[#FF6B2C] hover:text-[#ff8a4c] font-medium px-2 py-0.5 rounded-md hover:bg-[#FF6B2C]/10 transition-colors"
+            className="flex items-center gap-1 text-[10px] text-select hover:text-select font-medium px-2 py-0.5 rounded-md hover:bg-select/10 transition-colors"
             title="Reset all color and white balance settings to default"
           >
             <RotateCcw className="w-3 h-3" />
@@ -142,8 +142,8 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
 
       {/* 1-Click Quick Presets */}
       <div>
-        <div className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 mb-1.5 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-[#FF6B2C]" />
+        <div className="text-[10px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-select" />
           <span>Quick 1-Click Presets</span>
         </div>
         <div className="grid grid-cols-3 gap-1.5">
@@ -170,7 +170,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
                 }
                 className={`py-1.5 px-2 rounded-lg text-[10px] font-medium flex items-center justify-center gap-1 transition-all border ${
                   isCurrent
-                    ? "bg-[#FF6B2C] text-white border-[#FF6B2C] shadow-sm font-semibold"
+                    ? "bg-select text-onselect border-select shadow-sm font-semibold"
                     : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:text-slate-300 dark:border-white/10"
                 }`}
               >
@@ -194,7 +194,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
               <span>Brightness (Exposure)</span>
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[#FF6B2C] font-bold text-[11px]">
+              <span className="tabular-nums text-select font-bold text-[11px]">
                 {Math.round(brightness * 100)}%
               </span>
               {Math.abs(brightness - 1.0) > 0.01 && (
@@ -218,9 +218,9 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
             onChange={(e) =>
               onChangeConfig({ videoBrightness: parseFloat(e.target.value) })
             }
-            className="w-full accent-[#FF6B2C] cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
+            className="w-full accent-select cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
           />
-          <div className="flex justify-between text-[9px] text-slate-400 font-mono px-0.5">
+          <div className="flex justify-between text-[9px] text-slate-400 tabular-nums px-0.5">
             <span>50% (Dark)</span>
             <span>100% (Normal)</span>
             <span>200% (Max)</span>
@@ -235,7 +235,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
               <span>Contrast (Dynamic Range)</span>
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[#FF6B2C] font-bold text-[11px]">
+              <span className="tabular-nums text-select font-bold text-[11px]">
                 {Math.round(contrast * 100)}%
               </span>
               {Math.abs(contrast - 1.0) > 0.01 && (
@@ -259,7 +259,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
             onChange={(e) =>
               onChangeConfig({ videoContrast: parseFloat(e.target.value) })
             }
-            className="w-full accent-[#FF6B2C] cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
+            className="w-full accent-select cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
           />
         </div>
 
@@ -271,7 +271,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
               <span>Color Saturation (Vibrance)</span>
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[#FF6B2C] font-bold text-[11px]">
+              <span className="tabular-nums text-select font-bold text-[11px]">
                 {Math.round(saturation * 100)}%
               </span>
               {Math.abs(saturation - 1.0) > 0.01 && (
@@ -295,9 +295,9 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
             onChange={(e) =>
               onChangeConfig({ videoSaturation: parseFloat(e.target.value) })
             }
-            className="w-full accent-[#FF6B2C] cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
+            className="w-full accent-select cursor-pointer h-1.5 bg-slate-200 dark:bg-white/10 rounded"
           />
-          <div className="flex justify-between text-[9px] text-slate-400 font-mono px-0.5">
+          <div className="flex justify-between text-[9px] text-slate-400 tabular-nums px-0.5">
             <span>0% (B&amp;W)</span>
             <span>100% (Natural)</span>
             <span>200% (Vivid)</span>
@@ -309,7 +309,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
 
       {/* Sliders Group 2: White Balance (Temperature & Tint) */}
       <div className="space-y-2.5">
-        <div className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 flex items-center gap-1">
+        <div className="text-[10px] font-semibold text-slate-400 flex items-center gap-1">
           <Thermometer className="w-3 h-3 text-cyan-400" />
           <span>White Balance &amp; Tones</span>
         </div>
@@ -323,7 +323,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
             </span>
             <div className="flex items-center gap-1.5">
               <span
-                className={`font-mono font-bold text-[11px] ${
+                className={`tabular-nums font-bold text-[11px] ${
                   temperature > 0.05
                     ? "text-amber-500"
                     : temperature < -0.05
@@ -366,7 +366,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
               }}
             />
           </div>
-          <div className="flex justify-between text-[9px] text-slate-400 font-mono px-0.5">
+          <div className="flex justify-between text-[9px] text-slate-400 tabular-nums px-0.5">
             <span className="text-sky-400">Cool (Blue)</span>
             <span>Neutral</span>
             <span className="text-amber-500">Warm (Amber)</span>
@@ -382,7 +382,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
             </span>
             <div className="flex items-center gap-1.5">
               <span
-                className={`font-mono font-bold text-[11px] ${
+                className={`tabular-nums font-bold text-[11px] ${
                   tint > 0.05
                     ? "text-fuchsia-400"
                     : tint < -0.05
@@ -425,7 +425,7 @@ export const VideoColorAdjustments = memo(function VideoColorAdjustments({
               }}
             />
           </div>
-          <div className="flex justify-between text-[9px] text-slate-400 font-mono px-0.5">
+          <div className="flex justify-between text-[9px] text-slate-400 tabular-nums px-0.5">
             <span className="text-emerald-400">Green</span>
             <span>Neutral</span>
             <span className="text-fuchsia-400">Magenta</span>

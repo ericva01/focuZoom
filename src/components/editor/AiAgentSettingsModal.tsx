@@ -165,13 +165,13 @@ export function AiAgentSettingsModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF6B2C] to-amber-500 flex items-center justify-center text-white shadow-lg shadow-[#FF6B2C]/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-select to-amber-500 flex items-center justify-center text-white shadow-lg shadow-select/25">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-base font-bold flex items-center gap-2">
                 Connect AI Agent
-                <span className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-[#FF6B2C]/10 text-[#FF6B2C] border border-[#FF6B2C]/20">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-select/10 text-select border border-select/20">
                   Studio Copilot & MCP
                 </span>
               </h2>
@@ -194,7 +194,7 @@ export function AiAgentSettingsModal({
             onClick={() => setActiveTab("provider")}
             className={`pb-3 px-3 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === "provider"
-                ? "border-[#FF6B2C] text-[#FF6B2C]"
+                ? "border-select text-select"
                 : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
@@ -205,7 +205,7 @@ export function AiAgentSettingsModal({
             onClick={() => setActiveTab("mcp")}
             className={`pb-3 px-3 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === "mcp"
-                ? "border-[#FF6B2C] text-[#FF6B2C]"
+                ? "border-select text-select"
                 : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
             }`}
           >
@@ -256,13 +256,13 @@ export function AiAgentSettingsModal({
                         }}
                         className={`p-3 rounded-xl border text-left transition-all ${
                           isSelected
-                            ? "border-[#FF6B2C] bg-[#FF6B2C]/10 dark:bg-[#FF6B2C]/15 ring-2 ring-[#FF6B2C]/20"
+                            ? "border-select bg-select/10 dark:bg-select/15 ring-2 ring-select/20"
                             : "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 bg-slate-50 dark:bg-white/[0.02]"
                         }`}
                       >
                         <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
                           {p.name}
-                          {isSelected && <Check className="w-3.5 h-3.5 text-[#FF6B2C]" />}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-select" />}
                         </div>
                         <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                           {p.badge}
@@ -286,7 +286,7 @@ export function AiAgentSettingsModal({
                         href="https://aistudio.google.com/app/apikey"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[11px] text-[#FF6B2C] hover:underline flex items-center gap-1"
+                        className="text-[11px] text-select hover:underline flex items-center gap-1"
                       >
                         Get Free Gemini Key <ExternalLink className="w-3 h-3" />
                       </a>
@@ -296,7 +296,7 @@ export function AiAgentSettingsModal({
                         href="https://platform.openai.com/api-keys"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[11px] text-[#FF6B2C] hover:underline flex items-center gap-1"
+                        className="text-[11px] text-select hover:underline flex items-center gap-1"
                       >
                         Get OpenAI Key <ExternalLink className="w-3 h-3" />
                       </a>
@@ -314,7 +314,7 @@ export function AiAgentSettingsModal({
                           ? "sk-proj-..."
                           : "Enter provider API key"
                       }
-                      className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs font-mono outline-none focus:border-[#FF6B2C] pr-20"
+                      className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs tabular-nums outline-none focus:border-select pr-20"
                     />
                     <button
                       type="button"
@@ -342,7 +342,7 @@ export function AiAgentSettingsModal({
                     value={config.customEndpoint || ""}
                     onChange={(e) => setConfig({ ...config, customEndpoint: e.target.value })}
                     placeholder="http://localhost:11434/v1"
-                    className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs font-mono outline-none focus:border-[#FF6B2C]"
+                    className="w-full bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs tabular-nums outline-none focus:border-select"
                   />
                   <p className="text-[10px] text-slate-400 mt-1">
                     {config.provider === "ollama"
@@ -362,7 +362,7 @@ export function AiAgentSettingsModal({
                     type="text"
                     value={config.model}
                     onChange={(e) => setConfig({ ...config, model: e.target.value })}
-                    className="flex-1 bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs font-mono outline-none focus:border-[#FF6B2C]"
+                    className="flex-1 bg-white dark:bg-black/40 border border-slate-300 dark:border-white/15 rounded-xl px-3.5 py-2 text-xs tabular-nums outline-none focus:border-select"
                   />
                   {config.provider === "gemini" && (
                     <div className="flex flex-wrap gap-1.5 items-center">
@@ -457,7 +457,7 @@ export function AiAgentSettingsModal({
 
                 {config.provider === "gemini" && discoveredModels.length > 0 && (
                   <div className="mt-2.5 p-2.5 bg-slate-100 dark:bg-white/[0.04] rounded-xl border border-slate-200 dark:border-white/10">
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400 block mb-1.5">
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1.5">
                       Models detected on your Google AI Studio key (click to select):
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -466,10 +466,10 @@ export function AiAgentSettingsModal({
                           key={m}
                           type="button"
                           onClick={() => setConfig({ ...config, model: m })}
-                          className={`text-[10px] px-2.5 py-1 rounded-lg font-mono transition-colors ${
+                          className={`text-[10px] px-2.5 py-1 rounded-lg tabular-nums transition-colors ${
                             config.model === m
-                              ? "bg-[#FF6B2C] text-white font-semibold shadow-sm"
-                              : "bg-white dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:bg-[#FF6B2C]/20 border border-slate-200 dark:border-white/10"
+                              ? "bg-select text-onselect font-semibold shadow-sm"
+                              : "bg-white dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:bg-select/20 border border-slate-200 dark:border-white/10"
                           }`}
                         >
                           {m}
@@ -526,7 +526,7 @@ export function AiAgentSettingsModal({
                     isTesting ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <Radio className="w-3.5 h-3.5 text-[#FF6B2C]" />
+                      <Radio className="w-3.5 h-3.5 text-select" />
                     )
                   }
                 >
@@ -603,7 +603,7 @@ export function AiAgentSettingsModal({
                         Claude Desktop MCP Integration
                       </h4>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Add to your <code className="text-[#FF6B2C]">claude_desktop_config.json</code> to let Claude control FucuFlow:
+                        Add to your <code className="text-select">claude_desktop_config.json</code> to let Claude control FucuFlow:
                       </p>
                     </div>
                     <Button
@@ -621,7 +621,7 @@ export function AiAgentSettingsModal({
                       {copiedKey === "claude" ? "Copied!" : "Copy JSON"}
                     </Button>
                   </div>
-                  <pre className="p-3 rounded-lg bg-black/60 text-[11px] font-mono text-slate-300 overflow-x-auto border border-white/5">
+                  <pre className="p-3 rounded-lg bg-black/60 text-[11px] tabular-nums text-slate-300 overflow-x-auto border border-white/5">
                     {mcpClaudeConfig}
                   </pre>
                 </div>
@@ -635,7 +635,7 @@ export function AiAgentSettingsModal({
                         Cursor & Antigravity MCP Config
                       </h4>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Save to your workspace <code className="text-[#FF6B2C]">.cursor/mcp.json</code> or project MCP settings:
+                        Save to your workspace <code className="text-select">.cursor/mcp.json</code> or project MCP settings:
                       </p>
                     </div>
                     <Button
@@ -653,7 +653,7 @@ export function AiAgentSettingsModal({
                       {copiedKey === "cursor" ? "Copied!" : "Copy JSON"}
                     </Button>
                   </div>
-                  <pre className="p-3 rounded-lg bg-black/60 text-[11px] font-mono text-slate-300 overflow-x-auto border border-white/5">
+                  <pre className="p-3 rounded-lg bg-black/60 text-[11px] tabular-nums text-slate-300 overflow-x-auto border border-white/5">
                     {mcpCursorConfig}
                   </pre>
                 </div>
@@ -680,7 +680,7 @@ export function AiAgentSettingsModal({
                       {copiedKey === "cmd" ? "Copied!" : "Copy Command"}
                     </Button>
                   </div>
-                  <pre className="p-2.5 rounded-lg bg-black/60 text-[11px] font-mono text-emerald-400 border border-white/5">
+                  <pre className="p-2.5 rounded-lg bg-black/60 text-[11px] tabular-nums text-emerald-400 border border-white/5">
                     npm run agent:bridge
                   </pre>
                 </div>

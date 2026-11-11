@@ -1,4 +1,4 @@
-import { OpenSourceView } from "@/views/OpenSourceView";
+import { AboutPageView } from "@/views/AboutPageView";
 
 export const metadata = {
   title: "Open Source",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function OpenSourcePage() {
-  return <OpenSourceView />;
+  return <AboutPageView />;
 }

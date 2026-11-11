@@ -40,19 +40,19 @@ function ClickInspectorBase({
   onToggleAddMode,
 }: ClickInspectorProps) {
   return (
-    <aside className="w-full border-l border-white/[0.08] bg-[#090D16]/80 backdrop-blur-xl flex flex-col h-full overflow-hidden select-none">
+    <aside className="w-full border-l border-white/[0.08] bg-[#131B24]/80 backdrop-blur-xl flex flex-col h-full overflow-hidden select-none">
       {/* Header */}
       <div className="p-4 border-b border-white/[0.08] bg-white/[0.02] space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 flex items-center justify-center">
-              <Focus className="w-3.5 h-3.5 text-[#FF8A4C]" />
+            <div className="w-6 h-6 rounded-lg bg-select/20 border border-select/30 flex items-center justify-center">
+              <Focus className="w-3.5 h-3.5 text-select" />
             </div>
-            <h3 className="font-semibold text-white text-xs uppercase tracking-wider">
+            <h3 className="font-semibold text-white text-xs">
               Zoom Keyframes
             </h3>
           </div>
-          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-[#FF6B2C]/20 text-[#FF8A4C] border border-[#FF6B2C]/30">
+          <span className="text-[11px] tabular-nums px-2.5 py-0.5 rounded-lg bg-select/20 text-select border border-select/30">
             {events.length} Points
           </span>
         </div>
@@ -90,7 +90,7 @@ function ClickInspectorBase({
             <p className="text-xs text-slate-400">No zoom keyframes added yet.</p>
             <button
               onClick={onResetDemoEvents}
-              className="text-xs text-[#FF6B2C] hover:text-[#FF8A4C] flex items-center justify-center gap-1.5 mx-auto font-medium transition-colors"
+              className="text-xs text-select hover:text-select flex items-center justify-center gap-1.5 mx-auto font-medium transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Load standard demo points</span>
@@ -105,7 +105,7 @@ function ClickInspectorBase({
                 key={ev.id}
                 className={`rounded-xl border transition-all duration-200 ${
                   isNearCurrentTime
-                    ? "glass-panel-elevated border-[#FF6B2C]/50 shadow-[0_0_20px_rgba(255,107,44,0.15)] bg-[#17191F]"
+                    ? "glass-panel-elevated border-select/50 shadow-[0_0_20px_rgba(242,106,33,0.15)] bg-[#1C2733]"
                     : "glass-panel hover:border-white/20"
                 } p-3.5 space-y-2.5`}
               >
@@ -114,7 +114,7 @@ function ClickInspectorBase({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onSelectEvent(ev)}
-                      className="px-2 py-0.5 rounded-lg bg-[#FF6B2C]/20 border border-[#FF6B2C]/30 text-[11px] font-mono text-[#FF8A4C] hover:bg-[#FF6B2C]/30 transition-colors flex items-center gap-1 shadow-glass-sm"
+                      className="px-2 py-0.5 rounded-lg bg-select/20 border border-select/30 text-[11px] tabular-nums text-select hover:bg-select/30 transition-colors flex items-center gap-1 shadow-glass-sm"
                       title="Jump playhead to this event"
                     >
                       <Play className="w-2.5 h-2.5 fill-current" />
@@ -130,7 +130,7 @@ function ClickInspectorBase({
                     <button
                       onClick={() => onUpdateEvent(ev.id, { enabled: !ev.enabled })}
                       className={`p-1.5 rounded-lg hover:bg-white/[0.08] transition-colors ${
-                        ev.enabled ? "text-[#FF6B2C]" : "text-slate-500"
+                        ev.enabled ? "text-select" : "text-slate-500"
                       }`}
                       title={ev.enabled ? "Zoom point active" : "Zoom point disabled"}
                     >
@@ -139,7 +139,7 @@ function ClickInspectorBase({
 
                     <button
                       onClick={() => onDeleteEvent(ev.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-[#FF6B2C] hover:bg-white/[0.08] transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-select hover:bg-white/[0.08] transition-colors"
                       title="Delete zoom point"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -151,12 +151,12 @@ function ClickInspectorBase({
                 <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-300 bg-black/30 p-2.5 rounded-lg border border-white/[0.08]">
                   <div>
                     Target:{" "}
-                    <span className="text-white font-mono">
+                    <span className="text-white tabular-nums">
                       {Math.round(ev.x * 100)}%, {Math.round(ev.y * 100)}%
                     </span>
                   </div>
                   <div className="text-right">
-                    3D Dolly: <span className="text-[#FF8A4C] font-mono font-bold">{ev.zoom}x</span>
+                    3D Dolly: <span className="text-select tabular-nums font-bold">{ev.zoom}x</span>
                   </div>
                 </div>
 
@@ -168,9 +168,9 @@ function ClickInspectorBase({
                       <button
                         key={zm}
                         onClick={() => onUpdateEvent(ev.id, { zoom: zm })}
-                        className={`px-2 py-0.5 rounded-lg text-[10px] font-mono transition-all duration-200 ${
+                        className={`px-2 py-0.5 rounded-lg text-[10px] tabular-nums transition-all duration-200 ${
                           ev.zoom === zm
-                            ? "bg-[#FF6B2C]/20 text-[#FF8A4C] font-bold border border-[#FF6B2C]/30 shadow-glass-sm"
+                            ? "bg-select/20 text-select font-bold border border-select/30 shadow-glass-sm"
                             : "bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent"
                         }`}
                       >
@@ -192,7 +192,7 @@ function ClickInspectorBase({
           size="sm"
           onClick={onResetDemoEvents}
           className="w-full"
-          leftIcon={<RotateCcw className="w-3.5 h-3.5 text-[#FF8A4C]" />}
+          leftIcon={<RotateCcw className="w-3.5 h-3.5 text-select" />}
         >
           Reset Sample Keyframes
         </Button>

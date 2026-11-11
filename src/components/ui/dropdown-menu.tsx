@@ -41,7 +41,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-xl border border-slate-200 dark:border-white/[0.12] bg-white/95 dark:bg-[#090D16]/95 p-1 text-slate-800 dark:text-slate-200 shadow-glass-lg backdrop-blur-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      "z-50 min-w-[8rem] overflow-hidden rounded-xl border border-slate-200 dark:border-white/[0.12] bg-white/95 dark:bg-[#131B24]/95 p-1 text-slate-800 dark:text-slate-200 shadow-glass-lg backdrop-blur-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       className
     )}
     {...props}
@@ -59,7 +59,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-[12rem] overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.12] bg-white/95 dark:bg-[#090D16]/95 p-1.5 text-slate-800 dark:text-slate-200 shadow-glass-lg backdrop-blur-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 min-w-[12rem] overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.12] bg-white/95 dark:bg-[#131B24]/95 p-1.5 text-slate-800 dark:text-slate-200 shadow-glass-lg backdrop-blur-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       )}
       {...props}
@@ -141,7 +141,7 @@ const DropdownMenuLabel = React.forwardRef<
   <DropdownMenuPrimitive.Label
     ref={ref}
     className={cn(
-      "px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase text-slate-400 font-mono",
+      "px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase text-slate-400 tabular-nums",
       inset && "pl-8",
       className
     )}
@@ -169,7 +169,7 @@ const DropdownMenuShortcut = ({
   return (
     <span
       className={cn(
-        "ml-auto text-[10px] tracking-widest font-mono text-slate-400",
+        "ml-auto text-[10px] tracking-widest tabular-nums text-slate-400",
         className
       )}
       {...props}

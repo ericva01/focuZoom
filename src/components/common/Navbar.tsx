@@ -1,296 +1,86 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Download, Menu, LogIn, UserPlus } from "lucide-react";
-import { SignInButton, SignUpButton, Show, UserButton, ClerkLoaded, ClerkLoading, ClerkFailed } from "@clerk/react";
+import { SignInButton, Show, UserButton, ClerkLoaded, ClerkLoading, ClerkFailed } from "@clerk/react";
 import { Logo } from "@/components/common/Logo";
-import { DownloadModal } from "@/components/common/DownloadModal";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useLanguage } from "@/context/LanguageContext";
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useSiteCopy, container, GITHUB_URL } from "@/components/site/ui";
+
+const linkClass = "py-2.5 hover:text-studio-keydeep";
+const currentClass = "py-2.5 underline decoration-studio-key decoration-2 underline-offset-8";
 
 export function Navbar() {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [downloadOpen, setDownloadOpen] = useState(false);
+  const pathname = usePathname() ?? "";
   const { t, localePath } = useLanguage();
+  const copy = useSiteCopy().nav;
 
-  const navLinks = [
-    { label: t.nav.product, href: localePath("/product") },
-    { label: t.nav.features, href: localePath("/features") },
-    { label: t.nav.solutions, href: localePath("/solutions") },
-    { label: t.nav.openSource, href: localePath("/open-source") },
-    { label: t.nav.resources, href: localePath("/resources") },
+  const links = [
+    { label: copy.features, path: "/features" },
+    { label: copy.download, path: "/download" },
+    { label: copy.about, path: "/about" },
   ];
 
+  const signInLink = (
+    <Link href={localePath("/sign-in")} className={linkClass}>
+      {copy.signIn}
+    </Link>
+  );
+
   return (
-    <header className="sticky top-0 z-50 border-b border-[#E5E7EB] bg-white/90 backdrop-blur-md transition-colors duration-200">
+    <header className="font-display">
       <a href="#main-content" className="website-skip-link">
         {t.nav.skipToContent}
       </a>
-
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        {/* Brand Logo */}
-        <Link href={localePath("/")} aria-label="FucuFlow home" className="flex items-center gap-2">
-          <Logo size="md" theme="light" />
+      <div className={`${container} flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-6`}>
+        <Link href={localePath("/")} aria-label="FucuFlow home" className="flex min-h-[44px] items-center">
+          <Logo size="md" />
         </Link>
 
-        {/* Centered Navigation */}
-        <nav aria-label="Main navigation" className="hidden items-center gap-7 text-sm font-medium lg:flex">
-          {navLinks.map((link) => {
-            const isActive = pathname === link.href || pathname?.startsWith(link.href);
+        <nav aria-label={copy.main} className="flex flex-wrap items-center gap-x-7 gap-y-1 text-[17px]">
+          {links.map((link) => {
+            const current = pathname.includes(link.path);
             return (
               <Link
-                key={link.href}
-                href={link.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`transition-colors duration-150 ${
-                  isActive
-                    ? "text-[#FF6B2C] font-semibold"
-                    : "text-[#667085] hover:text-[#111318]"
-                }`}
+                key={link.path}
+                href={localePath(link.path)}
+                aria-current={current ? "page" : undefined}
+                className={current ? currentClass : linkClass}
               >
                 {link.label}
               </Link>
             );
           })}
-        </nav>
+          <a href={GITHUB_URL} target="_blank" rel="noreferrer" className={linkClass}>
+            {copy.github}
+          </a>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2.5">
-          <LanguageSwitcher variant="navbar" />
-
-          <ClerkLoading>
-            <Link
-              href={localePath("/sign-in")}
-              aria-label="Sign In"
-              title="Sign In"
-              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-            >
-              <LogIn size={14} className="text-[#667085]" />
-              <span>Sign In</span>
-            </Link>
-            <Link
-              href={localePath("/sign-up")}
-              aria-label="Sign Up"
-              title="Sign Up"
-              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-            >
-              <UserPlus size={14} className="text-[#FF6B2C]" />
-              <span>Sign Up</span>
-            </Link>
-          </ClerkLoading>
-          <ClerkFailed>
-            <Link
-              href={localePath("/sign-in")}
-              aria-label="Sign In"
-              title="Sign In"
-              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-            >
-              <LogIn size={14} className="text-[#667085]" />
-              <span>Sign In</span>
-            </Link>
-            <Link
-              href={localePath("/sign-up")}
-              aria-label="Sign Up"
-              title="Sign Up"
-              className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-            >
-              <UserPlus size={14} className="text-[#FF6B2C]" />
-              <span>Sign Up</span>
-            </Link>
-          </ClerkFailed>
+          <ClerkLoading>{signInLink}</ClerkLoading>
+          <ClerkFailed>{signInLink}</ClerkFailed>
           <ClerkLoaded>
             <Show when="signed-out">
               <SignInButton mode="modal">
-                <button
-                  aria-label="Sign In"
-                  title="Sign In"
-                  className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-                >
-                  <LogIn size={14} className="text-[#667085]" />
-                  <span>Sign In</span>
+                <button type="button" className={linkClass}>
+                  {copy.signIn}
                 </button>
               </SignInButton>
-              <SignUpButton mode="modal">
-                <button
-                  aria-label="Sign Up"
-                  title="Sign Up"
-                  className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] rounded-xl hover:bg-[#FFE6D8] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-                >
-                  <UserPlus size={14} className="text-[#FF6B2C]" />
-                  <span>Sign Up</span>
-                </button>
-              </SignUpButton>
             </Show>
             <Show when="signed-in">
-              <div className="flex items-center gap-2">
-                <UserButton />
-              </div>
+              <UserButton />
             </Show>
           </ClerkLoaded>
 
-          <Link
-            href={localePath("/download")}
-            className="hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#111318] border border-[#E5E7EB] rounded-xl hover:bg-[#F8F9FB] transition-colors sm:inline-flex cursor-pointer shadow-xs active:scale-95"
-          >
-            <Download size={14} className="text-[#FF6B2C]" />
-            <span>{t.nav.download}</span>
-          </Link>
+          <LanguageSwitcher variant="navbar" />
 
           <Link
-            href={localePath("/desktop")}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#FF6B2C] px-4 py-2 text-xs font-bold text-white shadow-sm transition-all duration-150 hover:bg-[#E85A1F] hover:shadow-[0_4px_14px_rgba(255,107,44,0.35)] active:scale-95"
+            href={localePath("/editor")}
+            className="inline-flex min-h-[44px] items-center rounded-md bg-studio-ink px-[18px] font-medium text-white transition-colors hover:bg-studio-deep"
           >
-            <span>{t.nav.launchApp}</span>
-            <ArrowRight size={14} />
+            {copy.openStudio}
           </Link>
-
-          {/* Mobile Navigation Trigger */}
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <button
-                aria-label="Open navigation"
-                className="rounded-xl border border-[#E5E7EB] p-2 text-[#667085] hover:bg-[#F8F9FB] hover:text-[#111318] lg:hidden"
-              >
-                <Menu size={20} />
-              </button>
-            </SheetTrigger>
-            <SheetContent className="flex w-[min(320px,100vw)] flex-col border-[#E5E7EB] bg-white p-6">
-              <SheetHeader>
-                <SheetTitle>
-                  <Logo theme="light" />
-                </SheetTitle>
-              </SheetHeader>
-
-              <div className="mt-6">
-                <LanguageSwitcher variant="mobile" />
-              </div>
-
-              <nav aria-label="Mobile navigation" className="mt-4 flex flex-col gap-1">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-xl px-4 py-3 text-sm font-medium text-[#667085] transition-colors hover:bg-[#FFF1E8] hover:text-[#FF6B2C]"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                <Link
-                  href={localePath("/desktop")}
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl px-4 py-3 text-sm font-medium text-[#667085] transition-colors hover:bg-[#F8F9FB] hover:text-[#111318]"
-                >
-                  {t.nav.loginWorkspace}
-                </Link>
-
-                <div className="pt-2 border-t border-[#E5E7EB] mt-2">
-                  <ClerkLoading>
-                    <div className="flex flex-col gap-2">
-                      <Link
-                        href={localePath("/sign-in")}
-                        onClick={() => setOpen(false)}
-                        aria-label="Sign In"
-                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
-                      >
-                        <LogIn size={15} className="text-[#667085]" />
-                        <span>Sign In</span>
-                      </Link>
-                      <Link
-                        href={localePath("/sign-up")}
-                        onClick={() => setOpen(false)}
-                        aria-label="Sign Up"
-                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
-                      >
-                        <UserPlus size={15} className="text-[#FF6B2C]" />
-                        <span>Sign Up</span>
-                      </Link>
-                    </div>
-                  </ClerkLoading>
-                  <ClerkFailed>
-                    <div className="flex flex-col gap-2">
-                      <Link
-                        href={localePath("/sign-in")}
-                        onClick={() => setOpen(false)}
-                        aria-label="Sign In"
-                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
-                      >
-                        <LogIn size={15} className="text-[#667085]" />
-                        <span>Sign In</span>
-                      </Link>
-                      <Link
-                        href={localePath("/sign-up")}
-                        onClick={() => setOpen(false)}
-                        aria-label="Sign Up"
-                        className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
-                      >
-                        <UserPlus size={15} className="text-[#FF6B2C]" />
-                        <span>Sign Up</span>
-                      </Link>
-                    </div>
-                  </ClerkFailed>
-                  <ClerkLoaded>
-                    <Show when="signed-out">
-                      <div className="flex flex-col gap-2">
-                        <SignInButton mode="modal">
-                          <button
-                            onClick={() => setOpen(false)}
-                            aria-label="Sign In"
-                            className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#111318] border border-[#E5E7EB] hover:bg-[#F8F9FB] transition-colors"
-                          >
-                            <LogIn size={15} className="text-[#667085]" />
-                            <span>Sign In</span>
-                          </button>
-                        </SignInButton>
-                        <SignUpButton mode="modal">
-                          <button
-                            onClick={() => setOpen(false)}
-                            aria-label="Sign Up"
-                            className="flex items-center gap-2.5 w-full text-left rounded-xl px-4 py-2.5 text-sm font-semibold text-[#FF6B2C] border border-[#FF6B2C]/30 bg-[#FFF1E8] hover:bg-[#FFE6D8] transition-colors"
-                          >
-                            <UserPlus size={15} className="text-[#FF6B2C]" />
-                            <span>Sign Up</span>
-                          </button>
-                        </SignUpButton>
-                      </div>
-                    </Show>
-                    <Show when="signed-in">
-                      <div className="px-4 py-2 flex items-center gap-3">
-                        <UserButton />
-                        <span className="text-sm font-medium text-[#111318]">Account</span>
-                      </div>
-                    </Show>
-                  </ClerkLoaded>
-                </div>
-              </nav>
-
-              <div className="mt-auto space-y-2 pt-6">
-                <Link
-                  href={localePath("/desktop")}
-                  onClick={() => setOpen(false)}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF6B2C] py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#E85A1F]"
-                >
-                  <span>{t.nav.launchApp}</span>
-                  <ArrowRight size={16} />
-                </Link>
-                <Link
-                  href={localePath("/download")}
-                  onClick={() => setOpen(false)}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] py-2.5 text-xs font-medium text-[#667085] hover:bg-[#F8F9FB] hover:text-[#111318]"
-                >
-                  <Download size={14} className="text-[#FF6B2C]" /> {t.nav.downloadClient}
-                </Link>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+        </nav>
       </div>
-
-      <DownloadModal isOpen={downloadOpen} onClose={() => setDownloadOpen(false)} />
     </header>
   );
 }
